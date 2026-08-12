@@ -1,0 +1,28 @@
+{
+    "name": "ideo/module-dhl",
+    "description": "DHL integration module for Magento 2",
+    "type": "magento2-module",
+    "license": "MIT",
+    "require": {
+        "php": "^8.1",
+        "magento/framework": "^103.0"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Ideo\\Dhl\\": ""
+        }
+    },
+    "extra": {
+        "map": [
+            [
+                "*",
+                "Ideo_Dhl"
+            ]
+        ]
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
