@@ -12,6 +12,7 @@ use Magento\Shipping\Model\Carrier\AbstractCarrier;
 use Magento\Shipping\Model\Carrier\CarrierInterface;
 use Magento\Shipping\Model\Rate\Result;
 use Magento\Shipping\Model\Rate\ResultFactory;
+use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 
 class Carrier extends AbstractCarrier implements CarrierInterface
@@ -62,6 +63,12 @@ class Carrier extends AbstractCarrier implements CarrierInterface
         $result = $this->resultFactory->create();
 
         $destCountryId = $request->getDestCountryId();
+        if (empty($destCountryId)) {
+            $destCountryId = (string)$this->_scopeConfig->getValue(
+                'general/country/default',
+                ScopeInterface::SCOPE_STORE
+            ) ?: 'PL';
+        }
 
         foreach ($this->methodCatalog->getMethods() as $method) {
             $code = $method['code'];

@@ -67,6 +67,8 @@
                 <method_economy_active>0</method_economy_active>
                 <method_economy_title>DHL Parcel Economy</method_economy_title>
                 <method_economy_price>0.00</method_economy_price>
+                <method_economy_point_map_type>all</method_economy_point_map_type>
+                <method_economy_point_delivery_mode>map</method_economy_point_delivery_mode>
                 <method_economy_sallowspecific>1</method_economy_sallowspecific>
                 <method_economy_specificcountry>PL</method_economy_specificcountry>
                 <method_economy_sort_order>60</method_economy_sort_order>
