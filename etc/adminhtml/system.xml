@@ -129,6 +129,16 @@
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_economy_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
                     <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_economy_title</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_economy_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
+                    <field id="point_delivery_mode" translate="label" type="select" sortOrder="26" showInDefault="1" showInWebsite="1" canRestore="1">
+                        <label>Point Delivery Mode</label>
+                        <config_path>carriers/dhlparcel/method_economy_point_delivery_mode</config_path>
+                        <source_model>Ideo\Dhl\Model\Config\Source\DeliveryMode</source_model>
+                    </field>
+                    <field id="point_map_type" translate="label" type="select" sortOrder="27" showInDefault="1" showInWebsite="1" canRestore="1">
+                        <label>Map Point Type Filter</label>
+                        <config_path>carriers/dhlparcel/method_economy_point_map_type</config_path>
+                        <source_model>Ideo\Dhl\Model\Config\Source\MapPointType</source_model>
+                    </field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_economy_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_economy_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
                     <field id="free_shipping_subtotal" translate="label" type="text" sortOrder="36" showInDefault="1" showInWebsite="1"><label>Free Shipping Amount Threshold</label><config_path>carriers/dhlparcel/method_economy_free_shipping_subtotal</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="free_shipping_enable">1</field></depends></field>
