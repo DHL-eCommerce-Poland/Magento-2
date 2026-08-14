@@ -35,5 +35,8 @@
                 </argument>
             </arguments>
         </referenceBlock>
+        <referenceContainer name="before.body.end">
+            <block class="Ideo\Dhl\Block\Debug" name="ideo_dhl_debug" template="Ideo_Dhl::debug.phtml" ifconfig="carriers/dhlparcel/debug" />
+        </referenceContainer>
     </body>
 </page>

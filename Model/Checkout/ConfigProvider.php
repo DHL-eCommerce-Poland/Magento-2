@@ -12,6 +12,7 @@ class ConfigProvider implements ConfigProviderInterface
 {
     private const XML_PATH_MAP_TYPE = 'carriers/dhlparcel/method_economy_point_map_type';
     private const XML_PATH_DELIVERY_MODE = 'carriers/dhlparcel/method_economy_point_delivery_mode';
+    private const XML_PATH_DEBUG = 'carriers/dhlparcel/debug';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -38,12 +39,18 @@ class ConfigProvider implements ConfigProviderInterface
             ScopeInterface::SCOPE_STORE
         ) ?: 'map';
 
+        $debug = $this->scopeConfig->isSetFlag(
+            self::XML_PATH_DEBUG,
+            ScopeInterface::SCOPE_STORE
+        );
+
         return [
             'shipping' => [
                 'dhlparcel' => [
                     'mapUrl' => 'https://parcelshop.dhl.pl/mapa',
                     'pointMapType' => $mapType,
                     'deliveryMode' => $deliveryMode,
+                    'debug' => $debug,
                     'pointMethods' => [
                         'dhlparcel_economy',
                         'dhlparcel_connect',

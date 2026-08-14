@@ -21,6 +21,11 @@ class ConfigProviderTest extends TestCase
                 ['carriers/dhlparcel/method_economy_point_delivery_mode', ScopeInterface::SCOPE_STORE, null, 'map'],
             ]);
 
+        $scopeConfig->expects($this->once())
+            ->method('isSetFlag')
+            ->with('carriers/dhlparcel/debug', ScopeInterface::SCOPE_STORE)
+            ->willReturn(true);
+
         $provider = new ConfigProvider($scopeConfig);
         $config = $provider->getConfig();
 
@@ -31,6 +36,7 @@ class ConfigProviderTest extends TestCase
         $this->assertEquals('https://parcelshop.dhl.pl/mapa', $dhlConfig['mapUrl']);
         $this->assertEquals('pop', $dhlConfig['pointMapType']);
         $this->assertEquals('map', $dhlConfig['deliveryMode']);
+        $this->assertTrue($dhlConfig['debug']);
         $this->assertContains('dhlparcel_economy', $dhlConfig['pointMethods']);
         $this->assertContains('dhlparcel_connect', $dhlConfig['pointMethods']);
     }

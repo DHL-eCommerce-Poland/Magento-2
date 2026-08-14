@@ -39,6 +39,13 @@
                         <label>Export Table Rates CSV</label>
                         <frontend_model>Ideo\Dhl\Block\Adminhtml\System\Config\Export</frontend_model>
                     </field>
+                    <field id="debug" translate="label" type="select" sortOrder="60"
+                           showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                        <label>Debug Mode</label>
+                        <config_path>carriers/dhlparcel/debug</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>When enabled, detailed cart item weight breakdown is logged to browser console.</comment>
+                    </field>
                 </group>
 
                 <group id="parcel_polska" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
