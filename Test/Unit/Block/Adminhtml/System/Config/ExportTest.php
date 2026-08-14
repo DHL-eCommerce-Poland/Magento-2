@@ -46,6 +46,15 @@ class ExportTest extends TestCase
         $this->exportBlock = new Export($context);
     }
 
+    protected function tearDown(): void
+    {
+        $reflection = new \ReflectionClass(ObjectManager::class);
+        if ($reflection->hasProperty('_instance')) {
+            $prop = $reflection->getProperty('_instance');
+            $prop->setValue(null, null);
+        }
+    }
+
     public function testRendersExportButtonHtml(): void
     {
         $this->urlBuilderMock
