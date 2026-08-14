@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\Checkout;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
+use Throwable;
 
 class ConfigProvider implements ConfigProviderInterface
 {
@@ -16,9 +18,11 @@ class ConfigProvider implements ConfigProviderInterface
 
     /**
      * @param ScopeConfigInterface $scopeConfig
+     * @param CheckoutSession $checkoutSession
      */
     public function __construct(
-        private readonly ScopeConfigInterface $scopeConfig
+        private readonly ScopeConfigInterface $scopeConfig,
+        private readonly CheckoutSession $checkoutSession
     ) {
     }
 
@@ -51,6 +55,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'pointMapType' => $mapType,
                     'deliveryMode' => $deliveryMode,
                     'debug' => $debug,
+                    'selectedPoint' => $this->getQuoteSelectedPoint(),
                     'pointMethods' => [
                         'dhlparcel_economy',
                         'dhlparcel_connect',
@@ -60,5 +65,47 @@ class ConfigProvider implements ConfigProviderInterface
                 ],
             ],
         ];
+    }
+
+    /**
+     * Retrieve DHL service point saved on the active quote shipping address if present.
+     *
+     * @return array|null
+     */
+    private function getQuoteSelectedPoint(): ?array
+    {
+        try {
+            $quote = $this->checkoutSession->getQuote();
+            if (!$quote) {
+                return null;
+            }
+
+            $shippingAddress = $quote->getShippingAddress();
+            if (!$shippingAddress) {
+                return null;
+            }
+
+            $sap = (string) $shippingAddress->getData('dhl_service_point_id');
+            if (trim($sap) === '') {
+                return null;
+            }
+
+            $name = (string) $shippingAddress->getData('dhl_service_point_name');
+            $street = (string) $shippingAddress->getData('dhl_service_point_street');
+            $postcode = (string) $shippingAddress->getData('dhl_service_point_postcode');
+            $city = (string) $shippingAddress->getData('dhl_service_point_city');
+
+            return [
+                'sap' => $sap,
+                'name' => $name !== '' ? $name : $sap,
+                'street' => $street,
+                'streetNo' => '',
+                'houseNo' => '',
+                'zip' => $postcode,
+                'city' => $city,
+            ];
+        } catch (Throwable) {
+            return null;
+        }
     }
 }

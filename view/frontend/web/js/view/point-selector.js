@@ -188,11 +188,58 @@ define([
         },
 
         /**
+         * Retrieve current quote ID if available.
+         *
+         * @return {string|number|null} Current quote entity ID or masked quote ID.
+         */
+        getQuoteId: function () {
+            return quote.getQuoteId() || (window.checkoutConfig && window.checkoutConfig.quoteData && window.checkoutConfig.quoteData.entity_id) || null;
+        },
+
+        /**
+         * Restore selected point from sessionStorage if present and matching current quote.
+         */
+        restoreSavedPoint: function () {
+            try {
+                var savedData = window.sessionStorage.getItem('dhl_selected_service_point');
+                if (savedData) {
+                    var savedPoint = JSON.parse(savedData);
+                    if (savedPoint && typeof savedPoint === 'object' && savedPoint.sap) {
+                        var currentQuoteId = this.getQuoteId();
+                        if (savedPoint.quoteId && currentQuoteId && String(savedPoint.quoteId) !== String(currentQuoteId)) {
+                            window.sessionStorage.removeItem('dhl_selected_service_point');
+                            this.selectedPoint(null);
+                            return;
+                        }
+                        this.selectedPoint(savedPoint);
+                    }
+                }
+            } catch (e) {
+                console.warn('DHL Point Selector: Error restoring point from storage:', e);
+            }
+        },
+
+        /**
          * Initialize component
          */
         initialize: function () {
             this._super();
             this.initListeners();
+
+            var config = this.getDhlConfig();
+            if (config && config.selectedPoint && config.selectedPoint.sap) {
+                var currentQuoteId = this.getQuoteId();
+                config.selectedPoint.quoteId = currentQuoteId;
+                this.selectedPoint(config.selectedPoint);
+                try {
+                    window.sessionStorage.setItem('dhl_selected_service_point', JSON.stringify(config.selectedPoint));
+                } catch (e) {
+                    console.warn('DHL Point Selector: Error saving initial point to storage:', e);
+                }
+            } else {
+                this.restoreSavedPoint();
+            }
+
             return this;
         },
 
@@ -335,7 +382,8 @@ define([
                     }
                 }
                 if (pointData && typeof pointData === 'object' && pointData.sap) {
-                    self.selectedPoint({
+                    var formattedPoint = {
+                        quoteId: self.getQuoteId(),
                         sap: pointData.sap || '',
                         name: pointData.name || pointData.sap,
                         street: pointData.street || '',
@@ -344,7 +392,14 @@ define([
                         zip: pointData.zip || pointData.postalCode || '',
                         city: pointData.city || '',
                         country: pointData.country || ''
-                    });
+                    };
+
+                    self.selectedPoint(formattedPoint);
+                    try {
+                        window.sessionStorage.setItem('dhl_selected_service_point', JSON.stringify(formattedPoint));
+                    } catch (e) {
+                        console.warn('DHL Point Selector: Error saving selected point to storage:', e);
+                    }
 
                     self.closeMapModal();
                 }

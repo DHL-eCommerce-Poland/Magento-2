@@ -16,5 +16,23 @@
             "PRIMARY": true,
             "UNQ_F7001E7F6A7A3B5890CF20A3A1077A2E": true
         }
+    },
+    "quote_address": {
+        "column": {
+            "dhl_service_point_id": true,
+            "dhl_service_point_name": true,
+            "dhl_service_point_street": true,
+            "dhl_service_point_postcode": true,
+            "dhl_service_point_city": true
+        }
+    },
+    "sales_order_address": {
+        "column": {
+            "dhl_service_point_id": true,
+            "dhl_service_point_name": true,
+            "dhl_service_point_street": true,
+            "dhl_service_point_postcode": true,
+            "dhl_service_point_city": true
+        }
     }
 }

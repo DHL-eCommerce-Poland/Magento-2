@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:DataObject/etc/fieldset.xsd">
+    <scope id="global">
+        <fieldset id="sales_convert_quote_address">
+            <field name="dhl_service_point_id">
+                <aspect name="to_order_address" />
+            </field>
+            <field name="dhl_service_point_name">
+                <aspect name="to_order_address" />
+            </field>
+            <field name="dhl_service_point_street">
+                <aspect name="to_order_address" />
+            </field>
+            <field name="dhl_service_point_postcode">
+                <aspect name="to_order_address" />
+            </field>
+            <field name="dhl_service_point_city">
+                <aspect name="to_order_address" />
+            </field>
+        </fieldset>
+    </scope>
+</config>

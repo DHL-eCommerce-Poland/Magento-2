@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Api\ShippingInformationManagementInterface">
+        <plugin name="ideo_dhl_save_service_point_to_quote_address"
+                type="Ideo\Dhl\Plugin\Checkout\SaveServicePointToQuoteAddress"
+                sortOrder="10" />
+    </type>
+    <type name="Magento\Quote\Model\Quote\Address\ToOrderAddress">
+        <plugin name="ideo_dhl_copy_service_point_to_order_address"
+                type="Ideo\Dhl\Plugin\Quote\CopyServicePointToOrderAddress"
+                sortOrder="10" />
+    </type>
+</config>
