@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model;
 
-/**
- * Static DHL Parcel services available to the carrier.
- */
 class MethodCatalog
 {
     /**
@@ -19,8 +16,8 @@ class MethodCatalog
         return [
             ['code' => 'parcel_polska', 'title' => 'DHL Parcel Polska'],
             ['code' => 'premium', 'title' => 'DHL Parcel Premium'],
-            ['code' => '9', 'title' => 'DHL Parcel 9'],
-            ['code' => '12', 'title' => 'DHL Parcel 12'],
+            ['code' => 'parcel_9', 'title' => 'DHL Parcel 9'],
+            ['code' => 'parcel_12', 'title' => 'DHL Parcel 12'],
             ['code' => 'return_polska', 'title' => 'DHL Parcel Return Polska'],
             ['code' => 'economy', 'title' => 'DHL Parcel Economy'],
             ['code' => 'max_paczka', 'title' => 'DHL Parcel Max Paczka'],

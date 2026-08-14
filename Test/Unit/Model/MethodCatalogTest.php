@@ -22,8 +22,8 @@ class MethodCatalogTest extends TestCase
             [
                 'parcel_polska',
                 'premium',
-                '9',
-                '12',
+                'parcel_9',
+                'parcel_12',
                 'return_polska',
                 'economy',
                 'max_paczka',
