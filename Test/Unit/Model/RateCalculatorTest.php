@@ -11,7 +11,14 @@ use PHPUnit\Framework\TestCase;
 
 class RateCalculatorTest extends TestCase
 {
+    /**
+     * @var TableRateResolver|MockObject
+     */
     private TableRateResolver|MockObject $tableRateResolverMock;
+
+    /**
+     * @var RateCalculator
+     */
     private RateCalculator $rateCalculator;
 
     protected function setUp(): void
