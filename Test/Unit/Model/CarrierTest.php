@@ -6,6 +6,8 @@ namespace Ideo\Dhl\Test\Unit\Model;
 
 use Ideo\Dhl\Model\Carrier;
 use Ideo\Dhl\Model\MethodCatalog;
+use Ideo\Dhl\Model\RateCalculator;
+use Ideo\Dhl\Model\TableRateResolver;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\DataObject;
 use Magento\Quote\Model\Quote\Address\RateRequest;
@@ -13,7 +15,6 @@ use Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
 use Magento\Shipping\Model\Rate\Result;
 use Magento\Shipping\Model\Rate\ResultFactory;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -225,13 +226,17 @@ class CarrierTest extends TestCase
         $errorFactory = $this->createStub(ErrorFactory::class);
         $errorFactory->method('create')->willReturnCallback(static fn (): DataObject => new DataObject());
 
+        $tableRateResolver = $this->createStub(TableRateResolver::class);
+        $rateCalculator = new RateCalculator($tableRateResolver);
+
         return new Carrier(
             $scopeConfig,
             $errorFactory,
             $this->createStub(LoggerInterface::class),
             $resultFactory,
             $methodFactory,
-            new MethodCatalog()
+            new MethodCatalog(),
+            $rateCalculator
         );
     }
 }

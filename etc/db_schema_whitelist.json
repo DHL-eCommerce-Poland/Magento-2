@@ -1,0 +1,20 @@
+{
+    "ideo_dhl_tablerate": {
+        "column": {
+            "entity_id": true,
+            "website_id": true,
+            "method_code": true,
+            "condition_type": true,
+            "condition_from": true,
+            "condition_to": true,
+            "price": true
+        },
+        "index": {
+            "IDEO_DHL_TABLERATE_WEBSITE_ID_METHOD_CODE_CONDITION_TYPE": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "UNQ_F7001E7F6A7A3B5890CF20A3A1077A2E": true
+        }
+    }
+}

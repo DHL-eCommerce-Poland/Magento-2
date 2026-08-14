@@ -27,13 +27,14 @@ class Carrier extends AbstractCarrier implements CarrierInterface
     protected $_code = self::CODE;
 
     /**
-     * @param ScopeConfigInterface $scopeConfig Carrier configuration provider.
-     * @param RateErrorFactory $rateErrorFactory Factory for carrier errors.
-     * @param LoggerInterface $logger Diagnostic logger.
-     * @param ResultFactory $resultFactory Factory for shipping rate results.
-     * @param RateMethodFactory $rateMethodFactory Factory for individual shipping rates.
-     * @param MethodCatalog $methodCatalog Catalog of supported DHL Parcel methods.
-     * @param array $data Additional carrier data.
+     * @param ScopeConfigInterface $scopeConfig
+     * @param RateErrorFactory $rateErrorFactory
+     * @param LoggerInterface $logger
+     * @param ResultFactory $resultFactory
+     * @param RateMethodFactory $rateMethodFactory
+     * @param MethodCatalog $methodCatalog
+     * @param RateCalculator $rateCalculator
+     * @param array $data
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -42,6 +43,7 @@ class Carrier extends AbstractCarrier implements CarrierInterface
         private readonly ResultFactory $resultFactory,
         private readonly RateMethodFactory $rateMethodFactory,
         private readonly MethodCatalog $methodCatalog,
+        private readonly RateCalculator $rateCalculator,
         array $data = []
     ) {
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
@@ -91,16 +93,26 @@ class Carrier extends AbstractCarrier implements CarrierInterface
                 continue;
             }
 
-            $price = (float)$this->getConfigData('method_' . $code . '_price');
+            $pricingType = (string)($this->getConfigData('method_' . $code . '_pricing_type')
+                ?: RateCalculator::PRICING_TYPE_FIXED);
+            $flatPrice = (float)$this->getConfigData('method_' . $code . '_price');
             $isFreeShippingEnabled = $this->getConfigFlag('method_' . $code . '_free_shipping_enable');
             $freeShippingSubtotal = (float)$this->getConfigData('method_' . $code . '_free_shipping_subtotal');
             $packageValue = (float)$request->getPackageValueWithDiscount();
+            $packageWeight = (float)$request->getPackageWeight();
+            $websiteId = (int)($request->getWebsiteId() ?: 0);
 
-            if ($request->getFreeShipping() === true
-                || ($isFreeShippingEnabled && $packageValue >= $freeShippingSubtotal)
-            ) {
-                $price = 0.00;
-            }
+            $price = $this->rateCalculator->calculate(
+                websiteId: $websiteId,
+                methodCode: $code,
+                pricingType: $pricingType,
+                packageWeight: $packageWeight,
+                packageValue: $packageValue,
+                flatPrice: $flatPrice,
+                isFreeShippingEnabled: $isFreeShippingEnabled,
+                freeShippingSubtotal: $freeShippingSubtotal,
+                isFreeShipping: $request->getFreeShipping() === true
+            );
 
             $rate = $this->rateMethodFactory->create();
             $rate->setCarrier(self::CODE);

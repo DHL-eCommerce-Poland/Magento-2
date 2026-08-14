@@ -30,11 +30,15 @@ class SystemXmlTest extends TestCase
             'active' => 'carriers/dhlparcel/active',
             'api_login' => 'carriers/dhlparcel/api_login',
             'api_password' => 'carriers/dhlparcel/api_password',
+            'import_tablerates' => 'carriers/dhlparcel/import_tablerates',
+            'export_tablerates' => '',
         ];
         foreach ($generalFields as $fieldId => $expectedPath) {
             $fields = $generalGroups[0]->xpath('./field[@id="' . $fieldId . '"]');
             self::assertCount(1, $fields);
-            self::assertSame($expectedPath, (string)$fields[0]->config_path);
+            if ($expectedPath !== '') {
+                self::assertSame($expectedPath, (string)$fields[0]->config_path);
+            }
         }
 
         // Method groups assertions
@@ -66,6 +70,7 @@ class SystemXmlTest extends TestCase
             foreach ([
                 'active',
                 'title',
+                'pricing_type',
                 'price',
                 'free_shipping_enable',
                 'free_shipping_subtotal',
