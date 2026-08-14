@@ -6,53 +6,21 @@
             <group id="dhlparcel" translate="label" type="text" sortOrder="140"
                    showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>DHL Parcel</label>
-                <group id="general" translate="label" type="text" sortOrder="10"
-                       showInDefault="1" showInWebsite="1" showInStore="1">
+                <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>General Configuration</label>
-                    <field id="active" translate="label" type="select" sortOrder="10"
-                           showInDefault="1" showInWebsite="1" canRestore="1">
-                        <label>Enabled for Checkout</label>
-                        <config_path>carriers/dhlparcel/active</config_path>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    </field>
-                    <field id="api_login" translate="label" type="obscure" sortOrder="20"
-                           showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>API Login</label>
-                        <config_path>carriers/dhlparcel/api_login</config_path>
-                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                    </field>
-                    <field id="api_password" translate="label" type="obscure" sortOrder="30"
-                           showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>API Password</label>
-                        <config_path>carriers/dhlparcel/api_password</config_path>
-                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                    </field>
-                    <field id="import_tablerates" translate="label" type="file" sortOrder="40"
-                           showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Import Table Rates CSV</label>
-                        <config_path>carriers/dhlparcel/import_tablerates</config_path>
-                        <backend_model>Ideo\Dhl\Model\Config\Backend\Tablerate</backend_model>
-                        <upload_dir scope_info="1">import/dhl</upload_dir>
-                        <comment>Upload CSV with columns: Website, Method Code, Condition Type, Value From, Value To, Price</comment>
-                    </field>
-                    <field id="export_tablerates" translate="label" type="button" sortOrder="50"
-                           showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Export Table Rates CSV</label>
-                        <frontend_model>Ideo\Dhl\Block\Adminhtml\System\Config\Export</frontend_model>
-                    </field>
-                    <field id="debug" translate="label" type="select" sortOrder="60"
-                           showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
-                        <label>Debug Mode</label>
-                        <config_path>carriers/dhlparcel/debug</config_path>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment>When enabled, detailed cart item weight breakdown is logged to browser console.</comment>
-                    </field>
+                    <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled for Checkout</label><config_path>carriers/dhlparcel/active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
+                    <field id="api_login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0"><label>API Login</label><config_path>carriers/dhlparcel/api_login</config_path><backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model></field>
+                    <field id="api_password" translate="label" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0"><label>API Password</label><config_path>carriers/dhlparcel/api_password</config_path><backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model></field>
+                    <field id="import_tablerates" translate="label" type="file" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0"><label>Import Table Rates CSV</label><config_path>carriers/dhlparcel/import_tablerates</config_path><backend_model>Ideo\Dhl\Model\Config\Backend\Tablerate</backend_model><upload_dir scope_info="1">import/dhl</upload_dir><comment>Upload CSV with columns: Website, Method Code, Condition Type, Value From, Value To, Price</comment></field>
+                    <field id="export_tablerates" translate="label" type="button" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0"><label>Export Table Rates CSV</label><frontend_model>Ideo\Dhl\Block\Adminhtml\System\Config\Export</frontend_model></field>
+                    <field id="debug" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1"><label>Debug Mode</label><config_path>carriers/dhlparcel/debug</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model><comment>When enabled, detailed cart item weight breakdown is logged to browser console.</comment></field>
                 </group>
 
                 <group id="parcel_polska" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel Polska</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_parcel_polska_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_parcel_polska_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_parcel_polska_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_parcel_polska_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_parcel_polska_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_parcel_polska_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_parcel_polska_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -67,7 +35,8 @@
                 <group id="premium" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel Premium</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_premium_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_premium_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_premium_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_premium_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_premium_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_premium_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_premium_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -82,7 +51,8 @@
                 <group id="parcel_9" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel 9</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_parcel_9_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_parcel_9_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_parcel_9_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_parcel_9_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_parcel_9_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_parcel_9_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_parcel_9_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -97,7 +67,8 @@
                 <group id="parcel_12" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel 12</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_parcel_12_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_parcel_12_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_parcel_12_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_parcel_12_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_parcel_12_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_parcel_12_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_parcel_12_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -112,7 +83,8 @@
                 <group id="return_polska" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel Return Polska</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_return_polska_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_return_polska_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_return_polska_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_return_polska_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_return_polska_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_return_polska_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_return_polska_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -127,7 +99,8 @@
                 <group id="economy" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel Economy</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_economy_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_economy_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_economy_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_economy_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_economy_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="point_delivery_mode" translate="label" type="select" sortOrder="26" showInDefault="1" showInWebsite="1" canRestore="1">
                         <label>Point Delivery Mode</label>
@@ -152,7 +125,8 @@
                 <group id="max_paczka" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel Max Paczka</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_max_paczka_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_max_paczka_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_max_paczka_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_max_paczka_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_max_paczka_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_max_paczka_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_max_paczka_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -167,7 +141,8 @@
                 <group id="max_polpaleta" translate="label" type="text" sortOrder="170" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel Max Półpaleta</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_max_polpaleta_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_max_polpaleta_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_max_polpaleta_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_max_polpaleta_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_max_polpaleta_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_max_polpaleta_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_max_polpaleta_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -182,7 +157,8 @@
                 <group id="max_paleta" translate="label" type="text" sortOrder="180" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel Max Paleta</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_max_paleta_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_max_paleta_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_max_paleta_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_max_paleta_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_max_paleta_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_max_paleta_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_max_paleta_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -197,7 +173,8 @@
                 <group id="connect" translate="label" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel Connect</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_connect_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_connect_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_connect_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_connect_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_connect_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_connect_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_connect_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -212,7 +189,8 @@
                 <group id="international" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel International</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_international_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_international_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_international_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_international_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_international_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_international_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_international_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -227,7 +205,8 @@
                 <group id="connect_plus" translate="label" type="text" sortOrder="210" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel Connect Plus</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_connect_plus_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_connect_plus_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_connect_plus_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_connect_plus_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_connect_plus_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_connect_plus_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_connect_plus_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -242,7 +221,8 @@
                 <group id="return_connect" translate="label" type="text" sortOrder="220" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel Return Connect</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_return_connect_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_return_connect_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_return_connect_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_return_connect_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_return_connect_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_return_connect_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_return_connect_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -257,7 +237,8 @@
                 <group id="connect_polpaleta" translate="label" type="text" sortOrder="230" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel Connect Pallet - Półpaleta</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_connect_polpaleta_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_connect_polpaleta_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_connect_polpaleta_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_connect_polpaleta_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_connect_polpaleta_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_connect_polpaleta_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_connect_polpaleta_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>
@@ -272,7 +253,8 @@
                 <group id="connect_pallet" translate="label" type="text" sortOrder="240" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DHL Parcel Connect Pallet - Paleta</label>
                     <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enabled</label><config_path>carriers/dhlparcel/method_connect_pallet_active</config_path><source_model>Magento\Config\Model\Config\Source\Yesno</source_model></field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1"><label>Title</label><config_path>carriers/dhlparcel/method_connect_pallet_title</config_path></field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Title</label><config_path>carriers/dhlparcel/method_connect_pallet_title</config_path></field>
+                    <field id="method_name" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1"><label>Method Name</label><config_path>carriers/dhlparcel/method_connect_pallet_method_name</config_path></field>
                     <field id="pricing_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" canRestore="1"><label>Pricing Calculation Type</label><config_path>carriers/dhlparcel/method_connect_pallet_pricing_type</config_path><source_model>Ideo\Dhl\Model\Config\Source\PricingType</source_model></field>
                     <field id="price" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"><label>Price</label><config_path>carriers/dhlparcel/method_connect_pallet_price</config_path><validate>validate-number validate-zero-or-greater</validate><depends><field id="pricing_type">fixed</field></depends></field>
                     <field id="free_shipping_enable" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" canRestore="1"><label>Enable Free Shipping Threshold</label><config_path>carriers/dhlparcel/method_connect_pallet_free_shipping_enable</config_path><source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model></field>

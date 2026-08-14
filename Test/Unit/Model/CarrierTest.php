@@ -38,7 +38,8 @@ class CarrierTest extends TestCase
         $config = [
             'active' => '1',
             'method_parcel_polska_active' => '1',
-            'method_parcel_polska_title' => 'Polska dostawa',
+            'method_parcel_polska_title' => 'DHL Express',
+            'method_parcel_polska_method_name' => 'Polska dostawa',
             'method_parcel_polska_price' => '12.50',
             'method_premium_active' => '0',
         ];
@@ -51,6 +52,7 @@ class CarrierTest extends TestCase
         self::assertCount(1, $rates);
         self::assertSame('parcel_polska', $rates[0]['method']);
         self::assertSame('Polska dostawa', $rates[0]['title']);
+        self::assertSame('DHL Express', $rates[0]['carrier_title']);
         self::assertSame(12.5, $rates[0]['price']);
     }
 
@@ -211,6 +213,7 @@ class CarrierTest extends TestCase
             $rates[] = [
                 'method' => $rate->getMethod(),
                 'title' => $rate->getMethodTitle(),
+                'carrier_title' => $rate->getCarrierTitle(),
                 'price' => $rate->getPrice(),
                 'sort_order' => $rate->getSortOrder(),
                 'error_message' => $rate->getErrorMessage(),
