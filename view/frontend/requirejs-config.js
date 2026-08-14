@@ -9,6 +9,12 @@ var config = {
             },
             'Magento_Checkout/js/action/set-payment-information-and-place-order': {
                 'Ideo_Dhl/js/action/set-payment-information-mixin': true
+            },
+            'Magento_Checkout/js/view/shipping-information': {
+                'Ideo_Dhl/js/view/summary/shipping-information-mixin': true
+            },
+            'Magento_Checkout/js/view/summary/shipping-information': {
+                'Ideo_Dhl/js/view/summary/shipping-information-mixin': true
             }
         }
     }

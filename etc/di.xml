@@ -11,4 +11,9 @@
                 type="Ideo\Dhl\Plugin\Quote\CopyServicePointToOrderAddress"
                 sortOrder="10" />
     </type>
+    <type name="Magento\Quote\Model\Quote\Address\ToOrder">
+        <plugin name="ideo_dhl_enrich_order_shipping_description"
+                type="Ideo\Dhl\Plugin\Quote\EnrichOrderShippingDescription"
+                sortOrder="10" />
+    </type>
 </config>
