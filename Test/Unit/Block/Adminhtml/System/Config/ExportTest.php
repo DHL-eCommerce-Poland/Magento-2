@@ -16,8 +16,19 @@ use PHPUnit\Framework\TestCase;
 
 class ExportTest extends TestCase
 {
+    /**
+     * @var LayoutInterface|MockObject
+     */
     private LayoutInterface|MockObject $layoutMock;
+
+    /**
+     * @var UrlInterface|MockObject
+     */
     private UrlInterface|MockObject $urlBuilderMock;
+
+    /**
+     * @var Export
+     */
     private Export $exportBlock;
 
     protected function setUp(): void

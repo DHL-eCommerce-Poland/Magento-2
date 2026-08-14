@@ -4,23 +4,29 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Config\Backend;
 
+use Magento\Config\Model\Config\Backend\File;
+use Magento\Config\Model\Config\Backend\File\RequestData\RequestDataInterface;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\App\Config\Value;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filesystem;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
+use Magento\MediaStorage\Model\File\UploaderFactory;
 
-class Tablerate extends Value
+class Tablerate extends File
 {
     /**
      * @param Context $context
      * @param Registry $registry
      * @param ScopeConfigInterface $config
      * @param TypeListInterface $cacheTypeList
+     * @param UploaderFactory $uploaderFactory
+     * @param RequestDataInterface $requestData
+     * @param Filesystem $filesystem
      * @param ResourceConnection $resourceConnection
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
@@ -31,12 +37,26 @@ class Tablerate extends Value
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
+        UploaderFactory $uploaderFactory,
+        RequestDataInterface $requestData,
+        Filesystem $filesystem,
         private readonly ResourceConnection $resourceConnection,
         ?AbstractResource $resource = null,
         ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-        parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
+        parent::__construct(
+            $context,
+            $registry,
+            $config,
+            $cacheTypeList,
+            $uploaderFactory,
+            $requestData,
+            $filesystem,
+            $resource,
+            $resourceCollection,
+            $data
+        );
     }
 
     /**
@@ -106,32 +126,53 @@ class Tablerate extends Value
     }
 
     /**
-     * Import uploaded CSV file data into database.
+     * Upload CSV file, append timestamp to filename, parse data and save into DB.
      *
      * @return $this
      * @throws LocalizedException
      */
-    public function afterSave(): self
+    public function beforeSave(): self
     {
-        $value = $this->getValue();
-        if (is_array($value) && !empty($value['tmp_name'])) {
-            $tmpFile = $value['tmp_name'];
-            if (file_exists($tmpFile)) {
-                $content = file_get_contents($tmpFile);
-                if ($content !== false) {
-                    $rows = $this->parseCsvContent($content);
-                    $this->saveTableRates($rows);
+        $fileData = $this->getFileData();
+        parent::beforeSave();
+        $savedFileName = (string)$this->getValue();
+
+        if (!empty($fileData) && $savedFileName !== '') {
+            $fileIo = new \Magento\Framework\Filesystem\Io\File();
+            $pathInfo = $fileIo->getPathInfo($savedFileName);
+            $baseFileName = $pathInfo['basename'] ?? $savedFileName;
+            $relativeFilePath = 'import/dhl/' . $baseFileName;
+
+            if ($this->_mediaDirectory->isExist($relativeFilePath)) {
+                $content = $this->_mediaDirectory->readFile($relativeFilePath);
+                $rows = $this->parseCsvContent($content);
+                $this->saveTableRates($rows);
+
+                $dateStr = date('Y-m-d_H-i-s');
+                $filename = $pathInfo['filename'] ?? 'dhl_tablerates';
+                $extension = $pathInfo['extension'] ?? 'csv';
+                $timestampedFileName = sprintf(
+                    '%s_%s.%s',
+                    $filename,
+                    $dateStr,
+                    $extension
+                );
+
+                $timestampedRelativePath = 'import/dhl/' . $timestampedFileName;
+                if ($this->_mediaDirectory->renameFile($relativeFilePath, $timestampedRelativePath)) {
+                    $this->setValue($timestampedFileName);
                 }
             }
         }
 
-        return parent::afterSave();
+        return $this;
     }
 
     /**
      * Bulk save parsed table rates into database table.
      *
      * @param array $rows
+     *
      * @return void
      * @throws LocalizedException
      */
@@ -151,5 +192,25 @@ class Tablerate extends Value
             $connection->rollBack();
             throw new LocalizedException(__('Failed to save table rates: %1', $e->getMessage()), $e);
         }
+    }
+
+    /**
+     * Return allowed extensions for table rates CSV import.
+     *
+     * @return string[]
+     */
+    protected function _getAllowedExtensions(): array
+    {
+        return ['csv'];
+    }
+
+    /**
+     * Return upload directory path for table rates CSV files.
+     *
+     * @return string
+     */
+    protected function _getUploadDir(): string
+    {
+        return $this->_mediaDirectory->getAbsolutePath('import/dhl');
     }
 }

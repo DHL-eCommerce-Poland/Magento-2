@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\System\Config;
 
 use Ideo\Dhl\Controller\Adminhtml\System\Config\ExportTablerates;
+use Ideo\Dhl\Model\MethodCatalog;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
@@ -16,7 +17,14 @@ use PHPUnit\Framework\TestCase;
 
 class ExportTableratesTest extends TestCase
 {
+    /**
+     * @var FileFactory|MockObject
+     */
     private FileFactory|MockObject $fileFactoryMock;
+
+    /**
+     * @var ExportTablerates
+     */
     private ExportTablerates $controller;
 
     protected function setUp(): void
@@ -28,7 +36,6 @@ class ExportTableratesTest extends TestCase
 
         $selectStub = $this->createStub(Select::class);
         $selectStub->method('from')->willReturnSelf();
-        $selectStub->method('order')->willReturnSelf();
 
         $connectionStub->method('select')->willReturn($selectStub);
         $connectionStub->method('fetchAll')->willReturn([
@@ -53,20 +60,23 @@ class ExportTableratesTest extends TestCase
         $this->controller = new ExportTablerates(
             $context,
             $this->fileFactoryMock,
-            $resourceConnectionStub
+            $resourceConnectionStub,
+            new MethodCatalog()
         );
     }
 
     public function testExecuteGeneratesCsvFile(): void
     {
         $responseStub = $this->createStub(ResponseInterface::class);
+        $expectedCsvContent = "Website,Method Code,Condition Type,Value From,Value To,Price\n"
+            . "1,parcel_polska,weight,0.0000,5.0000,15.0000";
 
         $this->fileFactoryMock
             ->expects($this->once())
             ->method('create')
             ->with(
                 'dhl_tablerates.csv',
-                $this->stringContains("Website,Method Code,Condition Type,Value From,Value To,Price\n1,parcel_polska,weight,0.0000,5.0000,15.0000"),
+                $this->stringContains($expectedCsvContent),
                 $this->anything(),
                 'text/csv'
             )

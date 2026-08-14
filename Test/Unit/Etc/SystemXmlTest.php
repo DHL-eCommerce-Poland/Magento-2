@@ -45,8 +45,8 @@ class SystemXmlTest extends TestCase
         $methodCodes = [
             'parcel_polska' => 'parcel_polska',
             'premium' => 'premium',
-            'parcel_9' => '9',
-            'parcel_12' => '12',
+            'parcel_9' => 'parcel_9',
+            'parcel_12' => 'parcel_12',
             'return_polska' => 'return_polska',
             'economy' => 'economy',
             'max_paczka' => 'max_paczka',
@@ -88,5 +88,12 @@ class SystemXmlTest extends TestCase
                 );
             }
         }
+
+        $economyGroup = $xml->xpath(
+            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]/group[@id="economy"]'
+        );
+        self::assertCount(1, $economyGroup);
+        self::assertCount(1, $economyGroup[0]->xpath('./field[@id="point_delivery_mode"]'));
+        self::assertCount(1, $economyGroup[0]->xpath('./field[@id="point_map_type"]'));
     }
 }

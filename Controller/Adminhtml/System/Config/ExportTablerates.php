@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Controller\Adminhtml\System\Config;
 
 use Exception;
+use Ideo\Dhl\Model\MethodCatalog;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\App\ResourceConnection;
-use Magento\Framework\App\Filesystem\DirectoryList;
 
 class ExportTablerates extends Action
 {
@@ -20,11 +21,13 @@ class ExportTablerates extends Action
      * @param Context $context
      * @param FileFactory $fileFactory
      * @param ResourceConnection $resourceConnection
+     * @param MethodCatalog $methodCatalog
      */
     public function __construct(
         Context $context,
         private readonly FileFactory $fileFactory,
-        private readonly ResourceConnection $resourceConnection
+        private readonly ResourceConnection $resourceConnection,
+        private readonly MethodCatalog $methodCatalog
     ) {
         parent::__construct($context);
     }
@@ -49,10 +52,26 @@ class ExportTablerates extends Action
                 'condition_from',
                 'condition_to',
                 'price',
-            ])
-            ->order(['website_id ASC', 'method_code ASC', 'condition_type ASC', 'condition_from ASC']);
+            ]);
 
         $rows = $connection->fetchAll($select);
+
+        $methodOrder = array_flip(array_column($this->methodCatalog->getMethods(), 'code'));
+
+        usort($rows, static function (array $a, array $b) use ($methodOrder): int {
+            if ((int)$a['website_id'] !== (int)$b['website_id']) {
+                return (int)$a['website_id'] <=> (int)$b['website_id'];
+            }
+            $orderA = $methodOrder[$a['method_code']] ?? 999;
+            $orderB = $methodOrder[$b['method_code']] ?? 999;
+            if ($orderA !== $orderB) {
+                return $orderA <=> $orderB;
+            }
+            if ($a['condition_type'] !== $b['condition_type']) {
+                return strcmp((string)$a['condition_type'], (string)$b['condition_type']);
+            }
+            return (float)$a['condition_from'] <=> (float)$b['condition_from'];
+        });
 
         $content = "Website,Method Code,Condition Type,Value From,Value To,Price\n";
         foreach ($rows as $row) {

@@ -5,17 +5,23 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Model\Config\Backend;
 
 use Ideo\Dhl\Model\Config\Backend\Tablerate;
+use Magento\Config\Model\Config\Backend\File\RequestData\RequestDataInterface;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filesystem;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;
+use Magento\MediaStorage\Model\File\UploaderFactory;
 use PHPUnit\Framework\TestCase;
 
 class TablerateTest extends TestCase
 {
+    /**
+     * @var Tablerate
+     */
     private Tablerate $backendModel;
 
     protected function setUp(): void
@@ -35,12 +41,18 @@ class TablerateTest extends TestCase
         $registry = $this->createStub(Registry::class);
         $scopeConfig = $this->createStub(ScopeConfigInterface::class);
         $cacheTypeList = $this->createStub(TypeListInterface::class);
+        $uploaderFactory = $this->createStub(UploaderFactory::class);
+        $requestData = $this->createStub(RequestDataInterface::class);
+        $filesystem = $this->createStub(Filesystem::class);
 
         $this->backendModel = new Tablerate(
             $context,
             $registry,
             $scopeConfig,
             $cacheTypeList,
+            $uploaderFactory,
+            $requestData,
+            $filesystem,
             $resourceConnectionStub
         );
     }
