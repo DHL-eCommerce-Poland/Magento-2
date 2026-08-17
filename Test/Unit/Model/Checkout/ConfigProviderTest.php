@@ -7,6 +7,7 @@ namespace Ideo\Dhl\Test\Unit\Model\Checkout;
 use Ideo\Dhl\Model\Checkout\ConfigProvider;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Store\Model\ScopeInterface;
@@ -34,7 +35,18 @@ class ConfigProviderTest extends TestCase
             ->method('getQuote')
             ->willReturn(null);
 
-        $provider = new ConfigProvider($scopeConfig, $checkoutSession);
+        $assetRepository = $this->createMock(AssetRepository::class);
+        $assetRepository->expects($this->exactly(2))
+            ->method('getUrl')
+            ->willReturnCallback(
+                static fn (string $fileId) => match ($fileId) {
+                    'Ideo_Dhl::images/logo_dhl_box_pop.png' => 'https://example.com/logo_dhl_box_pop.png',
+                    'Ideo_Dhl::images/logo_dhl.png' => 'https://example.com/logo_dhl.png',
+                    default => '',
+                }
+            );
+
+        $provider = new ConfigProvider($scopeConfig, $checkoutSession, $assetRepository);
         $config = $provider->getConfig();
 
         $this->assertArrayHasKey('shipping', $config);
@@ -46,6 +58,8 @@ class ConfigProviderTest extends TestCase
         $this->assertEquals('map', $dhlConfig['deliveryMode']);
         $this->assertTrue($dhlConfig['debug']);
         $this->assertNull($dhlConfig['selectedPoint']);
+        $this->assertEquals('https://example.com/logo_dhl_box_pop.png', $dhlConfig['logos']['dhlparcel_economy']);
+        $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['default']);
         $this->assertContains('dhlparcel_economy', $dhlConfig['pointMethods']);
         $this->assertContains('dhlparcel_connect', $dhlConfig['pointMethods']);
     }
@@ -73,7 +87,10 @@ class ConfigProviderTest extends TestCase
         $checkoutSession = $this->createStub(CheckoutSession::class);
         $checkoutSession->method('getQuote')->willReturn($quote);
 
-        $provider = new ConfigProvider($scopeConfig, $checkoutSession);
+        $assetRepository = $this->createStub(AssetRepository::class);
+        $assetRepository->method('getUrl')->willReturn('https://example.com/logo.png');
+
+        $provider = new ConfigProvider($scopeConfig, $checkoutSession, $assetRepository);
         $config = $provider->getConfig();
 
         $selectedPoint = $config['shipping']['dhlparcel']['selectedPoint'];

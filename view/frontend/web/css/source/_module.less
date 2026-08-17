@@ -20,3 +20,50 @@
         width: 100% !important;
     }
 }
+
+& when (@media-common = true) {
+    .dhl-method-logo {
+        height: 22px;
+        width: auto;
+        max-width: 80px;
+        vertical-align: middle;
+        margin-left: 8px;
+        display: inline-block;
+    }
+
+    .dhl-logo-base() {
+        content: '';
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 8px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center left;
+        height: 24px;
+        width: 70px;
+    }
+
+    .table-checkout-shipping-method {
+        label[for^="s_method_dhlparcel_"]:not(:has(.dhl-method-logo)) {
+            &::after {
+                .dhl-logo-base();
+                background-image: url('../images/logo_dhl.png');
+            }
+        }
+
+        label[for="s_method_dhlparcel_economy"]:not(:has(.dhl-method-logo)) {
+            &::after {
+                background-image: url('../images/logo_dhl_box_pop.png');
+            }
+        }
+
+        tr:has(input[value^="dhlparcel_"]) .col-carrier:not(:has(.dhl-method-logo))::after {
+            .dhl-logo-base();
+            background-image: url('../images/logo_dhl.png');
+        }
+
+        tr:has(input[value="dhlparcel_economy"]) .col-carrier:not(:has(.dhl-method-logo))::after {
+            background-image: url('../images/logo_dhl_box_pop.png');
+        }
+    }
+}

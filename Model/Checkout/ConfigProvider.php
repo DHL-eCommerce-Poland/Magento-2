@@ -7,6 +7,7 @@ namespace Ideo\Dhl\Model\Checkout;
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Store\Model\ScopeInterface;
 use Throwable;
 
@@ -19,10 +20,12 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * @param ScopeConfigInterface $scopeConfig
      * @param CheckoutSession $checkoutSession
+     * @param AssetRepository $assetRepository
      */
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly CheckoutSession $checkoutSession
+        private readonly CheckoutSession $checkoutSession,
+        private readonly AssetRepository $assetRepository
     ) {
     }
 
@@ -56,6 +59,10 @@ class ConfigProvider implements ConfigProviderInterface
                     'deliveryMode' => $deliveryMode,
                     'debug' => $debug,
                     'selectedPoint' => $this->getQuoteSelectedPoint(),
+                    'logos' => [
+                        'dhlparcel_economy' => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box_pop.png'),
+                        'default' => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
+                    ],
                     'pointMethods' => [
                         'dhlparcel_economy',
                         'dhlparcel_connect',

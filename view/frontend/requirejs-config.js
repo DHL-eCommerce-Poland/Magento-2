@@ -15,6 +15,9 @@ var config = {
             },
             'Magento_Checkout/js/view/summary/shipping-information': {
                 'Ideo_Dhl/js/view/summary/shipping-information-mixin': true
+            },
+            'Magento_Checkout/js/view/shipping': {
+                'Ideo_Dhl/js/view/shipping-mixin': true
             }
         }
     }
