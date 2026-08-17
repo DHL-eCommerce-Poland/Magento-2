@@ -28,8 +28,13 @@ class SystemXmlTest extends TestCase
         self::assertCount(1, $generalGroups);
         $generalFields = [
             'active' => 'carriers/dhlparcel/active',
+            'sandbox' => 'carriers/dhlparcel/sandbox',
             'api_login' => 'carriers/dhlparcel/api_login',
             'api_password' => 'carriers/dhlparcel/api_password',
+            'customer_number' => 'carriers/dhlparcel/customer_number',
+            'api_login_sandbox' => 'carriers/dhlparcel/api_login_sandbox',
+            'api_password_sandbox' => 'carriers/dhlparcel/api_password_sandbox',
+            'customer_number_sandbox' => 'carriers/dhlparcel/customer_number_sandbox',
             'import_tablerates' => 'carriers/dhlparcel/import_tablerates',
             'export_tablerates' => '',
         ];
@@ -40,6 +45,31 @@ class SystemXmlTest extends TestCase
                 self::assertSame($expectedPath, (string)$fields[0]->config_path);
             }
         }
+
+        // Test dynamic depends logic for prod vs sandbox fields
+        $apiLoginField = $generalGroups[0]->xpath('./field[@id="api_login"]')[0];
+        self::assertSame('0', (string)$apiLoginField->depends->field);
+        self::assertSame('sandbox', (string)$apiLoginField->depends->field['id']);
+
+        $apiPasswordField = $generalGroups[0]->xpath('./field[@id="api_password"]')[0];
+        self::assertSame('0', (string)$apiPasswordField->depends->field);
+        self::assertSame('sandbox', (string)$apiPasswordField->depends->field['id']);
+
+        $customerNumberField = $generalGroups[0]->xpath('./field[@id="customer_number"]')[0];
+        self::assertSame('0', (string)$customerNumberField->depends->field);
+        self::assertSame('sandbox', (string)$customerNumberField->depends->field['id']);
+
+        $apiLoginSandboxField = $generalGroups[0]->xpath('./field[@id="api_login_sandbox"]')[0];
+        self::assertSame('1', (string)$apiLoginSandboxField->depends->field);
+        self::assertSame('sandbox', (string)$apiLoginSandboxField->depends->field['id']);
+
+        $apiPasswordSandboxField = $generalGroups[0]->xpath('./field[@id="api_password_sandbox"]')[0];
+        self::assertSame('1', (string)$apiPasswordSandboxField->depends->field);
+        self::assertSame('sandbox', (string)$apiPasswordSandboxField->depends->field['id']);
+
+        $customerNumberSandboxField = $generalGroups[0]->xpath('./field[@id="customer_number_sandbox"]')[0];
+        self::assertSame('1', (string)$customerNumberSandboxField->depends->field);
+        self::assertSame('sandbox', (string)$customerNumberSandboxField->depends->field['id']);
 
         // Method groups assertions
         $methodCodes = [
