@@ -39,4 +39,60 @@
         <column xsi:type="varchar" name="dhl_service_point_postcode" length="32" nullable="true" comment="DHL Service Point Postcode"/>
         <column xsi:type="varchar" name="dhl_service_point_city" length="255" nullable="true" comment="DHL Service Point City"/>
     </table>
+
+    <table name="ideo_dhl_drop_off_point" resource="default" engine="innodb" comment="Ideo DHL Drop-Off Points">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="smallint" name="website_id" unsigned="true" nullable="false" default="0" comment="Website ID"/>
+        <column xsi:type="varchar" name="template_name" length="255" nullable="false" comment="Profile Template Name"/>
+        <column xsi:type="varchar" name="sender_name" length="255" nullable="false" comment="Sender Name"/>
+        <column xsi:type="varchar" name="first_name" length="255" nullable="true" comment="First Name"/>
+        <column xsi:type="varchar" name="last_name" length="255" nullable="true" comment="Last Name"/>
+        <column xsi:type="varchar" name="street" length="255" nullable="false" comment="Street"/>
+        <column xsi:type="varchar" name="house_number" length="32" nullable="false" comment="House Number"/>
+        <column xsi:type="varchar" name="postal_code" length="32" nullable="false" comment="Postal Code"/>
+        <column xsi:type="varchar" name="city" length="255" nullable="false" comment="City"/>
+        <column xsi:type="varchar" name="country_id" length="2" nullable="false" default="PL" comment="Country ID"/>
+        <column xsi:type="varchar" name="email" length="255" nullable="true" comment="Notification Email"/>
+        <column xsi:type="varchar" name="phone" length="64" nullable="true" comment="Phone Number"/>
+        <column xsi:type="varchar" name="sap_number" length="64" nullable="true" comment="SAP Customer Number"/>
+        <column xsi:type="varchar" name="pickup_time_from" length="16" nullable="true" comment="Courier Pickup Time From"/>
+        <column xsi:type="varchar" name="pickup_time_to" length="16" nullable="true" comment="Courier Pickup Time To"/>
+        <column xsi:type="smallint" name="is_default" unsigned="true" nullable="false" default="0" comment="Is Default Sender"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="IDX_IDEO_DHL_DROP_OFF_POINT_WEBSITE" indexType="btree">
+            <column name="website_id"/>
+        </index>
+    </table>
+    <table name="ideo_dhl_delivery_service" resource="default" engine="innodb" comment="Ideo DHL Delivery Services">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="smallint" name="website_id" unsigned="true" nullable="false" default="0" comment="Website ID"/>
+        <column xsi:type="varchar" name="template_name" length="255" nullable="false" comment="Template Name"/>
+        <column xsi:type="varchar" name="service_code" length="64" nullable="false" comment="DHL Service Code"/>
+        <column xsi:type="varchar" name="method_code" length="64" nullable="true" comment="Magento Shipping Method Code"/>
+        <column xsi:type="varchar" name="package_type" length="32" nullable="false" default="PACKAGE" comment="Package Type"/>
+        <column xsi:type="decimal" name="weight" precision="12" scale="4" nullable="false" default="0.0000" comment="Weight in KG"/>
+        <column xsi:type="decimal" name="length" precision="12" scale="4" nullable="false" default="0.0000" comment="Length in CM"/>
+        <column xsi:type="decimal" name="width" precision="12" scale="4" nullable="false" default="0.0000" comment="Width in CM"/>
+        <column xsi:type="decimal" name="height" precision="12" scale="4" nullable="false" default="0.0000" comment="Height in CM"/>
+        <column xsi:type="smallint" name="is_non_standard" unsigned="true" nullable="false" default="0" comment="Is Non Standard Package"/>
+        <column xsi:type="smallint" name="has_euro_return" unsigned="true" nullable="false" default="0" comment="Has Euro Return"/>
+        <column xsi:type="text" name="content" nullable="true" comment="Package Contents Description"/>
+        <column xsi:type="text" name="comment" nullable="true" comment="Special Comments"/>
+        <column xsi:type="varchar" name="reference" length="255" nullable="true" comment="Reference Number"/>
+        <column xsi:type="varchar" name="mpk" length="64" nullable="true" comment="MPK Cost Center Code"/>
+        <column xsi:type="text" name="additional_services" nullable="true" comment="Additional Services JSON"/>
+        <column xsi:type="varchar" name="label_type" length="32" nullable="false" default="BLP" comment="Shipment Label Format"/>
+        <column xsi:type="int" name="drop_off_point_id" unsigned="true" nullable="true" comment="Default Drop-Off Point ID"/>
+        <column xsi:type="varchar" name="address_type" length="16" nullable="true" comment="Address Type (C/B/N)"/>
+        <column xsi:type="smallint" name="auto_create_return_shipment" unsigned="true" nullable="false" default="0" comment="Auto Create Return Shipment"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="IDX_IDEO_DHL_DELIVERY_SERVICE_WEBSITE_METHOD" indexType="btree">
+            <column name="website_id"/>
+            <column name="method_code"/>
+        </index>
+    </table>
 </schema>

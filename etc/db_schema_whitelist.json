@@ -34,5 +34,63 @@
             "dhl_service_point_postcode": true,
             "dhl_service_point_city": true
         }
+    },
+    "ideo_dhl_drop_off_point": {
+        "column": {
+            "entity_id": true,
+            "website_id": true,
+            "template_name": true,
+            "sender_name": true,
+            "first_name": true,
+            "last_name": true,
+            "street": true,
+            "house_number": true,
+            "postal_code": true,
+            "city": true,
+            "country_id": true,
+            "email": true,
+            "phone": true,
+            "sap_number": true,
+            "pickup_time_from": true,
+            "pickup_time_to": true,
+            "is_default": true
+        },
+        "index": {
+            "IDX_IDEO_DHL_DROP_OFF_POINT_WEBSITE": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ideo_dhl_delivery_service": {
+        "column": {
+            "entity_id": true,
+            "website_id": true,
+            "template_name": true,
+            "service_code": true,
+            "method_code": true,
+            "package_type": true,
+            "weight": true,
+            "length": true,
+            "width": true,
+            "height": true,
+            "is_non_standard": true,
+            "has_euro_return": true,
+            "content": true,
+            "comment": true,
+            "reference": true,
+            "mpk": true,
+            "additional_services": true,
+            "label_type": true,
+            "drop_off_point_id": true,
+            "address_type": true,
+            "auto_create_return_shipment": true
+        },
+        "index": {
+            "IDX_IDEO_DHL_DELIVERY_SERVICE_WEBSITE_METHOD": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
     }
 }

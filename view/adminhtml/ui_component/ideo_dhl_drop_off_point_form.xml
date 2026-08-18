@@ -1,0 +1,236 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">ideo_dhl_drop_off_point_form.ideo_dhl_drop_off_point_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Drop-Off Point Details</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="save" class="Ideo\Dhl\Block\Adminhtml\Button\Save"/>
+            <button name="save_and_continue" class="Ideo\Dhl\Block\Adminhtml\Button\SaveAndContinue"/>
+            <button name="delete" class="Ideo\Dhl\Block\Adminhtml\Button\Delete"/>
+            <button name="back" class="Ideo\Dhl\Block\Adminhtml\Button\Back"/>
+        </buttons>
+        <namespace>ideo_dhl_drop_off_point_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>ideo_dhl_drop_off_point_form.ideo_dhl_drop_off_point_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="ideo_dhl_drop_off_point_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="ideo_dhl/dropoffpoint/save"/>
+        </settings>
+        <dataProvider class="Ideo\Dhl\Model\DropOffPoint\DataProvider" name="ideo_dhl_drop_off_point_form_data_source">
+            <settings>
+                <requestFieldName>entity_id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <label translate="true">General Information</label>
+        </settings>
+        <field name="entity_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>entity_id</dataScope>
+            </settings>
+        </field>
+        <field name="website_id" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Website Scope</label>
+                <dataScope>website_id</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Config\Model\Config\Source\Website"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="template_name" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Template Name</label>
+                <dataScope>template_name</dataScope>
+            </settings>
+        </field>
+        <field name="sender_name" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Sender Name</label>
+                <dataScope>sender_name</dataScope>
+            </settings>
+        </field>
+        <field name="first_name" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">First Name</label>
+                <dataScope>first_name</dataScope>
+            </settings>
+        </field>
+        <field name="last_name" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Last Name</label>
+                <dataScope>last_name</dataScope>
+            </settings>
+        </field>
+        <field name="email" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-email" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Email</label>
+                <dataScope>email</dataScope>
+            </settings>
+        </field>
+        <field name="street" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Street</label>
+                <dataScope>street</dataScope>
+            </settings>
+        </field>
+        <field name="house_number" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-alphanum-with-spaces" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">House Number</label>
+                <dataScope>house_number</dataScope>
+            </settings>
+        </field>
+        <field name="postal_code" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Postal Code</label>
+                <dataScope>postal_code</dataScope>
+            </settings>
+        </field>
+        <field name="city" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">City</label>
+                <dataScope>city</dataScope>
+            </settings>
+        </field>
+        <field name="country_id" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Country</label>
+                <dataScope>country_id</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Directory\Model\Config\Source\Country"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="phone" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Phone Number</label>
+                <dataScope>phone</dataScope>
+            </settings>
+        </field>
+        <field name="pickup_time_from" formElement="date">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Courier Pickup Time [From]</label>
+                <dataScope>pickup_time_from</dataScope>
+            </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="dateFormat" xsi:type="string">HH:mm</option>
+                            <option name="showsTime" xsi:type="boolean">true</option>
+                            <option name="timeOnly" xsi:type="boolean">true</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
+        </field>
+        <field name="pickup_time_to" formElement="date">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Courier Pickup Time [To]</label>
+                <dataScope>pickup_time_to</dataScope>
+            </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="dateFormat" xsi:type="string">HH:mm</option>
+                            <option name="showsTime" xsi:type="boolean">true</option>
+                            <option name="timeOnly" xsi:type="boolean">true</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
+        </field>
+        <field name="is_default" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Is Default Sender</label>
+                <dataScope>is_default</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+    </fieldset>
+</form>

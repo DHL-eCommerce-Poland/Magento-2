@@ -1,0 +1,66 @@
+<?php
+
+declare(strict_types=1);
+
+/** @var \Magento\Framework\View\Element\Template $block */
+?>
+<div class="dhl-help-container">
+    <div class="entry-edit form-inline">
+        <div class="fieldset-wrapper fieldset-wrapper-opened">
+            <div class="fieldset-wrapper-title">
+                <strong class="title">
+                    <span><?= $block->escapeHtml(__('DHL eCommerce Poland Integration')) ?></span>
+                </strong>
+            </div>
+            <div class="fieldset">
+                <p>
+                    <?= $block->escapeHtml(__('To configure the plugin, it is necessary to have API keys for either the production or sandbox environment. The module supports all DHL eCommerce Poland products and services via WebAPI v2.')) ?>
+                </p>
+                <p>
+                    <?= $block->escapeHtml(__('API keys are generated from your account in the DHL24 application at')) ?>
+                    <a href="https://www.dhl24.com.pl" target="_blank" rel="noopener">www.dhl24.com.pl</a>
+                    <?= $block->escapeHtml(__('with an active customer number, or for a test account registered at')) ?>
+                    <a href="https://sandbox.dhl24.com.pl" target="_blank" rel="noopener">sandbox.dhl24.com.pl</a>.
+                </p>
+                <p>
+                    <?= $block->escapeHtml(__('Information on how to obtain API keys can be found in the user manual on page 10 or in the instructional video.')) ?>
+                </p>
+            </div>
+        </div>
+
+        <div class="fieldset-wrapper fieldset-wrapper-opened">
+            <div class="fieldset-wrapper-title">
+                <strong class="title">
+                    <span><?= $block->escapeHtml(__('Technical Support')) ?></span>
+                </strong>
+            </div>
+            <div class="fieldset">
+                <p>
+                    <?= $block->escapeHtml(__('In case of questions or technical issues with the DHL module, please contact our support team at email:')) ?>
+                    <a href="mailto:plcim@dhl.com"><strong>plcim@dhl.com</strong></a>
+                </p>
+            </div>
+        </div>
+
+        <div class="fieldset-wrapper fieldset-wrapper-opened">
+            <div class="fieldset-wrapper-title">
+                <strong class="title">
+                    <span><?= $block->escapeHtml(__('Documentation & Manuals')) ?></span>
+                </strong>
+            </div>
+            <div class="fieldset">
+                <p>
+                    <?= $block->escapeHtml(__('A detailed user manual for the module is available at:')) ?>
+                </p>
+                <p>
+                    <a href="https://narzedzia.dhl.pl/pl/cms/content/view?content=integracje-dhl-prestashop"
+                       target="_blank"
+                       rel="noopener"
+                       class="action-secondary">
+                        <?= $block->escapeHtml(__('Open Detailed Module User Manual')) ?> &rarr;
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

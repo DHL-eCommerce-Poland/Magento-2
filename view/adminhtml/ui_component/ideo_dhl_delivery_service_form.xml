@@ -1,0 +1,634 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Delivery Service Details</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="save" class="Ideo\Dhl\Block\Adminhtml\Button\Save"/>
+            <button name="save_and_continue" class="Ideo\Dhl\Block\Adminhtml\Button\SaveAndContinue"/>
+            <button name="delete" class="Ideo\Dhl\Block\Adminhtml\Button\Delete"/>
+            <button name="back" class="Ideo\Dhl\Block\Adminhtml\Button\Back"/>
+        </buttons>
+        <namespace>ideo_dhl_delivery_service_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="ideo_dhl_delivery_service_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="ideo_dhl/deliveryservice/save"/>
+        </settings>
+        <dataProvider class="Ideo\Dhl\Model\DeliveryService\DataProvider" name="ideo_dhl_delivery_service_form_data_source">
+            <settings>
+                <requestFieldName>entity_id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <label translate="true">General Configuration</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="entity_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>entity_id</dataScope>
+            </settings>
+        </field>
+        <field name="website_id" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Website Scope</label>
+                <dataScope>website_id</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Config\Model\Config\Source\Website"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="template_name" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Template Name</label>
+                <dataScope>template_name</dataScope>
+            </settings>
+        </field>
+        <field name="service_code" formElement="select">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Service</label>
+                <dataScope>service_code</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\ServiceCode"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="drop_off_point_id" formElement="select">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Default Drop-Off Point</label>
+                <notice translate="true">Default Drop-Off Point is loaded from the DHL Drop-Off Points grid.</notice>
+                <dataScope>drop_off_point_id</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\DropOffPoint"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="address_type" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">B</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Address Type</label>
+                <dataScope>address_type</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\AddressType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="method_code" formElement="multiselect">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Associated Shipping Method</label>
+                <dataScope>method_code</dataScope>
+                <notice translate="true">Select DHL methods for this template.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\ShippingMethod"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="label_type" formElement="select">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Shipment Label Format</label>
+                <dataScope>label_type</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\LabelType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="content" formElement="select">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Package Contents Description</label>
+                <dataScope>content</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\ContentSource"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="comment" formElement="textarea">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Additional Comments</label>
+                <dataScope>comment</dataScope>
+            </settings>
+        </field>
+        <field name="reference" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Shipment Reference Number</label>
+                <dataScope>reference</dataScope>
+            </settings>
+        </field>
+        <field name="mpk" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">MPK</label>
+                <notice translate="true">Cost center code</notice>
+                <dataScope>mpk</dataScope>
+            </settings>
+        </field>
+        <field name="auto_create_return_shipment" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Generate return label automatically when creating shipment</label>
+                <dataScope>auto_create_return_shipment</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+    </fieldset>
+    <fieldset name="additional_services">
+        <settings>
+            <label translate="true">Additional Services</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="additional_services[insurance]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">UBEZP - Insurance</label>
+                <dataScope>additional_services.insurance</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="additional_services[cod]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">COD - Cash On Delivery</label>
+                <dataScope>additional_services.cod</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="additional_services[eveningDelivery]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">1722 - Evening Delivery (18-22)</label>
+                <dataScope>additional_services.eveningDelivery</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="additional_services[saturdayDelivery]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">SOBOTA - Saturday Delivery</label>
+                <dataScope>additional_services.saturdayDelivery</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="additional_services[pickupOnSaturday]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">NAD_SOBOTA - Saturday Pickup</label>
+                <dataScope>additional_services.pickupOnSaturday</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="additional_services[predeliveryInformation]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">PDI - Pre-delivery Information</label>
+                <dataScope>additional_services.predeliveryInformation</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="additional_services[returnOnDelivery]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">ROD - Return Confirmed Documents</label>
+                <dataScope>additional_services.returnOnDelivery</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="additional_services[proofOfDelivery]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">POD - Proof of Delivery</label>
+                <dataScope>additional_services.proofOfDelivery</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="additional_services[agever]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">AGEVER - Adult Verification / Delivery</label>
+                <dataScope>additional_services.agever</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="additional_services[odb]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">ODB - Self Pickup</label>
+                <dataScope>additional_services.odb</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+    </fieldset>
+    <fieldset name="dimensions">
+        <settings>
+            <label translate="true">Package Dimensions</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="package_type" formElement="select">
+            <settings>
+                <dataScope>package_type</dataScope>
+                <dataType>text</dataType>
+                <label translate="true">Shipment Type</label>
+                <notice translate="true">Dimensions are not required for envelope shipments</notice>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>ENVELOPE</value>
+                            <actions>
+                                <action name="0">
+                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.width</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="1">
+                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.length</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="2">
+                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.height</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="3">
+                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.weight</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>PACKAGE</value>
+                            <actions>
+                                <action name="0">
+                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.width</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="1">
+                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.length</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.height</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="3">
+                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.weight</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="2">
+                            <value>PALLET</value>
+                            <actions>
+                                <action name="0">
+                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.width</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="1">
+                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.length</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.height</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="3">
+                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.weight</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\PackageType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="width" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Width (cm)</label>
+                <dataScope>width</dataScope>
+            </settings>
+        </field>
+        <field name="length" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Length (cm)</label>
+                <dataScope>length</dataScope>
+            </settings>
+        </field>
+        <field name="height" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Height (cm)</label>
+                <dataScope>height</dataScope>
+            </settings>
+        </field>
+        <field name="weight" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Weight (kg)</label>
+                <dataScope>weight</dataScope>
+            </settings>
+        </field>
+        <field name="is_non_standard" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">NST - Non-Standard Package</label>
+                <dataScope>is_non_standard</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="has_euro_return" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">EURO RETURN - Pallet Return</label>
+                <dataScope>has_euro_return</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+    </fieldset>
+</form>
