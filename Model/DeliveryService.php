@@ -33,6 +33,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get entity ID.
+     *
      * @return int|null
      */
     public function getEntityId(): ?int
@@ -42,6 +44,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set entity ID.
+     *
      * @param mixed $entityId
      *
      * @return $this
@@ -52,6 +56,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get website ID.
+     *
      * @return int
      */
     public function getWebsiteId(): int
@@ -60,6 +66,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set website ID.
+     *
      * @param int $websiteId
      *
      * @return $this
@@ -70,6 +78,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get template name.
+     *
      * @return string
      */
     public function getTemplateName(): string
@@ -78,6 +88,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set template name.
+     *
      * @param string $templateName
      *
      * @return $this
@@ -88,6 +100,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get DHL service code.
+     *
      * @return string
      */
     public function getServiceCode(): string
@@ -96,6 +110,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set DHL service code.
+     *
      * @param string $serviceCode
      *
      * @return $this
@@ -106,25 +122,54 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get shipping method code.
+     *
      * @return string|null
      */
     public function getMethodCode(): ?string
     {
         $val = $this->getData(self::METHOD_CODE);
+        if (is_array($val)) {
+            return implode(',', array_filter($val));
+        }
         return $val !== null ? (string)$val : null;
     }
 
     /**
-     * @param string|null $methodCode
+     * Set shipping method code.
+     *
+     * @param string|array|null $methodCode
      *
      * @return $this
      */
-    public function setMethodCode(?string $methodCode): static
+    public function setMethodCode(string|array|null $methodCode): static
     {
+        if (is_array($methodCode)) {
+            $methodCode = implode(',', array_filter($methodCode));
+        }
         return $this->setData(self::METHOD_CODE, $methodCode);
     }
 
     /**
+     * Prepare data before saving model.
+     *
+     * @return $this
+     */
+    public function beforeSave(): static
+    {
+        parent::beforeSave();
+
+        $methodCode = $this->getData(self::METHOD_CODE);
+        if (is_array($methodCode)) {
+            $this->setData(self::METHOD_CODE, implode(',', array_filter($methodCode)));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get package type.
+     *
      * @return string
      */
     public function getPackageType(): string
@@ -133,6 +178,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set package type.
+     *
      * @param string $packageType
      *
      * @return $this
@@ -143,6 +190,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get weight in KG.
+     *
      * @return float
      */
     public function getWeight(): float
@@ -151,6 +200,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set weight in KG.
+     *
      * @param float $weight
      *
      * @return $this
@@ -161,6 +212,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get length in CM.
+     *
      * @return float
      */
     public function getLength(): float
@@ -169,6 +222,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set length in CM.
+     *
      * @param float $length
      *
      * @return $this
@@ -179,6 +234,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get width in CM.
+     *
      * @return float
      */
     public function getWidth(): float
@@ -187,6 +244,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set width in CM.
+     *
      * @param float $width
      *
      * @return $this
@@ -197,6 +256,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get height in CM.
+     *
      * @return float
      */
     public function getHeight(): float
@@ -205,6 +266,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set height in CM.
+     *
      * @param float $height
      *
      * @return $this
@@ -215,6 +278,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get is non standard package flag.
+     *
      * @return bool
      */
     public function getIsNonStandard(): bool
@@ -223,6 +288,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set is non standard package flag.
+     *
      * @param bool $isNonStandard
      *
      * @return $this
@@ -233,6 +300,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get has euro return flag.
+     *
      * @return bool
      */
     public function getHasEuroReturn(): bool
@@ -241,6 +310,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set has euro return flag.
+     *
      * @param bool $hasEuroReturn
      *
      * @return $this
@@ -251,6 +322,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get package contents description.
+     *
      * @return string|null
      */
     public function getContent(): ?string
@@ -260,6 +333,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set package contents description.
+     *
      * @param string|null $content
      *
      * @return $this
@@ -270,6 +345,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get special comments.
+     *
      * @return string|null
      */
     public function getComment(): ?string
@@ -279,6 +356,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set special comments.
+     *
      * @param string|null $comment
      *
      * @return $this
@@ -289,6 +368,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get reference number.
+     *
      * @return string|null
      */
     public function getReference(): ?string
@@ -298,6 +379,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set reference number.
+     *
      * @param string|null $reference
      *
      * @return $this
@@ -308,6 +391,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get MPK cost center code.
+     *
      * @return string|null
      */
     public function getMpk(): ?string
@@ -317,6 +402,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set MPK cost center code.
+     *
      * @param string|null $mpk
      *
      * @return $this
@@ -327,6 +414,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get additional services array.
+     *
      * @return array|null
      */
     public function getAdditionalServices(): ?array
@@ -343,6 +432,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set additional services array.
+     *
      * @param array|null $additionalServices
      *
      * @return $this
@@ -356,6 +447,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get label format type.
+     *
      * @return string
      */
     public function getLabelType(): string
@@ -364,6 +457,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set label format type.
+     *
      * @param string $labelType
      *
      * @return $this
@@ -374,6 +469,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get default drop off point ID.
+     *
      * @return int|null
      */
     public function getDropOffPointId(): ?int
@@ -383,6 +480,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set default drop off point ID.
+     *
      * @param int|null $dropOffPointId
      *
      * @return $this
@@ -393,6 +492,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get address type.
+     *
      * @return string|null
      */
     public function getAddressType(): ?string
@@ -402,6 +503,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set address type.
+     *
      * @param string|null $addressType
      *
      * @return $this
@@ -412,6 +515,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Get auto create return shipment flag.
+     *
      * @return bool
      */
     public function getAutoCreateReturnShipment(): bool
@@ -420,6 +525,8 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
+     * Set auto create return shipment flag.
+     *
      * @param bool $autoCreateReturnShipment
      *
      * @return $this

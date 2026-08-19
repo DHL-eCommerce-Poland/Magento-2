@@ -95,4 +95,24 @@
             <column name="method_code"/>
         </index>
     </table>
+    <table name="ideo_dhl_shipment_data" resource="default" engine="innodb" comment="Ideo DHL Shipment Data Entities">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Magento Order ID"/>
+        <column xsi:type="varchar" name="status" length="32" nullable="false" default="pending" comment="Shipment Data Status"/>
+        <column xsi:type="varchar" name="preset_sender_id" length="64" nullable="true" comment="Selected Sender Preset ID"/>
+        <column xsi:type="varchar" name="preset_shipment_id" length="64" nullable="true" comment="Selected Shipment Preset ID"/>
+        <column xsi:type="text" name="shipment_data" nullable="true" comment="Serialized DhlShipmentData JSON"/>
+        <column xsi:type="text" name="error_messages" nullable="true" comment="Validation Error Messages JSON"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="IDX_IDEO_DHL_SHIPMENT_DATA_ORDER_ID" indexType="btree">
+            <column name="order_id"/>
+        </index>
+        <index referenceId="IDX_IDEO_DHL_SHIPMENT_DATA_STATUS" indexType="btree">
+            <column name="status"/>
+        </index>
+    </table>
 </schema>

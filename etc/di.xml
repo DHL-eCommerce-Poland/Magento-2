@@ -5,7 +5,8 @@
     <preference for="Ideo\Dhl\Api\DropOffPointRepositoryInterface" type="Ideo\Dhl\Model\DropOffPointRepository" />
     <preference for="Ideo\Dhl\Api\Data\DeliveryServiceInterface" type="Ideo\Dhl\Model\DeliveryService" />
     <preference for="Ideo\Dhl\Api\DeliveryServiceRepositoryInterface" type="Ideo\Dhl\Model\DeliveryServiceRepository" />
-
+    <preference for="Ideo\Dhl\Api\Data\ShipmentDataInterface" type="Ideo\Dhl\Model\ShipmentData" />
+    <preference for="Ideo\Dhl\Api\ShipmentDataRepositoryInterface" type="Ideo\Dhl\Model\ShipmentDataRepository" />
 
     <type name="Magento\Checkout\Api\ShippingInformationManagementInterface">
         <plugin name="ideo_dhl_save_service_point_to_quote_address"

@@ -33,6 +33,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get entity ID.
+     *
      * @return int|null
      */
     public function getEntityId(): ?int
@@ -42,6 +44,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set entity ID.
+     *
      * @param mixed $entityId
      *
      * @return $this
@@ -52,6 +56,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get website ID.
+     *
      * @return int
      */
     public function getWebsiteId(): int
@@ -60,6 +66,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set website ID.
+     *
      * @param int $websiteId
      *
      * @return $this
@@ -70,6 +78,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get profile template name.
+     *
      * @return string
      */
     public function getTemplateName(): string
@@ -78,6 +88,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set profile template name.
+     *
      * @param string $templateName
      *
      * @return $this
@@ -88,6 +100,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get sender name.
+     *
      * @return string
      */
     public function getSenderName(): string
@@ -96,6 +110,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set sender name.
+     *
      * @param string $senderName
      *
      * @return $this
@@ -106,6 +122,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get street.
+     *
      * @return string
      */
     public function getStreet(): string
@@ -114,6 +132,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set street.
+     *
      * @param string $street
      *
      * @return $this
@@ -124,6 +144,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get house number.
+     *
      * @return string
      */
     public function getHouseNumber(): string
@@ -132,6 +154,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set house number.
+     *
      * @param string $houseNumber
      *
      * @return $this
@@ -142,6 +166,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get postal code.
+     *
      * @return string
      */
     public function getPostalCode(): string
@@ -150,6 +176,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set postal code.
+     *
      * @param string $postalCode
      *
      * @return $this
@@ -160,6 +188,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get city.
+     *
      * @return string
      */
     public function getCity(): string
@@ -168,6 +198,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set city.
+     *
      * @param string $city
      *
      * @return $this
@@ -178,6 +210,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get country ID.
+     *
      * @return string
      */
     public function getCountryId(): string
@@ -186,6 +220,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set country ID.
+     *
      * @param string $countryId
      *
      * @return $this
@@ -196,6 +232,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get email.
+     *
      * @return string|null
      */
     public function getEmail(): ?string
@@ -205,6 +243,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set email.
+     *
      * @param string|null $email
      *
      * @return $this
@@ -215,6 +255,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get phone.
+     *
      * @return string|null
      */
     public function getPhone(): ?string
@@ -224,6 +266,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set phone.
+     *
      * @param string|null $phone
      *
      * @return $this
@@ -234,6 +278,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get SAP number.
+     *
      * @return string|null
      */
     public function getSapNumber(): ?string
@@ -243,6 +289,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set SAP number.
+     *
      * @param string|null $sapNumber
      *
      * @return $this
@@ -253,6 +301,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get first name.
+     *
      * @return string|null
      */
     public function getFirstName(): ?string
@@ -262,6 +312,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set first name.
+     *
      * @param string|null $firstName
      *
      * @return $this
@@ -272,6 +324,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get last name.
+     *
      * @return string|null
      */
     public function getLastName(): ?string
@@ -281,6 +335,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set last name.
+     *
      * @param string|null $lastName
      *
      * @return $this
@@ -291,6 +347,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get pickup time from.
+     *
      * @return string|null
      */
     public function getPickupTimeFrom(): ?string
@@ -300,6 +358,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set pickup time from.
+     *
      * @param string|null $pickupTimeFrom
      *
      * @return $this
@@ -310,6 +370,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get pickup time to.
+     *
      * @return string|null
      */
     public function getPickupTimeTo(): ?string
@@ -319,6 +381,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set pickup time to.
+     *
      * @param string|null $pickupTimeTo
      *
      * @return $this
@@ -329,6 +393,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Get is default.
+     *
      * @return bool
      */
     public function getIsDefault(): bool
@@ -337,6 +403,8 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
+     * Set is default.
+     *
      * @param bool $isDefault
      *
      * @return $this

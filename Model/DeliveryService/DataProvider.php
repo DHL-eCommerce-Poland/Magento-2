@@ -57,6 +57,9 @@ class DataProvider extends AbstractDataProvider
                     $data['additional_services'] = $decoded;
                 }
             }
+            if (isset($data['method_code']) && is_string($data['method_code']) && $data['method_code'] !== '') {
+                $data['method_code'] = explode(',', $data['method_code']);
+            }
             $this->loadedData[$item->getId()] = $data;
         }
 

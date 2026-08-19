@@ -1,0 +1,249 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ideo\Dhl\Model\Shipment\Data;
+
+class RecipientData
+{
+    /**
+     * @param string $name
+     * @param string $type
+     * @param string $firstName
+     * @param string $lastName
+     * @param string $contactPerson
+     * @param string $street
+     * @param string $houseNumber
+     * @param string $flatNumber
+     * @param string $city
+     * @param string $postalCode
+     * @param string $country
+     * @param string $phone
+     * @param string $email
+     * @param string|null $popId
+     * @param string|null $popName
+     */
+    public function __construct(
+        private string $name = '',
+        private string $type = 'C',
+        private string $firstName = '',
+        private string $lastName = '',
+        private string $contactPerson = '',
+        private string $street = '',
+        private string $houseNumber = '',
+        private string $flatNumber = '',
+        private string $city = '',
+        private string $postalCode = '',
+        private string $country = 'PL',
+        private string $phone = '',
+        private string $email = '',
+        private ?string $popId = null,
+        private ?string $popName = null
+    ) {
+    }
+
+    /**
+     * Get company name.
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get recipient address type (B - Business, C - Consumer/Private).
+     *
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * Get first name.
+     *
+     * @return string
+     */
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * Get last name.
+     *
+     * @return string
+     */
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * Get full contact person name.
+     *
+     * @return string
+     */
+    public function getContactPerson(): string
+    {
+        return $this->contactPerson;
+    }
+
+    /**
+     * Get street name.
+     *
+     * @return string
+     */
+    public function getStreet(): string
+    {
+        return $this->street;
+    }
+
+    /**
+     * Get building/house number.
+     *
+     * @return string
+     */
+    public function getHouseNumber(): string
+    {
+        return $this->houseNumber;
+    }
+
+    /**
+     * Get apartment/flat number.
+     *
+     * @return string
+     */
+    public function getFlatNumber(): string
+    {
+        return $this->flatNumber;
+    }
+
+    /**
+     * Get city name.
+     *
+     * @return string
+     */
+    public function getCity(): string
+    {
+        return $this->city;
+    }
+
+    /**
+     * Get postal code.
+     *
+     * @return string
+     */
+    public function getPostalCode(): string
+    {
+        return $this->postalCode;
+    }
+
+    /**
+     * Get two-letter country ISO code (e.g. PL).
+     *
+     * @return string
+     */
+    public function getCountry(): string
+    {
+        return $this->country;
+    }
+
+    /**
+     * Get phone number.
+     *
+     * @return string
+     */
+    public function getPhone(): string
+    {
+        return $this->phone;
+    }
+
+    /**
+     * Get email address.
+     *
+     * @return string
+     */
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Get POP Service Point ID.
+     *
+     * @return string|null
+     */
+    public function getPopId(): ?string
+    {
+        return $this->popId;
+    }
+
+    /**
+     * Get POP Service Point Name and Address.
+     *
+     * @return string|null
+     */
+    public function getPopName(): ?string
+    {
+        return $this->popName;
+    }
+
+    /**
+     * Convert recipient object to array format.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'type' => $this->type,
+            'firstName' => $this->firstName,
+            'lastName' => $this->lastName,
+            'contactPerson' => $this->contactPerson,
+            'street' => $this->street,
+            'houseNumber' => $this->houseNumber,
+            'flatNumber' => $this->flatNumber,
+            'city' => $this->city,
+            'postalCode' => $this->postalCode,
+            'country' => $this->country,
+            'phone' => $this->phone,
+            'email' => $this->email,
+            'popId' => $this->popId,
+            'popName' => $this->popName,
+        ];
+    }
+
+    /**
+     * Create RecipientData object from array representation.
+     *
+     * @param array $data
+     *
+     * @return self
+     */
+    // phpcs:ignore Magento2.Functions.StaticFunction.StaticFunction
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            (string)($data['name'] ?? ''),
+            (string)($data['type'] ?? 'C'),
+            (string)($data['firstName'] ?? ''),
+            (string)($data['lastName'] ?? ''),
+            (string)($data['contactPerson'] ?? ''),
+            (string)($data['street'] ?? ''),
+            (string)($data['houseNumber'] ?? ''),
+            (string)($data['flatNumber'] ?? ''),
+            (string)($data['city'] ?? ''),
+            (string)($data['postalCode'] ?? ''),
+            (string)($data['country'] ?? 'PL'),
+            (string)($data['phone'] ?? ''),
+            (string)($data['email'] ?? ''),
+            isset($data['popId']) ? (string)$data['popId'] : null,
+            isset($data['popName']) ? (string)$data['popName'] : null
+        );
+    }
+}

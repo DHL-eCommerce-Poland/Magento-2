@@ -29,11 +29,15 @@ interface DeliveryServiceInterface
     public const AUTO_CREATE_RETURN_SHIPMENT = 'auto_create_return_shipment';
 
     /**
+     * Get entity ID.
+     *
      * @return int|null
      */
     public function getEntityId(): ?int;
 
     /**
+     * Set entity ID.
+     *
      * @param mixed $entityId
      *
      * @return $this
@@ -41,11 +45,15 @@ interface DeliveryServiceInterface
     public function setEntityId($entityId): static;
 
     /**
+     * Get website ID.
+     *
      * @return int
      */
     public function getWebsiteId(): int;
 
     /**
+     * Set website ID.
+     *
      * @param int $websiteId
      *
      * @return $this
@@ -53,11 +61,15 @@ interface DeliveryServiceInterface
     public function setWebsiteId(int $websiteId): static;
 
     /**
+     * Get template name.
+     *
      * @return string
      */
     public function getTemplateName(): string;
 
     /**
+     * Set template name.
+     *
      * @param string $templateName
      *
      * @return $this
@@ -65,11 +77,15 @@ interface DeliveryServiceInterface
     public function setTemplateName(string $templateName): static;
 
     /**
+     * Get DHL service code.
+     *
      * @return string
      */
     public function getServiceCode(): string;
 
     /**
+     * Set DHL service code.
+     *
      * @param string $serviceCode
      *
      * @return $this
@@ -77,11 +93,15 @@ interface DeliveryServiceInterface
     public function setServiceCode(string $serviceCode): static;
 
     /**
+     * Get shipping method code.
+     *
      * @return string|null
      */
     public function getMethodCode(): ?string;
 
     /**
+     * Set shipping method code.
+     *
      * @param string|null $methodCode
      *
      * @return $this
@@ -89,11 +109,15 @@ interface DeliveryServiceInterface
     public function setMethodCode(?string $methodCode): static;
 
     /**
+     * Get package type.
+     *
      * @return string
      */
     public function getPackageType(): string;
 
     /**
+     * Set package type.
+     *
      * @param string $packageType
      *
      * @return $this
@@ -101,11 +125,15 @@ interface DeliveryServiceInterface
     public function setPackageType(string $packageType): static;
 
     /**
+     * Get weight in KG.
+     *
      * @return float
      */
     public function getWeight(): float;
 
     /**
+     * Set weight in KG.
+     *
      * @param float $weight
      *
      * @return $this
@@ -113,11 +141,15 @@ interface DeliveryServiceInterface
     public function setWeight(float $weight): static;
 
     /**
+     * Get length in CM.
+     *
      * @return float
      */
     public function getLength(): float;
 
     /**
+     * Set length in CM.
+     *
      * @param float $length
      *
      * @return $this
@@ -125,11 +157,15 @@ interface DeliveryServiceInterface
     public function setLength(float $length): static;
 
     /**
+     * Get width in CM.
+     *
      * @return float
      */
     public function getWidth(): float;
 
     /**
+     * Set width in CM.
+     *
      * @param float $width
      *
      * @return $this
@@ -137,11 +173,15 @@ interface DeliveryServiceInterface
     public function setWidth(float $width): static;
 
     /**
+     * Get height in CM.
+     *
      * @return float
      */
     public function getHeight(): float;
 
     /**
+     * Set height in CM.
+     *
      * @param float $height
      *
      * @return $this
@@ -149,11 +189,15 @@ interface DeliveryServiceInterface
     public function setHeight(float $height): static;
 
     /**
+     * Get is non standard package flag.
+     *
      * @return bool
      */
     public function getIsNonStandard(): bool;
 
     /**
+     * Set is non standard package flag.
+     *
      * @param bool $isNonStandard
      *
      * @return $this
@@ -161,11 +205,15 @@ interface DeliveryServiceInterface
     public function setIsNonStandard(bool $isNonStandard): static;
 
     /**
+     * Get has euro return flag.
+     *
      * @return bool
      */
     public function getHasEuroReturn(): bool;
 
     /**
+     * Set has euro return flag.
+     *
      * @param bool $hasEuroReturn
      *
      * @return $this
@@ -173,11 +221,15 @@ interface DeliveryServiceInterface
     public function setHasEuroReturn(bool $hasEuroReturn): static;
 
     /**
+     * Get package contents description.
+     *
      * @return string|null
      */
     public function getContent(): ?string;
 
     /**
+     * Set package contents description.
+     *
      * @param string|null $content
      *
      * @return $this
@@ -185,11 +237,15 @@ interface DeliveryServiceInterface
     public function setContent(?string $content): static;
 
     /**
+     * Get special comments.
+     *
      * @return string|null
      */
     public function getComment(): ?string;
 
     /**
+     * Set special comments.
+     *
      * @param string|null $comment
      *
      * @return $this
@@ -197,11 +253,15 @@ interface DeliveryServiceInterface
     public function setComment(?string $comment): static;
 
     /**
+     * Get reference number.
+     *
      * @return string|null
      */
     public function getReference(): ?string;
 
     /**
+     * Set reference number.
+     *
      * @param string|null $reference
      *
      * @return $this
@@ -209,11 +269,15 @@ interface DeliveryServiceInterface
     public function setReference(?string $reference): static;
 
     /**
+     * Get MPK cost center code.
+     *
      * @return string|null
      */
     public function getMpk(): ?string;
 
     /**
+     * Set MPK cost center code.
+     *
      * @param string|null $mpk
      *
      * @return $this
@@ -221,11 +285,15 @@ interface DeliveryServiceInterface
     public function setMpk(?string $mpk): static;
 
     /**
+     * Get additional services array.
+     *
      * @return array|null
      */
     public function getAdditionalServices(): ?array;
 
     /**
+     * Set additional services array.
+     *
      * @param array|null $additionalServices
      *
      * @return $this
@@ -233,11 +301,15 @@ interface DeliveryServiceInterface
     public function setAdditionalServices(?array $additionalServices): static;
 
     /**
+     * Get label format type.
+     *
      * @return string
      */
     public function getLabelType(): string;
 
     /**
+     * Set label format type.
+     *
      * @param string $labelType
      *
      * @return $this
@@ -245,11 +317,15 @@ interface DeliveryServiceInterface
     public function setLabelType(string $labelType): static;
 
     /**
+     * Get default drop off point ID.
+     *
      * @return int|null
      */
     public function getDropOffPointId(): ?int;
 
     /**
+     * Set default drop off point ID.
+     *
      * @param int|null $dropOffPointId
      *
      * @return $this
@@ -257,11 +333,15 @@ interface DeliveryServiceInterface
     public function setDropOffPointId(?int $dropOffPointId): static;
 
     /**
+     * Get address type.
+     *
      * @return string|null
      */
     public function getAddressType(): ?string;
 
     /**
+     * Set address type.
+     *
      * @param string|null $addressType
      *
      * @return $this
@@ -269,11 +349,15 @@ interface DeliveryServiceInterface
     public function setAddressType(?string $addressType): static;
 
     /**
+     * Get auto create return shipment flag.
+     *
      * @return bool
      */
     public function getAutoCreateReturnShipment(): bool;
 
     /**
+     * Set auto create return shipment flag.
+     *
      * @param bool $autoCreateReturnShipment
      *
      * @return $this

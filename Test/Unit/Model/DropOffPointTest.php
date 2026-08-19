@@ -11,6 +11,9 @@ use PHPUnit\Framework\TestCase;
 
 class DropOffPointTest extends TestCase
 {
+    /**
+     * @var DropOffPoint
+     */
     private DropOffPoint $model;
 
     protected function setUp(): void

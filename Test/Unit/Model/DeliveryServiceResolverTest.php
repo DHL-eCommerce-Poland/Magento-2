@@ -12,7 +12,14 @@ use PHPUnit\Framework\TestCase;
 
 class DeliveryServiceResolverTest extends TestCase
 {
+    /**
+     * @var DeliveryServiceRepositoryInterface|MockObject
+     */
     private DeliveryServiceRepositoryInterface|MockObject $repositoryMock;
+
+    /**
+     * @var DeliveryServiceResolver
+     */
     private DeliveryServiceResolver $resolver;
 
     protected function setUp(): void

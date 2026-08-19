@@ -83,6 +83,12 @@
                 <label translate="true">Template Name</label>
             </settings>
         </column>
+        <column name="sap_number">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Numer SAP</label>
+            </settings>
+        </column>
         <column name="sender_name">
             <settings>
                 <filter>text</filter>

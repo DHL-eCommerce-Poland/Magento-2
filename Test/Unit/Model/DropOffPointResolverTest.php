@@ -12,7 +12,14 @@ use PHPUnit\Framework\TestCase;
 
 class DropOffPointResolverTest extends TestCase
 {
+    /**
+     * @var DropOffPointRepositoryInterface|MockObject
+     */
     private DropOffPointRepositoryInterface|MockObject $repositoryMock;
+
+    /**
+     * @var DropOffPointResolver
+     */
     private DropOffPointResolver $resolver;
 
     protected function setUp(): void

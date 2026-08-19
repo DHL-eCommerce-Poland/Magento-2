@@ -25,11 +25,15 @@ interface DropOffPointInterface
     public const IS_DEFAULT = 'is_default';
 
     /**
+     * Get entity ID.
+     *
      * @return int|null
      */
     public function getEntityId(): ?int;
 
     /**
+     * Set entity ID.
+     *
      * @param mixed $entityId
      *
      * @return $this
@@ -37,143 +41,63 @@ interface DropOffPointInterface
     public function setEntityId($entityId);
 
     /**
+     * Get website ID.
+     *
      * @return int
      */
     public function getWebsiteId(): int;
 
     /**
+     * Set website ID.
+     *
      * @param int $websiteId
- *
+     *
      * @return $this
      */
     public function setWebsiteId(int $websiteId): static;
 
     /**
+     * Get profile template name.
+     *
      * @return string
      */
     public function getTemplateName(): string;
 
     /**
+     * Set profile template name.
+     *
      * @param string $templateName
- *
+     *
      * @return $this
      */
     public function setTemplateName(string $templateName): static;
 
     /**
+     * Get sender name.
+     *
      * @return string
      */
     public function getSenderName(): string;
 
     /**
+     * Set sender name.
+     *
      * @param string $senderName
- *
+     *
      * @return $this
      */
     public function setSenderName(string $senderName): static;
 
     /**
-     * @return string
-     */
-    public function getStreet(): string;
-
-    /**
-     * @param string $street
- *
-     * @return $this
-     */
-    public function setStreet(string $street): static;
-
-    /**
-     * @return string
-     */
-    public function getHouseNumber(): string;
-
-    /**
-     * @param string $houseNumber
- *
-     * @return $this
-     */
-    public function setHouseNumber(string $houseNumber): static;
-
-    /**
-     * @return string
-     */
-    public function getPostalCode(): string;
-
-    /**
-     * @param string $postalCode
- *
-     * @return $this
-     */
-    public function setPostalCode(string $postalCode): static;
-
-    /**
-     * @return string
-     */
-    public function getCity(): string;
-
-    /**
-     * @param string $city
- *
-     * @return $this
-     */
-    public function setCity(string $city): static;
-
-    /**
-     * @return string
-     */
-    public function getCountryId(): string;
-
-    /**
-     * @param string $countryId
- *
-     * @return $this
-     */
-    public function setCountryId(string $countryId): static;
-
-    /**
-     * @return string|null
-     */
-    public function getEmail(): ?string;
-
-    /**
-     * @param string|null $email
- *
-     * @return $this
-     */
-    public function setEmail(?string $email): static;
-
-    /**
-     * @return string|null
-     */
-    public function getPhone(): ?string;
-
-    /**
-     * @param string|null $phone
- *
-     * @return $this
-     */
-    public function setPhone(?string $phone): static;
-
-    /**
-     * @return string|null
-     */
-    public function getSapNumber(): ?string;
-
-    /**
-     * @param string|null $sapNumber
- *
-     * @return $this
-     */
-    public function setSapNumber(?string $sapNumber): static;
-
-    /**
+     * Get first name.
+     *
      * @return string|null
      */
     public function getFirstName(): ?string;
 
     /**
+     * Set first name.
+     *
      * @param string|null $firstName
      *
      * @return $this
@@ -181,11 +105,15 @@ interface DropOffPointInterface
     public function setFirstName(?string $firstName): static;
 
     /**
+     * Get last name.
+     *
      * @return string|null
      */
     public function getLastName(): ?string;
 
     /**
+     * Set last name.
+     *
      * @param string|null $lastName
      *
      * @return $this
@@ -193,11 +121,143 @@ interface DropOffPointInterface
     public function setLastName(?string $lastName): static;
 
     /**
+     * Get street.
+     *
+     * @return string
+     */
+    public function getStreet(): string;
+
+    /**
+     * Set street.
+     *
+     * @param string $street
+     *
+     * @return $this
+     */
+    public function setStreet(string $street): static;
+
+    /**
+     * Get house number.
+     *
+     * @return string
+     */
+    public function getHouseNumber(): string;
+
+    /**
+     * Set house number.
+     *
+     * @param string $houseNumber
+     *
+     * @return $this
+     */
+    public function setHouseNumber(string $houseNumber): static;
+
+    /**
+     * Get postal code.
+     *
+     * @return string
+     */
+    public function getPostalCode(): string;
+
+    /**
+     * Set postal code.
+     *
+     * @param string $postalCode
+     *
+     * @return $this
+     */
+    public function setPostalCode(string $postalCode): static;
+
+    /**
+     * Get city.
+     *
+     * @return string
+     */
+    public function getCity(): string;
+
+    /**
+     * Set city.
+     *
+     * @param string $city
+     *
+     * @return $this
+     */
+    public function setCity(string $city): static;
+
+    /**
+     * Get country ID.
+     *
+     * @return string
+     */
+    public function getCountryId(): string;
+
+    /**
+     * Set country ID.
+     *
+     * @param string $countryId
+     *
+     * @return $this
+     */
+    public function setCountryId(string $countryId): static;
+
+    /**
+     * Get email.
+     *
+     * @return string|null
+     */
+    public function getEmail(): ?string;
+
+    /**
+     * Set email.
+     *
+     * @param string|null $email
+     *
+     * @return $this
+     */
+    public function setEmail(?string $email): static;
+
+    /**
+     * Get phone.
+     *
+     * @return string|null
+     */
+    public function getPhone(): ?string;
+
+    /**
+     * Set phone.
+     *
+     * @param string|null $phone
+     *
+     * @return $this
+     */
+    public function setPhone(?string $phone): static;
+
+    /**
+     * Get SAP number.
+     *
+     * @return string|null
+     */
+    public function getSapNumber(): ?string;
+
+    /**
+     * Set SAP number.
+     *
+     * @param string|null $sapNumber
+     *
+     * @return $this
+     */
+    public function setSapNumber(?string $sapNumber): static;
+
+    /**
+     * Get pickup time from.
+     *
      * @return string|null
      */
     public function getPickupTimeFrom(): ?string;
 
     /**
+     * Set pickup time from.
+     *
      * @param string|null $pickupTimeFrom
      *
      * @return $this
@@ -205,11 +265,15 @@ interface DropOffPointInterface
     public function setPickupTimeFrom(?string $pickupTimeFrom): static;
 
     /**
+     * Get pickup time to.
+     *
      * @return string|null
      */
     public function getPickupTimeTo(): ?string;
 
     /**
+     * Set pickup time to.
+     *
      * @param string|null $pickupTimeTo
      *
      * @return $this
@@ -217,11 +281,15 @@ interface DropOffPointInterface
     public function setPickupTimeTo(?string $pickupTimeTo): static;
 
     /**
+     * Get is default.
+     *
      * @return bool
      */
     public function getIsDefault(): bool;
 
     /**
+     * Set is default.
+     *
      * @param bool $isDefault
      *
      * @return $this

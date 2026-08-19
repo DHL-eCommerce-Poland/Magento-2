@@ -72,6 +72,16 @@
                 <dataScope>template_name</dataScope>
             </settings>
         </field>
+        <field name="sap_number" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Numer SAP</label>
+                <dataScope>sap_number</dataScope>
+            </settings>
+        </field>
         <field name="sender_name" formElement="input">
             <settings>
                 <validation>

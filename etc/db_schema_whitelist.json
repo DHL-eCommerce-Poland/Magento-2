@@ -10,11 +10,11 @@
             "price": true
         },
         "index": {
-            "IDEO_DHL_TABLERATE_WEBSITE_ID_METHOD_CODE_CONDITION_TYPE": true
+            "IDX_IDEO_DHL_TABLERATE_MATCH": true
         },
         "constraint": {
             "PRIMARY": true,
-            "UNQ_F7001E7F6A7A3B5890CF20A3A1077A2E": true
+            "UNQ_IDEO_DHL_TABLERATE_LOOKUP": true
         }
     },
     "quote_address": {
@@ -88,6 +88,26 @@
         },
         "index": {
             "IDX_IDEO_DHL_DELIVERY_SERVICE_WEBSITE_METHOD": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ideo_dhl_shipment_data": {
+        "column": {
+            "entity_id": true,
+            "order_id": true,
+            "status": true,
+            "preset_sender_id": true,
+            "preset_shipment_id": true,
+            "shipment_data": true,
+            "error_messages": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "IDX_IDEO_DHL_SHIPMENT_DATA_ORDER_ID": true,
+            "IDX_IDEO_DHL_SHIPMENT_DATA_STATUS": true
         },
         "constraint": {
             "PRIMARY": true

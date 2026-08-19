@@ -86,6 +86,7 @@
             <formElements>
                 <select>
                     <settings>
+                        <caption translate="true">Select Service...</caption>
                         <options class="Ideo\Dhl\Model\Config\Source\ServiceCode"/>
                     </settings>
                 </select>
@@ -184,6 +185,7 @@
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Additional Comments</label>
+                <notice translate="true">Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method}</notice>
                 <dataScope>comment</dataScope>
             </settings>
         </field>
@@ -191,6 +193,7 @@
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Shipment Reference Number</label>
+                <notice translate="true">Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method}</notice>
                 <dataScope>reference</dataScope>
             </settings>
         </field>
@@ -198,7 +201,7 @@
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">MPK</label>
-                <notice translate="true">Cost center code</notice>
+                <notice translate="true">Cost center code. Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method}</notice>
                 <dataScope>mpk</dataScope>
             </settings>
         </field>

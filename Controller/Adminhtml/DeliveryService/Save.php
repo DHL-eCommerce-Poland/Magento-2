@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Controller\Adminhtml\DeliveryService;
 
+use Exception;
 use Ideo\Dhl\Api\Data\DeliveryServiceInterfaceFactory;
 use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Model\DeliveryService;
@@ -52,6 +53,10 @@ class Save extends Action implements HttpPostActionInterface
                     $model = $this->deliveryServiceFactory->create();
                 }
 
+                if (isset($data['method_code']) && is_array($data['method_code'])) {
+                    $data['method_code'] = implode(',', array_filter($data['method_code']));
+                }
+
                 /** @var DeliveryService $model */
                 $model->setData($data);
                 $this->deliveryServiceRepository->save($model);
@@ -61,7 +66,7 @@ class Save extends Action implements HttpPostActionInterface
                     return $resultRedirect->setPath('*/*/edit', ['entity_id' => $model->getEntityId()]);
                 }
                 return $resultRedirect->setPath('*/*/index');
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->messageManager->addErrorMessage(__('Error saving delivery service: %1', $e->getMessage()));
                 return $resultRedirect->setPath('*/*/edit', ['entity_id' => $id]);
             }
