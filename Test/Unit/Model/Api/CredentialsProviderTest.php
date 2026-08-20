@@ -1,0 +1,150 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ideo\Dhl\Test\Unit\Model\Api;
+
+use Ideo\Dhl\Model\Api\Credentials;
+use Ideo\Dhl\Model\Api\CredentialsProvider;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+
+class CredentialsProviderTest extends TestCase
+{
+    /**
+     * @var ScopeConfigInterface|MockObject
+     */
+    private ScopeConfigInterface|MockObject $scopeConfigMock;
+
+    /**
+     * @var EncryptorInterface|MockObject
+     */
+    private EncryptorInterface|MockObject $encryptorMock;
+
+    /**
+     * @var CredentialsProvider
+     */
+    private CredentialsProvider $credentialsProvider;
+
+    /**
+     * Set up test dependencies.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        $this->scopeConfigMock = $this->createMock(ScopeConfigInterface::class);
+        $this->encryptorMock = $this->createMock(EncryptorInterface::class);
+
+        $this->credentialsProvider = new CredentialsProvider(
+            $this->scopeConfigMock,
+            $this->encryptorMock
+        );
+    }
+
+    /**
+     * Test getting credentials from config for production.
+     *
+     * @return void
+     */
+    public function testGetCredentialsFromConfigProduction(): void
+    {
+        $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+        $this->scopeConfigMock->expects($this->exactly(2))
+            ->method('getValue')
+            ->willReturnMap([
+                ['carriers/dhlparcel/api_login', $scope, null, '0:3:encrypted_user'],
+                ['carriers/dhlparcel/api_password', $scope, null, '0:3:encrypted_pass'],
+            ]);
+
+        $this->encryptorMock->expects($this->exactly(2))
+            ->method('decrypt')
+            ->willReturnMap([
+                ['0:3:encrypted_user', 'decrypted_user'],
+                ['0:3:encrypted_pass', 'decrypted_pass'],
+            ]);
+
+        $credentials = $this->credentialsProvider->getCredentials('production');
+
+        $this->assertEquals('decrypted_user', $credentials->getUsername());
+        $this->assertEquals('decrypted_pass', $credentials->getPassword());
+        $this->assertFalse($credentials->isSandbox());
+    }
+
+    /**
+     * Test getting credentials from config for sandbox.
+     *
+     * @return void
+     */
+    public function testGetCredentialsFromConfigSandbox(): void
+    {
+        $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+        $this->scopeConfigMock->expects($this->exactly(2))
+            ->method('getValue')
+            ->willReturnMap([
+                ['carriers/dhlparcel/api_login_sandbox', $scope, null, '0:3:enc_sb_user'],
+                ['carriers/dhlparcel/api_password_sandbox', $scope, null, '0:3:enc_sb_pass'],
+            ]);
+
+        $this->encryptorMock->expects($this->exactly(2))
+            ->method('decrypt')
+            ->willReturnMap([
+                ['0:3:enc_sb_user', 'sb_user'],
+                ['0:3:enc_sb_pass', 'sb_pass'],
+            ]);
+
+        $credentials = $this->credentialsProvider->getCredentials('sandbox');
+
+        $this->assertEquals('sb_user', $credentials->getUsername());
+        $this->assertEquals('sb_pass', $credentials->getPassword());
+        $this->assertTrue($credentials->isSandbox());
+    }
+
+    /**
+     * Test override credentials provided from form (Test before save).
+     *
+     * @return void
+     */
+    public function testGetCredentialsWithOverrides(): void
+    {
+        $this->scopeConfigMock->expects($this->never())->method('getValue');
+        $this->encryptorMock->expects($this->never())->method('decrypt');
+
+        $credentials = $this->credentialsProvider->getCredentials('sandbox', 'override_user', 'override_pass');
+
+        $this->assertEquals('override_user', $credentials->getUsername());
+        $this->assertEquals('override_pass', $credentials->getPassword());
+        $this->assertTrue($credentials->isSandbox());
+    }
+
+    /**
+     * Test filtering out Magento obscure dummy asterisks values (e.g. '******').
+     *
+     * @return void
+     */
+    public function testGetCredentialsFiltersObscurePlaceholder(): void
+    {
+        $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+        $this->scopeConfigMock->expects($this->exactly(2))
+            ->method('getValue')
+            ->willReturnMap([
+                ['carriers/dhlparcel/api_login', $scope, null, '0:3:encrypted_user'],
+                ['carriers/dhlparcel/api_password', $scope, null, '0:3:encrypted_pass'],
+            ]);
+
+        $this->encryptorMock->expects($this->exactly(2))
+            ->method('decrypt')
+            ->willReturnMap([
+                ['0:3:encrypted_user', 'decrypted_user'],
+                ['0:3:encrypted_pass', 'decrypted_pass'],
+            ]);
+
+        $credentials = $this->credentialsProvider->getCredentials('production', '******', '******');
+
+        $this->assertEquals('decrypted_user', $credentials->getUsername());
+        $this->assertEquals('decrypted_pass', $credentials->getPassword());
+        $this->assertFalse($credentials->isSandbox());
+    }
+}

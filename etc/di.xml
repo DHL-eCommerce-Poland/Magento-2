@@ -8,6 +8,29 @@
     <preference for="Ideo\Dhl\Api\Data\ShipmentDataInterface" type="Ideo\Dhl\Model\ShipmentData" />
     <preference for="Ideo\Dhl\Api\ShipmentDataRepositoryInterface" type="Ideo\Dhl\Model\ShipmentDataRepository" />
 
+    <preference for="Ideo\Dhl\Model\Api\ClientInterface" type="Ideo\Dhl\Model\Api\SoapClientAdapter" />
+
+    <virtualType name="IdeoDhlApiLoggerHandler" type="Ideo\Dhl\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="IdeoDhlApiLogger" type="Ideo\Dhl\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">dhl_api</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">IdeoDhlApiLoggerHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Ideo\Dhl\Model\Api\SoapClientAdapter">
+        <arguments>
+            <argument name="logger" xsi:type="object">IdeoDhlApiLogger</argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Checkout\Api\ShippingInformationManagementInterface">
         <plugin name="ideo_dhl_save_service_point_to_quote_address"
                 type="Ideo\Dhl\Plugin\Checkout\SaveServicePointToQuoteAddress"
