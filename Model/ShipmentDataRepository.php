@@ -9,6 +9,7 @@ use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Model\ResourceModel\ShipmentData as ShipmentDataResource;
 use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory as ShipmentDataCollectionFactory;
+use Magento\Framework\Api\CriteriaInterface;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResultsInterface;
@@ -76,7 +77,7 @@ class ShipmentDataRepository implements ShipmentDataRepositoryInterface
     }
 
     /**
-     * Get DHL shipment data by Magento order ID.
+     * Get DHL shipment data by Magento order ID (latest created entity).
      *
      * @param int $orderId
      *
@@ -86,9 +87,25 @@ class ShipmentDataRepository implements ShipmentDataRepositoryInterface
     {
         $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter(ShipmentDataInterface::ORDER_ID, $orderId);
+        $collection->setOrder(ShipmentDataInterface::ENTITY_ID, CriteriaInterface::SORT_ORDER_DESC);
         /** @var ShipmentData|null $entity */
         $entity = $collection->getFirstItem();
         return ($entity && $entity->getEntityId()) ? $entity : null;
+    }
+
+    /**
+     * Get all DHL shipment data entities for a Magento order ID.
+     *
+     * @param int $orderId
+     *
+     * @return ShipmentDataInterface[]
+     */
+    public function getListByOrderId(int $orderId): array
+    {
+        $collection = $this->collectionFactory->create();
+        $collection->addFieldToFilter(ShipmentDataInterface::ORDER_ID, $orderId);
+        $collection->setOrder(ShipmentDataInterface::ENTITY_ID, CriteriaInterface::SORT_ORDER_DESC);
+        return array_values($collection->getItems());
     }
 
     /**

@@ -84,6 +84,111 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
+     * Create shipments via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param array $shipmentsFullData
+     * @param int|null $orderId Optional Magento order ID for diagnostic logging context
+     *
+     * @return CreateShipmentsResult
+     */
+    public function createShipments(
+        Credentials $credentials,
+        array $shipmentsFullData,
+        ?int $orderId = null
+    ): CreateShipmentsResult {
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $orderContext = $orderId !== null ? sprintf(' (Order #%d)', $orderId) : '';
+
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
+
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+                'shipments' => [
+                    'item' => $shipmentsFullData,
+                ],
+            ];
+
+            $response = $client->createShipments($params);
+            $this->logSoapCommunication($client, 'createShipments' . $orderContext);
+
+            $shipmentResult = $response->createShipmentsResult->item ?? $response->createShipmentsResult ?? null;
+            if (is_array($shipmentResult)) {
+                $shipmentResult = $shipmentResult[0] ?? null;
+            }
+
+            if (is_object($shipmentResult) && !empty($shipmentResult->shipmentId)) {
+                return new CreateShipmentsResult(true, false, (string) $shipmentResult->shipmentId);
+            }
+
+            $errorMsg = is_object($shipmentResult) && !empty($shipmentResult->error)
+                ? (string) $shipmentResult->error
+                : 'DHL API returned an invalid response structure.';
+
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] createShipments failed%s: %s',
+                $orderContext,
+                $errorMsg
+            ));
+
+            return new CreateShipmentsResult(false, false, null, 'CREATE_SHIPMENT_ERROR', $errorMsg);
+        } catch (SoapFault $fault) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] SoapFault during createShipments%s: [%s] %s',
+                $orderContext,
+                $fault->faultcode ?? 'FAULT',
+                $fault->getMessage()
+            ));
+
+            $isTimeout = $this->isTimeoutException($fault);
+
+            return new CreateShipmentsResult(
+                false,
+                $isTimeout,
+                null,
+                $fault->faultcode ?? 'SOAP_FAULT',
+                'DHL API error: ' . $fault->getMessage()
+            );
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] Exception during createShipments%s: %s',
+                $orderContext,
+                $e->getMessage()
+            ));
+
+            $isTimeout = $this->isTimeoutException($e);
+
+            return new CreateShipmentsResult(
+                false,
+                $isTimeout,
+                null,
+                'CONNECTION_ERROR',
+                'An error occurred while connecting to DHL: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Check if exception message or code indicates a network/SOAP timeout.
+     *
+     * @param Throwable $e
+     * @return bool
+     */
+    private function isTimeoutException(Throwable $e): bool
+    {
+        $message = strtolower($e->getMessage());
+
+        return str_contains($message, 'timed out')
+            || str_contains($message, 'timeout')
+            || str_contains($message, 'could not connect')
+            || str_contains($message, 'connection refused');
+    }
+
+    /**
      * Create SoapClient instance with custom timeout and WSDL caching rules.
      *
      * @param string $wsdlUrl

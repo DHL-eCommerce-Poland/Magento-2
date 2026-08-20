@@ -124,4 +124,147 @@ class ShipmentDataValidatorTest extends TestCase
         $this->expectException(LocalizedException::class);
         $this->validator->validate($shipmentData);
     }
+
+    /**
+     * Test validation throws LocalizedException when multiple packages provided for ServicePoint.
+     *
+     * @return void
+     */
+    public function testValidateSinglePieceOnlyRestrictionThrowsException(): void
+    {
+        $sender = new SenderData(
+            name: 'Sender',
+            street: 'Street',
+            houseNumber: '1',
+            postalCode: '00-000',
+            city: 'City'
+        );
+        $recipient = new RecipientData(
+            firstName: 'Jan',
+            lastName: 'Kowalski',
+            street: 'Street',
+            houseNumber: '2',
+            postalCode: '00-000',
+            city: 'City',
+            popId: '4529508'
+        );
+        $packages = [
+            new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 1.0),
+            new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 1.0)
+        ];
+        $settings = new ShipmentSettingsData(serviceType: 'SP', content: 'Test', packages: $packages);
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 1,
+            sender: $sender,
+            recipient: $recipient,
+            shipmentSettings: $settings
+        );
+
+        $this->expectException(LocalizedException::class);
+        $this->validator->validate($shipmentData);
+    }
+
+    /**
+     * Test validation throws LocalizedException when non-standard package provided for ServicePoint.
+     *
+     * @return void
+     */
+    public function testValidateNonStandardForbiddenThrowsException(): void
+    {
+        $sender = new SenderData(
+            name: 'Sender',
+            street: 'Street',
+            houseNumber: '1',
+            postalCode: '00-000',
+            city: 'City'
+        );
+        $recipient = new RecipientData(
+            firstName: 'Jan',
+            lastName: 'Kowalski',
+            street: 'Street',
+            houseNumber: '2',
+            postalCode: '00-000',
+            city: 'City',
+            popId: '4529508'
+        );
+        $packages = [
+            new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 1.0, isNonStandard: true)
+        ];
+        $settings = new ShipmentSettingsData(serviceType: 'SP', content: 'Test', packages: $packages);
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 1,
+            sender: $sender,
+            recipient: $recipient,
+            shipmentSettings: $settings
+        );
+
+        $this->expectException(LocalizedException::class);
+        $this->validator->validate($shipmentData);
+    }
+
+    /**
+     * Test validate throws LocalizedException when insurance is selected without valid value.
+     *
+     * @return void
+     */
+    public function testValidateInsuranceValueRequiredWhenSelected(): void
+    {
+        $sender = new SenderData(name: 'S', street: 'St', houseNumber: '1', postalCode: '00-000', city: 'C');
+        $recipient = new RecipientData(
+            firstName: 'Jan',
+            lastName: 'K',
+            street: 'St',
+            houseNumber: '2',
+            postalCode: '00-000',
+            city: 'C'
+        );
+        $packages = [new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 1.0)];
+        $settings = new ShipmentSettingsData(serviceType: 'AH', content: 'Test', packages: $packages);
+        $specialServices = new \Ideo\Dhl\Model\Shipment\Data\SpecialServicesData(insurance: true, insuranceValue: 0.0);
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 1,
+            sender: $sender,
+            recipient: $recipient,
+            shipmentSettings: $settings,
+            specialServices: $specialServices
+        );
+
+        $this->expectException(LocalizedException::class);
+        $this->validator->validate($shipmentData);
+    }
+
+    /**
+     * Test validate throws LocalizedException when ROD is selected without document text.
+     *
+     * @return void
+     */
+    public function testValidateRodDocumentTextRequiredWhenSelected(): void
+    {
+        $sender = new SenderData(name: 'S', street: 'St', houseNumber: '1', postalCode: '00-000', city: 'C');
+        $recipient = new RecipientData(
+            firstName: 'Jan',
+            lastName: 'K',
+            street: 'St',
+            houseNumber: '2',
+            postalCode: '00-000',
+            city: 'C'
+        );
+        $packages = [new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 1.0)];
+        $settings = new ShipmentSettingsData(serviceType: 'AH', content: 'Test', packages: $packages);
+        $specialServices = new \Ideo\Dhl\Model\Shipment\Data\SpecialServicesData(rod: true, rodDocumentText: '');
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 1,
+            sender: $sender,
+            recipient: $recipient,
+            shipmentSettings: $settings,
+            specialServices: $specialServices
+        );
+
+        $this->expectException(LocalizedException::class);
+        $this->validator->validate($shipmentData);
+    }
 }

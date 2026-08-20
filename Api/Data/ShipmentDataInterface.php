@@ -8,6 +8,7 @@ interface ShipmentDataInterface
 {
     public const ENTITY_ID = 'entity_id';
     public const ORDER_ID = 'order_id';
+    public const SHIPMENT_ID = 'shipment_id';
     public const STATUS = 'status';
     public const PRESET_SENDER_ID = 'preset_sender_id';
     public const PRESET_SHIPMENT_ID = 'preset_shipment_id';
@@ -47,6 +48,22 @@ interface ShipmentDataInterface
      * @return $this
      */
     public function setOrderId(?int $orderId): static;
+
+    /**
+     * Get DHL waybill shipment ID.
+     *
+     * @return string|null
+     */
+    public function getShipmentId(): ?string;
+
+    /**
+     * Set DHL waybill shipment ID.
+     *
+     * @param string|null $shipmentId
+     *
+     * @return $this
+     */
+    public function setShipmentId(?string $shipmentId): static;
 
     /**
      * Get shipment status.

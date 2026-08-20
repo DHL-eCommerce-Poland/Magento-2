@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Ideo\Dhl\Model\Shipment\DhlShipmentRestrictions;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\Template;
 
@@ -171,18 +172,18 @@ use Magento\Framework\View\Element\Template;
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Package Contents Description')) ?></span></label>
                             <div class="admin__field-control">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Package Contents Description')) ?>" data-bind="value: content" required />
+                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Package Contents Description')) ?>" maxlength="<?= DhlShipmentRestrictions::MAX_LENGTH_CONTENT ?>" data-bind="value: content" required />
                                 <div class="admin__field-note">
-                                    <span><?= $escaper->escapeHtml(__('Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method}')) ?></span>
+                                    <span><?= $escaper->escapeHtml(__('Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method} (max %1 chars)', DhlShipmentRestrictions::MAX_LENGTH_CONTENT)) ?></span>
                                 </div>
                             </div>
                         </div>
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Additional Comments')) ?></span></label>
                             <div class="admin__field-control">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Additional Comments')) ?>" data-bind="value: comment" />
+                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Additional Comments')) ?>" maxlength="<?= DhlShipmentRestrictions::MAX_LENGTH_COMMENT ?>" data-bind="value: comment" />
                                 <div class="admin__field-note">
-                                    <span><?= $escaper->escapeHtml(__('Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method}')) ?></span>
+                                    <span><?= $escaper->escapeHtml(__('Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method} (max %1 chars)', DhlShipmentRestrictions::MAX_LENGTH_COMMENT)) ?></span>
                                 </div>
                             </div>
                         </div>
@@ -190,7 +191,7 @@ use Magento\Framework\View\Element\Template;
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipment Reference Number & MPK')) ?></span></label>
                             <div class="admin__field-control">
                                 <div style="display: flex; gap: 8px;">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipment Reference Number')) ?>" data-bind="value: reference" style="flex: 1;" />
+                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipment Reference Number')) ?>" maxlength="<?= DhlShipmentRestrictions::MAX_LENGTH_REFERENCE ?>" data-bind="value: reference" style="flex: 1;" />
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('MPK')) ?>" data-bind="value: mpk" style="flex: 1;" />
                                 </div>
                                 <div class="admin__field-note">
@@ -222,13 +223,13 @@ use Magento\Framework\View\Element\Template;
                                     <input type="checkbox" data-bind="checked: insurance" /> <?= $escaper->escapeHtml(__('UBEZP - Insurance')) ?>
                                 </label>
                                 <div style="margin-left: 24px; margin-top: 4px; margin-bottom: 8px; max-width: 250px;" data-bind="visible: insurance">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Insurance Value')) ?>" data-bind="value: insuranceValue" />
+                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Insurance Value')) ?>" data-bind="value: insuranceValue, attr: {required: insurance() ? 'required' : null}" data-validate="{'required-entry': true, 'validate-number': true, 'greater-than-zero': true}" />
                                 </div>
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
                                     <input type="checkbox" data-bind="checked: cod" /> <?= $escaper->escapeHtml(__('COD - Cash On Delivery')) ?>
                                 </label>
                                 <div style="margin-left: 24px; margin-top: 4px; margin-bottom: 8px; max-width: 250px;" data-bind="visible: cod">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('COD Amount')) ?>" data-bind="value: codAmount" />
+                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('COD Amount')) ?>" data-bind="value: codAmount, attr: {required: cod() ? 'required' : null}" data-validate="{'required-entry': true, 'validate-number': true, 'greater-than-zero': true}" />
                                 </div>
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
                                     <input type="checkbox" data-bind="checked: eveningDelivery" /> <?= $escaper->escapeHtml(__('1722 - Evening Delivery (18-22)')) ?>
@@ -246,7 +247,7 @@ use Magento\Framework\View\Element\Template;
                                     <input type="checkbox" data-bind="checked: rod" /> <?= $escaper->escapeHtml(__('ROD - Return Confirmed Documents')) ?>
                                 </label>
                                 <div style="margin-left: 24px; margin-top: 4px; margin-bottom: 8px; max-width: 250px;" data-bind="visible: rod">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('ROD Document Name')) ?>" data-bind="value: rodDocumentText" />
+                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('ROD Document Name')) ?>" data-bind="value: rodDocumentText, attr: {required: rod() ? 'required' : null}" data-validate="{'required-entry': true}" />
                                 </div>
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
                                     <input type="checkbox" data-bind="checked: pod" /> <?= $escaper->escapeHtml(__('POD - Proof of Delivery')) ?>
@@ -293,7 +294,7 @@ use Magento\Framework\View\Element\Template;
                                         <select class="admin__control-select" data-bind="options: $parents[1].packageTypeOptions, optionsText: 'label', optionsValue: 'value', value: packageType" required></select>
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: top;">
-                                        <input type="text" class="admin__control-text" data-bind="value: quantity" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true}" required />
+                                        <input type="text" class="admin__control-text" data-bind="value: quantity, disable: $parent.isSinglePieceOnly()" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true}" required />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: top;">
                                         <input type="text" class="admin__control-text" data-bind="value: weight" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true}" required />
@@ -308,13 +309,13 @@ use Magento\Framework\View\Element\Template;
                                         <input type="text" class="admin__control-text" data-bind="value: height, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true}' : null }" />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: middle; text-align: center;">
-                                        <input type="checkbox" data-bind="checked: isNonStandard" />
+                                        <input type="checkbox" data-bind="checked: isNonStandard, disable: $parent.isNonStandardForbidden()" title="<?= $escaper->escapeHtmlAttr(__('Non-standard package option')) ?>" />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: middle; text-align: center;">
                                         <input type="checkbox" data-bind="checked: hasEuroReturn" />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: middle; text-align: center;">
-                                        <!-- ko if: $parent.packages().length > 1 -->
+                                        <!-- ko if: $parent.packages().length > 1 && !$parent.isSinglePieceOnly() -->
                                         <button type="button" class="action-delete" data-bind="click: function() { $parent.removePackageRow($index()) }" title="<?= $escaper->escapeHtmlAttr(__('Delete Row')) ?>">
                                             <span><?= $escaper->escapeHtml(__('Delete')) ?></span>
                                         </button>
@@ -325,9 +326,16 @@ use Magento\Framework\View\Element\Template;
                             <tfoot>
                                 <tr>
                                     <td colspan="9" style="padding-top: 10px;">
+                                        <!-- ko if: !$data.isSinglePieceOnly() -->
                                         <button type="button" class="action-secondary" data-bind="click: function() { $data.addPackageRow() }">
                                             <span>+ <?= $escaper->escapeHtml(__('Add Package')) ?></span>
                                         </button>
+                                        <!-- /ko -->
+                                        <!-- ko if: $data.isSinglePieceOnly() -->
+                                        <div class="admin__field-note" style="margin-top: 5px;">
+                                            <span><?= $escaper->escapeHtml(__('Adding additional packages is restricted – ServicePoint, POP point, or selected service allows only 1 package per shipment.')) ?></span>
+                                        </div>
+                                        <!-- /ko -->
                                     </td>
                                 </tr>
                             </tfoot>

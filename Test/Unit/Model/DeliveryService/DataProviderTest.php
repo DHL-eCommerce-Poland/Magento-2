@@ -30,13 +30,15 @@ class DataProviderTest extends TestCase
         $collectionFactory->method('create')->willReturn($collection);
 
         $request = $this->createStub(RequestInterface::class);
+        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
 
         $dataProvider = new DataProvider(
             'ideo_dhl_delivery_service_form_data_source',
             'entity_id',
             'entity_id',
             $collectionFactory,
-            $request
+            $request,
+            $serializer
         );
 
         $data = $dataProvider->getData();

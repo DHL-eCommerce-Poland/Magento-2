@@ -6,16 +6,16 @@ namespace Ideo\Dhl\Test\Unit\Model\Api;
 
 use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\SoapClientAdapter;
-use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 class SoapClientAdapterTest extends TestCase
 {
     /**
-     * @var LoggerInterface|Stub
+     * @var LoggerInterface|MockObject
      */
-    private LoggerInterface|Stub $loggerStub;
+    private LoggerInterface|MockObject $loggerStub;
 
     /**
      * @var SoapClientAdapter
@@ -116,5 +116,57 @@ class SoapClientAdapterTest extends TestCase
         $this->assertFalse($result->isSuccess());
         $this->assertStringContainsString('Invalid credentials', $result->getMessage());
         $this->assertEquals('AUTH_ERR', $result->getErrorCode());
+    }
+
+    /**
+     * Test successful createShipments via mocked SoapClient.
+     *
+     * @return void
+     */
+    public function testCreateShipmentsSuccess(): void
+    {
+        $soapClientStub = new TestSoapClient(false);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->createShipments($credentials, [['content' => 'Test']]);
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertFalse($result->isTimeout());
+        $this->assertEquals('1234567890', $result->getShipmentId());
+    }
+
+    /**
+     * Test createShipments handling timeout exception.
+     *
+     * @return void
+     */
+    public function testCreateShipmentsTimeout(): void
+    {
+        $soapClientStub = new TestSoapClient(true);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->createShipments($credentials, [['content' => 'Test']]);
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertNull($result->getShipmentId());
+        $this->assertEquals('CREATE_ERR', $result->getErrorCode());
     }
 }

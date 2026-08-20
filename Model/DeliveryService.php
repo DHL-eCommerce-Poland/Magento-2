@@ -6,8 +6,13 @@ namespace Ideo\Dhl\Model;
 
 use Ideo\Dhl\Api\Data\DeliveryServiceInterface;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService as DeliveryServiceResource;
+use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Registry;
+use Magento\Framework\Serialize\SerializerInterface;
 
 class DeliveryService extends AbstractModel implements DeliveryServiceInterface
 {
@@ -20,6 +25,26 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
      * @var string
      */
     protected $_cacheTag = self::CACHE_TAG;
+
+    /**
+     * @param Context $context
+     * @param Registry $registry
+     * @param SerializerInterface $serializer
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     * @throws LocalizedException
+     */
+    public function __construct(
+        Context $context,
+        Registry $registry,
+        private readonly SerializerInterface $serializer,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+    }
 
     /**
      * Initialize resource model.
@@ -425,8 +450,12 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
             return $val;
         }
         if (is_string($val) && $val !== '') {
-            $decoded = json_decode($val, true);
-            return is_array($decoded) ? $decoded : null;
+            try {
+                $decoded = $this->serializer->unserialize($val);
+                return is_array($decoded) ? $decoded : null;
+            } catch (\InvalidArgumentException $e) {
+                return null;
+            }
         }
         return null;
     }
@@ -442,7 +471,7 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     {
         return $this->setData(
             self::ADDITIONAL_SERVICES,
-            $additionalServices !== null ? json_encode($additionalServices) : null
+            $additionalServices !== null ? $this->serializer->serialize($additionalServices) : null
         );
     }
 

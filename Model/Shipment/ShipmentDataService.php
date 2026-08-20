@@ -9,10 +9,12 @@ use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
-use Ideo\Dhl\Model\ShipmentData;
 use Ideo\Dhl\Model\ShipmentDataFactory;
+use InvalidArgumentException;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
@@ -26,7 +28,8 @@ class ShipmentDataService
      * @param DeliveryServiceRepositoryInterface $deliveryServiceRepository
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param ShipmentDataFactory $shipmentDataFactory
-     * @param LoggerInterface $logger
+     * @param SerializerInterface $serializer
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         private readonly OrderRepositoryInterface $orderRepository,
@@ -36,8 +39,70 @@ class ShipmentDataService
         private readonly DeliveryServiceRepositoryInterface $deliveryServiceRepository,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ShipmentDataFactory $shipmentDataFactory,
+        private readonly SerializerInterface $serializer,
         private readonly ?LoggerInterface $logger = null
     ) {
+    }
+
+    /**
+     * Load DhlShipmentData DTO for given entity ID.
+     *
+     * @param int $entityId
+     *
+     * @return DhlShipmentData
+     * @throws LocalizedException
+     */
+    public function loadShipmentData(int $entityId): DhlShipmentData
+    {
+        $entity = $this->shipmentDataRepository->getById($entityId);
+        $payload = $entity->getShipmentData();
+
+        if (empty($payload)) {
+            throw new LocalizedException(__('Shipment data payload is empty for entity #%1.', $entityId));
+        }
+
+        try {
+            $dataArr = $this->serializer->unserialize($payload);
+        } catch (InvalidArgumentException $e) {
+            $dataArr = null;
+        }
+
+        if (!is_array($dataArr)) {
+            throw new LocalizedException(__('Invalid JSON shipment payload for entity #%1.', $entityId));
+        }
+
+        return DhlShipmentData::fromArray($dataArr);
+    }
+
+    /**
+     * Update shipment status, shipment tracking ID, and optional error messages.
+     *
+     * @param int $entityId
+     * @param string $status
+     * @param string|null $shipmentId
+     * @param string|null $errorMessages
+     *
+     * @return ShipmentDataInterface
+     * @throws LocalizedException
+     */
+    public function updateShipmentStatusAndTracking(
+        int $entityId,
+        string $status,
+        ?string $shipmentId = null,
+        ?string $errorMessages = null
+    ): ShipmentDataInterface {
+        $entity = $this->shipmentDataRepository->getById($entityId);
+        $entity->setStatus($status);
+
+        if ($shipmentId !== null && trim($shipmentId) !== '') {
+            $entity->setShipmentId($shipmentId);
+        }
+
+        if ($errorMessages !== null) {
+            $entity->setErrorMessages($errorMessages);
+        }
+
+        return $this->shipmentDataRepository->save($entity);
     }
 
     /**
@@ -57,16 +122,7 @@ class ShipmentDataService
     ): DhlShipmentData {
         $order = $this->orderRepository->get($orderId);
 
-        // 1. Existing saved shipment data
-        $existing = $this->shipmentDataRepository->getByOrderId($orderId);
-        if ($existing && !empty($existing->getShipmentData())) {
-            $dataArr = json_decode($existing->getShipmentData(), true);
-            if (is_array($dataArr)) {
-                return DhlShipmentData::fromArray($dataArr);
-            }
-        }
-
-        // 2. Sender defaults from DropOffPoint preset
+        // 1. Sender defaults from DropOffPoint preset
         $senderDefaults = [];
         if ($presetSenderId) {
             try {
@@ -85,16 +141,21 @@ class ShipmentDataService
             }
         }
 
-        // 3. Shipment defaults from DeliveryService preset
+        // 2. Shipment defaults from DeliveryService preset
         $shipmentDefaults = [];
         if ($presetShipmentId) {
             try {
                 $serviceEntity = $this->deliveryServiceRepository->getById($presetShipmentId);
                 $shipmentDefaults = $serviceEntity->getData();
                 if (!empty($shipmentDefaults['additional_services'])) {
-                    $servicesArr = is_string($shipmentDefaults['additional_services'])
-                        ? json_decode($shipmentDefaults['additional_services'], true)
-                        : $shipmentDefaults['additional_services'];
+                    $servicesArr = $shipmentDefaults['additional_services'];
+                    if (is_string($servicesArr)) {
+                        try {
+                            $servicesArr = $this->serializer->unserialize($servicesArr);
+                        } catch (InvalidArgumentException $e) {
+                            $servicesArr = [];
+                        }
+                    }
                     if (is_array($servicesArr)) {
                         $shipmentDefaults['specialServices'] = $servicesArr;
                     }
@@ -124,11 +185,57 @@ class ShipmentDataService
     }
 
     /**
+     * Save DhlShipmentData object into database with custom status.
+     *
+     * @param DhlShipmentData $shipmentData
+     * @param string $status
+     * @param string|null $errorMessages
+     * @param string|null $presetSenderId
+     * @param string|null $presetShipmentId
+     * @param string|null $shipmentId
+     *
+     * @return ShipmentDataInterface
+     * @throws LocalizedException
+     * @throws CouldNotSaveException
+     */
+    public function saveShipmentDataWithStatus(
+        DhlShipmentData $shipmentData,
+        string $status = ShipmentStatus::DISPATCHED,
+        ?string $errorMessages = null,
+        ?string $presetSenderId = null,
+        ?string $presetShipmentId = null,
+        ?string $shipmentId = null
+    ): ShipmentDataInterface {
+        $this->validator->validate($shipmentData);
+
+        $orderId = $shipmentData->getOrderId();
+        $entity = $this->shipmentDataFactory->create();
+
+        $payloadArr = $shipmentData->toArray();
+        if ($shipmentId !== null && trim($shipmentId) !== '') {
+            $payloadArr['shipmentId'] = (string)$shipmentId;
+        }
+
+        $entity->setOrderId($orderId);
+        $entity->setStatus($status);
+        if ($shipmentId !== null && trim($shipmentId) !== '') {
+            $entity->setShipmentId($shipmentId);
+        }
+        $entity->setPresetSenderId($presetSenderId);
+        $entity->setPresetShipmentId($presetShipmentId);
+        $entity->setShipmentData($this->serializer->serialize($payloadArr));
+        $entity->setErrorMessages($errorMessages);
+
+        return $this->shipmentDataRepository->save($entity);
+    }
+
+    /**
      * Save DhlShipmentData object into database persistence.
      *
      * @param DhlShipmentData $shipmentData
      * @param string|null $presetSenderId
      * @param string|null $presetShipmentId
+     *
      * @return ShipmentDataInterface
      * @throws LocalizedException
      */
@@ -137,58 +244,24 @@ class ShipmentDataService
         ?string $presetSenderId = null,
         ?string $presetShipmentId = null
     ): ShipmentDataInterface {
-        $this->validator->validate($shipmentData);
-
-        $orderId = $shipmentData->getOrderId();
-        $entity = null;
-
-        if ($orderId) {
-            $entity = $this->shipmentDataRepository->getByOrderId($orderId);
-        }
-
-        if (!$entity) {
-            /** @var ShipmentDataInterface $entity */
-            $entity = $this->shipmentDataFactory->create();
-        }
-
-        $entity->setOrderId($orderId);
-        $entity->setStatus('pending');
-        $entity->setPresetSenderId($presetSenderId);
-        $entity->setPresetShipmentId($presetShipmentId);
-        $entity->setShipmentData(json_encode($shipmentData->toArray()));
-        $entity->setErrorMessages(null);
-
-        return $this->shipmentDataRepository->save($entity);
+        return $this->saveShipmentDataWithStatus(
+            $shipmentData,
+            ShipmentStatus::DISPATCHED,
+            null,
+            $presetSenderId,
+            $presetShipmentId
+        );
     }
 
     /**
-     * Prepare and save mass shipment data entities for given array of order IDs.
+     * Get all DHL shipment entities associated with Magento order ID.
      *
-     * @param int[] $orderIds
-     * @return array
+     * @param int $orderId
+     *
+     * @return ShipmentDataInterface[]
      */
-    public function prepareAndSaveMassShipmentData(array $orderIds): array
+    public function getAllShipmentsByOrderId(int $orderId): array
     {
-        $created = 0;
-        $errors = 0;
-
-        foreach ($orderIds as $orderId) {
-            try {
-                $shipmentData = $this->prepareShipmentData((int)$orderId);
-                $this->saveShipmentData($shipmentData);
-                $created++;
-            } catch (Exception $e) {
-                $this->logger?->error(
-                    'Error preparing mass shipment for order ' . $orderId . ': ' . $e->getMessage(),
-                    ['exception' => $e]
-                );
-                $errors++;
-            }
-        }
-
-        return [
-            'created' => $created,
-            'errors' => $errors,
-        ];
+        return $this->shipmentDataRepository->getListByOrderId($orderId);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model;
 
 use Ideo\Dhl\Api\Data\ShipmentDataInterface;
+use Ideo\Dhl\Model\Shipment\ShipmentStatus;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
 
@@ -66,13 +67,36 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
     }
 
     /**
+     * Get DHL waybill shipment ID.
+     *
+     * @return string|null
+     */
+    public function getShipmentId(): ?string
+    {
+        $val = $this->getData(self::SHIPMENT_ID);
+        return $val !== null ? (string)$val : null;
+    }
+
+    /**
+     * Set DHL waybill shipment ID.
+     *
+     * @param string|null $shipmentId
+     *
+     * @return $this
+     */
+    public function setShipmentId(?string $shipmentId): static
+    {
+        return $this->setData(self::SHIPMENT_ID, $shipmentId);
+    }
+
+    /**
      * Get shipment status.
      *
      * @return string
      */
     public function getStatus(): string
     {
-        return (string)($this->getData(self::STATUS) ?? 'pending');
+        return (string)($this->getData(self::STATUS) ?? ShipmentStatus::DISPATCHED);
     }
 
     /**

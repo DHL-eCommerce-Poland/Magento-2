@@ -36,13 +36,14 @@ class ShipmentDataServiceTest extends TestCase
 
         $order = $this->createStub(OrderInterface::class);
         $orderRepository->method('get')->willReturn($order);
-        $shipmentDataRepository->method('getByOrderId')->willReturn(null);
         $dropOffPointRepository->method('getDefaultByWebsiteId')->willReturn(null);
 
         $expectedData = new DhlShipmentData(orderId: 101);
         $mapper->expects($this->once())
             ->method('map')
             ->willReturn($expectedData);
+
+        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
 
         $service = new ShipmentDataService(
             $orderRepository,
@@ -51,7 +52,8 @@ class ShipmentDataServiceTest extends TestCase
             $dropOffPointRepository,
             $deliveryServiceRepository,
             $shipmentDataRepository,
-            $shipmentDataFactory
+            $shipmentDataFactory,
+            $serializer
         );
 
         $result = $service->prepareShipmentData(101);
@@ -77,12 +79,13 @@ class ShipmentDataServiceTest extends TestCase
         $entity = $this->createMock(ShipmentDataInterface::class);
 
         $validator->expects($this->once())->method('validate');
-        $shipmentDataRepository->method('getByOrderId')->willReturn(null);
         $shipmentDataFactory->method('create')->willReturn($entity);
 
         $entity->expects($this->once())->method('setOrderId')->with(102);
-        $entity->expects($this->once())->method('setStatus')->with('pending');
+        $entity->expects($this->once())->method('setStatus')->with(\Ideo\Dhl\Model\Shipment\ShipmentStatus::DISPATCHED);
         $shipmentDataRepository->expects($this->once())->method('save')->willReturn($entity);
+
+        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
 
         $service = new ShipmentDataService(
             $orderRepository,
@@ -91,10 +94,51 @@ class ShipmentDataServiceTest extends TestCase
             $dropOffPointRepository,
             $deliveryServiceRepository,
             $shipmentDataRepository,
-            $shipmentDataFactory
+            $shipmentDataFactory,
+            $serializer
         );
 
         $saved = $service->saveShipmentData($shipmentData);
         $this->assertSame($entity, $saved);
+    }
+
+    /**
+     * Test getAllShipmentsByOrderId calls repository getListByOrderId.
+     *
+     * @return void
+     */
+    public function testGetAllShipmentsByOrderId(): void
+    {
+        $orderRepository = $this->createStub(OrderRepositoryInterface::class);
+        $mapper = $this->createStub(OrderToShipmentDataMapper::class);
+        $validator = $this->createStub(ShipmentDataValidator::class);
+        $dropOffPointRepository = $this->createStub(DropOffPointRepositoryInterface::class);
+        $deliveryServiceRepository = $this->createStub(DeliveryServiceRepositoryInterface::class);
+        $shipmentDataRepository = $this->createMock(ShipmentDataRepositoryInterface::class);
+        $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
+
+        $entity1 = $this->createStub(ShipmentDataInterface::class);
+        $entity2 = $this->createStub(ShipmentDataInterface::class);
+        $shipmentDataRepository->expects($this->once())
+            ->method('getListByOrderId')
+            ->with(105)
+            ->willReturn([$entity1, $entity2]);
+
+        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
+
+        $service = new ShipmentDataService(
+            $orderRepository,
+            $mapper,
+            $validator,
+            $dropOffPointRepository,
+            $deliveryServiceRepository,
+            $shipmentDataRepository,
+            $shipmentDataFactory,
+            $serializer
+        );
+
+        $results = $service->getAllShipmentsByOrderId(105);
+        $this->assertCount(2, $results);
+        $this->assertSame([$entity1, $entity2], $results);
     }
 }

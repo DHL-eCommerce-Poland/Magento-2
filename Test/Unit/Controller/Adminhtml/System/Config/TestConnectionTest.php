@@ -14,20 +14,19 @@ use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 class TestConnectionTest extends TestCase
 {
     /**
-     * @var Context|Stub
+     * @var Context|MockObject
      */
-    private Context|Stub $contextStub;
+    private Context|MockObject $contextStub;
 
     /**
-     * @var HttpRequest|Stub
+     * @var HttpRequest|MockObject
      */
-    private HttpRequest|Stub $requestStub;
+    private HttpRequest|MockObject $requestStub;
 
     /**
      * @var JsonFactory|MockObject
@@ -49,11 +48,6 @@ class TestConnectionTest extends TestCase
      */
     private TestConnection $controller;
 
-    /**
-     * Set up test dependencies.
-     *
-     * @return void
-     */
     protected function setUp(): void
     {
         $this->contextStub = $this->createStub(Context::class);

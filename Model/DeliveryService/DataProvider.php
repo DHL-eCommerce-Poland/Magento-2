@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\DeliveryService;
 
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory;
+use Ideo\Dhl\Model\Shipment\DhlShipmentRestrictions;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 
 class DataProvider extends AbstractDataProvider
@@ -21,6 +23,7 @@ class DataProvider extends AbstractDataProvider
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
      * @param RequestInterface $request
+     * @param SerializerInterface $serializer
      * @param array $meta
      * @param array $data
      */
@@ -30,6 +33,7 @@ class DataProvider extends AbstractDataProvider
         string $requestFieldName,
         CollectionFactory $collectionFactory,
         private readonly RequestInterface $request,
+        private readonly SerializerInterface $serializer,
         array $meta = [],
         array $data = []
     ) {
@@ -52,9 +56,13 @@ class DataProvider extends AbstractDataProvider
         foreach ($items as $item) {
             $data = $item->getData();
             if (isset($data['additional_services']) && is_string($data['additional_services'])) {
-                $decoded = json_decode($data['additional_services'], true);
-                if (is_array($decoded)) {
-                    $data['additional_services'] = $decoded;
+                try {
+                    $decoded = $this->serializer->unserialize($data['additional_services']);
+                    if (is_array($decoded)) {
+                        $data['additional_services'] = $decoded;
+                    }
+                } catch (\InvalidArgumentException $e) {
+                    unset($e);
                 }
             }
             if (isset($data['method_code']) && is_string($data['method_code']) && $data['method_code'] !== '') {
@@ -70,5 +78,35 @@ class DataProvider extends AbstractDataProvider
         }
 
         return $this->loadedData;
+    }
+
+    /**
+     * Get meta configuration.
+     *
+     * @return array
+     */
+    public function getMeta(): array
+    {
+        $meta = parent::getMeta();
+
+        $maxComment = DhlShipmentRestrictions::MAX_LENGTH_COMMENT;
+        $commentConfig = &$meta['general']['children']['comment']['arguments']['data']['config'];
+        $commentConfig['validation']['max_text_length'] = $maxComment;
+        $commentConfig['notice'] = __(
+            'Available tags: {order_increment_id}, {product_names}, {sku_list}, '
+            . '{qty_total}, {customer_name}, {payment_method} (max %1 chars)',
+            $maxComment
+        );
+
+        $maxRef = DhlShipmentRestrictions::MAX_LENGTH_REFERENCE;
+        $refConfig = &$meta['general']['children']['reference']['arguments']['data']['config'];
+        $refConfig['validation']['max_text_length'] = $maxRef;
+        $refConfig['notice'] = __(
+            'Available tags: {order_increment_id}, {product_names}, {sku_list}, '
+            . '{qty_total}, {customer_name}, {payment_method} (max %1 chars)',
+            $maxRef
+        );
+
+        return $meta;
     }
 }

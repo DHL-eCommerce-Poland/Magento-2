@@ -51,6 +51,24 @@ define([
         var senderCountry = (s.country && s.country.length === 2) ? s.country.toUpperCase() : 'PL';
         var recipientCountry = (r.country && r.country.length === 2) ? r.country.toUpperCase() : 'PL';
 
+        var recipientObj = {
+            type: ko.observable(r.type || 'C'),
+            name: ko.observable(r.name || ''),
+            firstName: ko.observable(r.firstName || ''),
+            lastName: ko.observable(r.lastName || ''),
+            contactPerson: ko.observable(r.contactPerson || ''),
+            street: ko.observable(r.street || ''),
+            houseNumber: ko.observable(r.houseNumber || ''),
+            flatNumber: ko.observable(r.flatNumber || ''),
+            postalCode: ko.observable(r.postalCode || ''),
+            city: ko.observable(r.city || ''),
+            country: ko.observable(recipientCountry),
+            popId: ko.observable(r.popId || ''),
+            popName: ko.observable(r.popName || ''),
+            phone: ko.observable(r.phone || ''),
+            email: ko.observable(r.email || '')
+        };
+
         var packagesRaw = st.packages || [];
         var packagesObsArr = ko.observableArray([]);
 
@@ -84,7 +102,43 @@ define([
             packages: packagesObsArr
         };
 
+        shipmentSettingsObj.isSinglePieceOnly = ko.computed(function () {
+            var sType = (shipmentSettingsObj.serviceType() || '').toUpperCase().trim();
+            var popIdVal = (recipientObj.popId() || '').trim();
+            if (popIdVal !== '') return true;
+            return sType === 'SP' || sType === 'PS' || sType === 'LM';
+        });
+
+        shipmentSettingsObj.isNonStandardForbidden = ko.computed(function () {
+            var sType = (shipmentSettingsObj.serviceType() || '').toUpperCase().trim();
+            var popIdVal = (recipientObj.popId() || '').trim();
+            if (popIdVal !== '') return true;
+            return sType === 'SP' || sType === 'PS' || sType === 'LM';
+        });
+
+        var checkAndEnforceRestrictions = function () {
+            if (shipmentSettingsObj.isSinglePieceOnly()) {
+                if (shipmentSettingsObj.packages().length > 1) {
+                    shipmentSettingsObj.packages.splice(1, shipmentSettingsObj.packages().length - 1);
+                }
+                if (shipmentSettingsObj.packages().length > 0) {
+                    shipmentSettingsObj.packages()[0].quantity(1);
+                }
+            }
+            if (shipmentSettingsObj.isNonStandardForbidden()) {
+                if (shipmentSettingsObj.packages().length > 0) {
+                    $.each(shipmentSettingsObj.packages(), function (i, pkg) {
+                        pkg.isNonStandard(false);
+                    });
+                }
+            }
+        };
+
+        shipmentSettingsObj.serviceType.subscribe(checkAndEnforceRestrictions);
+        recipientObj.popId.subscribe(checkAndEnforceRestrictions);
+
         shipmentSettingsObj.addPackageRow = function () {
+            if (shipmentSettingsObj.isSinglePieceOnly()) return;
             shipmentSettingsObj.packages.push(createPackageObservable({
                 packageType: 'PACKAGE',
                 quantity: 1,
@@ -120,23 +174,7 @@ define([
                 phone: ko.observable(s.phone || ''),
                 email: ko.observable(s.email || '')
             },
-            recipient: {
-                type: ko.observable(r.type || 'C'),
-                name: ko.observable(r.name || ''),
-                firstName: ko.observable(r.firstName || ''),
-                lastName: ko.observable(r.lastName || ''),
-                contactPerson: ko.observable(r.contactPerson || ''),
-                street: ko.observable(r.street || ''),
-                houseNumber: ko.observable(r.houseNumber || ''),
-                flatNumber: ko.observable(r.flatNumber || ''),
-                postalCode: ko.observable(r.postalCode || ''),
-                city: ko.observable(r.city || ''),
-                country: ko.observable(recipientCountry),
-                popId: ko.observable(r.popId || ''),
-                popName: ko.observable(r.popName || ''),
-                phone: ko.observable(r.phone || ''),
-                email: ko.observable(r.email || '')
-            },
+            recipient: recipientObj,
             specialServices: {
                 insurance: ko.observable(isTruthy(ss.insurance || ss.service_UBEZP)),
                 insuranceValue: ko.observable(ss.insuranceValue !== undefined ? ss.insuranceValue : (ss.serviceValueUbez !== undefined ? ss.serviceValueUbez : '')),
@@ -318,7 +356,7 @@ define([
                     if (shipmentSettings && self.draft().shipmentSettings) {
                         var currentSettings = self.draft().shipmentSettings;
                         $.each(shipmentSettings, function (key, val) {
-                            if (key === 'selectedDeliveryServiceId' || key === 'packages') return;
+                            if (key === 'selectedDeliveryServiceId' || key === 'packages' || key === 'isSinglePieceOnly' || key === 'isNonStandardForbidden') return;
                             if (typeof currentSettings[key] === 'function') {
                                 if (typeof val === 'string') {
                                     val = val.trim();
@@ -470,17 +508,29 @@ define([
                                     $btn.prop('disabled', true);
                                     $('body').trigger('processStart');
 
+                                    var draftJs = ko.toJS(self.draft());
+                                    var senderPresetId = (draftJs.sender && draftJs.sender.selectedDropOffPointId) ? draftJs.sender.selectedDropOffPointId : null;
+                                    var shipmentPresetId = (draftJs.shipmentSettings && draftJs.shipmentSettings.selectedDeliveryServiceId) ? draftJs.shipmentSettings.selectedDeliveryServiceId : null;
+
                                     $.post(self.saveUrl, {
-                                        shipment_data: JSON.stringify(ko.toJS(self.draft())),
-                                        draft: JSON.stringify(ko.toJS(self.draft()))
+                                        shipment_data: JSON.stringify(draftJs),
+                                        draft: JSON.stringify(draftJs),
+                                        preset_sender_id: senderPresetId,
+                                        preset_shipment_id: shipmentPresetId
                                     }).done(function (saveRes) {
                                         if (saveRes.success) {
-                                            showAdminMessage('success', saveRes.message || $.mage.__('DHL shipment created successfully.'));
                                             selfModal.closeModal();
+                                            var successMsg = saveRes.message || ($.mage.__('Przesyłka DHL o numerze %1 została pomyślnie utworzona.').replace('%1', saveRes.shipmentId || ''));
+                                            showAdminMessage('success', successMsg);
+                                            setTimeout(function () {
+                                                window.location.reload();
+                                            }, 800);
                                         } else {
+                                            var errorMsg = (saveRes.message || $.mage.__('Error creating DHL shipment.'))
+                                                .replace(/\n/g, '<br/>');
                                             alert({
                                                 title: $.mage.__('Error'),
-                                                content: saveRes.message || $.mage.__('Error creating DHL shipment.')
+                                                content: errorMsg
                                             });
                                         }
                                     }).always(function () {

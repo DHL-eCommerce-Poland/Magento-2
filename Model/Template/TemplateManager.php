@@ -17,8 +17,10 @@ use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory as DropOffPointC
 use Ideo\Dhl\Model\Shipment\Data\SenderData;
 use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
+use InvalidArgumentException;
 use Magento\Directory\Model\Config\Source\Country as CountrySource;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 
@@ -40,6 +42,7 @@ class TemplateManager
      * @param ContentSource $contentSource
      * @param OrderRepositoryInterface $orderRepository
      * @param OrderToShipmentDataMapper $mapper
+     * @param SerializerInterface $serializer
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -56,6 +59,7 @@ class TemplateManager
         private readonly ContentSource $contentSource,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly OrderToShipmentDataMapper $mapper,
+        private readonly SerializerInterface $serializer,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -366,7 +370,12 @@ class TemplateManager
             $service = $this->deliveryServiceRepository->getById($templateId);
             $addServicesRaw = $service->getAdditionalServices();
             if (is_string($addServicesRaw)) {
-                $addServices = json_decode($addServicesRaw, true) ?: [];
+                try {
+                    $decoded = $this->serializer->unserialize($addServicesRaw);
+                    $addServices = is_array($decoded) ? $decoded : [];
+                } catch (InvalidArgumentException $e) {
+                    $addServices = [];
+                }
             } elseif (is_array($addServicesRaw)) {
                 $addServices = $addServicesRaw;
             } else {

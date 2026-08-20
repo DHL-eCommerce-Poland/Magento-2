@@ -27,7 +27,14 @@ class OrderToShipmentDataMapperTest extends TestCase
         $weightAggregator = new OrderWeightAggregator();
         $variableResolver = new TemplateVariableResolver();
 
-        $this->mapper = new OrderToShipmentDataMapper($addressParser, $weightAggregator, $variableResolver);
+        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
+
+        $this->mapper = new OrderToShipmentDataMapper(
+            $addressParser,
+            $weightAggregator,
+            $variableResolver,
+            $serializer
+        );
     }
 
     /**

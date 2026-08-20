@@ -15,6 +15,11 @@ class TestSoapClient extends SoapClient
     public function __construct(
         private readonly bool $shouldThrowFault = false
     ) {
+        parent::__construct(null, [
+            'location' => 'http://localhost',
+            'uri' => 'http://localhost',
+            'exceptions' => true,
+        ]);
     }
 
     /**
@@ -31,6 +36,28 @@ class TestSoapClient extends SoapClient
         }
 
         return (object) ['getPostalCodeServicesResult' => (object) ['item' => []]];
+    }
+
+    /**
+     * Dummy createShipments method for SoapClient mocking.
+     *
+     * @param mixed $args
+     * @return mixed
+     * @throws SoapFault
+     */
+    public function createShipments(mixed $args): mixed
+    {
+        if ($this->shouldThrowFault) {
+            throw new SoapFault('CREATE_ERR', 'Error creating shipment');
+        }
+
+        return (object) [
+            'createShipmentsResult' => (object) [
+                'item' => [
+                    (object) ['shipmentId' => '1234567890'],
+                ],
+            ],
+        ];
     }
 
     /**

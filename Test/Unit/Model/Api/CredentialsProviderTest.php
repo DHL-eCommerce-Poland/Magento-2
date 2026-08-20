@@ -51,15 +51,14 @@ class CredentialsProviderTest extends TestCase
      */
     public function testGetCredentialsFromConfigProduction(): void
     {
-        $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
-        $this->scopeConfigMock->expects($this->exactly(2))
+        $this->scopeConfigMock->expects(self::exactly(2))
             ->method('getValue')
             ->willReturnMap([
-                ['carriers/dhlparcel/api_login', $scope, null, '0:3:encrypted_user'],
-                ['carriers/dhlparcel/api_password', $scope, null, '0:3:encrypted_pass'],
+                ['carriers/dhlparcel/api_login', '0:3:encrypted_user'],
+                ['carriers/dhlparcel/api_password', '0:3:encrypted_pass'],
             ]);
 
-        $this->encryptorMock->expects($this->exactly(2))
+        $this->encryptorMock->expects(self::exactly(2))
             ->method('decrypt')
             ->willReturnMap([
                 ['0:3:encrypted_user', 'decrypted_user'],
@@ -80,15 +79,14 @@ class CredentialsProviderTest extends TestCase
      */
     public function testGetCredentialsFromConfigSandbox(): void
     {
-        $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
-        $this->scopeConfigMock->expects($this->exactly(2))
+        $this->scopeConfigMock->expects(self::exactly(2))
             ->method('getValue')
             ->willReturnMap([
-                ['carriers/dhlparcel/api_login_sandbox', $scope, null, '0:3:enc_sb_user'],
-                ['carriers/dhlparcel/api_password_sandbox', $scope, null, '0:3:enc_sb_pass'],
+                ['carriers/dhlparcel/api_login_sandbox', '0:3:enc_sb_user'],
+                ['carriers/dhlparcel/api_password_sandbox', '0:3:enc_sb_pass'],
             ]);
 
-        $this->encryptorMock->expects($this->exactly(2))
+        $this->encryptorMock->expects(self::exactly(2))
             ->method('decrypt')
             ->willReturnMap([
                 ['0:3:enc_sb_user', 'sb_user'],
@@ -109,8 +107,8 @@ class CredentialsProviderTest extends TestCase
      */
     public function testGetCredentialsWithOverrides(): void
     {
-        $this->scopeConfigMock->expects($this->never())->method('getValue');
-        $this->encryptorMock->expects($this->never())->method('decrypt');
+        $this->scopeConfigMock->expects(self::never())->method('getValue');
+        $this->encryptorMock->expects(self::never())->method('decrypt');
 
         $credentials = $this->credentialsProvider->getCredentials('sandbox', 'override_user', 'override_pass');
 
@@ -126,15 +124,14 @@ class CredentialsProviderTest extends TestCase
      */
     public function testGetCredentialsFiltersObscurePlaceholder(): void
     {
-        $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
-        $this->scopeConfigMock->expects($this->exactly(2))
+        $this->scopeConfigMock->expects(self::exactly(2))
             ->method('getValue')
             ->willReturnMap([
-                ['carriers/dhlparcel/api_login', $scope, null, '0:3:encrypted_user'],
-                ['carriers/dhlparcel/api_password', $scope, null, '0:3:encrypted_pass'],
+                ['carriers/dhlparcel/api_login', '0:3:encrypted_user'],
+                ['carriers/dhlparcel/api_password', '0:3:encrypted_pass'],
             ]);
 
-        $this->encryptorMock->expects($this->exactly(2))
+        $this->encryptorMock->expects(self::exactly(2))
             ->method('decrypt')
             ->willReturnMap([
                 ['0:3:encrypted_user', 'decrypted_user'],

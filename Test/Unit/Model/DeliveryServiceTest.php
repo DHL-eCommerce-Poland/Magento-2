@@ -26,9 +26,12 @@ class DeliveryServiceTest extends TestCase
         $registry = $this->createStub(\Magento\Framework\Registry::class);
         $resource = $this->createStub(DeliveryServiceResource::class);
 
+        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
+
         $this->model = new DeliveryService(
             $context,
             $registry,
+            $serializer,
             $resource
         );
     }

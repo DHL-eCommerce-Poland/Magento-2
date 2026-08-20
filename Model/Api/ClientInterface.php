@@ -14,4 +14,19 @@ interface ClientInterface
      * @return TestConnectionResult
      */
     public function testConnection(Credentials $credentials): TestConnectionResult;
+
+    /**
+     * Create shipments via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param array $shipmentsFullData
+     * @param int|null $orderId Optional Magento order ID for diagnostic logging context
+     *
+     * @return CreateShipmentsResult
+     */
+    public function createShipments(
+        Credentials $credentials,
+        array $shipmentsFullData,
+        ?int $orderId = null
+    ): CreateShipmentsResult;
 }

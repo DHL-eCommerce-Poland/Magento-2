@@ -97,6 +97,7 @@
         "column": {
             "entity_id": true,
             "order_id": true,
+            "shipment_id": true,
             "status": true,
             "preset_sender_id": true,
             "preset_shipment_id": true,
@@ -107,6 +108,7 @@
         },
         "index": {
             "IDX_IDEO_DHL_SHIPMENT_DATA_ORDER_ID": true,
+            "IDX_IDEO_DHL_SHIPMENT_DATA_SHIPMENT_ID": true,
             "IDX_IDEO_DHL_SHIPMENT_DATA_STATUS": true
         },
         "constraint": {

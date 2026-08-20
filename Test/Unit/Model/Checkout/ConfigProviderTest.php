@@ -18,25 +18,25 @@ class ConfigProviderTest extends TestCase
     public function testGetConfigReturnsConfiguredValues(): void
     {
         $scopeConfig = $this->createMock(ScopeConfigInterface::class);
-        $scopeConfig->expects($this->exactly(2))
+        $scopeConfig->expects(self::exactly(2))
             ->method('getValue')
             ->willReturnMap([
                 ['carriers/dhlparcel/method_economy_point_map_type', ScopeInterface::SCOPE_STORE, null, 'pop'],
                 ['carriers/dhlparcel/method_economy_point_delivery_mode', ScopeInterface::SCOPE_STORE, null, 'map'],
             ]);
 
-        $scopeConfig->expects($this->once())
+        $scopeConfig->expects(self::once())
             ->method('isSetFlag')
             ->with('carriers/dhlparcel/debug', ScopeInterface::SCOPE_STORE)
             ->willReturn(true);
 
         $checkoutSession = $this->createMock(CheckoutSession::class);
-        $checkoutSession->expects($this->once())
+        $checkoutSession->expects(self::once())
             ->method('getQuote')
             ->willReturn(null);
 
         $assetRepository = $this->createMock(AssetRepository::class);
-        $assetRepository->expects($this->exactly(2))
+        $assetRepository->expects(self::exactly(2))
             ->method('getUrl')
             ->willReturnCallback(
                 static fn (string $fileId) => match ($fileId) {
@@ -60,8 +60,8 @@ class ConfigProviderTest extends TestCase
         $this->assertNull($dhlConfig['selectedPoint']);
         $this->assertEquals('https://example.com/logo_dhl_box_pop.png', $dhlConfig['logos']['dhlparcel_economy']);
         $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['default']);
-        $this->assertContains('dhlparcel_economy', $dhlConfig['pointMethods']);
-        $this->assertContains('dhlparcel_connect', $dhlConfig['pointMethods']);
+        $this->assertContainsEquals('dhlparcel_economy', $dhlConfig['pointMethods']);
+        $this->assertContainsEquals('dhlparcel_connect', $dhlConfig['pointMethods']);
     }
 
     public function testGetConfigReturnsQuoteSelectedPointWhenPresent(): void
@@ -71,7 +71,7 @@ class ConfigProviderTest extends TestCase
         $scopeConfig->method('isSetFlag')->willReturn(false);
         $shippingAddress = $this->createStub(QuoteAddress::class);
         $shippingAddress->method('getData')->willReturnCallback(
-            static fn (string $key = '', mixed $index = null) => match ($key) {
+            static fn (string $key = '') => match ($key) {
                 'dhl_service_point_id' => 'POP-123',
                 'dhl_service_point_name' => 'DHL Point 123',
                 'dhl_service_point_street' => 'Main Street 10',

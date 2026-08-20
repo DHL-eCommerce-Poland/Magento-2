@@ -10,7 +10,9 @@ use Ideo\Dhl\Model\Shipment\Data\SenderData;
 use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Template\TemplateVariableResolver;
+use InvalidArgumentException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -21,12 +23,14 @@ class OrderToShipmentDataMapper
      * @param StreetAddressParser $streetAddressParser
      * @param OrderWeightAggregator $weightAggregator
      * @param TemplateVariableResolver $variableResolver
+     * @param SerializerInterface $serializer
      * @param LoggerInterface|null $logger
      */
     public function __construct(
         private readonly StreetAddressParser $streetAddressParser,
         private readonly OrderWeightAggregator $weightAggregator,
         private readonly TemplateVariableResolver $variableResolver,
+        private readonly SerializerInterface $serializer,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -234,7 +238,12 @@ class OrderToShipmentDataMapper
 
         $presetSS = $defaultShipmentDefaults['specialServices'] ?? [];
         if (is_string($presetSS)) {
-            $presetSS = json_decode($presetSS, true) ?: [];
+            try {
+                $decoded = $this->serializer->unserialize($presetSS);
+                $presetSS = is_array($decoded) ? $decoded : [];
+            } catch (InvalidArgumentException $e) {
+                $presetSS = [];
+            }
         }
         if (!is_array($presetSS)) {
             $presetSS = [];
