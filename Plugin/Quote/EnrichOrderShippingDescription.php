@@ -60,12 +60,19 @@ class EnrichOrderShippingDescription
 
         $methodCode = $parts[1] ?? $shippingMethod;
 
+        $postnummer = (string) ($quoteAddress->getData('dhl_postnummer') ?? '');
+        $country = (string) ($quoteAddress->getCountryId() ?? '');
+
         $servicePoint = new ServicePointValueObject(
             (string) ($quoteAddress->getData('dhl_service_point_id') ?? ''),
             (string) ($quoteAddress->getData('dhl_service_point_name') ?? ''),
             (string) ($quoteAddress->getData('dhl_service_point_street') ?? ''),
             (string) ($quoteAddress->getData('dhl_service_point_postcode') ?? ''),
-            (string) ($quoteAddress->getData('dhl_service_point_city') ?? '')
+            (string) ($quoteAddress->getData('dhl_service_point_city') ?? ''),
+            (bool) ($quoteAddress->getData('dhl_is_packstation') ?? false),
+            (bool) ($quoteAddress->getData('dhl_is_postfiliale') ?? false),
+            $postnummer !== '' ? $postnummer : null,
+            $country
         );
 
         if (!$this->validator->isPointSelectionRequired($carrierCode, $methodCode)

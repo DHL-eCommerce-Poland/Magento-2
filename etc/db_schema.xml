@@ -31,6 +31,9 @@
         <column xsi:type="varchar" name="dhl_service_point_street" length="255" nullable="true" comment="DHL Service Point Street"/>
         <column xsi:type="varchar" name="dhl_service_point_postcode" length="32" nullable="true" comment="DHL Service Point Postcode"/>
         <column xsi:type="varchar" name="dhl_service_point_city" length="255" nullable="true" comment="DHL Service Point City"/>
+        <column xsi:type="smallint" name="dhl_is_packstation" unsigned="true" nullable="false" default="0" comment="DHL Is Packstation (DE)"/>
+        <column xsi:type="smallint" name="dhl_is_postfiliale" unsigned="true" nullable="false" default="0" comment="DHL Is Postfiliale"/>
+        <column xsi:type="varchar" name="dhl_postnummer" length="64" nullable="true" comment="DHL Postnummer (DE Customer ID)"/>
     </table>
     <table name="sales_order_address" resource="sales" comment="Sales Flat Order Address">
         <column xsi:type="varchar" name="dhl_service_point_id" length="64" nullable="true" comment="DHL Service Point ID (SAP)"/>
@@ -38,6 +41,9 @@
         <column xsi:type="varchar" name="dhl_service_point_street" length="255" nullable="true" comment="DHL Service Point Street"/>
         <column xsi:type="varchar" name="dhl_service_point_postcode" length="32" nullable="true" comment="DHL Service Point Postcode"/>
         <column xsi:type="varchar" name="dhl_service_point_city" length="255" nullable="true" comment="DHL Service Point City"/>
+        <column xsi:type="smallint" name="dhl_is_packstation" unsigned="true" nullable="false" default="0" comment="DHL Is Packstation (DE)"/>
+        <column xsi:type="smallint" name="dhl_is_postfiliale" unsigned="true" nullable="false" default="0" comment="DHL Is Postfiliale"/>
+        <column xsi:type="varchar" name="dhl_postnummer" length="64" nullable="true" comment="DHL Postnummer (DE Customer ID)"/>
     </table>
 
     <table name="ideo_dhl_drop_off_point" resource="default" engine="innodb" comment="Ideo DHL Drop-Off Points">

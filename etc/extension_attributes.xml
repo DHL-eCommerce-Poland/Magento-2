@@ -7,6 +7,9 @@
         <attribute code="dhl_service_point_street" type="string" />
         <attribute code="dhl_service_point_postcode" type="string" />
         <attribute code="dhl_service_point_city" type="string" />
+        <attribute code="dhl_is_packstation" type="boolean" />
+        <attribute code="dhl_is_postfiliale" type="boolean" />
+        <attribute code="dhl_postnummer" type="string" />
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\OrderAddressInterface">
         <attribute code="dhl_service_point_id" type="string" />
@@ -14,5 +17,8 @@
         <attribute code="dhl_service_point_street" type="string" />
         <attribute code="dhl_service_point_postcode" type="string" />
         <attribute code="dhl_service_point_city" type="string" />
+        <attribute code="dhl_is_packstation" type="boolean" />
+        <attribute code="dhl_is_postfiliale" type="boolean" />
+        <attribute code="dhl_postnummer" type="string" />
     </extension_attributes>
 </config>

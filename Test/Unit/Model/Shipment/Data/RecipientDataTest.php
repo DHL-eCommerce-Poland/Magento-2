@@ -31,7 +31,10 @@ class RecipientDataTest extends TestCase
             phone: '123456789',
             email: 'jan@example.com',
             popId: 'POP-123',
-            popName: 'DHL POP Point - Warszawa'
+            popName: 'DHL POP Point - Warszawa',
+            isPackstation: true,
+            isPostfiliale: false,
+            postnummer: '123456'
         );
 
         $this->assertEquals('Acme Corp', $recipient->getName());
@@ -49,6 +52,9 @@ class RecipientDataTest extends TestCase
         $this->assertEquals('jan@example.com', $recipient->getEmail());
         $this->assertEquals('POP-123', $recipient->getPopId());
         $this->assertEquals('DHL POP Point - Warszawa', $recipient->getPopName());
+        $this->assertTrue($recipient->isPackstation());
+        $this->assertFalse($recipient->isPostfiliale());
+        $this->assertEquals('123456', $recipient->getPostnummer());
     }
 
     /**
@@ -65,6 +71,9 @@ class RecipientDataTest extends TestCase
         $this->assertEquals('PL', $recipient->getCountry());
         $this->assertNull($recipient->getPopId());
         $this->assertNull($recipient->getPopName());
+        $this->assertFalse($recipient->isPackstation());
+        $this->assertFalse($recipient->isPostfiliale());
+        $this->assertNull($recipient->getPostnummer());
     }
 
     /**
@@ -90,6 +99,9 @@ class RecipientDataTest extends TestCase
             'email' => 'anna@example.com',
             'popId' => 'POP-999',
             'popName' => 'DHL POP Krakow',
+            'isPackstation' => false,
+            'isPostfiliale' => false,
+            'postnummer' => null,
         ];
 
         $recipient = RecipientData::fromArray($data);

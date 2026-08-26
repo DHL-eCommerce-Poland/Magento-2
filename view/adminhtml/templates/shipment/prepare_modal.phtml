@@ -141,6 +141,14 @@ use Magento\Framework\View\Element\Template;
                             </div>
                         </div>
                         <!-- /ko -->
+                        <!-- ko if: postnummer() && postnummer().trim() !== '' -->
+                        <div class="admin__field">
+                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('German Customer Number (Postnummer)')) ?></span></label>
+                            <div class="admin__field-control">
+                                <input type="text" class="admin__control-text" data-bind="value: postnummer" disabled readonly />
+                            </div>
+                        </div>
+                        <!-- /ko -->
                         <!-- /ko -->
                     </fieldset>
                 </div>

@@ -19,6 +19,9 @@ class CopyServicePointToOrderAddress
         'dhl_service_point_street',
         'dhl_service_point_postcode',
         'dhl_service_point_city',
+        'dhl_is_packstation',
+        'dhl_is_postfiliale',
+        'dhl_postnummer',
     ];
 
     /**

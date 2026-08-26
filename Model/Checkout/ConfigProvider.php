@@ -51,11 +51,21 @@ class ConfigProvider implements ConfigProviderInterface
             ScopeInterface::SCOPE_STORE
         );
 
+        $pointMapTypes = [
+            'dhlparcel_economy' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_economy_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
+            'economy' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_economy_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
+            'dhlparcel_connect' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_connect_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
+            'connect' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_connect_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
+            'dhlparcel_international' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_international_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
+            'international' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_international_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
+        ];
+
         return [
             'shipping' => [
                 'dhlparcel' => [
                     'mapUrl' => 'https://parcelshop.dhl.pl/mapa',
                     'pointMapType' => $mapType,
+                    'pointMapTypes' => $pointMapTypes,
                     'deliveryMode' => $deliveryMode,
                     'debug' => $debug,
                     'selectedPoint' => $this->getQuoteSelectedPoint(),
@@ -67,7 +77,6 @@ class ConfigProvider implements ConfigProviderInterface
                         'dhlparcel_economy',
                         'dhlparcel_connect',
                         'dhlparcel_international',
-                        'dhlparcel_connect_plus',
                     ],
                 ],
             ],

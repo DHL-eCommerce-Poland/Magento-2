@@ -17,11 +17,9 @@ class ServicePointValidator
         'dhlparcel_economy',
         'dhlparcel_connect',
         'dhlparcel_international',
-        'dhlparcel_connect_plus',
         'economy',
         'connect',
         'international',
-        'connect_plus',
     ];
 
     /**
@@ -54,6 +52,21 @@ class ServicePointValidator
 
         if ($servicePoint === null || !$servicePoint->isValid()) {
             throw new LocalizedException(__('Please select a DHL pickup point on the map.'));
+        }
+
+        $country = strtoupper((string) $servicePoint->getCountry());
+        $postnummer = trim((string) $servicePoint->getPostnummer());
+
+        if ($country === 'DE' && $servicePoint->isPackstation()) {
+            if ($postnummer === '') {
+                throw new LocalizedException(__('German Customer Number (Postnummer) is required for delivery to a German Packstation.'));
+            }
+        }
+
+        if ($country === 'DE' && $postnummer !== '') {
+            if (!preg_match('/^\d{6,10}$/', $postnummer)) {
+                throw new LocalizedException(__('Invalid German Customer Number (Postnummer). It must contain between 6 and 10 digits.'));
+            }
         }
     }
 

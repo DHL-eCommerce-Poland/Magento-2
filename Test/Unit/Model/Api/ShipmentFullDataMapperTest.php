@@ -118,9 +118,10 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('2', $mapped['shipper']['apartmentNumber']);
 
         // Check receiver
-        $this->assertEquals('C', $mapped['receiver']['addressType']); // B2B maps to 'C' in DHL WebAPI2
+        $this->assertEquals('B', $mapped['receiver']['addressType']); // B2B maps to 'B' in DHL WebAPI2
         $this->assertEquals('Firma ABC', $mapped['receiver']['name']);
         $this->assertEquals('30002', $mapped['receiver']['postalCode']);
+        $this->assertEquals('PL', $mapped['receiver']['country']);
 
         // Check pieceList
         $this->assertCount(1, $mapped['pieceList']['item']);
@@ -171,5 +172,49 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $mapped = $this->mapper->map($shipmentData);
         $this->assertEquals('4529508', $mapped['servicePointAccountNumber']);
+        $this->assertEquals('C', $mapped['receiver']['addressType']);
+    }
+
+    /**
+     * Test mapping for German international Packstation point.
+     *
+     * @return void
+     */
+    public function testMapInternationalGermanPackstationPoint(): void
+    {
+        $recipient = new RecipientData(
+            name: 'Max Mustermann',
+            firstName: 'Max',
+            lastName: 'Mustermann',
+            street: 'Keetstr.',
+            houseNumber: '19',
+            city: 'Lohne',
+            postalCode: '49393',
+            country: 'DE',
+            popId: 'PACK-123',
+            isPackstation: true,
+            postnummer: '987654321'
+        );
+
+        $sender = new SenderData();
+        $specialServices = new SpecialServicesData();
+        $settings = new ShipmentSettingsData(serviceType: 'EKSP', packages: [new PackageData()]);
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 102,
+            sender: $sender,
+            recipient: $recipient,
+            specialServices: $specialServices,
+            shipmentSettings: $settings
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertEquals('DE', $mapped['receiver']['country']);
+        $this->assertEquals('C', $mapped['receiver']['addressType']);
+        $this->assertTrue($mapped['receiver']['isPackstation']);
+        $this->assertEquals('987654321', $mapped['receiver']['postnummer']);
+        $this->assertEquals('49393', $mapped['receiver']['postalCode']);
+        $this->assertEquals('Lohne', $mapped['receiver']['city']);
     }
 }

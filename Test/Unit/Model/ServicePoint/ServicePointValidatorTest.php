@@ -79,4 +79,71 @@ class ServicePointValidatorTest extends TestCase
         $validator->validate(Carrier::CODE, 'economy', $validPoint);
         $this->assertTrue(true);
     }
+
+    public function testValidationThrowsExceptionForGermanPackstationWithoutPostnummer(): void
+    {
+        $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+
+        $validator = new ServicePointValidator($scopeConfigStub);
+        $point = new ServicePointValueObject(
+            'DE123',
+            'Packstation 101',
+            'Keetstr.',
+            '49393',
+            'Lohne',
+            true,
+            false,
+            null,
+            'DE'
+        );
+
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('German Customer Number (Postnummer) is required for delivery to a German Packstation.');
+
+        $validator->validate(Carrier::CODE, 'connect', $point);
+    }
+
+    public function testValidationThrowsExceptionForInvalidPostnummerFormat(): void
+    {
+        $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+
+        $validator = new ServicePointValidator($scopeConfigStub);
+        $point = new ServicePointValueObject(
+            'DE123',
+            'Packstation 101',
+            'Keetstr.',
+            '49393',
+            'Lohne',
+            true,
+            false,
+            '123',
+            'DE'
+        );
+
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('Invalid German Customer Number (Postnummer). It must contain between 6 and 10 digits.');
+
+        $validator->validate(Carrier::CODE, 'connect', $point);
+    }
+
+    public function testValidationPassesForGermanPackstationWithValidPostnummer(): void
+    {
+        $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+
+        $validator = new ServicePointValidator($scopeConfigStub);
+        $point = new ServicePointValueObject(
+            'DE123',
+            'Packstation 101',
+            'Keetstr.',
+            '49393',
+            'Lohne',
+            true,
+            false,
+            '12345678',
+            'DE'
+        );
+
+        $validator->validate(Carrier::CODE, 'connect', $point);
+        $this->assertTrue(true);
+    }
 }

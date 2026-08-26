@@ -65,6 +65,7 @@ define([
             country: ko.observable(recipientCountry),
             popId: ko.observable(r.popId || ''),
             popName: ko.observable(r.popName || ''),
+            postnummer: ko.observable(r.postnummer || ''),
             phone: ko.observable(r.phone || ''),
             email: ko.observable(r.email || '')
         };

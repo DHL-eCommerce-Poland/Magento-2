@@ -29,6 +29,9 @@ class SaveServicePointToQuoteAddressTest extends TestCase
             'dhl_service_point_street' => 'Polna 1',
             'dhl_service_point_postcode' => '00-111',
             'dhl_service_point_city' => 'Warszawa',
+            'dhl_is_packstation' => true,
+            'dhl_is_postfiliale' => false,
+            'dhl_postnummer' => '123456',
         ]);
 
         $addressMock->method('getExtensionAttributes')->willReturn($extAttributesStub);
@@ -55,5 +58,8 @@ class SaveServicePointToQuoteAddressTest extends TestCase
         $this->assertEquals('Polna 1', $savedData['dhl_service_point_street']);
         $this->assertEquals('00-111', $savedData['dhl_service_point_postcode']);
         $this->assertEquals('Warszawa', $savedData['dhl_service_point_city']);
+        $this->assertEquals(1, $savedData['dhl_is_packstation']);
+        $this->assertEquals(0, $savedData['dhl_is_postfiliale']);
+        $this->assertEquals('123456', $savedData['dhl_postnummer']);
     }
 }

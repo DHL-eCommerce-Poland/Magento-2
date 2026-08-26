@@ -38,7 +38,10 @@ class RecipientData
         private string $phone = '',
         private string $email = '',
         private ?string $popId = null,
-        private ?string $popName = null
+        private ?string $popName = null,
+        private bool $isPackstation = false,
+        private bool $isPostfiliale = false,
+        private ?string $postnummer = null
     ) {
     }
 
@@ -193,6 +196,36 @@ class RecipientData
     }
 
     /**
+     * Check if recipient address is a Packstation (DE locker).
+     *
+     * @return bool
+     */
+    public function isPackstation(): bool
+    {
+        return $this->isPackstation;
+    }
+
+    /**
+     * Check if recipient address is a Postfiliale.
+     *
+     * @return bool
+     */
+    public function isPostfiliale(): bool
+    {
+        return $this->isPostfiliale;
+    }
+
+    /**
+     * Get German customer Postnummer for DE Packstation.
+     *
+     * @return string|null
+     */
+    public function getPostnummer(): ?string
+    {
+        return $this->postnummer;
+    }
+
+    /**
      * Convert recipient object to array format.
      *
      * @return array
@@ -215,6 +248,9 @@ class RecipientData
             'email' => $this->email,
             'popId' => $this->popId,
             'popName' => $this->popName,
+            'isPackstation' => $this->isPackstation,
+            'isPostfiliale' => $this->isPostfiliale,
+            'postnummer' => $this->postnummer,
         ];
     }
 
@@ -243,7 +279,10 @@ class RecipientData
             (string)($data['phone'] ?? ''),
             (string)($data['email'] ?? ''),
             isset($data['popId']) ? (string)$data['popId'] : null,
-            isset($data['popName']) ? (string)$data['popName'] : null
+            isset($data['popName']) ? (string)$data['popName'] : null,
+            !empty($data['isPackstation']),
+            !empty($data['isPostfiliale']),
+            isset($data['postnummer']) ? (string)$data['postnummer'] : null
         );
     }
 }

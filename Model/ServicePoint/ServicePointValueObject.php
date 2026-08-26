@@ -12,13 +12,21 @@ class ServicePointValueObject
      * @param string $street
      * @param string $postcode
      * @param string $city
+     * @param bool $isPackstation
+     * @param bool $isPostfiliale
+     * @param string|null $postnummer
+     * @param string $country
      */
     public function __construct(
         private readonly string $id,
         private readonly string $name = '',
         private readonly string $street = '',
         private readonly string $postcode = '',
-        private readonly string $city = ''
+        private readonly string $city = '',
+        private readonly bool $isPackstation = false,
+        private readonly bool $isPostfiliale = false,
+        private readonly ?string $postnummer = null,
+        private readonly string $country = ''
     ) {
     }
 
@@ -73,6 +81,46 @@ class ServicePointValueObject
     }
 
     /**
+     * Check if point is a Packstation (DE locker).
+     *
+     * @return bool
+     */
+    public function isPackstation(): bool
+    {
+        return $this->isPackstation;
+    }
+
+    /**
+     * Check if point is a Postfiliale.
+     *
+     * @return bool
+     */
+    public function isPostfiliale(): bool
+    {
+        return $this->isPostfiliale;
+    }
+
+    /**
+     * Get German customer Postnummer for DE Packstation.
+     *
+     * @return string|null
+     */
+    public function getPostnummer(): ?string
+    {
+        return $this->postnummer;
+    }
+
+    /**
+     * Get country ISO code.
+     *
+     * @return string
+     */
+    public function getCountry(): string
+    {
+        return $this->country;
+    }
+
+    /**
      * Check if the service point contains a non-empty ID.
      *
      * @return bool
@@ -95,6 +143,9 @@ class ServicePointValueObject
             'dhl_service_point_street' => $this->street,
             'dhl_service_point_postcode' => $this->postcode,
             'dhl_service_point_city' => $this->city,
+            'dhl_is_packstation' => $this->isPackstation,
+            'dhl_is_postfiliale' => $this->isPostfiliale,
+            'dhl_postnummer' => $this->postnummer,
         ];
     }
 }

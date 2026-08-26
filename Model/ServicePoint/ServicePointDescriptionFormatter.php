@@ -38,6 +38,10 @@ class ServicePointDescriptionFormatter
             $pointDetails .= ', ' . $formattedAddress;
         }
 
+        if ($point->getPostnummer()) {
+            $pointDetails .= ', Postnummer: ' . $point->getPostnummer();
+        }
+
         $fullDescription = sprintf(
             '%s (%s: %s)',
             $baseDescription,

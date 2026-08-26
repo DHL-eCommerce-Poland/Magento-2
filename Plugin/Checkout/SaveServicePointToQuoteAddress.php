@@ -48,7 +48,7 @@ class SaveServicePointToQuoteAddress
         $methodCode = (string) $addressInformation->getShippingMethodCode();
 
         $extAttributes = $shippingAddress->getExtensionAttributes();
-        $servicePoint = $this->extractPointFromExtensionAttributes($extAttributes);
+        $servicePoint = $this->extractPointFromExtensionAttributes($extAttributes, $shippingAddress);
 
         // Validate selection requirement
         $this->validator->validate($carrierCode, $methodCode, $servicePoint);
@@ -59,12 +59,18 @@ class SaveServicePointToQuoteAddress
             $shippingAddress->setData('dhl_service_point_street', $servicePoint->getStreet());
             $shippingAddress->setData('dhl_service_point_postcode', $servicePoint->getPostcode());
             $shippingAddress->setData('dhl_service_point_city', $servicePoint->getCity());
+            $shippingAddress->setData('dhl_is_packstation', $servicePoint->isPackstation() ? 1 : 0);
+            $shippingAddress->setData('dhl_is_postfiliale', $servicePoint->isPostfiliale() ? 1 : 0);
+            $shippingAddress->setData('dhl_postnummer', $servicePoint->getPostnummer());
         } else {
             $shippingAddress->setData('dhl_service_point_id', null);
             $shippingAddress->setData('dhl_service_point_name', null);
             $shippingAddress->setData('dhl_service_point_street', null);
             $shippingAddress->setData('dhl_service_point_postcode', null);
             $shippingAddress->setData('dhl_service_point_city', null);
+            $shippingAddress->setData('dhl_is_packstation', 0);
+            $shippingAddress->setData('dhl_is_postfiliale', 0);
+            $shippingAddress->setData('dhl_postnummer', null);
         }
 
         return [$cartId, $addressInformation];
@@ -74,11 +80,14 @@ class SaveServicePointToQuoteAddress
      * Extract ServicePointValueObject from extension attributes interface.
      *
      * @param mixed $extAttributes
+     * @param mixed $shippingAddress
      *
      * @return ServicePointValueObject|null
      */
-    private function extractPointFromExtensionAttributes(mixed $extAttributes): ?ServicePointValueObject
-    {
+    private function extractPointFromExtensionAttributes(
+        mixed $extAttributes,
+        mixed $shippingAddress = null
+    ): ?ServicePointValueObject {
         if (!$extAttributes) {
             return null;
         }
@@ -88,6 +97,9 @@ class SaveServicePointToQuoteAddress
         $street = '';
         $postcode = '';
         $city = '';
+        $isPackstation = false;
+        $isPostfiliale = false;
+        $postnummer = null;
 
         if (is_object($extAttributes)) {
             $id = $this->getAttrValue($extAttributes, 'getDhlServicePointId');
@@ -95,13 +107,31 @@ class SaveServicePointToQuoteAddress
             $street = $this->getAttrValue($extAttributes, 'getDhlServicePointStreet');
             $postcode = $this->getAttrValue($extAttributes, 'getDhlServicePointPostcode');
             $city = $this->getAttrValue($extAttributes, 'getDhlServicePointCity');
+            $isPackstation = (bool) $this->getAttrValue($extAttributes, 'getDhlIsPackstation');
+            $isPostfiliale = (bool) $this->getAttrValue($extAttributes, 'getDhlIsPostfiliale');
+            $postnummerStr = $this->getAttrValue($extAttributes, 'getDhlPostnummer');
+            $postnummer = $postnummerStr !== '' ? $postnummerStr : null;
         }
 
         if (trim($id) === '') {
             return null;
         }
 
-        return new ServicePointValueObject($id, $name, $street, $postcode, $city);
+        $country = ($shippingAddress && is_object($shippingAddress) && (method_exists($shippingAddress, 'getCountryId') || is_callable([$shippingAddress, 'getCountryId'])))
+            ? (string) $shippingAddress->getCountryId()
+            : '';
+
+        return new ServicePointValueObject(
+            $id,
+            $name,
+            $street,
+            $postcode,
+            $city,
+            $isPackstation,
+            $isPostfiliale,
+            $postnummer,
+            $country
+        );
     }
 
     /**

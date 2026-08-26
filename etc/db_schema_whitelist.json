@@ -10,11 +10,13 @@
             "price": true
         },
         "index": {
-            "IDX_IDEO_DHL_TABLERATE_MATCH": true
+            "IDX_IDEO_DHL_TABLERATE_MATCH": true,
+            "IDEO_DHL_TABLERATE_WEBSITE_ID_METHOD_CODE_CONDITION_TYPE": true
         },
         "constraint": {
             "PRIMARY": true,
-            "UNQ_IDEO_DHL_TABLERATE_LOOKUP": true
+            "UNQ_IDEO_DHL_TABLERATE_LOOKUP": true,
+            "UNQ_F7001E7F6A7A3B5890CF20A3A1077A2E": true
         }
     },
     "quote_address": {
@@ -23,7 +25,10 @@
             "dhl_service_point_name": true,
             "dhl_service_point_street": true,
             "dhl_service_point_postcode": true,
-            "dhl_service_point_city": true
+            "dhl_service_point_city": true,
+            "dhl_is_packstation": true,
+            "dhl_is_postfiliale": true,
+            "dhl_postnummer": true
         }
     },
     "sales_order_address": {
@@ -32,7 +37,10 @@
             "dhl_service_point_name": true,
             "dhl_service_point_street": true,
             "dhl_service_point_postcode": true,
-            "dhl_service_point_city": true
+            "dhl_service_point_city": true,
+            "dhl_is_packstation": true,
+            "dhl_is_postfiliale": true,
+            "dhl_postnummer": true
         }
     },
     "ideo_dhl_drop_off_point": {
@@ -56,7 +64,8 @@
             "is_default": true
         },
         "index": {
-            "IDX_IDEO_DHL_DROP_OFF_POINT_WEBSITE": true
+            "IDX_IDEO_DHL_DROP_OFF_POINT_WEBSITE": true,
+            "IDEO_DHL_DROP_OFF_POINT_WEBSITE_ID": true
         },
         "constraint": {
             "PRIMARY": true
@@ -87,7 +96,8 @@
             "auto_create_return_shipment": true
         },
         "index": {
-            "IDX_IDEO_DHL_DELIVERY_SERVICE_WEBSITE_METHOD": true
+            "IDX_IDEO_DHL_DELIVERY_SERVICE_WEBSITE_METHOD": true,
+            "IDEO_DHL_DELIVERY_SERVICE_WEBSITE_ID_METHOD_CODE": true
         },
         "constraint": {
             "PRIMARY": true
@@ -109,7 +119,10 @@
         "index": {
             "IDX_IDEO_DHL_SHIPMENT_DATA_ORDER_ID": true,
             "IDX_IDEO_DHL_SHIPMENT_DATA_SHIPMENT_ID": true,
-            "IDX_IDEO_DHL_SHIPMENT_DATA_STATUS": true
+            "IDX_IDEO_DHL_SHIPMENT_DATA_STATUS": true,
+            "IDEO_DHL_SHIPMENT_DATA_ORDER_ID": true,
+            "IDEO_DHL_SHIPMENT_DATA_SHIPMENT_ID": true,
+            "IDEO_DHL_SHIPMENT_DATA_STATUS": true
         },
         "constraint": {
             "PRIMARY": true

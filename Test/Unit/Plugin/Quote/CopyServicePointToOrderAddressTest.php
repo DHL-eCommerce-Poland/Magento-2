@@ -23,16 +23,19 @@ class CopyServicePointToOrderAddressTest extends TestCase
             ->willReturnCallback(function ($key) {
                 return match ($key) {
                     'dhl_service_point_id' => 'SAP123',
-                    'dhl_service_point_name' => 'Żabka Test',
-                    'dhl_service_point_street' => 'Polna 1',
-                    'dhl_service_point_postcode' => '00-111',
-                    'dhl_service_point_city' => 'Warszawa',
+                    'dhl_service_point_name' => 'Packstation 101',
+                    'dhl_service_point_street' => 'Keetstr. 19',
+                    'dhl_service_point_postcode' => '49393',
+                    'dhl_service_point_city' => 'Lohne',
+                    'dhl_is_packstation' => 1,
+                    'dhl_is_postfiliale' => 0,
+                    'dhl_postnummer' => '987654321',
                     default => null,
                 };
             });
 
         $savedData = [];
-        $orderAddressMock->expects($this->exactly(5))
+        $orderAddressMock->expects($this->exactly(8))
             ->method('setData')
             ->willReturnCallback(function ($key, $value) use ($orderAddressMock, &$savedData) {
                 $savedData[$key] = $value;
@@ -43,9 +46,12 @@ class CopyServicePointToOrderAddressTest extends TestCase
 
         $this->assertSame($orderAddressMock, $result);
         $this->assertEquals('SAP123', $savedData['dhl_service_point_id']);
-        $this->assertEquals('Żabka Test', $savedData['dhl_service_point_name']);
-        $this->assertEquals('Polna 1', $savedData['dhl_service_point_street']);
-        $this->assertEquals('00-111', $savedData['dhl_service_point_postcode']);
-        $this->assertEquals('Warszawa', $savedData['dhl_service_point_city']);
+        $this->assertEquals('Packstation 101', $savedData['dhl_service_point_name']);
+        $this->assertEquals('Keetstr. 19', $savedData['dhl_service_point_street']);
+        $this->assertEquals('49393', $savedData['dhl_service_point_postcode']);
+        $this->assertEquals('Lohne', $savedData['dhl_service_point_city']);
+        $this->assertEquals(1, $savedData['dhl_is_packstation']);
+        $this->assertEquals(0, $savedData['dhl_is_postfiliale']);
+        $this->assertEquals('987654321', $savedData['dhl_postnummer']);
     }
 }

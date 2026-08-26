@@ -59,7 +59,34 @@ define([
 
             updatePointSelectionState();
 
-            quote.shippingMethod.subscribe(function () {
+            var clearSelectedPoint = function () {
+                self.selectedPoint(null);
+                try {
+                    window.sessionStorage.removeItem('dhl_selected_service_point');
+                } catch (e) {
+                    console.warn('DHL Point Selector: Error clearing selected point:', e);
+                }
+
+                var address = quote.shippingAddress();
+                if (address && address.extension_attributes) {
+                    delete address.extension_attributes['dhl_service_point_id'];
+                    delete address.extension_attributes['dhl_service_point_name'];
+                    delete address.extension_attributes['dhl_service_point_street'];
+                    delete address.extension_attributes['dhl_service_point_postcode'];
+                    delete address.extension_attributes['dhl_service_point_city'];
+                    delete address.extension_attributes['dhl_is_packstation'];
+                    delete address.extension_attributes['dhl_is_postfiliale'];
+                    delete address.extension_attributes['dhl_postnummer'];
+                }
+            };
+
+            var lastMethodCode = null;
+            quote.shippingMethod.subscribe(function (newMethod) {
+                var currentCode = newMethod ? ((newMethod.carrier_code || newMethod.carrierCode || '') + '_' + (newMethod.method_code || newMethod.methodCode || '')) : '';
+                if (lastMethodCode !== null && lastMethodCode !== currentCode) {
+                    clearSelectedPoint();
+                }
+                lastMethodCode = currentCode;
                 updatePointSelectionState();
             });
 
@@ -279,10 +306,92 @@ define([
         /**
          * Check if current method is domestic SP with nearest delivery mode configured
          */
+        /**
+         * Check if current method is domestic SP with nearest delivery mode configured
+         */
         isNearestDeliveryMode: function () {
             var methodCode = this.currentMethodCode();
             var config = this.getDhlConfig();
             return (methodCode === 'dhlparcel_economy' || methodCode === 'economy') && config.deliveryMode === 'nearest';
+        },
+
+        /**
+         * Check if selected point is a German Packstation (Locker) requiring Postnummer input
+         */
+        isDePackstationSelected: function () {
+            var point = this.selectedPoint();
+            if (!point) {
+                return false;
+            }
+
+            var country = (point.country || '').toUpperCase();
+            if (!country) {
+                var address = quote.shippingAddress();
+                if (address && (address.countryId || address.country_id)) {
+                    country = (address.countryId || address.country_id).toUpperCase();
+                }
+            }
+
+            if (country !== 'DE') {
+                return false;
+            }
+
+            var nameStr = (point.name || point.sap || '').toLowerCase();
+            var typeStr = (point.type || point.ptype || '').toLowerCase();
+
+            return !!(
+                point.isPackstation ||
+                point.packstation ||
+                typeStr === 'packstation' ||
+                typeStr === 'lmecobox' ||
+                typeStr === 'box' ||
+                (point.ptype || '').toLowerCase() === 'packstation' ||
+                nameStr.indexOf('packstation') !== -1 ||
+                nameStr.indexOf('box') !== -1 ||
+                /^\d+$/.test((point.name || '').trim())
+            );
+        },
+
+        /**
+         * Check if selected point is a German Postfiliale / ParcelShop (Point) with optional Postnummer input
+         */
+        isDePointSelected: function () {
+            var point = this.selectedPoint();
+            if (!point) {
+                return false;
+            }
+
+            var country = (point.country || '').toUpperCase();
+            if (!country) {
+                var address = quote.shippingAddress();
+                if (address && (address.countryId || address.country_id)) {
+                    country = (address.countryId || address.country_id).toUpperCase();
+                }
+            }
+
+            return country === 'DE' && !this.isDePackstationSelected();
+        },
+
+        /**
+         * Update postnummer value on selected point and session storage
+         */
+        updatePostnummer: function (data, event) {
+            var val = event && event.target ? event.target.value : '';
+            var point = this.selectedPoint();
+            if (point) {
+                point.postnummer = val;
+                this.selectedPoint(point);
+                try {
+                    window.sessionStorage.setItem('dhl_selected_service_point', JSON.stringify(point));
+                } catch (e) {
+                    console.warn('DHL Point Selector: Error saving postnummer:', e);
+                }
+            }
+
+            if (val.trim()) {
+                $('#dhl_postnummer_input, #dhl_postnummer_input_opt').css('border-color', '#cccccc');
+                $('#dhl_postnummer_input_error, #dhl_postnummer_input_opt_error').hide().text('');
+            }
         },
 
         /**
@@ -311,9 +420,17 @@ define([
             }
 
             if (config) {
-                if (config.pointMapType === 'box') {
+                var currentMethod = this.currentMethodCode();
+                var mapType = 'all';
+                if (config.pointMapTypes && config.pointMapTypes[currentMethod]) {
+                    mapType = config.pointMapTypes[currentMethod];
+                } else if (config.pointMapType) {
+                    mapType = config.pointMapType;
+                }
+
+                if (mapType === 'box') {
                     params.push('ptype=packStation');
-                } else if (config.pointMapType === 'pop') {
+                } else if (mapType === 'pop') {
                     params.push('ptype=parcelShop');
                 }
             }
@@ -382,6 +499,25 @@ define([
                     }
                 }
                 if (pointData && typeof pointData === 'object' && pointData.sap) {
+                    var address = quote.shippingAddress();
+                    var recipientCountry = pointData.country || (address ? (address.countryId || address.country_id) : 'PL') || 'PL';
+                    var nameStr = (pointData.name || pointData.sap || '').toLowerCase();
+                    var typeStr = (pointData.type || pointData.ptype || '').toLowerCase();
+
+                    var isPackstation = !!(
+                        pointData.isPackstation ||
+                        pointData.packstation ||
+                        typeStr === 'packstation' ||
+                        typeStr === 'lmecobox' ||
+                        typeStr === 'box' ||
+                        (pointData.ptype || '').toLowerCase() === 'packstation' ||
+                        nameStr.indexOf('packstation') !== -1 ||
+                        nameStr.indexOf('box') !== -1 ||
+                        (/^\d+$/.test((pointData.name || '').trim()) && recipientCountry.toUpperCase() === 'DE')
+                    );
+
+                    var isPostfiliale = !isPackstation;
+
                     var formattedPoint = {
                         quoteId: self.getQuoteId(),
                         sap: pointData.sap || '',
@@ -391,7 +527,12 @@ define([
                         houseNo: pointData.houseNo || pointData.streetNo || '',
                         zip: pointData.zip || pointData.postalCode || '',
                         city: pointData.city || '',
-                        country: pointData.country || ''
+                        country: recipientCountry.toUpperCase(),
+                        isPackstation: isPackstation,
+                        isPostfiliale: isPostfiliale,
+                        type: typeStr,
+                        ptype: pointData.ptype || typeStr,
+                        postnummer: pointData.postnummer || ''
                     };
 
                     self.selectedPoint(formattedPoint);

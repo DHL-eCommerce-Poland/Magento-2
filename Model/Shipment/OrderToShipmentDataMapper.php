@@ -184,6 +184,17 @@ class OrderToShipmentDataMapper
             }
         }
 
+        $isPackstation = false;
+        $isPostfiliale = false;
+        $postnummer = null;
+
+        if ($shippingAddress) {
+            $isPackstation = (bool)($shippingAddress->getData('dhl_is_packstation') ?? false);
+            $isPostfiliale = (bool)($shippingAddress->getData('dhl_is_postfiliale') ?? false);
+            $postnummerVal = (string)($shippingAddress->getData('dhl_postnummer') ?? '');
+            $postnummer = $postnummerVal !== '' ? $postnummerVal : null;
+        }
+
         $recipientData = new RecipientData(
             name: $company,
             type: $recipientType,
@@ -199,7 +210,10 @@ class OrderToShipmentDataMapper
             phone: $phone,
             email: $email,
             popId: $popId,
-            popName: $popName
+            popName: $popName,
+            isPackstation: $isPackstation,
+            isPostfiliale: $isPostfiliale,
+            postnummer: $postnummer
         );
 
         // 2. Sender mapping
@@ -212,16 +226,16 @@ class OrderToShipmentDataMapper
             : $calculatedWeight;
 
         // 4. Resolving dynamic content & template variables
-        $rawContent = (string)($defaultShipmentDefaults['content'] ?? 'ORDER_NUMBER');
-        $resolvedContent = $this->resolveContentValue($rawContent, $order);
+        $rawContent = isset($defaultShipmentDefaults['content']) ? (string)$defaultShipmentDefaults['content'] : '';
+        $resolvedContent = $rawContent !== '' ? $this->resolveContentValue($rawContent, $order) : '';
 
-        $commentTemplate = (string)($defaultShipmentDefaults['comment'] ?? '{customer_name}');
-        $referenceTemplate = (string)($defaultShipmentDefaults['reference'] ?? '{order_increment_id}');
-        $mpkTemplate = (string)($defaultShipmentDefaults['mpk'] ?? '');
+        $commentTemplate = isset($defaultShipmentDefaults['comment']) ? (string)$defaultShipmentDefaults['comment'] : '';
+        $referenceTemplate = isset($defaultShipmentDefaults['reference']) ? (string)$defaultShipmentDefaults['reference'] : '';
+        $mpkTemplate = isset($defaultShipmentDefaults['mpk']) ? (string)$defaultShipmentDefaults['mpk'] : '';
 
-        $resolvedComment = $this->variableResolver->resolve($commentTemplate, $order);
-        $resolvedReference = $this->variableResolver->resolve($referenceTemplate, $order);
-        $resolvedMpk = $this->variableResolver->resolve($mpkTemplate, $order);
+        $resolvedComment = $commentTemplate !== '' ? $this->variableResolver->resolve($commentTemplate, $order) : '';
+        $resolvedReference = $referenceTemplate !== '' ? $this->variableResolver->resolve($referenceTemplate, $order) : '';
+        $resolvedMpk = $mpkTemplate !== '' ? $this->variableResolver->resolve($mpkTemplate, $order) : '';
 
         // 5. Special services & COD detection
         $isCod = false;
@@ -330,8 +344,10 @@ class OrderToShipmentDataMapper
             ? (int)$defaultShipmentDefaults['dropOffPointId']
             : null;
 
+        $serviceType = (string)($defaultShipmentDefaults['serviceType'] ?? '');
+
         $shipmentSettings = new ShipmentSettingsData(
-            serviceType: (string)($defaultShipmentDefaults['serviceType'] ?? 'AH'),
+            serviceType: $serviceType,
             pickupType: (string)($defaultShipmentDefaults['pickupType'] ?? 'COURIER'),
             content: $resolvedContent,
             mpk: (string)($defaultShipmentDefaults['mpk'] ?? $resolvedMpk),

@@ -73,6 +73,44 @@ class ShipmentFullDataMapper
             ? $this->sanitizeString($recipient->getPopId())
             : null;
 
+        $receiverAddressType = (!empty($recipient->getPopId()) || $recipient->isPackstation() || $recipient->isPostfiliale())
+            ? 'C'
+            : ($recipient->getType() === 'B' ? 'B' : 'C');
+
+        $recipientName = $recipient->getName() !== ''
+            ? $recipient->getName()
+            : $recipientContact;
+
+        $countryCode = strtoupper($recipient->getCountry() ?: 'PL');
+
+        $receiver = [
+            'addressType' => $receiverAddressType,
+            'country' => $countryCode,
+            'name' => $this->sanitizeString($recipientName),
+            'postalCode' => $this->sanitizePostalCode($recipient->getPostalCode()),
+            'city' => $this->sanitizeString($recipient->getCity()),
+            'street' => $this->sanitizeString($recipient->getStreet()),
+            'houseNumber' => $this->sanitizeString($recipient->getHouseNumber()),
+            'apartmentNumber' => $this->sanitizeString($recipient->getFlatNumber()),
+            'contactPerson' => $this->sanitizeString($recipientContact),
+            'contactPhone' => $this->sanitizeString($recipient->getPhone()),
+            'contactEmail' => $this->sanitizeString($recipient->getEmail()),
+        ];
+
+        if ($countryCode === 'DE') {
+            if ($recipient->isPackstation()) {
+                $receiver['isPackstation'] = true;
+            } else {
+                $receiver['isPostfiliale'] = true;
+            }
+
+            if ($recipient->getPostnummer() !== null && $recipient->getPostnummer() !== '') {
+                $receiver['postnummer'] = $this->sanitizeString($recipient->getPostnummer());
+            }
+        } elseif ($recipient->isPostfiliale()) {
+            $receiver['isPostfiliale'] = true;
+        }
+
         return [
             'shipper' => [
                 'name' => $this->sanitizeString($sender->getName()),
@@ -85,19 +123,7 @@ class ShipmentFullDataMapper
                 'contactPhone' => $this->sanitizeString($sender->getPhone()),
                 'contactEmail' => $this->sanitizeString($sender->getEmail()),
             ],
-            'receiver' => [
-                'addressType' => $recipient->getType() === 'B' ? 'C' : 'B',
-                'country' => 'PL',
-                'name' => $this->sanitizeString($recipient->getName()),
-                'postalCode' => $this->sanitizePostalCode($recipient->getPostalCode()),
-                'city' => $this->sanitizeString($recipient->getCity()),
-                'street' => $this->sanitizeString($recipient->getStreet()),
-                'houseNumber' => $this->sanitizeString($recipient->getHouseNumber()),
-                'apartmentNumber' => $this->sanitizeString($recipient->getFlatNumber()),
-                'contactPerson' => $this->sanitizeString($recipientContact),
-                'contactPhone' => $this->sanitizeString($recipient->getPhone()),
-                'contactEmail' => $this->sanitizeString($recipient->getEmail()),
-            ],
+            'receiver' => $receiver,
             'pieceList' => [
                 'item' => $pieceItems,
             ],

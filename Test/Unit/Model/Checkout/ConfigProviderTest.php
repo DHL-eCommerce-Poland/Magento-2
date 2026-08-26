@@ -18,12 +18,17 @@ class ConfigProviderTest extends TestCase
     public function testGetConfigReturnsConfiguredValues(): void
     {
         $scopeConfig = $this->createMock(ScopeConfigInterface::class);
-        $scopeConfig->expects(self::exactly(2))
+        $scopeConfig->expects(self::atLeast(2))
             ->method('getValue')
-            ->willReturnMap([
-                ['carriers/dhlparcel/method_economy_point_map_type', ScopeInterface::SCOPE_STORE, null, 'pop'],
-                ['carriers/dhlparcel/method_economy_point_delivery_mode', ScopeInterface::SCOPE_STORE, null, 'map'],
-            ]);
+            ->willReturnCallback(
+                static fn (string $path) => match ($path) {
+                    'carriers/dhlparcel/method_economy_point_map_type' => 'pop',
+                    'carriers/dhlparcel/method_economy_point_delivery_mode' => 'map',
+                    'carriers/dhlparcel/method_connect_point_map_type' => 'all',
+                    'carriers/dhlparcel/method_international_point_map_type' => 'box',
+                    default => null,
+                }
+            );
 
         $scopeConfig->expects(self::once())
             ->method('isSetFlag')

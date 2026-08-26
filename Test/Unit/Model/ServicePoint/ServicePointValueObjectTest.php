@@ -41,6 +41,9 @@ class ServicePointValueObjectTest extends TestCase
             'dhl_service_point_street' => 'Street 1',
             'dhl_service_point_postcode' => '12-345',
             'dhl_service_point_city' => 'City',
+            'dhl_is_packstation' => false,
+            'dhl_is_postfiliale' => false,
+            'dhl_postnummer' => null,
         ];
 
         $point = new ServicePointValueObject(
