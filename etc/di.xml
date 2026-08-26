@@ -53,6 +53,8 @@
                       xsi:type="string">Ideo\Dhl\Model\ResourceModel\DropOffPoint\Grid\Collection</item>
                 <item name="ideo_dhl_delivery_service_listing_data_source"
                       xsi:type="string">Ideo\Dhl\Model\ResourceModel\DeliveryService\Grid\Collection</item>
+                <item name="ideo_dhl_shipment_listing_data_source"
+                      xsi:type="string">Ideo\Dhl\Model\ResourceModel\ShipmentData\Grid\Collection</item>
             </argument>
         </arguments>
     </type>

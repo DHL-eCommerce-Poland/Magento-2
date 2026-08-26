@@ -1,0 +1,874 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">ideo_dhl_shipment_form.ideo_dhl_shipment_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">DHL Shipment Details</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="back" class="Ideo\Dhl\Block\Adminhtml\Button\Back"/>
+        </buttons>
+        <namespace>ideo_dhl_shipment_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>ideo_dhl_shipment_form.ideo_dhl_shipment_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="ideo_dhl_shipment_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="ideo_dhl/shipment/save"/>
+        </settings>
+        <dataProvider class="Ideo\Dhl\Model\Shipment\DataProvider" name="ideo_dhl_shipment_form_data_source">
+            <settings>
+                <requestFieldName>entity_id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <label translate="true">General</label>
+            <visible>false</visible>
+        </settings>
+        <field name="entity_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>entity_id</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="sender">
+        <settings>
+            <label translate="true">Sender Address</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="sender[sapNumber]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">SAP Number</label>
+                <dataScope>sender.sapNumber</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="sender[name]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Sender Name</label>
+                <dataScope>sender.name</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="sender[firstName]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">First Name</label>
+                <dataScope>sender.firstName</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="sender[lastName]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Last Name</label>
+                <dataScope>sender.lastName</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="sender[street]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Street</label>
+                <dataScope>sender.street</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="sender[houseNumber]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">House No.</label>
+                <dataScope>sender.houseNumber</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="sender[flatNumber]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Apt No.</label>
+                <dataScope>sender.flatNumber</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="sender[postalCode]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Postal Code</label>
+                <dataScope>sender.postalCode</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="sender[city]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">City</label>
+                <dataScope>sender.city</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="sender[country]" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Country</label>
+                <dataScope>sender.country</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Directory\Model\Config\Source\Country"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="sender[phone]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Phone</label>
+                <dataScope>sender.phone</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="sender[email]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Email</label>
+                <dataScope>sender.email</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="recipient">
+        <settings>
+            <label translate="true">Recipient Address</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="recipient[type]" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Address Type</label>
+                <dataScope>recipient.type</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\ShipmentAddressType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="recipient[name]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Company Name</label>
+                <dataScope>recipient.name</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="recipient[firstName]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">First Name</label>
+                <dataScope>recipient.firstName</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="recipient[lastName]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Last Name</label>
+                <dataScope>recipient.lastName</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="recipient[street]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Street</label>
+                <dataScope>recipient.street</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="recipient[houseNumber]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">House No.</label>
+                <dataScope>recipient.houseNumber</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="recipient[flatNumber]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Apt No.</label>
+                <dataScope>recipient.flatNumber</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="recipient[postalCode]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Postal Code</label>
+                <dataScope>recipient.postalCode</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="recipient[city]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">City</label>
+                <dataScope>recipient.city</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="recipient[country]" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Country</label>
+                <dataScope>recipient.country</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Directory\Model\Config\Source\Country"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="recipient[phone]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Phone</label>
+                <dataScope>recipient.phone</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="recipient[email]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Email</label>
+                <dataScope>recipient.email</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="recipient[popId]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">POP Service Point ID</label>
+                <dataScope>recipient.popId</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="recipient[popName]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">POP Service Point Address</label>
+                <dataScope>recipient.popName</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="shipment_settings">
+        <settings>
+            <label translate="true">Shipment Settings</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="shipmentSettings[shipmentId]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Shipment ID</label>
+                <dataScope>shipmentSettings.shipmentId</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="shipmentSettings[serviceType]" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Service</label>
+                <dataScope>shipmentSettings.serviceType</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <caption translate="true">Select Service...</caption>
+                        <options class="Ideo\Dhl\Model\Config\Source\ServiceCode"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="shipmentSettings[labelType]" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Shipment Label Format</label>
+                <dataScope>shipmentSettings.labelType</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\LabelType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="shipmentSettings[content]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Package Contents Description</label>
+                <dataScope>shipmentSettings.content</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="shipmentSettings[comment]" formElement="textarea">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Additional Comments</label>
+                <dataScope>shipmentSettings.comment</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="shipmentSettings[reference]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Shipment Reference Number</label>
+                <dataScope>shipmentSettings.reference</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="shipmentSettings[mpk]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">MPK</label>
+                <dataScope>shipmentSettings.mpk</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="shipmentSettings[autoCreateReturnShipment]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Generate return label automatically when creating shipment</label>
+                <dataScope>shipmentSettings.autoCreateReturnShipment</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+    </fieldset>
+
+    <fieldset name="special_services">
+        <settings>
+            <label translate="true">Additional Services</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="specialServices[insurance]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">UBEZP - Insurance</label>
+                <dataScope>specialServices.insurance</dataScope>
+                <disabled>true</disabled>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>0</value>
+                            <actions>
+                                <action name="0">
+                                    <target>ideo_dhl_shipment_form.ideo_dhl_shipment_form.special_services.specialServices[insuranceValue]</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>ideo_dhl_shipment_form.ideo_dhl_shipment_form.special_services.specialServices[insuranceValue]</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="specialServices[insuranceValue]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Insurance Value</label>
+                <dataScope>specialServices.insuranceValue</dataScope>
+                <disabled>true</disabled>
+                <imports>
+                    <link name="visible">${$.provider}:data.specialServices.insurance</link>
+                </imports>
+            </settings>
+        </field>
+        <field name="specialServices[cod]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">COD - Cash On Delivery</label>
+                <dataScope>specialServices.cod</dataScope>
+                <disabled>true</disabled>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>0</value>
+                            <actions>
+                                <action name="0">
+                                    <target>ideo_dhl_shipment_form.ideo_dhl_shipment_form.special_services.specialServices[codAmount]</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>ideo_dhl_shipment_form.ideo_dhl_shipment_form.special_services.specialServices[codAmount]</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="specialServices[codAmount]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">COD Amount</label>
+                <dataScope>specialServices.codAmount</dataScope>
+                <disabled>true</disabled>
+                <imports>
+                    <link name="visible">${$.provider}:data.specialServices.cod</link>
+                </imports>
+            </settings>
+        </field>
+        <field name="specialServices[eveningDelivery]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">1722 - Evening Delivery (18-22)</label>
+                <dataScope>specialServices.eveningDelivery</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="specialServices[saturdayDelivery]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">SOBOTA - Saturday Delivery</label>
+                <dataScope>specialServices.saturdayDelivery</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="specialServices[saturdayDispatch]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">NAD_SOBOTA - Saturday Pickup</label>
+                <dataScope>specialServices.saturdayDispatch</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="specialServices[pdi]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">PDI - Pre-delivery Information</label>
+                <dataScope>specialServices.pdi</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="specialServices[rod]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">ROD - Return Confirmed Documents</label>
+                <dataScope>specialServices.rod</dataScope>
+                <disabled>true</disabled>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>0</value>
+                            <actions>
+                                <action name="0">
+                                    <target>ideo_dhl_shipment_form.ideo_dhl_shipment_form.special_services.specialServices[rodDocumentText]</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>ideo_dhl_shipment_form.ideo_dhl_shipment_form.special_services.specialServices[rodDocumentText]</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="specialServices[rodDocumentText]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">ROD Document Name</label>
+                <dataScope>specialServices.rodDocumentText</dataScope>
+                <disabled>true</disabled>
+                <imports>
+                    <link name="visible">${$.provider}:data.specialServices.rod</link>
+                </imports>
+            </settings>
+        </field>
+        <field name="specialServices[pod]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">POD - Proof of Delivery</label>
+                <dataScope>specialServices.pod</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="specialServices[agever]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">AGEVER - Adult Verification / Delivery</label>
+                <dataScope>specialServices.agever</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="specialServices[odb]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">ODB - Self Pickup</label>
+                <dataScope>specialServices.odb</dataScope>
+                <disabled>true</disabled>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+    </fieldset>
+
+    <fieldset name="packages_fieldset">
+        <settings>
+            <label translate="true">Shipment Packages</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <dynamicRows name="packages">
+            <settings>
+                <additionalClasses>
+                    <class name="admin__field-wide">true</class>
+                </additionalClasses>
+                <componentType>dynamicRows</componentType>
+            </settings>
+            <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="isTemplate" xsi:type="boolean">true</item>
+                        <item name="is_collection" xsi:type="boolean">true</item>
+                        <item name="componentType" xsi:type="string">container</item>
+                    </item>
+                </argument>
+                <field name="packageType" formElement="select">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Package Type</label>
+                        <dataScope>packageType</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
+                    <formElements>
+                        <select>
+                            <settings>
+                                <options class="Ideo\Dhl\Model\Config\Source\PackageType"/>
+                            </settings>
+                        </select>
+                    </formElements>
+                </field>
+                <field name="quantity" formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Qty</label>
+                        <dataScope>quantity</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
+                </field>
+                <field name="weight" formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Weight (kg)</label>
+                        <dataScope>weight</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
+                </field>
+                <field name="width" formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Width (cm)</label>
+                        <dataScope>width</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
+                </field>
+                <field name="length" formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Length (cm)</label>
+                        <dataScope>length</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
+                </field>
+                <field name="height" formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Height (cm)</label>
+                        <dataScope>height</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
+                </field>
+                <field name="isNonStandard" formElement="checkbox">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="default" xsi:type="number">0</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>boolean</dataType>
+                        <label translate="true">NST</label>
+                        <dataScope>isNonStandard</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
+                    <formElements>
+                        <checkbox>
+                            <settings>
+                                <valueMap>
+                                    <map name="false" xsi:type="number">0</map>
+                                    <map name="true" xsi:type="number">1</map>
+                                </valueMap>
+                            </settings>
+                        </checkbox>
+                    </formElements>
+                </field>
+                <field name="hasEuroReturn" formElement="checkbox">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="default" xsi:type="number">0</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>boolean</dataType>
+                        <label translate="true">Euro Return</label>
+                        <dataScope>hasEuroReturn</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
+                    <formElements>
+                        <checkbox>
+                            <settings>
+                                <valueMap>
+                                    <map name="false" xsi:type="number">0</map>
+                                    <map name="true" xsi:type="number">1</map>
+                                </valueMap>
+                            </settings>
+                        </checkbox>
+                    </formElements>
+                </field>
+            </container>
+        </dynamicRows>
+    </fieldset>
+</form>

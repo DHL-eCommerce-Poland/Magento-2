@@ -3,6 +3,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
         <add id="Ideo_Dhl::main" title="DHL Parcel" module="Ideo_Dhl" sortOrder="25" parent="Magento_Sales::sales" resource="Ideo_Dhl::main"/>
+        <add id="Ideo_Dhl::shipment" title="DHL Shipments" module="Ideo_Dhl" sortOrder="5" parent="Ideo_Dhl::main" action="ideo_dhl/shipment/index" resource="Ideo_Dhl::shipment"/>
         <add id="Ideo_Dhl::drop_off_point" title="DHL Drop-Off Points" module="Ideo_Dhl" sortOrder="10" parent="Ideo_Dhl::main" action="ideo_dhl/dropoffpoint/index" resource="Ideo_Dhl::drop_off_point"/>
         <add id="Ideo_Dhl::delivery_service" title="DHL Delivery Services" module="Ideo_Dhl" sortOrder="20" parent="Ideo_Dhl::main" action="ideo_dhl/deliveryservice/index" resource="Ideo_Dhl::delivery_service"/>
         <add id="Ideo_Dhl::config" title="Configuration" module="Ideo_Dhl" sortOrder="30" parent="Ideo_Dhl::main" action="adminhtml/system_config/edit/section/carriers/_fragment/carriers_dhlparcel-link" resource="Ideo_Dhl::config"/>
