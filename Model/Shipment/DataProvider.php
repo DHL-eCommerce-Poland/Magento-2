@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\Shipment;
 
 use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
+use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use InvalidArgumentException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
@@ -66,9 +67,11 @@ class DataProvider extends AbstractDataProvider
                         }
                         if (isset($payload['shipmentSettings']) && is_array($payload['shipmentSettings'])) {
                             $shipmentId = (string)($item->getShipmentId() ?? ($payload['shipmentId'] ?? ''));
+                            $status = (string)($item->getStatus() ?? '');
                             $data['shipmentSettings'] = $this->normalizeShipmentSettings(
                                 $payload['shipmentSettings'],
-                                $shipmentId
+                                $shipmentId,
+                                $status
                             );
                             if (isset($payload['shipmentSettings']['packages']) && is_array($payload['shipmentSettings']['packages'])) {
                                 $data['packages'] = $this->normalizePackages($payload['shipmentSettings']['packages']);
@@ -104,7 +107,7 @@ class DataProvider extends AbstractDataProvider
      */
     private function normalizeSpecialServices(array $ss): array
     {
-        $dto = \Ideo\Dhl\Model\Shipment\Data\SpecialServicesData::fromArray($ss);
+        $dto = SpecialServicesData::fromArray($ss);
         $isEvening = !empty($ss['eveningDelivery'])
             || ($dto->getDeliveryHours() !== null && (string)$dto->getDeliveryHours() === '1722');
 
@@ -126,18 +129,22 @@ class DataProvider extends AbstractDataProvider
     }
 
     /**
-     * Normalize shipment settings flags to string '1'/'0' and ensure shipmentId is present.
+     * Normalize shipment settings flags to string '1'/'0' and ensure shipmentId and status are present.
      *
      * @param array $settings
      * @param string $shipmentId
+     * @param string $status
      *
      * @return array
      */
-    private function normalizeShipmentSettings(array $settings, string $shipmentId = ''): array
+    private function normalizeShipmentSettings(array $settings, string $shipmentId = '', string $status = ''): array
     {
         $settings['autoCreateReturnShipment'] = !empty($settings['autoCreateReturnShipment']) ? '1' : '0';
         if (empty($settings['shipmentId']) && !empty($shipmentId)) {
             $settings['shipmentId'] = $shipmentId;
+        }
+        if (!empty($status)) {
+            $settings['status'] = $status;
         }
         return $settings;
     }

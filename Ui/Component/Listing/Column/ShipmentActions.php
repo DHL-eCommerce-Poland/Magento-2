@@ -12,6 +12,7 @@ use Magento\Ui\Component\Listing\Columns\Column;
 class ShipmentActions extends Column
 {
     private const URL_PATH_EDIT = 'ideo_dhl/shipment/edit';
+    private const URL_PATH_DELETE = 'ideo_dhl/shipment/delete';
     private const URL_PATH_VIEW_ORDER = 'sales/order/view';
 
     /**
@@ -62,6 +63,21 @@ class ShipmentActions extends Column
                             'label' => __('View Order'),
                         ];
                     }
+
+                    $actions['delete'] = [
+                        'href' => $this->urlBuilder->getUrl(
+                            self::URL_PATH_DELETE,
+                            ['entity_id' => $item['entity_id']]
+                        ),
+                        'label' => __('Delete'),
+                        'confirm' => [
+                            'title' => __('Delete Shipment'),
+                            'message' => __(
+                                'Are you sure you want to delete this shipment? It will be cancelled in DHL and removed from Magento.'
+                            ),
+                        ],
+                        'post' => true,
+                    ];
 
                     $item[$this->getData('name')] = $actions;
                 }

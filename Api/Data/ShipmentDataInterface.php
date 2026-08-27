@@ -17,6 +17,8 @@ interface ShipmentDataInterface
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
+    public const DEFAULT_STATUS = 'Nowa';
+
     /**
      * Get entity ID.
      *
@@ -50,14 +52,14 @@ interface ShipmentDataInterface
     public function setOrderId(?int $orderId): static;
 
     /**
-     * Get DHL waybill shipment ID.
+     * Get DHL shipment ID.
      *
      * @return string|null
      */
     public function getShipmentId(): ?string;
 
     /**
-     * Set DHL waybill shipment ID.
+     * Set DHL shipment ID.
      *
      * @param string|null $shipmentId
      *

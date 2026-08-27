@@ -12,13 +12,15 @@ class CreateShipmentsResult
      * @param string|null $shipmentId
      * @param string|null $errorCode
      * @param string|null $errorMessage
+     * @param string|null $orderStatus
      */
     public function __construct(
         private readonly bool $success,
         private readonly bool $timeout = false,
         private readonly ?string $shipmentId = null,
         private readonly ?string $errorCode = null,
-        private readonly ?string $errorMessage = null
+        private readonly ?string $errorMessage = null,
+        private readonly ?string $orderStatus = null
     ) {
     }
 
@@ -70,5 +72,15 @@ class CreateShipmentsResult
     public function getErrorMessage(): ?string
     {
         return $this->errorMessage;
+    }
+
+    /**
+     * Get the DHL order status returned by API (e.g. "Nowa").
+     *
+     * @return string|null
+     */
+    public function getOrderStatus(): ?string
+    {
+        return $this->orderStatus;
     }
 }

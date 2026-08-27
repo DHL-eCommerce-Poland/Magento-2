@@ -78,8 +78,13 @@ class SaveTest extends TestCase
         $this->loggerStub = $this->createStub(LoggerInterface::class);
 
         $messageManagerStub = $this->createStub(\Magento\Framework\Message\ManagerInterface::class);
+        $resultRedirectFactoryStub = $this->createStub(\Magento\Framework\Controller\Result\RedirectFactory::class);
+        $resultRedirectStub = $this->createStub(\Magento\Framework\Controller\Result\Redirect::class);
+        $resultRedirectFactoryStub->method('create')->willReturn($resultRedirectStub);
+
         $this->contextStub->method('getRequest')->willReturn($this->requestStub);
         $this->contextStub->method('getMessageManager')->willReturn($messageManagerStub);
+        $this->contextStub->method('getResultRedirectFactory')->willReturn($resultRedirectFactoryStub);
         $this->jsonFactoryStub->method('create')->willReturn($this->jsonResultMock);
 
         $serializerStub = $this->createStub(\Magento\Framework\Serialize\SerializerInterface::class);
@@ -110,10 +115,11 @@ class SaveTest extends TestCase
             ->willReturnMap([
                 ['draft', null, null],
                 ['shipment_data', null, null],
+                ['isAjax', null, true],
             ]);
 
         $this->scopeConfigMock->expects(self::never())->method('getValue');
-        $this->shipmentCreationServiceMock->expects(self::never())->method('createAndDispatchShipment');
+        $this->shipmentCreationServiceMock->expects(self::never())->method('createShipment');
 
         $this->jsonResultMock->expects(self::once())
             ->method('setData')
@@ -161,9 +167,9 @@ class SaveTest extends TestCase
             ->with('carriers/dhlparcel/sandbox')
             ->willReturn('1');
 
-        $apiResult = new CreateShipmentsResult(true, false, 'WAYBILL123456');
+        $apiResult = new CreateShipmentsResult(true, false, '90039521201');
         $this->shipmentCreationServiceMock->expects(self::once())
-            ->method('createAndDispatchShipment')
+            ->method('createShipment')
             ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'sandbox', '1', '2')
             ->willReturn($apiResult);
 
@@ -171,8 +177,8 @@ class SaveTest extends TestCase
             ->method('setData')
             ->with(Assert::callback(function (array $data) {
                 return $data['success'] === true
-                    && $data['shipmentId'] === 'WAYBILL123456'
-                    && $data['status'] === \Ideo\Dhl\Model\Shipment\ShipmentStatus::DISPATCHED;
+                    && $data['shipmentId'] === '90039521201'
+                    && $data['status'] === 'created';
             }))
             ->willReturn($this->jsonResultMock);
 
@@ -211,7 +217,7 @@ class SaveTest extends TestCase
 
         $apiResult = new CreateShipmentsResult(false, false, null, 'ERR_01', 'Nieprawidłowy kod pocztowy');
         $this->shipmentCreationServiceMock->expects(self::once())
-            ->method('createAndDispatchShipment')
+            ->method('createShipment')
             ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'production', null, null)
             ->willReturn($apiResult);
 

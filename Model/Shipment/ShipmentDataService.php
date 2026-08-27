@@ -45,6 +45,19 @@ class ShipmentDataService
     }
 
     /**
+     * Load persistent shipment data DB entity by entity ID.
+     *
+     * @param int $entityId
+     *
+     * @return ShipmentDataInterface
+     * @throws LocalizedException
+     */
+    public function getShipmentEntity(int $entityId): ShipmentDataInterface
+    {
+        return $this->shipmentDataRepository->getById($entityId);
+    }
+
+    /**
      * Load DhlShipmentData DTO for given entity ID.
      *
      * @param int $entityId
@@ -72,37 +85,6 @@ class ShipmentDataService
         }
 
         return DhlShipmentData::fromArray($dataArr);
-    }
-
-    /**
-     * Update shipment status, shipment tracking ID, and optional error messages.
-     *
-     * @param int $entityId
-     * @param string $status
-     * @param string|null $shipmentId
-     * @param string|null $errorMessages
-     *
-     * @return ShipmentDataInterface
-     * @throws LocalizedException
-     */
-    public function updateShipmentStatusAndTracking(
-        int $entityId,
-        string $status,
-        ?string $shipmentId = null,
-        ?string $errorMessages = null
-    ): ShipmentDataInterface {
-        $entity = $this->shipmentDataRepository->getById($entityId);
-        $entity->setStatus($status);
-
-        if ($shipmentId !== null && trim($shipmentId) !== '') {
-            $entity->setShipmentId($shipmentId);
-        }
-
-        if ($errorMessages !== null) {
-            $entity->setErrorMessages($errorMessages);
-        }
-
-        return $this->shipmentDataRepository->save($entity);
     }
 
     /**
@@ -200,7 +182,7 @@ class ShipmentDataService
      */
     public function saveShipmentDataWithStatus(
         DhlShipmentData $shipmentData,
-        string $status = ShipmentStatus::DISPATCHED,
+        string $status = ShipmentDataInterface::DEFAULT_STATUS,
         ?string $errorMessages = null,
         ?string $presetSenderId = null,
         ?string $presetShipmentId = null,
@@ -230,6 +212,44 @@ class ShipmentDataService
     }
 
     /**
+     * Update existing shipment entity in database with new DhlShipmentData and optional shipmentId.
+     *
+     * @param int $entityId
+     * @param DhlShipmentData $shipmentData
+     * @param string $status
+     * @param string|null $shipmentId
+     * @param string|null $errorMessages
+     *
+     * @return ShipmentDataInterface
+     * @throws LocalizedException
+     */
+    public function updateExistingShipmentPayload(
+        int $entityId,
+        DhlShipmentData $shipmentData,
+        string $status = 'created',
+        ?string $shipmentId = null,
+        ?string $errorMessages = null
+    ): ShipmentDataInterface {
+        $this->validator->validate($shipmentData);
+
+        $entity = $this->shipmentDataRepository->getById($entityId);
+        $payloadArr = $shipmentData->toArray();
+
+        if ($shipmentId !== null && trim($shipmentId) !== '') {
+            $payloadArr['shipmentId'] = (string)$shipmentId;
+            $entity->setShipmentId($shipmentId);
+        }
+
+        $entity->setStatus($status);
+        $entity->setShipmentData($this->serializer->serialize($payloadArr));
+        if ($errorMessages !== null) {
+            $entity->setErrorMessages($errorMessages);
+        }
+
+        return $this->shipmentDataRepository->save($entity);
+    }
+
+    /**
      * Save DhlShipmentData object into database persistence.
      *
      * @param DhlShipmentData $shipmentData
@@ -246,7 +266,7 @@ class ShipmentDataService
     ): ShipmentDataInterface {
         return $this->saveShipmentDataWithStatus(
             $shipmentData,
-            ShipmentStatus::DISPATCHED,
+            ShipmentDataInterface::DEFAULT_STATUS,
             null,
             $presetSenderId,
             $presetShipmentId

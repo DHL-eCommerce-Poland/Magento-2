@@ -12,15 +12,13 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Lock\LockManagerInterface;
 use Magento\Framework\Serialize\SerializerInterface;
+use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
 class ShipmentCreationService
 {
     private const LOCK_TTL = 15;
-    public const STATUS_DISPATCHED = ShipmentStatus::DISPATCHED;
-    public const STATUS_PENDING_VERIFICATION = ShipmentStatus::PENDING_VERIFICATION;
-    public const STATUS_ERROR_SYNC = ShipmentStatus::ERROR_SYNC;
 
     /**
      * @param ShipmentDataService $shipmentDataService
@@ -47,9 +45,9 @@ class ShipmentCreationService
     }
 
     /**
-     * Validate and dispatch shipment directly to DHL WebAPI2 without saving preliminary draft.
+     * Validate and create shipment directly in DHL WebAPI2 without saving preliminary draft.
      *
-     * Saves to DB only upon API success (status DISPATCHED) or timeout (status PENDING_VERIFICATION).
+     * Saves to DB only upon API success (status CREATED or DHL order status).
      *
      * @param DhlShipmentData $shipmentData
      * @param string $environment ('sandbox' or 'production')
@@ -59,7 +57,7 @@ class ShipmentCreationService
      * @return CreateShipmentsResult
      * @throws LocalizedException
      */
-    public function createAndDispatchShipment(
+    public function createShipment(
         DhlShipmentData $shipmentData,
         string $environment = 'sandbox',
         ?string $presetSenderId = null,
@@ -67,11 +65,11 @@ class ShipmentCreationService
     ): CreateShipmentsResult {
         $orderId = $shipmentData->getOrderId();
         $hash = hash('sha256', $this->serializer->serialize($shipmentData->toArray()));
-        $lockName = 'dhl_shipment_dispatch_' . ($orderId ?? $hash);
+        $lockName = 'dhl_shipment_create_' . ($orderId ?? $hash);
 
         if (!$this->lockManager->lock($lockName, self::LOCK_TTL)) {
             throw new LocalizedException(
-                __('Shipment dispatch is already in progress. Please wait a moment.')
+                __('Shipment creation is already in progress. Please wait a moment.')
             );
         }
 
@@ -86,27 +84,16 @@ class ShipmentCreationService
             // 3. Dispatch directly to DHL WebAPI2 (createShipments)
             $apiResult = $this->client->createShipments($credentials, [$mappedData], $orderId);
 
-            // 4. Handle Timeout scenario (save as PENDING_VERIFICATION to prevent duplicate creations)
-            if ($apiResult->isTimeout()) {
-                $this->shipmentDataService->saveShipmentDataWithStatus(
-                    $shipmentData,
-                    self::STATUS_PENDING_VERIFICATION,
-                    $apiResult->getErrorMessage(),
-                    $presetSenderId,
-                    $presetShipmentId
-                );
+            // 4. Handle Failure or Timeout scenario (do NOT save anything in DB)
+            if ($apiResult->isTimeout() || !$apiResult->isSuccess()) {
                 return $apiResult;
             }
 
-            // 5. Handle API Failure scenario (do NOT save anything in DB)
-            if (!$apiResult->isSuccess()) {
-                return $apiResult;
-            }
-
-            // 6. Handle API Success scenario (save DB entity directly as DISPATCHED)
+            // 5. Handle API Success scenario (save DB entity with DHL order status or CREATED fallback)
+            $status = $apiResult->getOrderStatus() ?: ShipmentDataInterface::DEFAULT_STATUS;
             $this->shipmentDataService->saveShipmentDataWithStatus(
                 $shipmentData,
-                self::STATUS_DISPATCHED,
+                $status,
                 null,
                 $presetSenderId,
                 $presetShipmentId,
@@ -120,138 +107,67 @@ class ShipmentCreationService
     }
 
     /**
-     * Dispatch shipment to DHL API with locking, transaction safety, and error handling for existing entity.
+     * Re-create shipment: deletes old DHL shipment (if exists), creates updated data, and updates entity in DB.
      *
      * @param int $entityId
+     * @param DhlShipmentData $shipmentData
      * @param string $environment ('sandbox' or 'production')
      *
      * @return CreateShipmentsResult
      * @throws LocalizedException
      */
-    public function dispatchShipment(int $entityId, string $environment = 'sandbox'): CreateShipmentsResult
-    {
-        $lockName = 'dhl_shipment_dispatch_' . $entityId;
+    public function recreateShipment(
+        int $entityId,
+        DhlShipmentData $shipmentData,
+        string $environment = 'sandbox'
+    ): CreateShipmentsResult {
+        $lockName = 'dhl_shipment_recreate_' . $entityId;
 
         if (!$this->lockManager->lock($lockName, self::LOCK_TTL)) {
             throw new LocalizedException(
-                __('Shipment dispatch is already in progress. Please wait a moment.')
+                __('Shipment re-creation is already in progress. Please wait a moment.')
             );
         }
 
         try {
-            $shipmentData = $this->shipmentDataService->loadShipmentData($entityId);
             $this->validator->validate($shipmentData);
-
             $credentials = $this->credentialsProvider->getCredentials($environment);
-            $mappedData = $this->mapper->map($shipmentData);
 
+            $existingEntity = $this->shipmentDataService->getShipmentEntity($entityId);
+            $oldShipmentId = $existingEntity->getShipmentId();
+
+            if (!empty($oldShipmentId)) {
+                try {
+                    $this->client->deleteShipment($credentials, $oldShipmentId);
+                } catch (Throwable $e) {
+                    $this->logger->warning(sprintf(
+                        '[DHL Recreate] Failed to delete old DHL shipment %s for entity #%d before recreation: %s',
+                        $oldShipmentId,
+                        $entityId,
+                        $e->getMessage()
+                    ));
+                }
+            }
+
+            $mappedData = $this->mapper->map($shipmentData);
             $apiResult = $this->client->createShipments($credentials, [$mappedData], $shipmentData->getOrderId());
 
-            if ($apiResult->isTimeout()) {
-                $this->updateStatus($entityId, self::STATUS_PENDING_VERIFICATION, null, $apiResult->getErrorMessage());
+            if ($apiResult->isTimeout() || !$apiResult->isSuccess()) {
                 return $apiResult;
             }
 
-            if (!$apiResult->isSuccess()) {
-                return $apiResult;
-            }
-
-            $shipmentId = (string) $apiResult->getShipmentId();
-
-            $connection = $this->resourceConnection->getConnection();
-            $connection->beginTransaction();
-
-            try {
-                $this->shipmentDataService->updateShipmentStatusAndTracking(
-                    $entityId,
-                    self::STATUS_DISPATCHED,
-                    $shipmentId
-                );
-
-                $connection->commit();
-            } catch (Throwable $dbEx) {
-                $connection->rollBack();
-
-                $this->logger->critical(
-                    sprintf(
-                        '[DHL] Critical: Shipment created in DHL (Tracking: %s), '
-                        . 'but Magento DB transaction failed for entity #%d: %s',
-                        $shipmentId,
-                        $entityId,
-                        $dbEx->getMessage()
-                    ),
-                    ['exception' => $dbEx]
-                );
-
-                $this->updateStatusFallback(
-                    $entityId,
-                    self::STATUS_ERROR_SYNC,
-                    $shipmentId,
-                    $dbEx->getMessage()
-                );
-
-                throw new LocalizedException(__(
-                    'Shipment was created in DHL (Tracking #: %1), but saving to Magento DB failed: %2',
-                    $shipmentId,
-                    $dbEx->getMessage()
-                ), $dbEx);
-            }
+            $newShipmentId = (string) $apiResult->getShipmentId();
+            $status = $apiResult->getOrderStatus() ?: ShipmentDataInterface::DEFAULT_STATUS;
+            $this->shipmentDataService->updateExistingShipmentPayload(
+                $entityId,
+                $shipmentData,
+                $status,
+                $newShipmentId
+            );
 
             return $apiResult;
         } finally {
             $this->lockManager->unlock($lockName);
-        }
-    }
-
-    /**
-     * Safely update shipment status.
-     *
-     * @param int $entityId
-     * @param string $status
-     * @param string|null $shipmentId
-     * @param string|null $errorMsg
-     *
-     * @return void
-     */
-    private function updateStatus(
-        int $entityId,
-        string $status,
-        ?string $shipmentId = null,
-        ?string $errorMsg = null
-    ): void {
-        try {
-            $this->shipmentDataService->updateShipmentStatusAndTracking($entityId, $status, $shipmentId, $errorMsg);
-        } catch (Throwable $e) {
-            $this->logger->error('Failed to update shipment status: ' . $e->getMessage(), ['exception' => $e]);
-        }
-    }
-
-    /**
-     * Fallback update status in separate connection if main transaction rolled back.
-     *
-     * @param int $entityId
-     * @param string $status
-     * @param string $shipmentId
-     * @param string $errorMsg
-     *
-     * @return void
-     */
-    private function updateStatusFallback(
-        int $entityId,
-        string $status,
-        string $shipmentId,
-        string $errorMsg
-    ): void {
-        try {
-            $this->shipmentDataService->updateShipmentStatusAndTracking($entityId, $status, $shipmentId, $errorMsg);
-        } catch (Throwable $e) {
-            $this->logger->critical(sprintf(
-                '[DHL Fallback Update Failed] Entity #%d, Status: %s, Tracking: %s: %s',
-                $entityId,
-                $status,
-                $shipmentId,
-                $e->getMessage()
-            ));
         }
     }
 }

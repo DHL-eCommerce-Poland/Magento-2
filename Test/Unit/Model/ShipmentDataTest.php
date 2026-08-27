@@ -26,7 +26,7 @@ class ShipmentDataTest extends TestCase
         $shipmentData = new ShipmentData($context, $registry, $resource);
 
         $shipmentData->setOrderId(10);
-        $shipmentData->setStatus(\Ideo\Dhl\Model\Shipment\ShipmentStatus::DISPATCHED);
+        $shipmentData->setStatus('created');
         $shipmentData->setShipmentId('24123456789');
         $shipmentData->setPresetSenderId('1');
         $shipmentData->setPresetShipmentId('2');
@@ -34,7 +34,7 @@ class ShipmentDataTest extends TestCase
         $shipmentData->setErrorMessages(null);
 
         $this->assertEquals(10, $shipmentData->getOrderId());
-        $this->assertEquals(\Ideo\Dhl\Model\Shipment\ShipmentStatus::DISPATCHED, $shipmentData->getStatus());
+        $this->assertEquals('created', $shipmentData->getStatus());
         $this->assertEquals('24123456789', $shipmentData->getShipmentId());
         $this->assertEquals('1', $shipmentData->getPresetSenderId());
         $this->assertEquals('2', $shipmentData->getPresetShipmentId());

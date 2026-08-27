@@ -18,11 +18,12 @@ class ShipmentActionsTest extends TestCase
         $uiComponentFactory = $this->createStub(UiComponentFactory::class);
         $urlBuilder = $this->createMock(UrlInterface::class);
 
-        $urlBuilder->expects($this->exactly(2))
+        $urlBuilder->expects($this->exactly(3))
             ->method('getUrl')
             ->willReturnMap([
                 ['ideo_dhl/shipment/edit', ['entity_id' => 10], 'http://example.com/dhl/shipment/edit/entity_id/10'],
                 ['sales/order/view', ['order_id' => 100], 'http://example.com/sales/order/view/order_id/100'],
+                ['ideo_dhl/shipment/delete', ['entity_id' => 10], 'http://example.com/dhl/shipment/delete/entity_id/10'],
             ]);
 
         $actionColumn = new ShipmentActions(
@@ -55,18 +56,23 @@ class ShipmentActionsTest extends TestCase
 
         $this->assertEquals('http://example.com/sales/order/view/order_id/100', $actions['view_order']['href']);
         $this->assertEquals('View Order', (string)$actions['view_order']['label']);
+
+        $this->assertEquals('http://example.com/dhl/shipment/delete/entity_id/10', $actions['delete']['href']);
+        $this->assertEquals('Delete', (string)$actions['delete']['label']);
     }
 
-    public function testPrepareDataSourceWithoutOrderIdOnlyRendersEditAction(): void
+    public function testPrepareDataSourceWithoutOrderIdOnlyRendersEditAndDeleteActions(): void
     {
         $context = $this->createStub(ContextInterface::class);
         $uiComponentFactory = $this->createStub(UiComponentFactory::class);
         $urlBuilder = $this->createMock(UrlInterface::class);
 
-        $urlBuilder->expects($this->once())
+        $urlBuilder->expects($this->exactly(2))
             ->method('getUrl')
-            ->with('ideo_dhl/shipment/edit', ['entity_id' => 15])
-            ->willReturn('http://example.com/dhl/shipment/edit/entity_id/15');
+            ->willReturnMap([
+                ['ideo_dhl/shipment/edit', ['entity_id' => 15], 'http://example.com/dhl/shipment/edit/entity_id/15'],
+                ['ideo_dhl/shipment/delete', ['entity_id' => 15], 'http://example.com/dhl/shipment/delete/entity_id/15'],
+            ]);
 
         $actionColumn = new ShipmentActions(
             $context,
@@ -91,6 +97,7 @@ class ShipmentActionsTest extends TestCase
 
         $actions = $result['data']['items'][0]['actions'];
         $this->assertArrayHasKey('edit', $actions);
+        $this->assertArrayHasKey('delete', $actions);
         $this->assertArrayNotHasKey('view_order', $actions);
     }
 }

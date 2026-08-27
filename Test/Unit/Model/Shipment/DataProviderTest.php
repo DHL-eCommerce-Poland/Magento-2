@@ -25,8 +25,9 @@ class DataProviderTest extends TestCase
             'entity_id' => 42,
             'order_id' => 1001,
             'shipment_id' => '99887766',
-            'status' => 'DISPATCHED',
+            'status' => 'CREATED',
         ]);
+        $shipmentDataModel->method('getStatus')->willReturn('CREATED');
         $shipmentDataModel->method('getShipmentData')->willReturn('{"sender":{"name":"Sender Co"}}');
 
         $collection->method('getItems')->willReturn([$shipmentDataModel]);
@@ -56,6 +57,7 @@ class DataProviderTest extends TestCase
         $this->assertEquals('Sender Co', $data[42]['sender']['name']);
         $this->assertEquals('John', $data[42]['recipient']['firstName']);
         $this->assertEquals('AH', $data[42]['shipmentSettings']['serviceType']);
+        $this->assertEquals('CREATED', $data[42]['shipmentSettings']['status']);
         $this->assertEquals('1', $data[42]['specialServices']['insurance']);
         $this->assertCount(1, $data[42]['packages']);
     }

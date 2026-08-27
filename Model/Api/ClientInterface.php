@@ -29,4 +29,18 @@ interface ClientInterface
         array $shipmentsFullData,
         ?int $orderId = null
     ): CreateShipmentsResult;
+
+    /**
+     * Delete shipment via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string $shipmentId
+     *
+     * @return DeleteShipmentResult
+     */
+    public function deleteShipment(
+        Credentials $credentials,
+        string $shipmentId
+    ): DeleteShipmentResult;
 }
+

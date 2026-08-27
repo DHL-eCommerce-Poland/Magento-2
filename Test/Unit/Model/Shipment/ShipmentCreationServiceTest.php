@@ -123,25 +123,25 @@ class ShipmentCreationServiceTest extends TestCase
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
         $this->mapperStub->method('map')->willReturn(['content' => 'Test']);
 
-        $apiResult = new CreateShipmentsResult(true, false, 'WAYBILL_999');
+        $apiResult = new CreateShipmentsResult(true, false, '90039521201', 'Nowa');
         $this->clientStub->method('createShipments')->willReturn($apiResult);
 
-        // Expect DB save with status DISPATCHED
+        // Expect DB save with status Nowa
         $this->shipmentDataServiceMock->expects($this->once())
             ->method('saveShipmentDataWithStatus')
-            ->with($shipmentData, ShipmentCreationService::STATUS_DISPATCHED, null, '1', '2');
+            ->with($shipmentData, 'Nowa', null, '1', '2');
 
-        $result = $this->service->createAndDispatchShipment($shipmentData, 'sandbox', '1', '2');
+        $result = $this->service->createShipment($shipmentData, 'sandbox', '1', '2');
         $this->assertTrue($result->isSuccess());
-        $this->assertEquals('WAYBILL_999', $result->getShipmentId());
+        $this->assertEquals('90039521201', $result->getShipmentId());
     }
 
     /**
-     * Test createAndDispatchShipment does NOT save DB record on API failure.
+     * Test createShipment does NOT save DB record on API failure.
      *
      * @return void
      */
-    public function testCreateAndDispatchShipmentFailureDoesNotSaveDbRecord(): void
+    public function testCreateShipmentFailureDoesNotSaveDbRecord(): void
     {
         $shipmentData = $this->createStub(DhlShipmentData::class);
         $shipmentData->method('getOrderId')->willReturn(100);
@@ -162,20 +162,20 @@ class ShipmentCreationServiceTest extends TestCase
         $this->shipmentDataServiceMock->expects($this->never())
             ->method('saveShipmentDataWithStatus');
 
-        $result = $this->service->createAndDispatchShipment($shipmentData, 'sandbox', '1', '2');
+        $result = $this->service->createShipment($shipmentData, 'sandbox', '1', '2');
         $this->assertFalse($result->isSuccess());
         $this->assertEquals('Błędny kod pocztowy', $result->getErrorMessage());
     }
 
     /**
-     * Test successful shipment dispatch.
+     * Test successful shipment recreation.
      *
      * @return void
      */
-    public function testDispatchShipmentSuccess(): void
+    public function testRecreateShipmentSuccess(): void
     {
         $entityId = 123;
-        $lockName = 'dhl_shipment_dispatch_123';
+        $lockName = 'dhl_shipment_recreate_123';
 
         $this->lockManagerMock->expects($this->once())
             ->method('lock')
@@ -187,10 +187,13 @@ class ShipmentCreationServiceTest extends TestCase
             ->with($lockName);
 
         $shipmentData = $this->createStub(DhlShipmentData::class);
+        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub->method('getShipmentId')->willReturn('OLD_123');
+
         $this->shipmentDataServiceMock->expects($this->once())
-            ->method('loadShipmentData')
+            ->method('getShipmentEntity')
             ->with($entityId)
-            ->willReturn($shipmentData);
+            ->willReturn($entityStub);
 
         $credentials = new Credentials('user', 'pass', true);
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
@@ -199,7 +202,7 @@ class ShipmentCreationServiceTest extends TestCase
         $apiResult = new CreateShipmentsResult(true, false, '999888777');
         $this->clientStub->method('createShipments')->willReturn($apiResult);
 
-        $result = $this->service->dispatchShipment($entityId, 'sandbox');
+        $result = $this->service->recreateShipment($entityId, $shipmentData, 'sandbox');
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('999888777', $result->getShipmentId());

@@ -23,6 +23,11 @@ class SoapClientAdapterTest extends TestCase
     private SoapClientAdapter $adapter;
 
     /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface|MockObject
+     */
+    private \Magento\Framework\App\Config\ScopeConfigInterface|MockObject $scopeConfigStub;
+
+    /**
      * Set up test dependencies.
      *
      * @return void
@@ -30,9 +35,11 @@ class SoapClientAdapterTest extends TestCase
     protected function setUp(): void
     {
         $this->loggerStub = $this->createStub(LoggerInterface::class);
+        $this->scopeConfigStub = $this->createStub(\Magento\Framework\App\Config\ScopeConfigInterface::class);
 
         $this->adapter = new SoapClientAdapter(
-            $this->loggerStub
+            $this->loggerStub,
+            $this->scopeConfigStub
         );
     }
 
@@ -77,7 +84,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -102,7 +109,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -128,7 +135,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -154,7 +161,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -168,5 +175,55 @@ class SoapClientAdapterTest extends TestCase
         $this->assertFalse($result->isSuccess());
         $this->assertNull($result->getShipmentId());
         $this->assertEquals('CREATE_ERR', $result->getErrorCode());
+    }
+
+    /**
+     * Test successful deleteShipment via mocked SoapClient.
+     *
+     * @return void
+     */
+    public function testDeleteShipmentSuccess(): void
+    {
+        $soapClientStub = new TestSoapClient(false);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->deleteShipment($credentials, '1234567890');
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals('1234567890', $result->getShipmentId());
+    }
+
+    /**
+     * Test deleteShipment failure on SoapFault.
+     *
+     * @return void
+     */
+    public function testDeleteShipmentFault(): void
+    {
+        $soapClientStub = new TestSoapClient(true);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->deleteShipment($credentials, '1234567890');
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertEquals('DELETE_ERR', $result->getErrorCode());
     }
 }

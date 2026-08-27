@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Api;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Filesystem\Driver\File as FileDriver;
 use Psr\Log\LoggerInterface;
 use SoapClient;
@@ -15,13 +16,16 @@ class SoapClientAdapter implements ClientInterface
     private const WSDL_URL_PRODUCTION = 'https://dhl24.com.pl/webapi2';
     private const WSDL_URL_SANDBOX = 'https://sandbox.dhl24.com.pl/webapi2';
     private const CONNECTION_TIMEOUT = 10;
+    private const XML_PATH_API_ORIGIN = 'carriers/dhlparcel/api_origin';
 
     /**
      * @param LoggerInterface $logger
+     * @param ScopeConfigInterface $scopeConfig
      * @param FileDriver|null $fileDriver
      */
     public function __construct(
         private readonly LoggerInterface $logger,
+        private readonly ScopeConfigInterface $scopeConfig,
         private readonly ?FileDriver $fileDriver = null
     ) {
     }
@@ -122,7 +126,8 @@ class SoapClientAdapter implements ClientInterface
             }
 
             if (is_object($shipmentResult) && !empty($shipmentResult->shipmentId)) {
-                return new CreateShipmentsResult(true, false, (string) $shipmentResult->shipmentId);
+                $orderStatus = !empty($shipmentResult->orderStatus) ? (string) $shipmentResult->orderStatus : null;
+                return new CreateShipmentsResult(true, false, (string) $shipmentResult->shipmentId, null, null, $orderStatus);
             }
 
             $errorMsg = is_object($shipmentResult) && !empty($shipmentResult->error)
@@ -189,7 +194,89 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
-     * Create SoapClient instance with custom timeout and WSDL caching rules.
+     * Delete shipment via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string $shipmentId
+     *
+     * @return DeleteShipmentResult
+     */
+    public function deleteShipment(
+        Credentials $credentials,
+        string $shipmentId
+    ): DeleteShipmentResult {
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
+
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+                'shipments' => [
+                    'item' => $this->ensureUtf8($shipmentId),
+                ],
+            ];
+
+            $response = $client->deleteShipments($params);
+            $this->logSoapCommunication($client, 'deleteShipments');
+
+            $resultItem = $response->deleteShipmentsResult->item ?? $response->deleteShipmentsResult ?? null;
+            if (is_array($resultItem)) {
+                $resultItem = $resultItem[0] ?? null;
+            }
+
+            if (is_object($resultItem)) {
+                if (!empty($resultItem->error)) {
+                    return new DeleteShipmentResult(false, $shipmentId, 'DELETE_SHIPMENT_ERROR', (string) $resultItem->error);
+                }
+
+                if (!empty($resultItem->id) || !empty($resultItem->shipmentIdentification) || (isset($resultItem->result) && (bool) $resultItem->result === true)) {
+                    return new DeleteShipmentResult(true, $shipmentId);
+                }
+            }
+
+            if (is_bool($resultItem) && $resultItem === true) {
+                return new DeleteShipmentResult(true, $shipmentId);
+            }
+
+            $errorMsg = is_object($resultItem) && !empty($resultItem->error)
+                ? (string) $resultItem->error
+                : 'DHL API returned an error or invalid response during deleteShipments.';
+
+            return new DeleteShipmentResult(false, $shipmentId, 'DELETE_SHIPMENT_ERROR', $errorMsg);
+        } catch (SoapFault $fault) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] SoapFault during deleteShipment: [%s] %s',
+                $fault->faultcode ?? 'FAULT',
+                $fault->getMessage()
+            ));
+
+            return new DeleteShipmentResult(
+                false,
+                $shipmentId,
+                $fault->faultcode ?? 'SOAP_FAULT',
+                'DHL API error: ' . $fault->getMessage()
+            );
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] Exception during deleteShipment: %s',
+                $e->getMessage()
+            ));
+
+            return new DeleteShipmentResult(
+                false,
+                $shipmentId,
+                'CONNECTION_ERROR',
+                'An error occurred while connecting to DHL: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Create SoapClient instance with custom timeout, DHLApiOrgin header and WSDL caching rules.
      *
      * @param string $wsdlUrl
      *
@@ -210,10 +297,26 @@ class SoapClientAdapter implements ClientInterface
 
         $cacheWsdl = $isWritable ? WSDL_CACHE_BOTH : WSDL_CACHE_NONE;
 
+        $apiOrigin = 'Ideo_Magento';
+        if ($this->scopeConfig !== null) {
+            $configuredOrigin = (string) $this->scopeConfig->getValue(self::XML_PATH_API_ORIGIN);
+            if (trim($configuredOrigin) !== '') {
+                $apiOrigin = trim($configuredOrigin);
+            }
+        }
+
+        $context = stream_context_create([
+            'http' => [
+                'header' => 'DHLApiOrgin: ' . $apiOrigin,
+            ],
+        ]);
+
         $options = [
             'trace' => true,
             'exceptions' => true,
             'connection_timeout' => self::CONNECTION_TIMEOUT,
+            'keep-alive' => true,
+            'stream_context' => $context,
             'cache_wsdl' => $cacheWsdl,
             'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
             'encoding' => 'UTF-8',
@@ -277,10 +380,29 @@ class SoapClientAdapter implements ClientInterface
     private function logSoapCommunication(SoapClient $client, string $action): void
     {
         try {
-            $requestXml = $this->sanitizeXml((string) $client->__getLastRequest());
-            $responseXml = $this->sanitizeXml((string) $client->__getLastResponse());
+            $isDebug = false;
+            if ($this->scopeConfig !== null) {
+                $isDebug = (bool) $this->scopeConfig->getValue('carriers/dhlparcel/debug');
+            }
 
+            if ($isDebug) {
+                $requestHeaders = (string) $client->__getLastRequestHeaders();
+                if (!empty($requestHeaders)) {
+                    $this->logger->info(sprintf('[DHL SOAP Request Headers - %s] %s', $action, trim($requestHeaders)));
+                }
+            }
+
+            $requestXml = $this->sanitizeXml((string) $client->__getLastRequest());
             $this->logger->info(sprintf('[DHL SOAP Request - %s] %s', $action, $requestXml));
+
+            if ($isDebug) {
+                $responseHeaders = (string) $client->__getLastResponseHeaders();
+                if (!empty($responseHeaders)) {
+                    $this->logger->info(sprintf('[DHL SOAP Response Headers - %s] %s', $action, trim($responseHeaders)));
+                }
+            }
+
+            $responseXml = $this->sanitizeXml((string) $client->__getLastResponse());
             $this->logger->info(sprintf('[DHL SOAP Response - %s] %s', $action, $responseXml));
         } catch (Throwable $e) {
             $this->logger->warning('Failed to log SOAP communication: ' . $e->getMessage());

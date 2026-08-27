@@ -82,7 +82,7 @@ class ShipmentDataServiceTest extends TestCase
         $shipmentDataFactory->method('create')->willReturn($entity);
 
         $entity->expects($this->once())->method('setOrderId')->with(102);
-        $entity->expects($this->once())->method('setStatus')->with(\Ideo\Dhl\Model\Shipment\ShipmentStatus::DISPATCHED);
+        $entity->expects($this->once())->method('setStatus')->with('Nowa');
         $shipmentDataRepository->expects($this->once())->method('save')->willReturn($entity);
 
         $serializer = new \Magento\Framework\Serialize\Serializer\Json();
@@ -140,5 +140,43 @@ class ShipmentDataServiceTest extends TestCase
         $results = $service->getAllShipmentsByOrderId(105);
         $this->assertCount(2, $results);
         $this->assertSame([$entity1, $entity2], $results);
+    }
+
+    /**
+     * Test loadShipmentData loads entity payload and returns DhlShipmentData object.
+     *
+     * @return void
+     */
+    public function testLoadShipmentData(): void
+    {
+        $orderRepository = $this->createStub(OrderRepositoryInterface::class);
+        $mapper = $this->createStub(OrderToShipmentDataMapper::class);
+        $validator = $this->createStub(ShipmentDataValidator::class);
+        $dropOffPointRepository = $this->createStub(DropOffPointRepositoryInterface::class);
+        $deliveryServiceRepository = $this->createStub(DeliveryServiceRepositoryInterface::class);
+        $shipmentDataRepository = $this->createMock(ShipmentDataRepositoryInterface::class);
+        $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
+        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
+
+        $entity = $this->createStub(ShipmentDataInterface::class);
+        $entity->method('getShipmentData')->willReturn('{"orderId":105}');
+        $shipmentDataRepository->expects($this->once())
+            ->method('getById')
+            ->with(5)
+            ->willReturn($entity);
+
+        $service = new ShipmentDataService(
+            $orderRepository,
+            $mapper,
+            $validator,
+            $dropOffPointRepository,
+            $deliveryServiceRepository,
+            $shipmentDataRepository,
+            $shipmentDataFactory,
+            $serializer
+        );
+
+        $result = $service->loadShipmentData(5);
+        $this->assertEquals(105, $result->getOrderId());
     }
 }

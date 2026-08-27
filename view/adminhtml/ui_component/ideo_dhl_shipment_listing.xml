@@ -34,6 +34,19 @@
         <columnsControls name="columns_controls"/>
         <filterSearch name="fulltext"/>
         <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <action name="delete">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to delete the selected shipments? They will be cancelled in DHL and removed from Magento.</message>
+                        <title translate="true">Delete Shipments</title>
+                    </confirm>
+                    <url path="ideo_dhl/shipment/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete Shipments</label>
+                </settings>
+            </action>
+        </massaction>
         <paging name="listing_paging"/>
     </listingToolbar>
     <columns name="ideo_dhl_shipment_columns">
@@ -64,7 +77,7 @@
         <column name="status">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Status</label>
+                <label translate="true">Status (API)</label>
             </settings>
         </column>
         <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">

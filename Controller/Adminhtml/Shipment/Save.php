@@ -8,13 +8,14 @@ use Exception;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Ideo\Dhl\Model\Shipment\ShipmentCreationService;
 use Ideo\Dhl\Model\Shipment\ShipmentDataService;
-use Ideo\Dhl\Model\Shipment\ShipmentStatus;
+use InvalidArgumentException;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Controller\Result\Json;
+use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -49,27 +50,43 @@ class Save extends Action implements HttpPostActionInterface
     /**
      * Execute save shipment action and dispatch directly to DHL API.
      *
-     * @return Json
+     * @return ResponseInterface|ResultInterface
      */
-    public function execute(): Json
+    public function execute(): ResultInterface|ResponseInterface
     {
+        $isAjax = (method_exists($this->getRequest(), 'isXmlHttpRequest') && $this->getRequest()->isXmlHttpRequest())
+            || (bool)$this->getRequest()->getParam('isAjax')
+            || $this->getRequest()->getParam('draft') !== null;
         $resultJson = $this->jsonFactory->create();
-        $payload = $this->getRequest()->getParam('draft') ?? $this->getRequest()->getParam('shipment_data');
+
+        $postValue = method_exists($this->getRequest(), 'getPostValue') ? $this->getRequest()->getPostValue() : null;
+        $payload = $this->getRequest()->getParam('draft')
+            ?? $this->getRequest()->getParam('shipment_data')
+            ?? $this->getRequest()->getParam('data')
+            ?? (is_array($postValue) ? ($postValue['data'] ?? $postValue) : null);
 
         if (is_string($payload)) {
             try {
                 $payload = $this->serializer->unserialize($payload);
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $payload = null;
             }
         }
 
-        if (empty($payload) || !is_array($payload)) {
-            return $resultJson->setData([
-                'success' => false,
-                'message' => __('Invalid shipment data provided.')->render(),
-            ]);
+        if (is_array($payload) && isset($payload['data']) && is_array($payload['data'])) {
+            $payload = $payload['data'];
         }
+
+        if (empty($payload) || !is_array($payload)) {
+            $msg = __('Invalid shipment data provided.')->render();
+            if ($isAjax) {
+                return $resultJson->setData(['success' => false, 'message' => $msg]);
+            }
+            $this->messageManager->addErrorMessage($msg);
+            return $this->resultRedirectFactory->create()->setPath('*/*/index');
+        }
+
+        $entityId = (int) ($this->getRequest()->getParam('entity_id') ?? $this->getRequest()->getParam('id') ?? ($payload['entity_id'] ?? 0));
 
         try {
             $shipmentData = DhlShipmentData::fromArray($payload);
@@ -92,54 +109,83 @@ class Save extends Action implements HttpPostActionInterface
             $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlparcel/sandbox');
             $environment = $isSandbox ? 'sandbox' : 'production';
 
-            // 2. Dispatch directly to DHL WebAPI2 (createShipments)
-            $dispatchResult = $this->shipmentCreationService->createAndDispatchShipment(
-                $shipmentData,
-                $environment,
-                $presetSenderId,
-                $presetShipmentId
-            );
+            if ($entityId > 0) {
+                $dispatchResult = $this->shipmentCreationService->recreateShipment(
+                    $entityId,
+                    $shipmentData,
+                    $environment
+                );
+            } else {
+                $dispatchResult = $this->shipmentCreationService->createShipment(
+                    $shipmentData,
+                    $environment,
+                    $presetSenderId,
+                    $presetShipmentId
+                );
+            }
 
             if ($dispatchResult->isTimeout()) {
-                return $resultJson->setData([
-                    'success' => false,
-                    'isTimeout' => true,
-                    'message' => __(
-                        'Connection to DHL timed out. Status set to PENDING_VERIFICATION. '
-                        . 'Please verify parcel status in DHL24 portal before re-trying.'
-                    )->render(),
-                ]);
+                $msg = __(
+                    'Connection to DHL timed out. Please verify parcel status in DHL24 portal before re-trying.'
+                )->render();
+
+                if ($isAjax) {
+                    return $resultJson->setData([
+                        'success' => false,
+                        'isTimeout' => true,
+                        'message' => $msg,
+                    ]);
+                }
+
+                $this->messageManager->addErrorMessage($msg);
+                return $this->resultRedirectFactory->create()->setPath($entityId > 0 ? '*/*/edit' : '*/*/index', ['entity_id' => $entityId]);
             }
 
             if (!$dispatchResult->isSuccess()) {
                 $errorMsg = $dispatchResult->getErrorMessage() ?? __('Failed to create shipment in DHL.')->render();
-                return $resultJson->setData([
-                    'success' => false,
-                    'message' => $errorMsg,
-                    'errorCode' => $dispatchResult->getErrorCode(),
-                ]);
+
+                if ($isAjax) {
+                    return $resultJson->setData([
+                        'success' => false,
+                        'message' => $errorMsg,
+                        'errorCode' => $dispatchResult->getErrorCode(),
+                    ]);
+                }
+
+                $this->messageManager->addErrorMessage($errorMsg);
+                return $this->resultRedirectFactory->create()->setPath($entityId > 0 ? '*/*/edit' : '*/*/index', ['entity_id' => $entityId]);
             }
 
-            $waybillNumber = (string) $dispatchResult->getShipmentId();
-            $successMsg = __('Przesyłka DHL o numerze %1 została pomyślnie utworzona.', $waybillNumber)->render();
+            $createdShipmentId = (string) $dispatchResult->getShipmentId();
+            $successMsg = __('DHL shipment %1 has been created successfully.', $createdShipmentId)->render();
 
             $this->messageManager->addSuccessMessage($successMsg);
 
-            return $resultJson->setData([
-                'success' => true,
-                'shipmentId' => $waybillNumber,
-                'status' => ShipmentStatus::DISPATCHED,
-                'message' => $successMsg,
-            ]);
+            if ($isAjax) {
+                return $resultJson->setData([
+                    'success' => true,
+                    'shipmentId' => $createdShipmentId,
+                    'status' => $dispatchResult->getOrderStatus() ?: 'created',
+                    'message' => $successMsg,
+                ]);
+            }
+
+            return $this->resultRedirectFactory->create()->setPath('*/*/index');
         } catch (Exception $e) {
             $this->logger?->error(
                 'Error saving and dispatching DHL shipment: ' . $e->getMessage(),
                 ['exception' => $e]
             );
-            return $resultJson->setData([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ]);
+
+            if ($isAjax) {
+                return $resultJson->setData([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ]);
+            }
+
+            $this->messageManager->addErrorMessage(__('Error saving DHL shipment: %1', $e->getMessage()));
+            return $this->resultRedirectFactory->create()->setPath($entityId > 0 ? '*/*/edit' : '*/*/index', ['entity_id' => $entityId]);
         }
     }
 }

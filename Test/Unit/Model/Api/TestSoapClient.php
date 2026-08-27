@@ -54,7 +54,32 @@ class TestSoapClient extends SoapClient
         return (object) [
             'createShipmentsResult' => (object) [
                 'item' => [
-                    (object) ['shipmentId' => '1234567890'],
+                    (object) ['shipmentId' => '1234567890', 'orderStatus' => 'Nowa'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Dummy deleteShipments method for SoapClient mocking.
+     *
+     * @param mixed $args
+     * @return mixed
+     * @throws SoapFault
+     */
+    public function deleteShipments(mixed $args): mixed
+    {
+        if ($this->shouldThrowFault) {
+            throw new SoapFault('DELETE_ERR', 'Error deleting shipment');
+        }
+
+        return (object) [
+            'deleteShipmentsResult' => (object) [
+                'item' => [
+                    (object) [
+                        'shipmentIdentification' => '1234567890',
+                        'result' => true,
+                    ],
                 ],
             ],
         ];
