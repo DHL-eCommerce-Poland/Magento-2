@@ -226,4 +226,81 @@ class SoapClientAdapterTest extends TestCase
         $this->assertFalse($result->isSuccess());
         $this->assertEquals('DELETE_ERR', $result->getErrorCode());
     }
+
+    /**
+     * Test successful getPostalCodeServices via mocked SoapClient.
+     *
+     * @return void
+     */
+    public function testGetPostalCodeServicesSuccess(): void
+    {
+        $soapClientStub = new TestSoapClient(false);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->getPostalCodeServices($credentials, '00-001', '2026-08-28');
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals('10:00', $result->getDrPickupFrom());
+        $this->assertEquals('16:00', $result->getDrPickupTo());
+        $this->assertTrue($result->isPickupOnSaturday());
+    }
+
+    /**
+     * Test successful bookCourier via mocked SoapClient.
+     *
+     * @return void
+     */
+    public function testBookCourierSuccess(): void
+    {
+        $soapClientStub = new TestSoapClient(false);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->bookCourier($credentials, ['1234567890'], '2026-08-28', '10:00', '14:00');
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals('ORDER_98765', $result->getCourierOrderId());
+    }
+
+    /**
+     * Test successful cancelCourierBooking via mocked SoapClient.
+     *
+     * @return void
+     */
+    public function testCancelCourierBookingSuccess(): void
+    {
+        $soapClientStub = new TestSoapClient(false);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->cancelCourierBooking($credentials, ['ORDER_98765']);
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals('ORDER_98765', $result->getDispatchNumber());
+    }
 }

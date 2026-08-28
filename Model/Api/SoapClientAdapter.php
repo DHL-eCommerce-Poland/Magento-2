@@ -276,6 +276,329 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
+     * Get postal code services and pickup windows via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string $postCode
+     * @param string $pickupDate Format YYYY-MM-DD
+     *
+     * @return PostalCodeServicesResult
+     */
+    public function getPostalCodeServices(
+        Credentials $credentials,
+        string $postCode,
+        string $pickupDate
+    ): PostalCodeServicesResult {
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
+
+            $cleanPostCode = (string) preg_replace('/[^0-9]/', '', $postCode);
+            if (strlen($cleanPostCode) < 5) {
+                $cleanPostCode = str_pad($cleanPostCode, 5, '0', STR_PAD_LEFT);
+            }
+            if (empty($cleanPostCode) || $cleanPostCode === '00000') {
+                $cleanPostCode = '00001';
+            }
+
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+                'postCode' => $this->ensureUtf8($cleanPostCode),
+                'pickupDate' => $this->ensureUtf8($pickupDate),
+            ];
+
+            $response = $client->getPostalCodeServices($params);
+            $this->logSoapCommunication($client, 'getPostalCodeServices');
+
+            $result = $response->getPostalCodeServicesResult ?? null;
+
+            if (is_object($result)) {
+                $drFrom = !empty($result->drPickupFrom) ? (string) $result->drPickupFrom : null;
+                $drTo = !empty($result->drPickupTo) ? (string) $result->drPickupTo : null;
+                $exFrom = !empty($result->exPickupFrom) ? (string) $result->exPickupFrom : null;
+                $exTo = !empty($result->exPickupTo) ? (string) $result->exPickupTo : null;
+                $sat = !empty($result->pickupOnSaturday) && (bool) $result->pickupOnSaturday;
+
+                return new PostalCodeServicesResult(
+                    true,
+                    $drFrom,
+                    $drTo,
+                    $exFrom,
+                    $exTo,
+                    $sat
+                );
+            }
+
+            return new PostalCodeServicesResult(
+                false,
+                null,
+                null,
+                null,
+                null,
+                false,
+                'INVALID_RESPONSE',
+                'DHL WebAPI2 returned invalid response for getPostalCodeServices.'
+            );
+        } catch (SoapFault $fault) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] SoapFault during getPostalCodeServices: [%s] %s',
+                $fault->faultcode ?? 'FAULT',
+                $fault->getMessage()
+            ));
+
+            return new PostalCodeServicesResult(
+                false,
+                null,
+                null,
+                null,
+                null,
+                false,
+                $fault->faultcode ?? 'SOAP_FAULT',
+                'DHL API error: ' . $fault->getMessage()
+            );
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] Exception during getPostalCodeServices: %s',
+                $e->getMessage()
+            ));
+
+            return new PostalCodeServicesResult(
+                false,
+                null,
+                null,
+                null,
+                null,
+                false,
+                'CONNECTION_ERROR',
+                'An error occurred while connecting to DHL: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Book courier for existing generated shipments via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string[] $shipmentIds
+     * @param string $pickupDate Format YYYY-MM-DD
+     * @param string $pickupTimeFrom Format HH:MM
+     * @param string $pickupTimeTo Format HH:MM
+     * @param string|null $additionalInfo
+     *
+     * @return CourierBookingResult
+     */
+    public function bookCourier(
+        Credentials $credentials,
+        array $shipmentIds,
+        string $pickupDate,
+        string $pickupTimeFrom,
+        string $pickupTimeTo,
+        ?string $additionalInfo = null
+    ): CourierBookingResult {
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
+
+            $formattedShipmentIds = array_map([$this, 'ensureUtf8'], array_values($shipmentIds));
+
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+                'pickupDate' => $this->ensureUtf8($pickupDate),
+                'pickupTimeFrom' => $this->ensureUtf8($pickupTimeFrom),
+                'pickupTimeTo' => $this->ensureUtf8($pickupTimeTo),
+                'shipmentIdList' => [
+                    'item' => $formattedShipmentIds,
+                ],
+            ];
+
+            if ($additionalInfo !== null && trim($additionalInfo) !== '') {
+                $params['additionalInfo'] = $this->ensureUtf8($additionalInfo);
+            }
+
+            $response = $client->bookCourier($params);
+            $this->logSoapCommunication($client, 'bookCourier');
+
+            $result = $response->bookCourierResult ?? null;
+
+            if (is_object($result)) {
+                if (!empty($result->error)) {
+                    return new CourierBookingResult(
+                        false,
+                        null,
+                        'BOOK_COURIER_ERROR',
+                        (string) $result->error
+                    );
+                }
+
+                $orderId = null;
+                $orderStatus = null;
+
+                if (!empty($result->id)) {
+                    $orderId = (string) $result->id;
+                } elseif (!empty($result->item)) {
+                    $item = is_array($result->item) ? $result->item[0] : $result->item;
+                    if (is_object($item)) {
+                        $orderId = !empty($item->id) ? (string) $item->id : null;
+                        $orderStatus = !empty($item->orderStatus) ? (string) $item->orderStatus : null;
+                    } elseif (is_string($item)) {
+                        $orderId = $item;
+                    }
+                }
+
+                if (empty($orderStatus) && !empty($result->orderStatus)) {
+                    $orderStatus = (string) $result->orderStatus;
+                }
+
+                if (empty($orderStatus)) {
+                    $orderStatus = (string) __('Kurier zamówiony');
+                }
+
+                return new CourierBookingResult(true, $orderId, null, null, $orderStatus);
+            }
+
+            if (is_array($result) && !empty($result)) {
+                $orderId = is_string($result[0]) ? $result[0] : (string) ($result[0]->id ?? '');
+                $orderStatus = (string) __('Kurier zamówiony');
+                return new CourierBookingResult(true, $orderId, null, null, $orderStatus);
+            }
+
+            return new CourierBookingResult(
+                false,
+                null,
+                'INVALID_RESPONSE',
+                'DHL WebAPI2 returned invalid response for bookCourier.'
+            );
+        } catch (SoapFault $fault) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] SoapFault during bookCourier: [%s] %s',
+                $fault->faultcode ?? 'FAULT',
+                $fault->getMessage()
+            ));
+
+            return new CourierBookingResult(
+                false,
+                null,
+                $fault->faultcode ?? 'SOAP_FAULT',
+                'DHL API error: ' . $fault->getMessage()
+            );
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] Exception during bookCourier: %s',
+                $e->getMessage()
+            ));
+
+            return new CourierBookingResult(
+                false,
+                null,
+                'CONNECTION_ERROR',
+                'An error occurred while connecting to DHL: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Cancel existing courier booking via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string[] $dispatchNumbers
+     *
+     * @return CancelCourierBookingResult
+     */
+    public function cancelCourierBooking(
+        Credentials $credentials,
+        array $dispatchNumbers
+    ): CancelCourierBookingResult {
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
+
+            $formattedNumbers = array_map([$this, 'ensureUtf8'], array_values($dispatchNumbers));
+
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+                'orders' => [
+                    'item' => $formattedNumbers,
+                ],
+            ];
+
+            $response = $client->cancelCourierBooking($params);
+            $this->logSoapCommunication($client, 'cancelCourierBooking');
+
+            $result = $response->cancelCourierBookingResult ?? null;
+            $items = $result->item ?? $result ?? null;
+
+            if (is_array($items)) {
+                $items = $items[0] ?? null;
+            }
+
+            if (is_object($items)) {
+                $isSuccess = isset($items->result) ? (bool) $items->result : true;
+                $errorMsg = !empty($items->error) ? (string) $items->error : null;
+                $id = !empty($items->id) ? (string) $items->id : ($dispatchNumbers[0] ?? null);
+
+                if ($isSuccess && empty($errorMsg)) {
+                    return new CancelCourierBookingResult(true, $id);
+                }
+
+                return new CancelCourierBookingResult(
+                    false,
+                    $id,
+                    'CANCEL_COURIER_ERROR',
+                    $errorMsg ?: 'Failed to cancel courier booking.'
+                );
+            }
+
+            if (is_bool($items) && $items === true) {
+                return new CancelCourierBookingResult(true, $dispatchNumbers[0] ?? null);
+            }
+
+            return new CancelCourierBookingResult(
+                false,
+                $dispatchNumbers[0] ?? null,
+                'INVALID_RESPONSE',
+                'DHL WebAPI2 returned invalid response for cancelCourierBooking.'
+            );
+        } catch (SoapFault $fault) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] SoapFault during cancelCourierBooking: [%s] %s',
+                $fault->faultcode ?? 'FAULT',
+                $fault->getMessage()
+            ));
+
+            return new CancelCourierBookingResult(
+                false,
+                $dispatchNumbers[0] ?? null,
+                $fault->faultcode ?? 'SOAP_FAULT',
+                'DHL API error: ' . $fault->getMessage()
+            );
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] Exception during cancelCourierBooking: %s',
+                $e->getMessage()
+            ));
+
+            return new CancelCourierBookingResult(
+                false,
+                $dispatchNumbers[0] ?? null,
+                'CONNECTION_ERROR',
+                'An error occurred while connecting to DHL: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
      * Create SoapClient instance with custom timeout, DHLApiOrgin header and WSDL caching rules.
      *
      * @param string $wsdlUrl

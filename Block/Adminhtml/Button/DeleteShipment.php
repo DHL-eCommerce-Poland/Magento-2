@@ -4,10 +4,28 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Block\Adminhtml\Button;
 
+use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
+use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
+use Throwable;
 
 class DeleteShipment extends Generic implements ButtonProviderInterface
 {
+    /**
+     * @param Context $context
+     * @param ShipmentDataRepositoryInterface $shipmentDataRepository
+     * @param mixed $request
+     * @param mixed $urlBuilder
+     */
+    public function __construct(
+        Context $context,
+        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
+        mixed $request = null,
+        mixed $urlBuilder = null
+    ) {
+        parent::__construct($context);
+    }
+
     /**
      * Get button data for deleting DHL shipment.
      *
@@ -17,6 +35,17 @@ class DeleteShipment extends Generic implements ButtonProviderInterface
     {
         $entityId = $this->getEntityId();
         if (!$entityId) {
+            return [];
+        }
+
+        try {
+            $entity = $this->shipmentDataRepository->getById($entityId);
+
+            // Hide Delete button if courier has already been ordered for this shipment
+            if (!empty($entity->getDispatchNumber())) {
+                return [];
+            }
+        } catch (Throwable $e) {
             return [];
         }
 

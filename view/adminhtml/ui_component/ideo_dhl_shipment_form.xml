@@ -11,6 +11,8 @@
     <settings>
         <buttons>
             <button name="back" class="Ideo\Dhl\Block\Adminhtml\Button\Back"/>
+            <button name="book_courier" class="Ideo\Dhl\Block\Adminhtml\Button\BookCourierShipment"/>
+            <button name="cancel_courier" class="Ideo\Dhl\Block\Adminhtml\Button\CancelCourierShipment"/>
             <button name="recreate" class="Ideo\Dhl\Block\Adminhtml\Button\RecreateShipment"/>
             <button name="delete" class="Ideo\Dhl\Block\Adminhtml\Button\DeleteShipment"/>
         </buttons>
@@ -353,10 +355,18 @@
                 <disabled>true</disabled>
             </settings>
         </field>
+        <field name="shipmentSettings[dispatchNumber]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Courier Dispatch No.</label>
+                <dataScope>shipmentSettings.dispatchNumber</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
         <field name="shipmentSettings[status]" formElement="input">
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Status (API)</label>
+                <label translate="true">Status</label>
                 <dataScope>shipmentSettings.status</dataScope>
                 <disabled>true</disabled>
             </settings>

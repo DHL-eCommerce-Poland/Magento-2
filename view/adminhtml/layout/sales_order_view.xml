@@ -5,6 +5,8 @@
         <referenceContainer name="content">
             <block name="ideo_dhl_prepare_modal"
                    template="Ideo_Dhl::shipment/prepare_modal.phtml" />
+            <block name="ideo_dhl_book_courier_modal"
+                   template="Ideo_Dhl::shipment/book_courier_modal.phtml" />
         </referenceContainer>
     </body>
 </page>

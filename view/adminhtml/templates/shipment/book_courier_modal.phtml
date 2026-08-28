@@ -1,0 +1,84 @@
+<?php
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+
+$hoursUrl = $block->getUrl('ideo_dhl/shipment/getPickupHours');
+$bookUrl = $block->getUrl('ideo_dhl/shipment/bookCourier');
+?>
+<div id="ideo-dhl-book-courier-modal" style="display: none;" data-bind="scope: 'dhlBookCourierModal'">
+    <form id="ideo-dhl-book-courier-form" onsubmit="return false;">
+        <div class="admin__fieldset" style="margin-bottom: 0;">
+
+            <!-- Warning Notice if Today is Unavailable -->
+            <!-- ko if: warningMessage() -->
+            <div class="message message-warning warning" style="margin-bottom: 15px;">
+                <div data-bind="text: warningMessage"></div>
+            </div>
+            <!-- /ko -->
+
+            <!-- Selected Shipments Info -->
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Selected Shipments')) ?></span></label>
+                <div class="admin__field-control" style="padding-top: 6px;">
+                    <strong><span data-bind="text: selectedShipmentIds().length"></span> <?= $escaper->escapeHtml(__('shipment(s) selected')) ?></strong>
+                </div>
+            </div>
+
+            <!-- Pickup Date Selection (Magento Admin Datepicker) -->
+            <div class="admin__field required">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Pickup Date')) ?></span></label>
+                <div class="admin__field-control">
+                    <input type="text" id="ideo_dhl_pickup_date" class="admin__control-text input-text _has-datepicker" data-bind="value: pickupDate, event: { change: onDateChange.bind($data) }" style="width: 200px;" required autocomplete="off" />
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <!-- ko if: isLoading() -->
+            <div style="padding: 15px 0; text-align: center; color: #666;">
+                <span><?= $escaper->escapeHtml(__('Fetching available courier pickup hours...')) ?></span>
+            </div>
+            <!-- /ko -->
+
+            <!-- Available Hours Selection -->
+            <!-- ko if: !isLoading() && availableHours().length > 0 -->
+            <div class="admin__field required">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Available Courier Pickup Hours')) ?></span></label>
+                <div class="admin__field-control">
+                    <select class="admin__control-select" data-bind="options: availableHours, optionsText: 'label', optionsValue: 'value', value: selectedHourSlot" style="width: 260px;" required></select>
+                </div>
+            </div>
+            <!-- /ko -->
+
+            <!-- Additional Info for Courier -->
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Notes for Courier (Optional)')) ?></span></label>
+                <div class="admin__field-control">
+                    <textarea class="admin__control-textarea" data-bind="value: additionalInfo" rows="2" placeholder="<?= $escaper->escapeHtmlAttr(__('Instructions for courier pickup...')) ?>"></textarea>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script type="text/x-magento-init">
+{
+    "#ideo-dhl-book-courier-modal": {
+        "Magento_Ui/js/core/app": {
+            "components": {
+                "dhlBookCourierModal": {
+                    "component": "Ideo_Dhl/js/shipment/book-courier-modal",
+                    "hoursUrl": "<?= $escaper->escapeUrl($hoursUrl) ?>",
+                    "bookUrl": "<?= $escaper->escapeUrl($bookUrl) ?>"
+                }
+            }
+        }
+    }
+}
+</script>

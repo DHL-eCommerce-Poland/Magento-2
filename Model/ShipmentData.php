@@ -89,6 +89,29 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
     }
 
     /**
+     * Get DHL courier order / dispatch number.
+     *
+     * @return string|null
+     */
+    public function getDispatchNumber(): ?string
+    {
+        $val = $this->getData(self::DISPATCH_NUMBER);
+        return $val !== null ? (string)$val : null;
+    }
+
+    /**
+     * Set DHL courier order / dispatch number.
+     *
+     * @param string|null $dispatchNumber
+     *
+     * @return $this
+     */
+    public function setDispatchNumber(?string $dispatchNumber): static
+    {
+        return $this->setData(self::DISPATCH_NUMBER, $dispatchNumber);
+    }
+
+    /**
      * Get shipment status.
      *
      * @return string

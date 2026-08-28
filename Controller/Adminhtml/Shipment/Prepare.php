@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
 
 use Exception;
+use Ideo\Dhl\Model\Shipment\ShipmentDataService;
 use Ideo\Dhl\Model\Template\TemplateManager;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -25,6 +26,7 @@ class Prepare extends Action
      * @param OrderRepositoryInterface $orderRepository
      * @param TemplateManager $templateManager
      * @param JsonFactory $jsonFactory
+     * @param ShipmentDataService $shipmentDataService
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -32,6 +34,7 @@ class Prepare extends Action
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly TemplateManager $templateManager,
         private readonly JsonFactory $jsonFactory,
+        private readonly ShipmentDataService $shipmentDataService,
         private readonly ?LoggerInterface $logger = null
     ) {
         parent::__construct($context);

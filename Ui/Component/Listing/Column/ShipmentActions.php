@@ -54,6 +54,32 @@ class ShipmentActions extends Column
                         ],
                     ];
 
+                    if (empty($item['dispatch_number'])) {
+                        $actions['book_courier'] = [
+                            'href' => '#',
+                            'label' => __('Order Courier'),
+                            'click' => sprintf(
+                                "if (window.IdeoDhlBookCourier && typeof window.IdeoDhlBookCourier.openModal === 'function') { window.IdeoDhlBookCourier.openModal([%d]); } return false;",
+                                (int) $item['entity_id']
+                            ),
+                        ];
+                    } else {
+                        $actions['cancel_courier'] = [
+                            'href' => $this->urlBuilder->getUrl(
+                                'ideo_dhl/shipment/cancelCourierBooking',
+                                ['entity_id' => $item['entity_id']]
+                            ),
+                            'label' => __('Cancel Courier'),
+                            'confirm' => [
+                                'title' => __('Cancel Courier Booking'),
+                                'message' => __(
+                                    'Are you sure you want to cancel courier booking for this shipment?'
+                                ),
+                            ],
+                            'post' => true,
+                        ];
+                    }
+
                     if (isset($item['order_id']) && (int)$item['order_id'] > 0) {
                         $actions['view_order'] = [
                             'href' => $this->urlBuilder->getUrl(
@@ -64,20 +90,22 @@ class ShipmentActions extends Column
                         ];
                     }
 
-                    $actions['delete'] = [
-                        'href' => $this->urlBuilder->getUrl(
-                            self::URL_PATH_DELETE,
-                            ['entity_id' => $item['entity_id']]
-                        ),
-                        'label' => __('Delete'),
-                        'confirm' => [
-                            'title' => __('Delete Shipment'),
-                            'message' => __(
-                                'Are you sure you want to delete this shipment? It will be cancelled in DHL and removed from Magento.'
+                    if (empty($item['dispatch_number'])) {
+                        $actions['delete'] = [
+                            'href' => $this->urlBuilder->getUrl(
+                                self::URL_PATH_DELETE,
+                                ['entity_id' => $item['entity_id']]
                             ),
-                        ],
-                        'post' => true,
-                    ];
+                            'label' => __('Delete'),
+                            'confirm' => [
+                                'title' => __('Delete Shipment'),
+                                'message' => __(
+                                    'Are you sure you want to delete this shipment? It will be cancelled in DHL and removed from Magento.'
+                                ),
+                            ],
+                            'post' => true,
+                        ];
+                    }
 
                     $item[$this->getData('name')] = $actions;
                 }

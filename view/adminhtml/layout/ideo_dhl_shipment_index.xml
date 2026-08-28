@@ -5,6 +5,7 @@
     <body>
         <referenceContainer name="content">
             <uiComponent name="ideo_dhl_shipment_listing"/>
+            <block name="ideo_dhl_book_courier_modal" template="Ideo_Dhl::shipment/book_courier_modal.phtml"/>
         </referenceContainer>
     </body>
 </page>

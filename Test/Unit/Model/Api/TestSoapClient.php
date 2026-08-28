@@ -35,7 +35,60 @@ class TestSoapClient extends SoapClient
             throw new SoapFault('AUTH_ERR', 'Invalid credentials');
         }
 
-        return (object) ['getPostalCodeServicesResult' => (object) ['item' => []]];
+        return (object) [
+            'getPostalCodeServicesResult' => (object) [
+                'drPickupFrom' => '10:00',
+                'drPickupTo' => '16:00',
+                'exPickupFrom' => '10:00',
+                'exPickupTo' => '15:00',
+                'pickupOnSaturday' => true,
+            ],
+        ];
+    }
+
+    /**
+     * Dummy bookCourier method for SoapClient mocking.
+     *
+     * @param mixed $args
+     * @return mixed
+     * @throws SoapFault
+     */
+    public function bookCourier(mixed $args): mixed
+    {
+        if ($this->shouldThrowFault) {
+            throw new SoapFault('BOOK_ERR', 'Error booking courier');
+        }
+
+        return (object) [
+            'bookCourierResult' => (object) [
+                'id' => 'ORDER_98765',
+            ],
+        ];
+    }
+
+    /**
+     * Dummy cancelCourierBooking method for SoapClient mocking.
+     *
+     * @param mixed $args
+     * @return mixed
+     * @throws SoapFault
+     */
+    public function cancelCourierBooking(mixed $args): mixed
+    {
+        if ($this->shouldThrowFault) {
+            throw new SoapFault('CANCEL_ERR', 'Error cancelling courier booking');
+        }
+
+        return (object) [
+            'cancelCourierBookingResult' => (object) [
+                'item' => [
+                    (object) [
+                        'id' => 'ORDER_98765',
+                        'result' => true,
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**

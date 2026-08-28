@@ -28,6 +28,7 @@ class ShipmentDataTest extends TestCase
         $shipmentData->setOrderId(10);
         $shipmentData->setStatus('created');
         $shipmentData->setShipmentId('24123456789');
+        $shipmentData->setDispatchNumber('90018060826WWW');
         $shipmentData->setPresetSenderId('1');
         $shipmentData->setPresetShipmentId('2');
         $shipmentData->setShipmentData('{"test": true}');
@@ -36,6 +37,7 @@ class ShipmentDataTest extends TestCase
         $this->assertEquals(10, $shipmentData->getOrderId());
         $this->assertEquals('created', $shipmentData->getStatus());
         $this->assertEquals('24123456789', $shipmentData->getShipmentId());
+        $this->assertEquals('90018060826WWW', $shipmentData->getDispatchNumber());
         $this->assertEquals('1', $shipmentData->getPresetSenderId());
         $this->assertEquals('2', $shipmentData->getPresetShipmentId());
         $this->assertEquals('{"test": true}', $shipmentData->getShipmentData());

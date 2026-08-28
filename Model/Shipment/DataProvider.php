@@ -75,12 +75,14 @@ class DataProvider extends AbstractDataProvider
                             $shipmentId = (string)($item->getShipmentId() ?? ($payload['shipmentId'] ?? ''));
                             $status = (string)($item->getStatus() ?? '');
                             $createdAt = (string)($item->getCreatedAt() ?? '');
+                            $dispatchNumber = (string)($item->getDispatchNumber() ?? '');
                             $data['shipmentSettings'] = $this->normalizeShipmentSettings(
                                 $payload['shipmentSettings'],
                                 $shipmentId,
                                 $status,
                                 $createdAt,
-                                $payload['sender'] ?? []
+                                $payload['sender'] ?? [],
+                                $dispatchNumber
                             );
                             if (isset($payload['shipmentSettings']['packages']) && is_array($payload['shipmentSettings']['packages'])) {
                                 $data['packages'] = $this->normalizePackages($payload['shipmentSettings']['packages']);
@@ -143,6 +145,9 @@ class DataProvider extends AbstractDataProvider
      * @param array $settings
      * @param string $shipmentId
      * @param string $status
+     * @param string $createdAt
+     * @param array $sender
+     * @param string $dispatchNumber
      *
      * @return array
      */
@@ -151,7 +156,8 @@ class DataProvider extends AbstractDataProvider
         string $shipmentId = '',
         string $status = '',
         string $createdAt = '',
-        array $sender = []
+        array $sender = [],
+        string $dispatchNumber = ''
     ): array {
         $settings['autoCreateReturnShipment'] = !empty($settings['autoCreateReturnShipment']) ? '1' : '0';
         if (empty($settings['shipmentId']) && !empty($shipmentId)) {
@@ -159,6 +165,9 @@ class DataProvider extends AbstractDataProvider
         }
         if (!empty($status)) {
             $settings['status'] = $status;
+        }
+        if (!empty($dispatchNumber)) {
+            $settings['dispatchNumber'] = $dispatchNumber;
         }
         $today = date('Y-m-d');
         $rawDate = $settings['shipmentDate'] ?? $settings['dispatchDate'] ?? null;
