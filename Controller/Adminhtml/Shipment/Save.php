@@ -7,7 +7,6 @@ namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
 use Exception;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Ideo\Dhl\Model\Shipment\ShipmentCreationService;
-use Ideo\Dhl\Model\Shipment\ShipmentDataService;
 use InvalidArgumentException;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -28,7 +27,6 @@ class Save extends Action implements HttpPostActionInterface
 
     /**
      * @param Context $context
-     * @param ShipmentDataService $shipmentDataService
      * @param ShipmentCreationService $shipmentCreationService
      * @param ScopeConfigInterface $scopeConfig
      * @param JsonFactory $jsonFactory
@@ -37,7 +35,6 @@ class Save extends Action implements HttpPostActionInterface
      */
     public function __construct(
         Context $context,
-        private readonly ShipmentDataService $shipmentDataService,
         private readonly ShipmentCreationService $shipmentCreationService,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly JsonFactory $jsonFactory,
@@ -60,10 +57,15 @@ class Save extends Action implements HttpPostActionInterface
         $resultJson = $this->jsonFactory->create();
 
         $postValue = method_exists($this->getRequest(), 'getPostValue') ? $this->getRequest()->getPostValue() : null;
-        $payload = $this->getRequest()->getParam('draft')
-            ?? $this->getRequest()->getParam('shipment_data')
-            ?? $this->getRequest()->getParam('data')
-            ?? (is_array($postValue) ? ($postValue['data'] ?? $postValue) : null);
+
+        if (is_array($postValue) && (isset($postValue['shipmentSettings']) || isset($postValue['sender']))) {
+            $payload = $postValue;
+        } else {
+            $payload = $this->getRequest()->getParam('draft')
+                ?? $this->getRequest()->getParam('shipment_data')
+                ?? $this->getRequest()->getParam('data')
+                ?? (is_array($postValue) ? ($postValue['data'] ?? $postValue) : null);
+        }
 
         if (is_string($payload)) {
             try {
@@ -84,6 +86,33 @@ class Save extends Action implements HttpPostActionInterface
             }
             $this->messageManager->addErrorMessage($msg);
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
+        }
+
+        // Sanitize shipmentDate to YYYY-MM-DD and enforce at least today's date
+        if (isset($payload['shipmentSettings']) && is_array($payload['shipmentSettings'])) {
+            $today = date('Y-m-d');
+            $rawDate = (string)($payload['shipmentSettings']['shipmentDate'] ?? $payload['shipmentSettings']['dispatchDate'] ?? '');
+            if (!empty($rawDate)) {
+                $ts = strtotime($rawDate);
+                $parsed = $ts ? date('Y-m-d', $ts) : $today;
+                $finalDate = ($parsed < $today) ? $today : $parsed;
+            } else {
+                $finalDate = $today;
+            }
+            $payload['shipmentSettings']['shipmentDate'] = $finalDate;
+            $payload['shipmentSettings']['dispatchDate'] = $finalDate;
+
+            if (!empty($payload['shipmentSettings']['pickupHourFrom'])) {
+                $payload['shipmentSettings']['pickupHourFrom'] = substr((string)$payload['shipmentSettings']['pickupHourFrom'], 0, 5);
+            }
+            if (!empty($payload['shipmentSettings']['pickupHourTo'])) {
+                $payload['shipmentSettings']['pickupHourTo'] = substr((string)$payload['shipmentSettings']['pickupHourTo'], 0, 5);
+            }
+
+            if (isset($payload['sender']) && is_array($payload['sender'])) {
+                $payload['sender']['pickupHourFrom'] = $payload['shipmentSettings']['pickupHourFrom'] ?? null;
+                $payload['sender']['pickupHourTo'] = $payload['shipmentSettings']['pickupHourTo'] ?? null;
+            }
         }
 
         $entityId = (int) ($this->getRequest()->getParam('entity_id') ?? $this->getRequest()->getParam('id') ?? ($payload['entity_id'] ?? 0));

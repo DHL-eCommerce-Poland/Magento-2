@@ -33,7 +33,8 @@ class ShipmentFullDataMapper
                 'width' => $pkg->getWidth(),
                 'height' => $pkg->getHeight(),
                 'length' => $pkg->getLength(),
-                'nonStandard' => $pkg->isNonStandard(),
+                'nonStandard' => $pkg->isNonStandard() || $services->isNonStandard(),
+                'euroReturn' => $services->isEuroReturn(),
             ];
         }
 
@@ -41,7 +42,7 @@ class ShipmentFullDataMapper
             'product' => $services->getDeliveryHours() ?? $settings->getServiceType(),
             'deliveryEvening' => $services->getDeliveryHours() === '1722',
             'pickupOnSaturday' => $services->isSaturdayDispatch(),
-            'deliverySaturday' => $services->isSaturdayDelivery(),
+            'deliveryOnSaturday' => $services->isSaturdayDelivery(),
         ];
 
         if ($services->isCod()) {
@@ -53,6 +54,22 @@ class ShipmentFullDataMapper
         if ($services->isInsurance()) {
             $serviceDef['insurance'] = true;
             $serviceDef['insuranceValue'] = $services->getInsuranceValue();
+        }
+
+        if ($services->isPdi()) {
+            $serviceDef['predeliveryInformation'] = true;
+            $serviceDef['preaviso'] = true;
+        }
+
+        if ($services->isRod()) {
+            $serviceDef['returnOnDelivery'] = true;
+            if ($services->getRodDocumentText() !== '') {
+                $serviceDef['returnOnDeliveryReference'] = $services->getRodDocumentText();
+            }
+        }
+
+        if ($services->isPod()) {
+            $serviceDef['proofOfDelivery'] = true;
         }
 
         $senderContact = $sender->getName() !== ''
@@ -111,7 +128,7 @@ class ShipmentFullDataMapper
             $receiver['isPostfiliale'] = true;
         }
 
-        return [
+        $result = [
             'shipper' => [
                 'name' => $this->sanitizeString($sender->getName()),
                 'postalCode' => $this->sanitizePostalCode($sender->getPostalCode()),
@@ -134,7 +151,7 @@ class ShipmentFullDataMapper
                 'costsCenter' => $this->sanitizeString($settings->getMpk()),
             ],
             'service' => $serviceDef,
-            'shipmentDate' => $settings->getDispatchDate(),
+            'shipmentDate' => $settings->getShipmentDate(),
             'skipRestrictionCheck' => false,
             'servicePointAccountNumber' => $servicePointAccountNumber,
             'content' => $this->truncateString(
@@ -150,6 +167,15 @@ class ShipmentFullDataMapper
                 DhlShipmentRestrictions::MAX_LENGTH_REFERENCE
             ),
         ];
+
+        if ($settings->getPickupHourFrom() !== null && $settings->getPickupHourFrom() !== '') {
+            $result['shipmentStartHour'] = $settings->getPickupHourFrom();
+        }
+        if ($settings->getPickupHourTo() !== null && $settings->getPickupHourTo() !== '') {
+            $result['shipmentEndHour'] = $settings->getPickupHourTo();
+        }
+
+        return $result;
     }
 
     /**

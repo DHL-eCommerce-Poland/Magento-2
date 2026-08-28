@@ -267,24 +267,24 @@ class SpecialServicesData
     // phpcs:ignore Magento2.Functions.StaticFunction.StaticFunction
     public static function fromArray(array $data): self
     {
-        $insurance = (bool)($data['insurance'] ?? $data['service_UBEZP'] ?? false);
+        $insurance = filter_var($data['insurance'] ?? $data['service_UBEZP'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $insuranceValRaw = $data['insuranceValue'] ?? $data['serviceValueUbez'] ?? null;
         $insuranceValue = ($insurance && $insuranceValRaw !== null && $insuranceValRaw !== '')
             ? (float)$insuranceValRaw
             : null;
 
-        $cod = (bool)($data['cod'] ?? $data['service_COD'] ?? false);
+        $cod = filter_var($data['cod'] ?? $data['service_COD'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $codAmtRaw = $data['codAmount'] ?? $data['serviceValueCOD'] ?? null;
         $codAmount = ($cod && $codAmtRaw !== null && $codAmtRaw !== '') ? (float)$codAmtRaw : null;
 
-        $rod = (bool)($data['rod'] ?? $data['returnOnDelivery'] ?? $data['service_ROD'] ?? false);
+        $rod = filter_var($data['rod'] ?? $data['returnOnDelivery'] ?? $data['service_ROD'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $rodDocRaw = (string)($data['rodDocumentText'] ?? $data['textInstruction'] ?? '');
         $rodDocumentText = $rod ? trim($rodDocRaw) : '';
 
         return new self(
             $data['deliveryHours'] ?? null,
-            (bool)($data['saturdayDelivery'] ?? $data['service_SOBOTA'] ?? false),
-            (bool)($data['saturdayDispatch'] ?? $data['pickupOnSaturday'] ?? $data['service_NAD_SOBOTA'] ?? false),
+            filter_var($data['saturdayDelivery'] ?? $data['service_SOBOTA'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            filter_var($data['saturdayDispatch'] ?? $data['pickupOnSaturday'] ?? $data['service_NAD_SOBOTA'] ?? false, FILTER_VALIDATE_BOOLEAN),
             $insurance,
             $insuranceValue,
             (string)($data['insuranceCurrency'] ?? 'PLN'),
@@ -292,14 +292,14 @@ class SpecialServicesData
             $codAmount,
             (string)($data['codCurrency'] ?? 'PLN'),
             (string)($data['codPaymentMethod'] ?? 'CASH'),
-            (bool)($data['pdi'] ?? $data['predeliveryInformation'] ?? $data['service_PDI'] ?? false),
+            filter_var($data['pdi'] ?? $data['predeliveryInformation'] ?? $data['service_PDI'] ?? false, FILTER_VALIDATE_BOOLEAN),
             $rod,
             $rodDocumentText,
-            (bool)($data['pod'] ?? $data['proofOfDelivery'] ?? $data['service_POD'] ?? false),
-            (bool)($data['euroReturn'] ?? false),
-            (bool)($data['nonStandard'] ?? false),
-            (bool)($data['agever'] ?? $data['service_AGEVER'] ?? false),
-            (bool)($data['odb'] ?? $data['service_ODB'] ?? false)
+            filter_var($data['pod'] ?? $data['proofOfDelivery'] ?? $data['service_POD'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            filter_var($data['euroReturn'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            filter_var($data['nonStandard'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            filter_var($data['agever'] ?? $data['service_AGEVER'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            filter_var($data['odb'] ?? $data['service_ODB'] ?? false, FILTER_VALIDATE_BOOLEAN)
         );
     }
 }

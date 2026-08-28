@@ -97,7 +97,9 @@ class ShipmentFullDataMapperTest extends TestCase
             comment: "Bardzo długa uwaga z niewidocznym znakiem \x00 przekraczająca limit znaków,"
                 . " która musi zostać obcięta do 100 znaków",
             reference: 'ORDER #10000123',
-            dispatchDate: '2026-08-25',
+            shipmentDate: '2026-08-25',
+            pickupHourFrom: '10:00',
+            pickupHourTo: '14:00',
             packages: $packages
         );
 
@@ -110,6 +112,10 @@ class ShipmentFullDataMapperTest extends TestCase
         );
 
         $mapped = $this->mapper->map($shipmentData);
+
+        // Check pickup hours
+        $this->assertEquals('10:00', $mapped['shipmentStartHour']);
+        $this->assertEquals('14:00', $mapped['shipmentEndHour']);
 
         // Check shipper
         $this->assertEquals('Jan Kowalski', $mapped['shipper']['name']);

@@ -144,8 +144,8 @@ class PackageData
             isset($data['width']) && $data['width'] !== null ? (float)$data['width'] : null,
             isset($data['length']) && $data['length'] !== null ? (float)$data['length'] : null,
             isset($data['height']) && $data['height'] !== null ? (float)$data['height'] : null,
-            !empty($data['isNonStandard']),
-            !empty($data['hasEuroReturn'])
+            filter_var($data['isNonStandard'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            filter_var($data['hasEuroReturn'] ?? false, FILTER_VALIDATE_BOOLEAN)
         );
     }
 }

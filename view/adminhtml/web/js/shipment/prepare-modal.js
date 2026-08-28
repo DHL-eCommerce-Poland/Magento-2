@@ -39,7 +39,7 @@ define([
         };
     }
 
-    function createDraft(data) {
+    function createShipmentData(data) {
         data = data || {};
         var s = data.sender || {};
         var r = data.recipient || {};
@@ -50,6 +50,11 @@ define([
 
         var senderCountry = (s.country && s.country.length === 2) ? s.country.toUpperCase() : 'PL';
         var recipientCountry = (r.country && r.country.length === 2) ? r.country.toUpperCase() : 'PL';
+
+        var pFrom = s.pickupHourFrom || s.pickup_time_from || st.pickupHourFrom || '';
+        var pTo = s.pickupHourTo || s.pickup_time_to || st.pickupHourTo || '';
+        var pickupHourFromObs = ko.observable(pFrom);
+        var pickupHourToObs = ko.observable(pTo);
 
         var recipientObj = {
             type: ko.observable(r.type || 'C'),
@@ -90,13 +95,23 @@ define([
             }));
         }
 
+        var todayStr = new Date().toISOString().split('T')[0];
+        var dDate = st.shipmentDate || st.dispatchDate || todayStr;
+        if (dDate < todayStr) {
+            dDate = todayStr;
+        }
+
         var shipmentSettingsObj = {
             selectedDeliveryServiceId: ko.observable(defaultServiceId),
             serviceType: ko.observable(st.serviceType || ''),
+            shipmentDate: ko.observable(dDate),
+            dispatchDate: ko.observable(dDate),
             content: ko.observable(st.content !== undefined ? st.content : ''),
             mpk: ko.observable(st.mpk || ''),
             comment: ko.observable(st.comment || ''),
             reference: ko.observable(st.reference || ''),
+            pickupHourFrom: pickupHourFromObs,
+            pickupHourTo: pickupHourToObs,
             labelType: ko.observable(st.labelType || 'BLP'),
             autoCreateReturnShipment: ko.observable(!!st.autoCreateReturnShipment),
             addressType: ko.observable(st.addressType || 'N'),
@@ -173,7 +188,9 @@ define([
                 city: ko.observable(s.city || ''),
                 country: ko.observable(senderCountry),
                 phone: ko.observable(s.phone || ''),
-                email: ko.observable(s.email || '')
+                email: ko.observable(s.email || ''),
+                pickupHourFrom: shipmentSettingsObj.pickupHourFrom,
+                pickupHourTo: shipmentSettingsObj.pickupHourTo
             },
             recipient: recipientObj,
             specialServices: {
@@ -219,7 +236,8 @@ define([
         initialize: function () {
             this._super();
 
-            this.draft = ko.observable(createDraft({}));
+            this.shipmentData = ko.observable(createShipmentData({}));
+            this.draft = this.shipmentData; // Alias for backward compatibility
             this.senderTemplates = ko.observableArray([]);
             this.senderPresets = this.senderTemplates; // Alias
             this.countryOptions = ko.observableArray([]);
@@ -269,6 +287,14 @@ define([
                 sender.country('PL');
                 sender.phone('');
                 sender.email('');
+                if (this.draft() && this.draft().shipmentSettings) {
+                    if (typeof this.draft().shipmentSettings.pickupHourFrom === 'function') {
+                        this.draft().shipmentSettings.pickupHourFrom('');
+                    }
+                    if (typeof this.draft().shipmentSettings.pickupHourTo === 'function') {
+                        this.draft().shipmentSettings.pickupHourTo('');
+                    }
+                }
                 return;
             }
 
@@ -289,6 +315,14 @@ define([
                                 currentSender[key](val);
                             }
                         });
+                        if (self.draft() && self.draft().shipmentSettings) {
+                            if (res.data.pickupHourFrom !== undefined && typeof self.draft().shipmentSettings.pickupHourFrom === 'function') {
+                                self.draft().shipmentSettings.pickupHourFrom(res.data.pickupHourFrom || '');
+                            }
+                            if (res.data.pickupHourTo !== undefined && typeof self.draft().shipmentSettings.pickupHourTo === 'function') {
+                                self.draft().shipmentSettings.pickupHourTo(res.data.pickupHourTo || '');
+                            }
+                        }
                     }
                 });
         },
@@ -476,8 +510,8 @@ define([
                             response.data.shipmentSettings.selectedDeliveryServiceId = defaultDeliveryServiceId;
                         }
 
-                        // 3. Create reactive draft instance AFTER options are set
-                        var newDraft = createDraft(response.data);
+                        // 3. Create reactive shipmentData instance AFTER options are set
+                        var newDraft = createShipmentData(response.data);
                         self.draft(newDraft);
 
                         if (defaultPointId) {
@@ -499,10 +533,24 @@ define([
                                     var $btn = $(e.target).closest('button');
                                     var $form = $('#ideo-dhl-prepare-modal-form');
                                     
-                                    if ($form.length > 0 && typeof $form.valid === 'function') {
-                                        if (!$form.valid()) {
-                                            return false;
-                                        }
+                                    var draftJs = ko.toJS(self.shipmentData());
+                                    var pFrom = draftJs.sender ? draftJs.sender.pickupHourFrom : null;
+                                    var pTo = draftJs.sender ? draftJs.sender.pickupHourTo : null;
+
+                                    if ((pFrom && !pTo) || (!pFrom && pTo)) {
+                                        alert({
+                                            title: $.mage.__('Error'),
+                                            content: $.mage.__('Both Courier Pickup Time [From] and [To] must be specified.')
+                                        });
+                                        return false;
+                                    }
+
+                                    if (pFrom && pTo && pFrom >= pTo) {
+                                        alert({
+                                            title: $.mage.__('Error'),
+                                            content: $.mage.__('Courier Pickup Time [From] must be earlier than Pickup Time [To].')
+                                        });
+                                        return false;
                                     }
 
                                     // Double-click protection & native loader

@@ -140,7 +140,22 @@ class ShipmentDataValidator
             }
         }
 
-        // 4. Special services validation
+        // 4. Pickup hours validation
+        $pFrom = $settings->getPickupHourFrom();
+        $pTo = $settings->getPickupHourTo();
+        if (($pFrom !== null && trim($pFrom) !== '') || ($pTo !== null && trim($pTo) !== '')) {
+            if (empty($pFrom) || empty($pTo)) {
+                $errors[] = __('Both Courier Pickup Time [From] and [To] must be specified.')->render();
+            } else {
+                $tsFrom = strtotime('1970-01-01 ' . $pFrom);
+                $tsTo = strtotime('1970-01-01 ' . $pTo);
+                if ($tsFrom !== false && $tsTo !== false && $tsFrom >= $tsTo) {
+                    $errors[] = __('Courier Pickup Time [From] must be earlier than Pickup Time [To].')->render();
+                }
+            }
+        }
+
+        // 5. Special services validation
         $specialServices = $shipmentData->getSpecialServices();
         if ($specialServices->isCod()) {
             if ($specialServices->getCodAmount() === null || $specialServices->getCodAmount() <= 0) {

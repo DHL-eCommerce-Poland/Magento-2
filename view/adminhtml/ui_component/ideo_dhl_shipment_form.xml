@@ -56,6 +56,21 @@
             <collapsible>true</collapsible>
             <opened>true</opened>
         </settings>
+        <field name="sender[presetSenderId]" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Drop-Off Point Template</label>
+                <dataScope>sender.presetSenderId</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <caption translate="true">Select Template...</caption>
+                        <options class="Ideo\Dhl\Model\Config\Source\DropOffPoint"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
         <field name="sender[sapNumber]" formElement="input">
             <settings>
                 <dataType>text</dataType>
@@ -145,6 +160,51 @@
                 <dataType>text</dataType>
                 <label translate="true">Email</label>
                 <dataScope>sender.email</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="shipment_time_information">
+        <settings>
+            <label translate="true">Shipment Time Information</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="shipmentSettings[shipmentDate]" formElement="date">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Shipment Date</label>
+                <dataScope>shipmentSettings.shipmentDate</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="dateFormat" xsi:type="string">yyyy-MM-dd</option>
+                            <option name="outputFormat" xsi:type="string">yyyy-MM-dd</option>
+                            <option name="minDate" xsi:type="string">today</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
+        </field>
+        <field name="shipmentSettings[pickupHourFrom]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Courier Pickup Time [From]</label>
+                <dataScope>shipmentSettings.pickupHourFrom</dataScope>
+                <elementTmpl>Ideo_Dhl/form/element/time</elementTmpl>
+            </settings>
+        </field>
+        <field name="shipmentSettings[pickupHourTo]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Courier Pickup Time [To]</label>
+                <dataScope>shipmentSettings.pickupHourTo</dataScope>
+                <elementTmpl>Ideo_Dhl/form/element/time</elementTmpl>
             </settings>
         </field>
     </fieldset>

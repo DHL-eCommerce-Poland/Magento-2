@@ -344,6 +344,13 @@ class OrderToShipmentDataMapper
             ? (int)$defaultShipmentDefaults['dropOffPointId']
             : null;
 
+        $pickupHourFrom = !empty($defaultSenderDefaults['pickup_time_from'])
+            ? (string)$defaultSenderDefaults['pickup_time_from']
+            : null;
+        $pickupHourTo = !empty($defaultSenderDefaults['pickup_time_to'])
+            ? (string)$defaultSenderDefaults['pickup_time_to']
+            : null;
+
         $serviceType = (string)($defaultShipmentDefaults['serviceType'] ?? '');
 
         $shipmentSettings = new ShipmentSettingsData(
@@ -353,7 +360,9 @@ class OrderToShipmentDataMapper
             mpk: (string)($defaultShipmentDefaults['mpk'] ?? $resolvedMpk),
             comment: (string)($defaultShipmentDefaults['comment'] ?? $resolvedComment),
             reference: (string)($defaultShipmentDefaults['reference'] ?? $resolvedReference),
-            dispatchDate: date('Y-m-d'),
+            shipmentDate: date('Y-m-d'),
+            pickupHourFrom: $pickupHourFrom,
+            pickupHourTo: $pickupHourTo,
             packageType: (string)($defaultShipmentDefaults['packageType'] ?? 'PACKAGE'),
             weight: (float)number_format($finalWeight, 4, '.', ''),
             width: $sWidth,

@@ -94,7 +94,6 @@ class SaveTest extends TestCase
 
         $this->controller = new Save(
             $this->contextStub,
-            $this->shipmentDataServiceMock,
             $this->shipmentCreationServiceMock,
             $this->scopeConfigMock,
             $this->jsonFactoryStub,

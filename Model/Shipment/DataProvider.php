@@ -62,16 +62,25 @@ class DataProvider extends AbstractDataProvider
                         if (isset($payload['sender']) && is_array($payload['sender'])) {
                             $data['sender'] = $payload['sender'];
                         }
+                        if (isset($data['sender']) && is_array($data['sender'])) {
+                            $presetId = $item->getData('preset_sender_id');
+                            if (!isset($data['sender']['presetSenderId']) && !empty($presetId) && is_scalar($presetId)) {
+                                $data['sender']['presetSenderId'] = (string)$presetId;
+                            }
+                        }
                         if (isset($payload['recipient']) && is_array($payload['recipient'])) {
                             $data['recipient'] = $payload['recipient'];
                         }
                         if (isset($payload['shipmentSettings']) && is_array($payload['shipmentSettings'])) {
                             $shipmentId = (string)($item->getShipmentId() ?? ($payload['shipmentId'] ?? ''));
                             $status = (string)($item->getStatus() ?? '');
+                            $createdAt = (string)($item->getCreatedAt() ?? '');
                             $data['shipmentSettings'] = $this->normalizeShipmentSettings(
                                 $payload['shipmentSettings'],
                                 $shipmentId,
-                                $status
+                                $status,
+                                $createdAt,
+                                $payload['sender'] ?? []
                             );
                             if (isset($payload['shipmentSettings']['packages']) && is_array($payload['shipmentSettings']['packages'])) {
                                 $data['packages'] = $this->normalizePackages($payload['shipmentSettings']['packages']);
@@ -137,8 +146,13 @@ class DataProvider extends AbstractDataProvider
      *
      * @return array
      */
-    private function normalizeShipmentSettings(array $settings, string $shipmentId = '', string $status = ''): array
-    {
+    private function normalizeShipmentSettings(
+        array $settings,
+        string $shipmentId = '',
+        string $status = '',
+        string $createdAt = '',
+        array $sender = []
+    ): array {
         $settings['autoCreateReturnShipment'] = !empty($settings['autoCreateReturnShipment']) ? '1' : '0';
         if (empty($settings['shipmentId']) && !empty($shipmentId)) {
             $settings['shipmentId'] = $shipmentId;
@@ -146,6 +160,27 @@ class DataProvider extends AbstractDataProvider
         if (!empty($status)) {
             $settings['status'] = $status;
         }
+        $today = date('Y-m-d');
+        $rawDate = $settings['shipmentDate'] ?? $settings['dispatchDate'] ?? null;
+        $finalDate = (empty($rawDate) || $rawDate < $today) ? $today : $rawDate;
+        $settings['shipmentDate'] = $finalDate;
+        $settings['dispatchDate'] = $finalDate;
+
+        $senderPickupFrom = $sender['pickupHourFrom'] ?? $sender['pickup_time_from'] ?? null;
+        $senderPickupTo = $sender['pickupHourTo'] ?? $sender['pickup_time_to'] ?? null;
+
+        if (!empty($settings['pickupHourFrom'])) {
+            $settings['pickupHourFrom'] = substr((string)$settings['pickupHourFrom'], 0, 5);
+        } else {
+            $settings['pickupHourFrom'] = null;
+        }
+
+        if (!empty($settings['pickupHourTo'])) {
+            $settings['pickupHourTo'] = substr((string)$settings['pickupHourTo'], 0, 5);
+        } else {
+            $settings['pickupHourTo'] = null;
+        }
+
         return $settings;
     }
 

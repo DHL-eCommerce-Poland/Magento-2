@@ -11,6 +11,7 @@ use Ideo\Dhl\Model\Config\Source\AddressType as AddressTypeSource;
 use Ideo\Dhl\Model\Config\Source\ContentSource;
 use Ideo\Dhl\Model\Config\Source\LabelType as LabelTypeSource;
 use Ideo\Dhl\Model\Config\Source\PackageType as PackageTypeSource;
+use Ideo\Dhl\Model\Config\Source\PickupTime;
 use Ideo\Dhl\Model\Config\Source\ServiceCode as ServiceCodeSource;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory as DeliveryServiceCollectionFactory;
 use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory as DropOffPointCollectionFactory;
@@ -23,7 +24,6 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
-
 use Psr\Log\LoggerInterface;
 
 class TemplateManager
@@ -40,6 +40,7 @@ class TemplateManager
      * @param PackageTypeSource $packageTypeSource
      * @param AddressTypeSource $addressTypeSource
      * @param ContentSource $contentSource
+     * @param PickupTime $pickupTimeSource
      * @param OrderRepositoryInterface $orderRepository
      * @param OrderToShipmentDataMapper $mapper
      * @param SerializerInterface $serializer
@@ -338,7 +339,7 @@ class TemplateManager
                 mpk: (string)($service->getMpk() ?? ''),
                 comment: (string)($service->getComment() ?? ''),
                 reference: (string)($service->getReference() ?? ''),
-                dispatchDate: date('Y-m-d'),
+                shipmentDate: date('Y-m-d'),
                 packageType: (string)($service->getPackageType() ?: 'PACKAGE'),
                 weight: (float)number_format((float)($service->getWeight() ?: 1.0), 4, '.', ''),
                 width: $service->getWidth() ? (float)number_format((float)$service->getWidth(), 4, '.', '') : null,

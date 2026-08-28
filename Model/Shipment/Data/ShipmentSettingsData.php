@@ -40,7 +40,7 @@ class ShipmentSettingsData
         private string $mpk = '',
         private string $comment = '',
         private string $reference = '',
-        private string $dispatchDate = '',
+        private string $shipmentDate = '',
         private ?string $pickupHourFrom = null,
         private ?string $pickupHourTo = null,
         private string $packageType = 'PACKAGE',
@@ -57,6 +57,13 @@ class ShipmentSettingsData
         private ?string $addressType = 'N',
         array $packages = []
     ) {
+        if (!empty($this->shipmentDate)) {
+            $timestamp = strtotime($this->shipmentDate);
+            if ($timestamp !== false) {
+                $this->shipmentDate = date('Y-m-d', $timestamp);
+            }
+        }
+
         if (!empty($packages)) {
             foreach ($packages as $pkg) {
                 if ($pkg instanceof PackageData) {
@@ -142,13 +149,23 @@ class ShipmentSettingsData
     }
 
     /**
-     * Get dispatch date string (YYYY-MM-DD).
+     * Get shipment date string (YYYY-MM-DD).
+     *
+     * @return string
+     */
+    public function getShipmentDate(): string
+    {
+        return $this->shipmentDate;
+    }
+
+    /**
+     * Get dispatch date string (YYYY-MM-DD). Alias for getShipmentDate().
      *
      * @return string
      */
     public function getDispatchDate(): string
     {
-        return $this->dispatchDate;
+        return $this->getShipmentDate();
     }
 
     /**
@@ -321,7 +338,8 @@ class ShipmentSettingsData
             'mpk' => $this->mpk,
             'comment' => $this->comment,
             'reference' => $this->reference,
-            'dispatchDate' => $this->dispatchDate,
+            'shipmentDate' => $this->shipmentDate,
+            'dispatchDate' => $this->shipmentDate,
             'pickupHourFrom' => $this->pickupHourFrom,
             'pickupHourTo' => $this->pickupHourTo,
             'packageType' => $firstPkg->getPackageType(),
@@ -368,7 +386,7 @@ class ShipmentSettingsData
             mpk: (string)($data['mpk'] ?? ''),
             comment: (string)($data['comment'] ?? ''),
             reference: (string)($data['reference'] ?? ''),
-            dispatchDate: (string)($data['dispatchDate'] ?? date('Y-m-d')),
+            shipmentDate: (string)($data['shipmentDate'] ?? $data['dispatchDate'] ?? date('Y-m-d')),
             pickupHourFrom: $data['pickupHourFrom'] ?? null,
             pickupHourTo: $data['pickupHourTo'] ?? null,
             packageType: (string)($data['packageType'] ?? 'PACKAGE'),
@@ -378,9 +396,9 @@ class ShipmentSettingsData
             length: isset($data['length']) ? (float)$data['length'] : null,
             packageQuantity: (int)($data['packageQuantity'] ?? 1),
             labelType: (string)($data['labelType'] ?? 'BLP'),
-            isNonStandard: !empty($data['isNonStandard']),
-            hasEuroReturn: !empty($data['hasEuroReturn']),
-            autoCreateReturnShipment: !empty($data['autoCreateReturnShipment']),
+            isNonStandard: filter_var($data['isNonStandard'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            hasEuroReturn: filter_var($data['hasEuroReturn'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            autoCreateReturnShipment: filter_var($data['autoCreateReturnShipment'] ?? false, FILTER_VALIDATE_BOOLEAN),
             dropOffPointId: isset($data['dropOffPointId']) ? (int)$data['dropOffPointId'] : null,
             addressType: (string)($data['addressType'] ?? 'N'),
             packages: $packages

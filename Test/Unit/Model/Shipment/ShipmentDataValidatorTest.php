@@ -61,7 +61,7 @@ class ShipmentDataValidatorTest extends TestCase
 
         $settings = new ShipmentSettingsData(
             content: 'Sprzęt elektroniczny',
-            dispatchDate: date('Y-m-d'),
+            shipmentDate: date('Y-m-d'),
             packages: [$package]
         );
 
@@ -265,6 +265,31 @@ class ShipmentDataValidatorTest extends TestCase
         );
 
         $this->expectException(LocalizedException::class);
+        $this->validator->validate($shipmentData);
+    }
+
+    /**
+     * Test validate throws LocalizedException when pickupHourFrom is greater than or equal to pickupHourTo.
+     *
+     * @return void
+     */
+    public function testValidatePickupHourFromLaterThanToThrowsException(): void
+    {
+        $sender = new SenderData(name: 'S', street: 'St', houseNumber: '1', postalCode: '00-000', city: 'C');
+        $recipient = new RecipientData(firstName: 'J', lastName: 'K', street: 'St', houseNumber: '2', postalCode: '00-000', city: 'C');
+        $packages = [new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 1.0)];
+        $settings = new ShipmentSettingsData(
+            serviceType: 'AH',
+            content: 'Test',
+            pickupHourFrom: '14:00',
+            pickupHourTo: '10:00',
+            packages: $packages
+        );
+
+        $shipmentData = new DhlShipmentData(orderId: 1, sender: $sender, recipient: $recipient, shipmentSettings: $settings);
+
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('Courier Pickup Time [From] must be earlier than Pickup Time [To].');
         $this->validator->validate($shipmentData);
     }
 }

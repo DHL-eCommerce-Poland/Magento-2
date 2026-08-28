@@ -85,6 +85,8 @@ class LoadTemplate extends Action
                         'country' => $sender->getCountryId(),
                         'phone' => $sender->getPhone(),
                         'email' => $sender->getEmail(),
+                        'pickupHourFrom' => $sender->getData('pickup_time_from') ?: null,
+                        'pickupHourTo' => $sender->getData('pickup_time_to') ?: null,
                     ]
                 ]);
             }

@@ -17,9 +17,9 @@ use Magento\Framework\View\Element\Template;
             <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 15px;">
 
                 <!-- 1. Sender Address (Left Column) -->
-                <!-- ko if: draft() && draft().sender -->
+                <!-- ko if: shipmentData() && shipmentData().sender -->
                 <div style="flex: 1; min-width: 0;">
-                    <fieldset class="admin__fieldset" data-bind="with: draft().sender">
+                    <fieldset class="admin__fieldset" data-bind="with: shipmentData().sender">
                         <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Sender Address')) ?></span></legend>
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Drop-Off Point Template')) ?></span></label>
@@ -69,14 +69,23 @@ use Magento\Framework\View\Element\Template;
                                 <input type="email" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Email')) ?>" data-bind="value: email" style="flex: 1;" required />
                             </div>
                         </div>
+                        <div class="admin__field">
+                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Courier Pickup Time [From - To]')) ?></span></label>
+                            <div class="admin__field-control">
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="time" class="admin__control-text" placeholder="10:00" data-bind="value: pickupHourFrom" style="flex: 1;" />
+                                    <input type="time" class="admin__control-text" placeholder="14:00" data-bind="value: pickupHourTo" style="flex: 1;" />
+                                </div>
+                            </div>
+                        </div>
                     </fieldset>
                 </div>
                 <!-- /ko -->
 
                 <!-- 2. Recipient Address (Right Column) -->
-                <!-- ko if: draft() && draft().recipient -->
+                <!-- ko if: shipmentData() && shipmentData().recipient -->
                 <div style="flex: 1; min-width: 0;">
-                    <fieldset class="admin__fieldset" data-bind="with: draft().recipient">
+                    <fieldset class="admin__fieldset" data-bind="with: shipmentData().recipient">
                         <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Recipient Address')) ?></span></legend>
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Address Type')) ?></span></label>
@@ -160,14 +169,20 @@ use Magento\Framework\View\Element\Template;
             <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
 
                 <!-- 3. Shipment Settings (Left Column) -->
-                <!-- ko if: draft() && draft().shipmentSettings -->
+                <!-- ko if: shipmentData() && shipmentData().shipmentSettings -->
                 <div style="flex: 1; min-width: 0;">
-                    <fieldset class="admin__fieldset" data-bind="with: draft().shipmentSettings">
+                    <fieldset class="admin__fieldset" data-bind="with: shipmentData().shipmentSettings">
                         <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Shipment Settings')) ?></span></legend>
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Delivery Service Template')) ?></span></label>
                             <div class="admin__field-control">
                                 <select class="admin__control-select" data-bind="options: $parent.shipmentTemplates, optionsText: 'label', optionsValue: 'value', value: selectedDeliveryServiceId, optionsCaption: '<?= $escaper->escapeHtmlAttr(__('Select Template...')) ?>', event: { change: function() { $parent.onShipmentTemplateChange() } }"></select>
+                            </div>
+                        </div>
+                        <div class="admin__field required">
+                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipment Date')) ?></span></label>
+                            <div class="admin__field-control">
+                                <input type="date" class="admin__control-text" min="<?= date('Y-m-d') ?>" data-bind="value: shipmentDate" required />
                             </div>
                         </div>
                         <div class="admin__field required">
@@ -220,9 +235,9 @@ use Magento\Framework\View\Element\Template;
                 <!-- /ko -->
 
                 <!-- 4. Additional Services (Right Column) -->
-                <!-- ko if: draft() && draft().specialServices -->
+                <!-- ko if: shipmentData() && shipmentData().specialServices -->
                 <div style="flex: 1; min-width: 0;">
-                    <fieldset class="admin__fieldset" data-bind="with: draft().specialServices">
+                    <fieldset class="admin__fieldset" data-bind="with: shipmentData().specialServices">
                         <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Additional Services')) ?></span></legend>
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Services')) ?></span></label>
@@ -275,8 +290,8 @@ use Magento\Framework\View\Element\Template;
             </div>
 
             <!-- 5. Packages Table -->
-            <!-- ko if: draft() && draft().shipmentSettings -->
-            <fieldset class="admin__fieldset" data-bind="with: draft().shipmentSettings">
+            <!-- ko if: shipmentData() && shipmentData().shipmentSettings -->
+            <fieldset class="admin__fieldset" data-bind="with: shipmentData().shipmentSettings">
 
                 <!-- Dynamic Packages Table -->
                 <div class="admin__field required">
