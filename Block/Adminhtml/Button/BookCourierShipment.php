@@ -49,6 +49,8 @@ class BookCourierShipment extends Generic implements ButtonProviderInterface
             return [];
         }
 
+        $shipmentNumber = $entity->getShipmentId() ?: (string) $entityId;
+
         return [
             'label' => __('Order Courier'),
             'class' => 'action-secondary',
@@ -56,15 +58,17 @@ class BookCourierShipment extends Generic implements ButtonProviderInterface
                 "require(['jquery'], function($) {
                     var modal = $('#ideo-dhl-book-courier-modal');
                     if (modal.length && typeof modal.data('openBookCourierModal') === 'function') {
-                        modal.data('openBookCourierModal')([%d]);
+                        modal.data('openBookCourierModal')([%d], ['%s']);
                     } else if (window.IdeoDhlBookCourier && typeof window.IdeoDhlBookCourier.openModal === 'function') {
-                        window.IdeoDhlBookCourier.openModal([%d]);
+                        window.IdeoDhlBookCourier.openModal([%d], ['%s']);
                     } else {
                         alert('%s');
                     }
                 });",
                 $entityId,
+                addslashes($shipmentNumber),
                 $entityId,
+                addslashes($shipmentNumber),
                 addslashes((string) __('Courier booking dialog is loading. Please try again.'))
             ),
             'sort_order' => 80,

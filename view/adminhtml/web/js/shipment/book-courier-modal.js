@@ -4,8 +4,7 @@ define([
     'uiComponent',
     'Magento_Ui/js/modal/modal',
     'Magento_Ui/js/modal/alert',
-    'mage/translate',
-    'mage/calendar'
+    'mage/translate'
 ], function ($, ko, Component, modal, alert, $t) {
     'use strict';
 
@@ -15,20 +14,41 @@ define([
             bookUrl: ''
         },
 
+        initObservable: function () {
+            this._super()
+                .observe({
+                    selectedShipmentIds: [],
+                    selectedShipmentNumbers: [],
+                    availableHours: [],
+                    selectedHourSlot: '',
+                    additionalInfo: '',
+                    isLoading: false,
+                    warningMessage: ''
+                });
+
+            this.pickupDate = ko.observable(new Date().toISOString().slice(0, 10));
+            this.value = this.pickupDate;
+            this.isUpdatingDate = false;
+            this.hoursCache = {};
+            this.currentXhr = null;
+            this.debounceTimer = null;
+
+            return this;
+        },
+
         initialize: function () {
             this._super();
 
-            this.selectedShipmentIds = ko.observableArray([]);
-            this.pickupDate = ko.observable(new Date().toISOString().slice(0, 10));
-            this.availableHours = ko.observableArray([]);
-            this.selectedHourSlot = ko.observable('');
-            this.additionalInfo = ko.observable('');
-            this.isLoading = ko.observable(false);
-            this.warningMessage = ko.observable('');
-
             var self = this;
-            var openHandler = function (ids) {
-                self.openModal(ids);
+
+            this.pickupDate.subscribe(function (newVal) {
+                if (!self.isUpdatingDate && newVal) {
+                    self.loadPickupHours();
+                }
+            });
+
+            var openHandler = function (ids, numbers) {
+                self.openModal(ids, numbers);
             };
 
             window.IdeoDhlBookCourier = {
@@ -40,32 +60,32 @@ define([
             return this;
         },
 
-        initCalendar: function () {
-            var self = this;
-            var $dateInput = $('#ideo_dhl_pickup_date');
-
-            if ($dateInput.length && !$dateInput.hasClass('hasDatepicker')) {
-                $dateInput.calendar({
-                    dateFormat: 'yy-mm-dd',
-                    minDate: new Date(),
-                    showsTime: false,
-                    changeMonth: true,
-                    changeYear: true,
-                    onSelect: function (dateText) {
-                        self.pickupDate(dateText);
-                        self.onDateChange();
-                    }
-                });
-            }
-        },
-
-        openModal: function (shipmentIds) {
+        openModal: function (shipmentIds, shipmentNumbers) {
             var self = this;
             var ids = Array.isArray(shipmentIds) ? shipmentIds : [shipmentIds];
+            var numbers = (Array.isArray(shipmentNumbers) && shipmentNumbers.length) ? shipmentNumbers : ids;
+            var todayStr = new Date().toISOString().slice(0, 10);
+
             self.selectedShipmentIds(ids);
-            self.pickupDate(new Date().toISOString().slice(0, 10));
+            self.selectedShipmentNumbers(numbers);
+
+            self.hoursCache = {};
+            if (self.currentXhr) {
+                self.currentXhr.abort();
+                self.currentXhr = null;
+            }
+            if (self.debounceTimer) {
+                clearTimeout(self.debounceTimer);
+                self.debounceTimer = null;
+            }
+
+            self.isUpdatingDate = true;
+            self.pickupDate(todayStr);
             self.warningMessage('');
             self.additionalInfo('');
+            self.isUpdatingDate = false;
+
+            $('#ideo_dhl_pickup_date').attr('min', todayStr);
 
             var $modal = $('#ideo-dhl-book-courier-modal');
             if (!$modal.data('mageModal')) {
@@ -89,7 +109,6 @@ define([
             }
 
             $modal.modal('openModal');
-            self.initCalendar();
             self.loadPickupHours();
         },
 
@@ -101,50 +120,88 @@ define([
             var self = this;
             var ids = self.selectedShipmentIds();
             var firstId = ids.length ? ids[0] : null;
+            var date = self.pickupDate();
 
-            self.isLoading(true);
+            if (self.debounceTimer) {
+                clearTimeout(self.debounceTimer);
+            }
+
+            if (self.currentXhr) {
+                self.currentXhr.abort();
+                self.currentXhr = null;
+            }
+
+            var cacheKey = date + '_' + ids.join('_');
+            if (self.hoursCache[cacheKey]) {
+                self.applyPickupHoursResponse(self.hoursCache[cacheKey]);
+                return;
+            }
+
+            self.debounceTimer = setTimeout(function () {
+                self.isLoading(true);
+                self.availableHours([]);
+                self.selectedHourSlot('');
+                self.warningMessage('');
+
+                self.currentXhr = $.ajax({
+                    url: self.hoursUrl,
+                    type: 'GET',
+                    data: {
+                        date: date,
+                        shipment_id: firstId,
+                        shipment_ids: ids
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        self.currentXhr = null;
+                        self.isLoading(false);
+                        if (response && response.success) {
+                            self.hoursCache[cacheKey] = response;
+                        }
+                        self.applyPickupHoursResponse(response);
+                    },
+                    error: function (xhr, status) {
+                        self.currentXhr = null;
+                        if (status === 'abort') {
+                            return;
+                        }
+                        self.isLoading(false);
+                        self.warningMessage($t('Courier pickup is not available for the selected date. Please select another date in the calendar.'));
+                    }
+                });
+            }, 300);
+        },
+
+        applyPickupHoursResponse: function (response) {
+            var self = this;
+            self.isLoading(false);
             self.availableHours([]);
             self.selectedHourSlot('');
 
-            $.ajax({
-                url: self.hoursUrl,
-                type: 'GET',
-                data: {
-                    date: self.pickupDate(),
-                    shipment_id: firstId
-                },
-                dataType: 'json',
-                success: function (response) {
-                    self.isLoading(false);
-                    if (response.success && response.data) {
-                        var data = response.data;
-                        if (data.message) {
-                            self.warningMessage(data.message);
-                        } else {
-                            self.warningMessage('');
-                        }
-
-                        if (data.available_hours && data.available_hours.length > 0) {
-                            var formattedSlots = data.available_hours.map(function (slot) {
-                                return {
-                                    label: slot.label,
-                                    value: slot.from + '|' + slot.to
-                                };
-                            });
-                            self.availableHours(formattedSlots);
-                            if (formattedSlots.length > 0) {
-                                self.selectedHourSlot(formattedSlots[0].value);
-                            }
-                        }
-                    } else {
-                        self.warningMessage($t('zamówienie kuriera na dziś nie jest możliwe zamów kuriera na kolejny dzień'));
-                    }
-                },
-                error: function () {
-                    self.isLoading(false);
-                    self.warningMessage($t('zamówienie kuriera na dziś nie jest możliwe zamów kuriera na kolejny dzień'));
+            if (response && response.success && response.data) {
+                var data = response.data;
+                if (data.message) {
+                    self.warningMessage(data.message);
+                } else {
+                    self.warningMessage('');
                 }
-            });
+
+                if (data.available_hours && data.available_hours.length > 0) {
+                    var formattedSlots = data.available_hours.map(function (slot) {
+                        return {
+                            label: slot.label,
+                            value: slot.from + '|' + slot.to
+                        };
+                    });
+                    self.availableHours(formattedSlots);
+                    if (formattedSlots.length > 0) {
+                        self.selectedHourSlot(formattedSlots[0].value);
+                    }
+                }
+            } else {
+                var msg = (response && response.message) ? response.message : $t('Courier pickup is not available for the selected date. Please select another date in the calendar.');
+                self.warningMessage(msg);
+            }
         },
 
         submitBooking: function () {

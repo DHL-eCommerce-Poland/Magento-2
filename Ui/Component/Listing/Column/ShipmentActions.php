@@ -12,6 +12,7 @@ use Magento\Ui\Component\Listing\Columns\Column;
 class ShipmentActions extends Column
 {
     private const URL_PATH_EDIT = 'ideo_dhl/shipment/edit';
+    private const URL_PATH_UPDATE_STATUS = 'ideo_dhl/shipment/updateStatus';
     private const URL_PATH_DELETE = 'ideo_dhl/shipment/delete';
     private const URL_PATH_VIEW_ORDER = 'sales/order/view';
 
@@ -54,14 +55,24 @@ class ShipmentActions extends Column
                         ],
                     ];
 
+                    if (!empty($item['shipment_id'])) {
+                        $actions['update_status'] = [
+                            'href' => $this->urlBuilder->getUrl(
+                                self::URL_PATH_UPDATE_STATUS,
+                                ['entity_id' => $item['entity_id']]
+                            ),
+                            'label' => __('Update Status'),
+                        ];
+                    }
+
                     if (empty($item['dispatch_number'])) {
                         $actions['book_courier'] = [
                             'href' => '#',
                             'label' => __('Order Courier'),
-                            'click' => sprintf(
-                                "if (window.IdeoDhlBookCourier && typeof window.IdeoDhlBookCourier.openModal === 'function') { window.IdeoDhlBookCourier.openModal([%d]); } return false;",
-                                (int) $item['entity_id']
-                            ),
+                            'callback' => [
+                                'provider' => 'ideo_dhl_shipment_listing.ideo_dhl_shipment_listing.ideo_dhl_shipment_columns.actions',
+                                'target' => 'bookCourierRow',
+                            ],
                         ];
                     } else {
                         $actions['cancel_courier'] = [

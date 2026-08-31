@@ -26,15 +26,21 @@ $bookUrl = $block->getUrl('ideo_dhl/shipment/bookCourier');
             <div class="admin__field">
                 <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Selected Shipments')) ?></span></label>
                 <div class="admin__field-control" style="padding-top: 6px;">
-                    <strong><span data-bind="text: selectedShipmentIds().length"></span> <?= $escaper->escapeHtml(__('shipment(s) selected')) ?></strong>
+                    <div><strong><span data-bind="text: selectedShipmentIds().length"></span> <?= $escaper->escapeHtml(__('shipment(s) selected')) ?></strong></div>
+                    <!-- ko if: typeof selectedShipmentNumbers !== 'undefined' && selectedShipmentNumbers().length > 0 -->
+                    <div style="margin-top: 4px; color: #555; font-size: 1.2rem;">
+                        <span><?= $escaper->escapeHtml(__('Shipment IDs:')) ?></span>
+                        <span data-bind="text: selectedShipmentNumbers().join(', ')"></span>
+                    </div>
+                    <!-- /ko -->
                 </div>
             </div>
 
-            <!-- Pickup Date Selection (Magento Admin Datepicker) -->
+            <!-- Pickup Date Selection -->
             <div class="admin__field required">
                 <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Pickup Date')) ?></span></label>
                 <div class="admin__field-control">
-                    <input type="text" id="ideo_dhl_pickup_date" class="admin__control-text input-text _has-datepicker" data-bind="value: pickupDate, event: { change: onDateChange.bind($data) }" style="width: 200px;" required autocomplete="off" />
+                    <input type="date" id="ideo_dhl_pickup_date" class="admin__control-text" data-bind="value: pickupDate" style="width: 200px;" required />
                 </div>
             </div>
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Exception;
 use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 
 class CourierPickupTimeResolver
@@ -29,6 +29,7 @@ class CourierPickupTimeResolver
      * @param string|null $currentTime HH:MM format for test injection (defaults to current time)
      *
      * @return array
+     * @throws Exception
      */
     public function resolveAvailableHours(
         string $postalCode,
@@ -40,6 +41,18 @@ class CourierPickupTimeResolver
         $requestedDate = $requestedDate ?: $today;
         $currentTime = $currentTime ?: date('H:i');
 
+        $requestedDt = new \DateTime($requestedDate);
+        if ((int) $requestedDt->format('N') >= 6) {
+            return [
+                'is_today_possible' => false,
+                'is_date_available' => false,
+                'message' => (string) __('Courier pickup is not available for the selected date. Please select another date in the calendar.'),
+                'available_hours' => [],
+                'dr_pickup_from' => null,
+                'dr_pickup_to' => null,
+            ];
+        }
+
         $credentials = $this->credentialsProvider->getCredentials($environment);
         $result = $this->client->getPostalCodeServices($credentials, $postalCode, $requestedDate);
 
@@ -49,7 +62,7 @@ class CourierPickupTimeResolver
             return [
                 'is_today_possible' => false,
                 'is_date_available' => false,
-                'message' => (string) __('zamówienie kuriera na dziś nie jest możliwe zamów kuriera na kolejny dzień'),
+                'message' => (string) __('Courier pickup is not available for the selected date. Please select another date in the calendar.'),
                 'available_hours' => [],
                 'dr_pickup_from' => null,
                 'dr_pickup_to' => null,
@@ -60,11 +73,11 @@ class CourierPickupTimeResolver
         $drFrom = $result->getDrPickupFrom() ?: $result->getExPickupFrom();
         $drTo = $result->getDrPickupTo() ?: $result->getExPickupTo();
 
-        if (empty($drFrom) || empty($drTo)) {
+        if (empty($drFrom) || empty($drTo) || $drFrom === 'brak' || $drTo === 'brak') {
             return [
                 'is_today_possible' => false,
                 'is_date_available' => false,
-                'message' => (string) __('zamówienie kuriera na dziś nie jest możliwe zamów kuriera na kolejny dzień'),
+                'message' => (string) __('Courier pickup is not available for the selected date. Please select another date in the calendar.'),
                 'available_hours' => [],
                 'dr_pickup_from' => null,
                 'dr_pickup_to' => null,
@@ -76,7 +89,7 @@ class CourierPickupTimeResolver
             return [
                 'is_today_possible' => false,
                 'is_date_available' => false,
-                'message' => (string) __('zamówienie kuriera na dziś nie jest możliwe zamów kuriera na kolejny dzień'),
+                'message' => (string) __('Courier pickup is not available for the selected date. Please select another date in the calendar.'),
                 'available_hours' => [],
                 'dr_pickup_from' => $drFrom,
                 'dr_pickup_to' => $drTo,
@@ -89,7 +102,7 @@ class CourierPickupTimeResolver
             return [
                 'is_today_possible' => false,
                 'is_date_available' => false,
-                'message' => (string) __('zamówienie kuriera na dziś nie jest możliwe zamów kuriera na kolejny dzień'),
+                'message' => (string) __('Courier pickup is not available for the selected date. Please select another date in the calendar.'),
                 'available_hours' => [],
                 'dr_pickup_from' => $drFrom,
                 'dr_pickup_to' => $drTo,
@@ -116,6 +129,7 @@ class CourierPickupTimeResolver
      * @param string|null $currentTime
      *
      * @return array
+     * @throws Exception
      */
     public function resolveAvailableHoursForPostalCodes(
         array $postalCodes,
@@ -126,7 +140,14 @@ class CourierPickupTimeResolver
         $postalCodes = array_values(array_unique(array_filter($postalCodes)));
 
         if (empty($postalCodes)) {
-            return $this->resolveAvailableHours('00-001', $requestedDate, $environment, $currentTime);
+            return [
+                'is_today_possible' => false,
+                'is_date_available' => false,
+                'message' => (string) __('Sender postal code is required.'),
+                'available_hours' => [],
+                'dr_pickup_from' => null,
+                'dr_pickup_to' => null,
+            ];
         }
 
         if (count($postalCodes) === 1) {
@@ -142,7 +163,7 @@ class CourierPickupTimeResolver
                 return [
                     'is_today_possible' => false,
                     'is_date_available' => false,
-                    'message' => (string) __('zamówienie kuriera na dziś nie jest możliwe zamów kuriera na kolejny dzień'),
+                    'message' => (string) __('Courier pickup is not available for the selected date. Please select another date in the calendar.'),
                     'available_hours' => [],
                     'dr_pickup_from' => null,
                     'dr_pickup_to' => null,
@@ -160,7 +181,7 @@ class CourierPickupTimeResolver
             return [
                 'is_today_possible' => false,
                 'is_date_available' => false,
-                'message' => (string) __('zamówienie kuriera na dziś nie jest możliwe zamów kuriera na kolejny dzień'),
+                'message' => (string) __('Courier pickup is not available for the selected date. Please select another date in the calendar.'),
                 'available_hours' => [],
                 'dr_pickup_from' => null,
                 'dr_pickup_to' => null,

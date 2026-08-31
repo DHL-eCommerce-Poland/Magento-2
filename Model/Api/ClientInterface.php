@@ -91,5 +91,18 @@ interface ClientInterface
         Credentials $credentials,
         array $dispatchNumbers
     ): CancelCourierBookingResult;
+
+    /**
+     * Get tracking and status history info for a shipment via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string $shipmentId
+     *
+     * @return TrackingResult
+     */
+    public function getTrackAndTraceInfo(
+        Credentials $credentials,
+        string $shipmentId
+    ): TrackingResult;
 }
 

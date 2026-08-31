@@ -74,8 +74,9 @@ class CancelCourierBooking extends Action implements HttpGetActionInterface, Htt
             );
         }
 
-        if (!empty($entityId)) {
-            return $resultRedirect->setPath('ideo_dhl/shipment/edit', ['entity_id' => $entityId]);
+        $referer = $this->_redirect->getRefererUrl();
+        if (!empty($referer)) {
+            return $resultRedirect->setUrl($referer);
         }
 
         return $resultRedirect->setPath('ideo_dhl/shipment/index');

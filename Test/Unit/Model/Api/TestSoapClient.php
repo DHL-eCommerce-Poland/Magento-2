@@ -139,6 +139,37 @@ class TestSoapClient extends SoapClient
     }
 
     /**
+     * Dummy getTrackAndTraceInfo method for SoapClient mocking.
+     *
+     * @param mixed $args
+     * @return mixed
+     * @throws SoapFault
+     */
+    public function getTrackAndTraceInfo(mixed $args): mixed
+    {
+        if ($this->shouldThrowFault) {
+            throw new SoapFault('TRACK_ERR', 'Error fetching tracking info');
+        }
+
+        return (object) [
+            'getTrackAndTraceInfoResult' => (object) [
+                'shipmentId' => '1234567890',
+                'receivedBy' => 'Jan Kowalski',
+                'events' => (object) [
+                    'item' => [
+                        (object) [
+                            'status' => 'DOR',
+                            'description' => 'Doręczono',
+                            'terminal' => 'Warszawa',
+                            'timestamp' => '2026-08-28 14:00:00',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * Dummy __getLastRequest method.
      *
      * @return string

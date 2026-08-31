@@ -55,6 +55,9 @@ class GetPickupHours extends Action implements HttpGetActionInterface
             $senderId = (int) $this->getRequest()->getParam('sender_id');
             $shipmentId = (int) $this->getRequest()->getParam('shipment_id');
             $shipmentIds = (array) $this->getRequest()->getParam('shipment_ids', []);
+            if ($shipmentId > 0 && !in_array($shipmentId, $shipmentIds, true)) {
+                $shipmentIds[] = $shipmentId;
+            }
             if ($shipmentId <= 0 && !empty($shipmentIds)) {
                 $shipmentId = (int) reset($shipmentIds);
             }
@@ -92,10 +95,18 @@ class GetPickupHours extends Action implements HttpGetActionInterface
                 }
             }
 
-            // Default fallback sender postal code if not set
             if (empty($postalCodes)) {
                 $defaultSender = $this->dropOffPointRepository->getDefaultByWebsiteId(0);
-                $postalCodes[] = $defaultSender ? (string) $defaultSender->getPostalCode() : '00-001';
+                if ($defaultSender && !empty($defaultSender->getPostalCode())) {
+                    $postalCodes[] = (string) $defaultSender->getPostalCode();
+                }
+            }
+
+            if (empty($postalCodes)) {
+                return $resultJson->setData([
+                    'success' => false,
+                    'message' => __('Sender postal code is required to retrieve courier pickup hours.'),
+                ]);
             }
 
             $environment = (string) $this->scopeConfig->getValue('carriers/dhlparcel/environment') ?: 'sandbox';

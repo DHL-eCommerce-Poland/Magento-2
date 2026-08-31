@@ -11,6 +11,8 @@
     <settings>
         <buttons>
             <button name="back" class="Ideo\Dhl\Block\Adminhtml\Button\Back"/>
+            <button name="track_shipment" class="Ideo\Dhl\Block\Adminhtml\Button\TrackShipment"/>
+            <button name="update_status" class="Ideo\Dhl\Block\Adminhtml\Button\UpdateStatusShipment"/>
             <button name="book_courier" class="Ideo\Dhl\Block\Adminhtml\Button\BookCourierShipment"/>
             <button name="cancel_courier" class="Ideo\Dhl\Block\Adminhtml\Button\CancelCourierShipment"/>
             <button name="recreate" class="Ideo\Dhl\Block\Adminhtml\Button\RecreateShipment"/>
@@ -347,6 +349,14 @@
             <collapsible>true</collapsible>
             <opened>true</opened>
         </settings>
+        <field name="shipmentSettings[status]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Status</label>
+                <dataScope>shipmentSettings.status</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
         <field name="shipmentSettings[shipmentId]" formElement="input">
             <settings>
                 <dataType>text</dataType>
@@ -361,14 +371,9 @@
                 <label translate="true">Courier Dispatch No.</label>
                 <dataScope>shipmentSettings.dispatchNumber</dataScope>
                 <disabled>true</disabled>
-            </settings>
-        </field>
-        <field name="shipmentSettings[status]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Status</label>
-                <dataScope>shipmentSettings.status</dataScope>
-                <disabled>true</disabled>
+                <imports>
+                    <link name="visible">${$.provider}:data.shipmentSettings.dispatchNumber</link>
+                </imports>
             </settings>
         </field>
         <field name="shipmentSettings[serviceType]" formElement="select">
@@ -905,5 +910,16 @@
                 </field>
             </container>
         </dynamicRows>
+    </fieldset>
+
+    <fieldset name="tracking_history_fieldset">
+        <settings>
+            <label translate="true">Shipment Tracking History</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <htmlContent name="tracking_history_content">
+            <block class="Ideo\Dhl\Block\Adminhtml\Shipment\Edit\TrackingHistory" name="tracking_history_block" template="Ideo_Dhl::shipment/tracking_history.phtml"/>
+        </htmlContent>
     </fieldset>
 </form>

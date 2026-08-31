@@ -9,6 +9,8 @@ use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use InvalidArgumentException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
+use Psr\Log\LoggerInterface;
+use Throwable;
 
 class DataProvider extends AbstractDataProvider
 {
@@ -32,6 +34,7 @@ class DataProvider extends AbstractDataProvider
         string $requestFieldName,
         CollectionFactory $collectionFactory,
         private readonly SerializerInterface $serializer,
+        private readonly ?LoggerInterface $logger = null,
         array $meta = [],
         array $data = []
     ) {
@@ -98,8 +101,12 @@ class DataProvider extends AbstractDataProvider
                             $data['packages_fieldset'] = ['packages' => $data['packages']];
                         }
                     }
-                } catch (InvalidArgumentException $e) {
-                    unset($e);
+                } catch (Throwable $e) {
+                    $this->logger?->warning(sprintf(
+                        '[DataProvider] Failed to unserialize shipment_data payload for shipment entity #%s: %s',
+                        $item->getId(),
+                        $e->getMessage()
+                    ));
                 }
             }
 
@@ -168,6 +175,8 @@ class DataProvider extends AbstractDataProvider
         }
         if (!empty($dispatchNumber)) {
             $settings['dispatchNumber'] = $dispatchNumber;
+        } else {
+            $settings['dispatchNumber'] = null;
         }
         $today = date('Y-m-d');
         $rawDate = $settings['shipmentDate'] ?? $settings['dispatchDate'] ?? null;

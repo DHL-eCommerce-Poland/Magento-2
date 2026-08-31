@@ -295,11 +295,15 @@ class SoapClientAdapter implements ClientInterface
             $client = $this->createSoapClient($wsdlUrl);
 
             $cleanPostCode = (string) preg_replace('/[^0-9]/', '', $postCode);
+            if (empty($cleanPostCode) || $cleanPostCode === '00000') {
+                return new PostalCodeServicesResult(
+                    success: false,
+                    errorCode: 'INVALID_POSTAL_CODE',
+                    errorMessage: 'Sender postal code is invalid or missing.'
+                );
+            }
             if (strlen($cleanPostCode) < 5) {
                 $cleanPostCode = str_pad($cleanPostCode, 5, '0', STR_PAD_LEFT);
-            }
-            if (empty($cleanPostCode) || $cleanPostCode === '00000') {
-                $cleanPostCode = '00001';
             }
 
             $params = [
@@ -317,10 +321,10 @@ class SoapClientAdapter implements ClientInterface
             $result = $response->getPostalCodeServicesResult ?? null;
 
             if (is_object($result)) {
-                $drFrom = !empty($result->drPickupFrom) ? (string) $result->drPickupFrom : null;
-                $drTo = !empty($result->drPickupTo) ? (string) $result->drPickupTo : null;
-                $exFrom = !empty($result->exPickupFrom) ? (string) $result->exPickupFrom : null;
-                $exTo = !empty($result->exPickupTo) ? (string) $result->exPickupTo : null;
+                $drFrom = (!empty($result->drPickupFrom) && (string)$result->drPickupFrom !== 'brak') ? (string) $result->drPickupFrom : null;
+                $drTo = (!empty($result->drPickupTo) && (string)$result->drPickupTo !== 'brak') ? (string) $result->drPickupTo : null;
+                $exFrom = (!empty($result->exPickupFrom) && (string)$result->exPickupFrom !== 'brak') ? (string) $result->exPickupFrom : null;
+                $exTo = (!empty($result->exPickupTo) && (string)$result->exPickupTo !== 'brak') ? (string) $result->exPickupTo : null;
                 $sat = !empty($result->pickupOnSaturday) && (bool) $result->pickupOnSaturday;
 
                 return new PostalCodeServicesResult(
@@ -592,6 +596,111 @@ class SoapClientAdapter implements ClientInterface
             return new CancelCourierBookingResult(
                 false,
                 $dispatchNumbers[0] ?? null,
+                'CONNECTION_ERROR',
+                'An error occurred while connecting to DHL: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Get tracking and status history info for a shipment via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string $shipmentId
+     *
+     * @return TrackingResult
+     */
+    public function getTrackAndTraceInfo(
+        Credentials $credentials,
+        string $shipmentId
+    ): TrackingResult {
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
+
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+                'shipmentId' => $this->ensureUtf8($shipmentId),
+            ];
+
+            $response = $client->getTrackAndTraceInfo($params);
+            $this->logSoapCommunication($client, 'getTrackAndTraceInfo');
+
+            $result = $response->getTrackAndTraceInfoResult ?? null;
+
+            if (is_object($result)) {
+                $receivedBy = !empty($result->receivedBy) ? (string) $result->receivedBy : null;
+                $shipmentIdResult = !empty($result->shipmentId) ? (string) $result->shipmentId : $shipmentId;
+                $rawEvents = $result->events->item ?? $result->events ?? [];
+
+                if (is_object($rawEvents)) {
+                    if (isset($rawEvents->status) || isset($rawEvents->description) || isset($rawEvents->timestamp)) {
+                        $rawEvents = [$rawEvents];
+                    } else {
+                        $rawEvents = [];
+                    }
+                }
+
+                $events = [];
+                if (is_array($rawEvents)) {
+                    foreach ($rawEvents as $event) {
+                        if (is_object($event) && (!empty($event->status) || !empty($event->description))) {
+                            $events[] = [
+                                'status' => !empty($event->status) ? (string) $event->status : '',
+                                'description' => !empty($event->description) ? (string) $event->description : '',
+                                'terminal' => !empty($event->terminal) ? (string) $event->terminal : '',
+                                'timestamp' => !empty($event->timestamp) ? (string) $event->timestamp : '',
+                            ];
+                        }
+                    }
+                }
+
+                return new TrackingResult(
+                    true,
+                    $shipmentIdResult,
+                    $receivedBy,
+                    $events
+                );
+            }
+
+            return new TrackingResult(
+                false,
+                $shipmentId,
+                null,
+                [],
+                'INVALID_RESPONSE',
+                'DHL WebAPI2 returned invalid response for getTrackAndTraceInfo.'
+            );
+        } catch (SoapFault $fault) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] SoapFault during getTrackAndTraceInfo: [%s] %s',
+                $fault->faultcode ?? 'FAULT',
+                $fault->getMessage()
+            ));
+
+            return new TrackingResult(
+                false,
+                $shipmentId,
+                null,
+                [],
+                $fault->faultcode ?? 'SOAP_FAULT',
+                'DHL API error: ' . $fault->getMessage()
+            );
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] Exception during getTrackAndTraceInfo: %s',
+                $e->getMessage()
+            ));
+
+            return new TrackingResult(
+                false,
+                $shipmentId,
+                null,
+                [],
                 'CONNECTION_ERROR',
                 'An error occurred while connecting to DHL: ' . $e->getMessage()
             );

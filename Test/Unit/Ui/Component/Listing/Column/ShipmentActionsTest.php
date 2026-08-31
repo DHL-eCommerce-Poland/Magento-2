@@ -18,10 +18,11 @@ class ShipmentActionsTest extends TestCase
         $uiComponentFactory = $this->createStub(UiComponentFactory::class);
         $urlBuilder = $this->createMock(UrlInterface::class);
 
-        $urlBuilder->expects($this->exactly(3))
+        $urlBuilder->expects($this->exactly(4))
             ->method('getUrl')
             ->willReturnMap([
                 ['ideo_dhl/shipment/edit', ['entity_id' => 10], 'http://example.com/dhl/shipment/edit/entity_id/10'],
+                ['ideo_dhl/shipment/updateStatus', ['entity_id' => 10], 'http://example.com/dhl/shipment/updateStatus/entity_id/10'],
                 ['sales/order/view', ['order_id' => 100], 'http://example.com/sales/order/view/order_id/100'],
                 ['ideo_dhl/shipment/delete', ['entity_id' => 10], 'http://example.com/dhl/shipment/delete/entity_id/10'],
             ]);
@@ -67,10 +68,11 @@ class ShipmentActionsTest extends TestCase
         $uiComponentFactory = $this->createStub(UiComponentFactory::class);
         $urlBuilder = $this->createMock(UrlInterface::class);
 
-        $urlBuilder->expects($this->exactly(2))
+        $urlBuilder->expects($this->exactly(3))
             ->method('getUrl')
             ->willReturnMap([
                 ['ideo_dhl/shipment/edit', ['entity_id' => 15], 'http://example.com/dhl/shipment/edit/entity_id/15'],
+                ['ideo_dhl/shipment/updateStatus', ['entity_id' => 15], 'http://example.com/dhl/shipment/updateStatus/entity_id/15'],
                 ['ideo_dhl/shipment/delete', ['entity_id' => 15], 'http://example.com/dhl/shipment/delete/entity_id/15'],
             ]);
 

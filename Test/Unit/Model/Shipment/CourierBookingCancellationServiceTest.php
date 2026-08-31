@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
+use ArrayIterator;
 use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Model\Api\CancelCourierBookingResult;
 use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
+use Ideo\Dhl\Model\ResourceModel\ShipmentData\Collection as ShipmentDataCollection;
+use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory as ShipmentDataCollectionFactory;
 use Ideo\Dhl\Model\Shipment\CourierBookingCancellationService;
 use Magento\Framework\Exception\LocalizedException;
 use PHPUnit\Framework\MockObject\Stub;
@@ -20,6 +23,7 @@ class CourierBookingCancellationServiceTest extends TestCase
     private ClientInterface|Stub $clientStub;
     private CredentialsProvider|Stub $credentialsProviderStub;
     private ShipmentDataRepositoryInterface|Stub $shipmentDataRepositoryStub;
+    private ShipmentDataCollectionFactory|Stub $collectionFactoryStub;
     private CourierBookingCancellationService $service;
 
     protected function setUp(): void
@@ -27,6 +31,7 @@ class CourierBookingCancellationServiceTest extends TestCase
         $this->clientStub = $this->createStub(ClientInterface::class);
         $this->credentialsProviderStub = $this->createStub(CredentialsProvider::class);
         $this->shipmentDataRepositoryStub = $this->createStub(ShipmentDataRepositoryInterface::class);
+        $this->collectionFactoryStub = $this->createStub(ShipmentDataCollectionFactory::class);
 
         $this->credentialsProviderStub->method('getCredentials')
             ->willReturn(new Credentials('user', 'pass', true));
@@ -34,7 +39,8 @@ class CourierBookingCancellationServiceTest extends TestCase
         $this->service = new CourierBookingCancellationService(
             $this->clientStub,
             $this->credentialsProviderStub,
-            $this->shipmentDataRepositoryStub
+            $this->shipmentDataRepositoryStub,
+            $this->collectionFactoryStub
         );
     }
 
@@ -83,5 +89,47 @@ class CourierBookingCancellationServiceTest extends TestCase
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('90018060826WWW', $result->getDispatchNumber());
+    }
+
+    public function testCancelCourierBookingResetsAllEntitiesSharingDispatchNumber(): void
+    {
+        $entity1Mock = $this->createMock(ShipmentDataInterface::class);
+        $entity1Mock->method('getEntityId')->willReturn(10);
+        $entity1Mock->method('getDispatchNumber')->willReturn('90018060826WWW');
+        $entity1Mock->expects($this->once())->method('setDispatchNumber')->with(null);
+        $entity1Mock->expects($this->once())->method('setStatus')->with((string) __('Nowa'));
+
+        $entity2Mock = $this->createMock(ShipmentDataInterface::class);
+        $entity2Mock->method('getEntityId')->willReturn(11);
+        $entity2Mock->method('getDispatchNumber')->willReturn('90018060826WWW');
+        $entity2Mock->expects($this->once())->method('setDispatchNumber')->with(null);
+        $entity2Mock->expects($this->once())->method('setStatus')->with((string) __('Nowa'));
+
+        $this->shipmentDataRepositoryStub->method('getById')
+            ->willReturn($entity1Mock);
+
+        $collectionMock = $this->createMock(ShipmentDataCollection::class);
+        $collectionMock->expects($this->once())
+            ->method('addFieldToFilter')
+            ->with(ShipmentDataInterface::DISPATCH_NUMBER, ['in' => ['90018060826WWW']]);
+        $collectionMock->method('getIterator')
+            ->willReturn(new ArrayIterator([$entity1Mock, $entity2Mock]));
+
+        $collectionFactoryStub = $this->createStub(ShipmentDataCollectionFactory::class);
+        $collectionFactoryStub->method('create')->willReturn($collectionMock);
+
+        $cancelResult = new CancelCourierBookingResult(true, '90018060826WWW');
+        $this->clientStub->method('cancelCourierBooking')->willReturn($cancelResult);
+
+        $serviceWithCollection = new CourierBookingCancellationService(
+            $this->clientStub,
+            $this->credentialsProviderStub,
+            $this->shipmentDataRepositoryStub,
+            $collectionFactoryStub
+        );
+
+        $result = $serviceWithCollection->cancelCourierBooking([10]);
+
+        $this->assertTrue($result->isSuccess());
     }
 }

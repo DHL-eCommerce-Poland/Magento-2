@@ -303,4 +303,58 @@ class SoapClientAdapterTest extends TestCase
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('ORDER_98765', $result->getDispatchNumber());
     }
+
+    /**
+     * Test successful getTrackAndTraceInfo via mocked SoapClient.
+     *
+     * @return void
+     */
+    public function testGetTrackAndTraceInfoSuccess(): void
+    {
+        $soapClientStub = new TestSoapClient(false);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->getTrackAndTraceInfo($credentials, '1234567890');
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals('1234567890', $result->getShipmentId());
+        $this->assertEquals('Jan Kowalski', $result->getReceivedBy());
+        $this->assertEquals('Doręczono', $result->getLatestStatusDescription());
+        $this->assertEquals('DOR', $result->getLatestStatusCode());
+    }
+
+    /**
+     * Test getTrackAndTraceInfo with SoapFault failure.
+     *
+     * @return void
+     */
+    public function testGetTrackAndTraceInfoFault(): void
+    {
+        $soapClientStub = new TestSoapClient(true);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->getTrackAndTraceInfo($credentials, '1234567890');
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertEquals('TRACK_ERR', $result->getErrorCode());
+        $this->assertStringContainsString('Error fetching tracking info', (string) $result->getErrorMessage());
+    }
 }

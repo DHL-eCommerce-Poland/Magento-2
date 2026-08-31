@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Model\Api\CancelCourierBookingResult;
 use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
+use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory as ShipmentDataCollectionFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -19,11 +21,13 @@ class CourierBookingCancellationService
      * @param CredentialsProvider $credentialsProvider
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param LoggerInterface|null $logger
+     * @param ShipmentDataCollectionFactory|null $collectionFactory
      */
     public function __construct(
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
+        private readonly ShipmentDataCollectionFactory $collectionFactory,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -89,8 +93,28 @@ class CourierBookingCancellationService
 
         if ($result->isSuccess()) {
             $resetStatus = (string) __('Nowa');
+            $entitiesToUpdate = [];
 
-            foreach ($affectedEntities as $entity) {
+            if ($this->collectionFactory !== null) {
+                try {
+                    $collection = $this->collectionFactory->create();
+                    $collection->addFieldToFilter(ShipmentDataInterface::DISPATCH_NUMBER, ['in' => $dispatchNumbers]);
+                    foreach ($collection as $entity) {
+                        $entitiesToUpdate[(int) $entity->getEntityId()] = $entity;
+                    }
+                } catch (Throwable $e) {
+                    $this->logger?->warning(sprintf(
+                        '[CourierBookingCancellationService] Failed to query entities by dispatch number: %s',
+                        $e->getMessage()
+                    ));
+                }
+            }
+
+            foreach ($affectedEntities as $id => $entity) {
+                $entitiesToUpdate[$id] = $entity;
+            }
+
+            foreach ($entitiesToUpdate as $entity) {
                 try {
                     $entity->setDispatchNumber(null);
                     $entity->setStatus($resetStatus);

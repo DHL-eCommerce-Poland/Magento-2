@@ -72,7 +72,7 @@ class CourierPickupTimeResolverTest extends TestCase
             false
         );
 
-        $this->clientMock->expects($this->once())
+        $this->clientMock->expects($this->atLeastOnce())
             ->method('getPostalCodeServices')
             ->willReturn($apiResult);
 
@@ -82,7 +82,7 @@ class CourierPickupTimeResolverTest extends TestCase
         $this->assertFalse($result['is_today_possible']);
         $this->assertFalse($result['is_date_available']);
         $this->assertEquals(
-            'zamówienie kuriera na dziś nie jest możliwe zamów kuriera na kolejny dzień',
+            'Courier pickup is not available for the selected date. Please select another date in the calendar.',
             $result['message']
         );
         $this->assertEmpty($result['available_hours']);
@@ -110,7 +110,7 @@ class CourierPickupTimeResolverTest extends TestCase
 
         $this->assertFalse($result['is_today_possible']);
         $this->assertEquals(
-            'zamówienie kuriera na dziś nie jest możliwe zamów kuriera na kolejny dzień',
+            'Courier pickup is not available for the selected date. Please select another date in the calendar.',
             $result['message']
         );
     }

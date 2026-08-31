@@ -35,6 +35,13 @@
         <filterSearch name="fulltext"/>
         <filters name="listing_filters"/>
         <massaction name="listing_massaction">
+            <action name="update_status">
+                <settings>
+                    <url path="ideo_dhl/shipment/massUpdateStatus"/>
+                    <type>update_status</type>
+                    <label translate="true">Update Status</label>
+                </settings>
+            </action>
             <action name="book_courier">
                 <settings>
                     <type>book_courier</type>

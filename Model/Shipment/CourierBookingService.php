@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use DateTime;
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CourierBookingResult;
@@ -51,6 +52,21 @@ class CourierBookingService
     ): CourierBookingResult {
         if (empty($ids)) {
             throw new LocalizedException(__('No shipments selected for courier booking.'));
+        }
+
+        try {
+            $pickupDt = new DateTime($pickupDate);
+            if ((int) $pickupDt->format('N') >= 6) {
+                throw new LocalizedException(__('Courier pickup is not available for weekends. Please select a business day in the calendar.'));
+            }
+        } catch (LocalizedException $le) {
+            throw $le;
+        } catch (Throwable $e) {
+            $this->logger?->warning(sprintf(
+                '[CourierBookingService] Could not parse pickup date "%s": %s',
+                $pickupDate,
+                $e->getMessage()
+            ));
         }
 
         $dhlShipmentIds = [];

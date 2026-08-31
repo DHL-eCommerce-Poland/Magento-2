@@ -1,0 +1,55 @@
+<?php
+
+declare(strict_types=1);
+
+use Ideo\Dhl\Block\Adminhtml\Shipment\Edit\TrackingHistory;
+use Magento\Framework\Escaper;
+
+/** @var TrackingHistory $block */
+/** @var Escaper $escaper */
+
+$events = $block->getTrackingEvents();
+$shipmentId = $block->getShipmentId();
+?>
+
+<div class="admin__page-section-content" style="margin-bottom: 15px;">
+    <?php if (!empty($shipmentId)): ?>
+        <div style="margin-bottom: 15px;">
+            <a href="https://mojdhl.pl/sprawdz?paczki=<?= $escaper->escapeHtmlAttr($shipmentId) ?>"
+               target="_blank"
+               class="action-secondary"
+               style="text-decoration: none;">
+                <?= $escaper->escapeHtml(__('Track on DHL (https://mojdhl.pl/sprawdz?paczki=%1)', $shipmentId)) ?>
+            </a>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($events)): ?>
+        <div class="admin__table-wrapper">
+            <table class="data-table admin__table-primary">
+                <thead>
+                <tr>
+                    <th class="col-date"><span><?= $escaper->escapeHtml(__('Date Added')) ?></span></th>
+                    <th class="col-status"><span><?= $escaper->escapeHtml(__('Status')) ?></span></th>
+                    <th class="col-description"><span><?= $escaper->escapeHtml(__('Description')) ?></span></th>
+                    <th class="col-terminal"><span><?= $escaper->escapeHtml(__('Terminal')) ?></span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($events as $event): ?>
+                    <tr>
+                        <td><?= $escaper->escapeHtml($event['timestamp'] ?? '') ?></td>
+                        <td><strong><?= $escaper->escapeHtml($event['status'] ?? '') ?></strong></td>
+                        <td><?= $escaper->escapeHtml($event['description'] ?? '') ?></td>
+                        <td><?= $escaper->escapeHtml($event['terminal'] ?? '') ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php else: ?>
+        <div class="message message-notice notice">
+            <div><?= $escaper->escapeHtml(__('No tracking events recorded yet for this shipment.')) ?></div>
+        </div>
+    <?php endif; ?>
+</div>
