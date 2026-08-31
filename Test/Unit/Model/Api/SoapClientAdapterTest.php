@@ -72,6 +72,17 @@ class SoapClientAdapterTest extends TestCase
         $this->assertStringContainsString('<shipmentId>12345</shipmentId>', $sanitized);
     }
 
+    public function testSanitizeXmlTruncatesScanData(): void
+    {
+        $rawXml = '<soap:Envelope><getShipmentScanResult><scanData>iVBORw0KGgoAAAANSUhEUgAAAXgAAAF4CAYAAABeneKmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQU</scanData><scanMimeType>image/png</scanMimeType></getShipmentScanResult></soap:Envelope>';
+
+        $sanitized = $this->adapter->sanitizeXml($rawXml);
+
+        $this->assertStringNotContainsString('iVBORw0KGgoAAAANSUhEUgAAAXgAAAF4CAYAAABeneKmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQU', $sanitized);
+        $this->assertStringContainsString('<scanData>***BINARY DATA TRUNCATED***</scanData>', $sanitized);
+        $this->assertStringContainsString('<scanMimeType>image/png</scanMimeType>', $sanitized);
+    }
+
     /**
      * Test UTF-8 sanitization for invalid non-UTF-8 byte sequences.
      *

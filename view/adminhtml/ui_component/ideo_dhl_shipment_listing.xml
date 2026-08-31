@@ -42,6 +42,20 @@
                     <label translate="true">Print Labels</label>
                 </settings>
             </action>
+            <action name="download_scan">
+                <settings>
+                    <url path="ideo_dhl/shipment/massDownloadScan"/>
+                    <type>download_scan</type>
+                    <label translate="true">Download Scans</label>
+                </settings>
+            </action>
+            <action name="download_epod">
+                <settings>
+                    <url path="ideo_dhl/shipment/massDownloadEpod"/>
+                    <type>download_epod</type>
+                    <label translate="true">Download ePODs</label>
+                </settings>
+            </action>
             <action name="update_status">
                 <settings>
                     <url path="ideo_dhl/shipment/massUpdateStatus"/>

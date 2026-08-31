@@ -65,6 +65,24 @@ class ShipmentActions extends Column
                             'target' => '_blank',
                         ];
 
+                        $actions['download_scan'] = [
+                            'href' => $this->urlBuilder->getUrl(
+                                'ideo_dhl/shipment/downloadScan',
+                                ['entity_id' => $item['entity_id']]
+                            ),
+                            'label' => __('Download Scan'),
+                            'target' => '_blank',
+                        ];
+
+                        $actions['download_epod'] = [
+                            'href' => $this->urlBuilder->getUrl(
+                                'ideo_dhl/shipment/downloadEpod',
+                                ['entity_id' => $item['entity_id']]
+                            ),
+                            'label' => __('Download ePOD'),
+                            'target' => '_blank',
+                        ];
+
                         $actions['update_status'] = [
                             'href' => $this->urlBuilder->getUrl(
                                 self::URL_PATH_UPDATE_STATUS,

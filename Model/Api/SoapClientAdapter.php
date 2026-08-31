@@ -810,6 +810,148 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
+     * Get consignment note scan via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string $shipmentId
+     *
+     * @return GetScanResult
+     */
+    public function getShipmentScan(Credentials $credentials, string $shipmentId): GetScanResult
+    {
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
+
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+                'shipmentId' => $this->ensureUtf8($shipmentId),
+            ];
+
+            $response = $client->getShipmentScan($params);
+            $this->logSoapCommunication($client, 'getShipmentScan');
+
+            $scanResult = $response->getShipmentScanResult ?? null;
+
+            if ($scanResult === null) {
+                return new GetScanResult(false, null, null, 'INVALID_RESPONSE', 'DHL WebAPI2 returned invalid response for getShipmentScan.');
+            }
+
+            $rawBase64 = (string) ($scanResult->scanData ?? '');
+            $fileData = !empty($rawBase64) ? base64_decode($rawBase64) : null;
+            $mimeType = (string) ($scanResult->scanMimeType ?? 'application/pdf');
+
+            if (empty($fileData)) {
+                return new GetScanResult(false, null, null, 'EMPTY_SCAN', 'DHL WebAPI2 returned no scan data for shipment ID ' . $shipmentId);
+            }
+
+            return new GetScanResult(true, $fileData, $mimeType);
+        } catch (SoapFault $fault) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] SoapFault during getShipmentScan: [%s] %s',
+                $fault->faultcode ?? 'FAULT',
+                $fault->getMessage()
+            ));
+
+            return new GetScanResult(
+                false,
+                null,
+                null,
+                $fault->faultcode ?? 'SOAP_FAULT',
+                'DHL error: ' . $fault->getMessage()
+            );
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] Exception during getShipmentScan: %s',
+                $e->getMessage()
+            ));
+
+            return new GetScanResult(
+                false,
+                null,
+                null,
+                'CONNECTION_ERROR',
+                'An error occurred while connecting to DHL: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Get electronic proof of delivery (ePOD) via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string $shipmentId
+     *
+     * @return GetEpodResult
+     */
+    public function getEpod(Credentials $credentials, string $shipmentId): GetEpodResult
+    {
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
+
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+                'shipmentId' => $this->ensureUtf8($shipmentId),
+            ];
+
+            $response = $client->getEpod($params);
+            $this->logSoapCommunication($client, 'getEpod');
+
+            $epodResult = $response->getEpodResult ?? null;
+
+            if ($epodResult === null) {
+                return new GetEpodResult(false, null, null, 'INVALID_RESPONSE', 'DHL WebAPI2 returned invalid response for getEpod.');
+            }
+
+            $rawBase64 = (string) ($epodResult->scanData ?? '');
+            $fileData = !empty($rawBase64) ? base64_decode($rawBase64) : null;
+            $mimeType = (string) ($epodResult->scanMimeType ?? 'application/pdf');
+
+            if (empty($fileData)) {
+                return new GetEpodResult(false, null, null, 'EMPTY_EPOD', 'DHL WebAPI2 returned no ePOD data for shipment ID ' . $shipmentId);
+            }
+
+            return new GetEpodResult(true, $fileData, $mimeType);
+        } catch (SoapFault $fault) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] SoapFault during getEpod: [%s] %s',
+                $fault->faultcode ?? 'FAULT',
+                $fault->getMessage()
+            ));
+
+            return new GetEpodResult(
+                false,
+                null,
+                null,
+                $fault->faultcode ?? 'SOAP_FAULT',
+                'DHL error: ' . $fault->getMessage()
+            );
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] Exception during getEpod: %s',
+                $e->getMessage()
+            ));
+
+            return new GetEpodResult(
+                false,
+                null,
+                null,
+                'CONNECTION_ERROR',
+                'An error occurred while connecting to DHL: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
      * Create SoapClient instance with custom timeout, DHLApiOrgin header and WSDL caching rules.
      *
      * @param string $wsdlUrl
@@ -881,7 +1023,7 @@ class SoapClientAdapter implements ClientInterface
         );
 
         return (string) preg_replace(
-            '/(<(?:[a-zA-Z0-9_]+:)?(?:labelData|cn23Data|fvProformaData|primaryFile)>)[^<]{30,}(<\/(?:[a-zA-Z0-9_]+:)?(?:labelData|cn23Data|fvProformaData|primaryFile)>)/i',
+            '/(<(?:[a-zA-Z0-9_]+:)?(?:labelData|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)[^<]{30,}(<\/(?:[a-zA-Z0-9_]+:)?(?:labelData|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)/i',
             '$1***BINARY DATA TRUNCATED***$2',
             $xml
         );

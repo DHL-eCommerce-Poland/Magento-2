@@ -117,5 +117,30 @@ interface ClientInterface
         Credentials $credentials,
         array $itemsToPrint
     ): GetLabelsResult;
-}
 
+    /**
+     * Get shipment consignment note scan via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string $shipmentId
+     *
+     * @return GetScanResult
+     */
+    public function getShipmentScan(
+        Credentials $credentials,
+        string $shipmentId
+    ): GetScanResult;
+
+    /**
+     * Get electronic proof of delivery (ePOD) via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string $shipmentId
+     *
+     * @return GetEpodResult
+     */
+    public function getEpod(
+        Credentials $credentials,
+        string $shipmentId
+    ): GetEpodResult;
+}

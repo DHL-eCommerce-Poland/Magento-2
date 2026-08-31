@@ -170,6 +170,48 @@ class TestSoapClient extends SoapClient
     }
 
     /**
+     * Dummy getShipmentScan method for SoapClient mocking.
+     *
+     * @param mixed $args
+     * @return mixed
+     * @throws SoapFault
+     */
+    public function getShipmentScan(mixed $args): mixed
+    {
+        if ($this->shouldThrowFault) {
+            throw new SoapFault('SCAN_ERR', 'Error fetching shipment scan');
+        }
+
+        return (object) [
+            'getShipmentScanResult' => (object) [
+                'scanData' => base64_encode('dummy_scan_pdf_content'),
+                'scanMimeType' => 'application/pdf',
+            ],
+        ];
+    }
+
+    /**
+     * Dummy getEpod method for SoapClient mocking.
+     *
+     * @param mixed $args
+     * @return mixed
+     * @throws SoapFault
+     */
+    public function getEpod(mixed $args): mixed
+    {
+        if ($this->shouldThrowFault) {
+            throw new SoapFault('EPOD_ERR', 'Error fetching ePOD');
+        }
+
+        return (object) [
+            'getEpodResult' => (object) [
+                'scanData' => base64_encode('dummy_epod_pdf_content'),
+                'scanMimeType' => 'application/pdf',
+            ],
+        ];
+    }
+
+    /**
      * Dummy __getLastRequest method.
      *
      * @return string
