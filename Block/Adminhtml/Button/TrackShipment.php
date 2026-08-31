@@ -50,7 +50,7 @@ class TrackShipment implements ButtonProviderInterface
                 "window.open('https://mojdhl.pl/sprawdz?paczki=%s', '_blank');",
                 urlencode($shipmentId)
             ),
-            'sort_order' => 15,
+            'sort_order' => 40,
         ];
     }
 }

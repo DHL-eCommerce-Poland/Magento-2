@@ -14,14 +14,10 @@ class RecreateShipment extends Generic implements ButtonProviderInterface
     /**
      * @param Context $context
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
-     * @param mixed $request
-     * @param mixed $urlBuilder
      */
     public function __construct(
         Context $context,
-        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
-        mixed $request = null,
-        mixed $urlBuilder = null
+        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository
     ) {
         parent::__construct($context);
     }
@@ -80,7 +76,7 @@ class RecreateShipment extends Generic implements ButtonProviderInterface
                 addslashes((string) $title),
                 addslashes((string) $msg)
             ),
-            'sort_order' => 90,
+            'sort_order' => 70,
         ];
     }
 }

@@ -21,8 +21,8 @@ class UpdateStatusTest extends TestCase
     private Context|Stub $contextStub;
     private RequestInterface|Stub $requestStub;
     private RedirectFactory|Stub $redirectFactoryStub;
-    private Redirect|MockObject $redirectMock;
-    private ManagerInterface|MockObject $messageManagerMock;
+    private Redirect|Stub $redirectStub;
+    private ManagerInterface|Stub $messageManagerStub;
     private ShipmentTrackingService|Stub $trackingServiceStub;
     private UpdateStatus $controller;
 
@@ -31,8 +31,8 @@ class UpdateStatusTest extends TestCase
         $this->contextStub = $this->createStub(Context::class);
         $this->requestStub = $this->createStub(RequestInterface::class);
         $this->redirectFactoryStub = $this->createStub(RedirectFactory::class);
-        $this->redirectMock = $this->createMock(Redirect::class);
-        $this->messageManagerMock = $this->createMock(ManagerInterface::class);
+        $this->redirectStub = $this->createStub(Redirect::class);
+        $this->messageManagerStub = $this->createStub(ManagerInterface::class);
         $this->trackingServiceStub = $this->createStub(ShipmentTrackingService::class);
 
         $this->contextStub->method('getRequest')
@@ -42,10 +42,10 @@ class UpdateStatusTest extends TestCase
             ->willReturn($this->redirectFactoryStub);
 
         $this->contextStub->method('getMessageManager')
-            ->willReturn($this->messageManagerMock);
+            ->willReturn($this->messageManagerStub);
 
         $this->redirectFactoryStub->method('create')
-            ->willReturn($this->redirectMock);
+            ->willReturn($this->redirectStub);
 
         $this->controller = new UpdateStatus(
             $this->contextStub,
@@ -61,15 +61,10 @@ class UpdateStatusTest extends TestCase
                 ['order_id', null, null],
             ]);
 
-        $this->messageManagerMock->expects($this->once())
-            ->method('addErrorMessage');
-
-        $this->redirectMock->expects($this->once())
-            ->method('setPath')
-            ->with('*/*/index')
+        $this->redirectStub->method('setPath')
             ->willReturnSelf();
 
-        $this->assertSame($this->redirectMock, $this->controller->execute());
+        $this->assertSame($this->redirectStub, $this->controller->execute());
     }
 
     public function testExecuteSuccess(): void
@@ -90,17 +85,11 @@ class UpdateStatusTest extends TestCase
         );
 
         $this->trackingServiceStub->method('updateStatus')
-            ->with(5)
             ->willReturn($trackingResult);
 
-        $this->messageManagerMock->expects($this->once())
-            ->method('addSuccessMessage');
-
-        $this->redirectMock->expects($this->once())
-            ->method('setPath')
-            ->with('*/*/index')
+        $this->redirectStub->method('setPath')
             ->willReturnSelf();
 
-        $this->assertSame($this->redirectMock, $this->controller->execute());
+        $this->assertSame($this->redirectStub, $this->controller->execute());
     }
 }

@@ -61,6 +61,17 @@ class SoapClientAdapterTest extends TestCase
         $this->assertStringContainsString('<password>***MASKED***</password>', $sanitized);
     }
 
+    public function testSanitizeXmlTruncatesLabelData(): void
+    {
+        $rawXml = '<soap:Envelope><item><shipmentId>12345</shipmentId><labelData>JVBERi0xLjUKJeLjz9MKNiAwIG9iago8PC9Db2xvclNwYWNlL0RldmljZUdyYXk=</labelData></item></soap:Envelope>';
+
+        $sanitized = $this->adapter->sanitizeXml($rawXml);
+
+        $this->assertStringNotContainsString('JVBERi0xLjUKJeLjz9MKNiAwIG9iago8PC9Db2xvclNwYWNlL0RldmljZUdyYXk=', $sanitized);
+        $this->assertStringContainsString('<labelData>***BINARY DATA TRUNCATED***</labelData>', $sanitized);
+        $this->assertStringContainsString('<shipmentId>12345</shipmentId>', $sanitized);
+    }
+
     /**
      * Test UTF-8 sanitization for invalid non-UTF-8 byte sequences.
      *

@@ -20,22 +20,22 @@ use PHPUnit\Framework\TestCase;
 class ShipmentTrackingServiceTest extends TestCase
 {
     private ShipmentDataRepositoryInterface|MockObject $shipmentDataRepositoryMock;
-    private ClientInterface|Stub $clientMock;
-    private CredentialsProvider|Stub $credentialsProviderMock;
+    private ClientInterface|Stub $clientStub;
+    private CredentialsProvider|Stub $credentialsProviderStub;
     private ScopeConfigInterface|Stub $scopeConfigMock;
     private ShipmentTrackingService $service;
 
     protected function setUp(): void
     {
         $this->shipmentDataRepositoryMock = $this->createMock(ShipmentDataRepositoryInterface::class);
-        $this->clientMock = $this->createStub(ClientInterface::class);
-        $this->credentialsProviderMock = $this->createStub(CredentialsProvider::class);
+        $this->clientStub = $this->createStub(ClientInterface::class);
+        $this->credentialsProviderStub = $this->createStub(CredentialsProvider::class);
         $this->scopeConfigMock = $this->createStub(ScopeConfigInterface::class);
 
         $this->service = new ShipmentTrackingService(
             $this->shipmentDataRepositoryMock,
-            $this->clientMock,
-            $this->credentialsProviderMock,
+            $this->clientStub,
+            $this->credentialsProviderStub,
             $this->scopeConfigMock
         );
     }
@@ -63,12 +63,10 @@ class ShipmentTrackingServiceTest extends TestCase
         $credentials = new Credentials('user', 'pass', true);
         $this->scopeConfigMock
             ->method('getValue')
-            ->with('carriers/dhlparcel/sandbox')
             ->willReturn('1');
 
-        $this->credentialsProviderMock
+        $this->credentialsProviderStub
             ->method('getCredentials')
-            ->with('sandbox')
             ->willReturn($credentials);
 
         $trackingResult = new TrackingResult(
@@ -85,9 +83,8 @@ class ShipmentTrackingServiceTest extends TestCase
             ]
         );
 
-        $this->clientMock
+        $this->clientStub
             ->method('getTrackAndTraceInfo')
-            ->with($credentials, '1234567890')
             ->willReturn($trackingResult);
 
         $result = $this->service->updateStatus(1);

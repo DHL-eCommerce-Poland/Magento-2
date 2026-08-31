@@ -708,6 +708,108 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
+     * Get shipment labels via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param array $itemsToPrint Array of items to print [['shipmentId' => string, 'labelType' => string]]
+     *
+     * @return GetLabelsResult
+     */
+    public function getLabels(Credentials $credentials, array $itemsToPrint): GetLabelsResult
+    {
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
+
+            $formattedItems = [];
+            foreach ($itemsToPrint as $item) {
+                if (!empty($item['shipmentId'])) {
+                    $formattedItems[] = [
+                        'labelType' => $item['labelType'] ?? 'BLP',
+                        'shipmentId' => (string) $item['shipmentId'],
+                    ];
+                }
+            }
+
+            if (empty($formattedItems)) {
+                return new GetLabelsResult(false, [], 'INVALID_INPUT', 'No valid shipments provided for label printing.');
+            }
+
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+                'itemsToPrint' => $formattedItems,
+            ];
+
+            $response = $client->getLabels($params);
+            $this->logSoapCommunication($client, 'getLabels');
+
+            $result = $response->getLabelsResult ?? null;
+
+            if ($result === null) {
+                return new GetLabelsResult(false, [], 'INVALID_RESPONSE', 'DHL WebAPI2 returned invalid response for getLabels.');
+            }
+
+            $itemsRaw = [];
+            if (isset($result->item)) {
+                $itemsRaw = is_array($result->item) ? $result->item : [$result->item];
+            }
+
+            $parsedItems = [];
+            foreach ($itemsRaw as $itemObj) {
+                $shipmentId = (string) ($itemObj->shipmentId ?? '');
+                $labelType = (string) ($itemObj->labelType ?? 'BLP');
+                $rawBase64 = (string) ($itemObj->labelData ?? '');
+                $labelBinary = !empty($rawBase64) ? base64_decode($rawBase64) : '';
+                $mimeType = (string) ($itemObj->labelMimeType ?? $itemObj->mimeType ?? (str_contains($labelType, 'ZBLP') ? 'text/plain' : 'application/pdf'));
+
+                if (!empty($labelBinary)) {
+                    $parsedItems[] = [
+                        'shipmentId' => $shipmentId,
+                        'labelType' => $labelType,
+                        'labelData' => $labelBinary,
+                        'mimeType' => $mimeType,
+                    ];
+                }
+            }
+
+            if (empty($parsedItems)) {
+                return new GetLabelsResult(false, [], 'EMPTY_LABEL', 'DHL WebAPI2 returned no label data.');
+            }
+
+            return new GetLabelsResult(true, $parsedItems);
+        } catch (SoapFault $fault) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] SoapFault during getLabels: [%s] %s',
+                $fault->faultcode ?? 'FAULT',
+                $fault->getMessage()
+            ));
+
+            return new GetLabelsResult(
+                false,
+                [],
+                $fault->faultcode ?? 'SOAP_FAULT',
+                'DHL error: ' . $fault->getMessage()
+            );
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] Exception during getLabels: %s',
+                $e->getMessage()
+            ));
+
+            return new GetLabelsResult(
+                false,
+                [],
+                'CONNECTION_ERROR',
+                'An error occurred while connecting to DHL: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
      * Create SoapClient instance with custom timeout, DHLApiOrgin header and WSDL caching rules.
      *
      * @param string $wsdlUrl
@@ -772,9 +874,15 @@ class SoapClientAdapter implements ClientInterface
 
         $xml = $this->ensureUtf8($xml);
 
-        return (string) preg_replace(
+        $xml = (string) preg_replace(
             '/(<(?:[a-zA-Z0-9_]+:)?(?:password|username)>)[^<]+(<\/(?:[a-zA-Z0-9_]+:)?(?:password|username)>)/i',
             '$1***MASKED***$2',
+            $xml
+        );
+
+        return (string) preg_replace(
+            '/(<(?:[a-zA-Z0-9_]+:)?(?:labelData|cn23Data|fvProformaData|primaryFile)>)[^<]{30,}(<\/(?:[a-zA-Z0-9_]+:)?(?:labelData|cn23Data|fvProformaData|primaryFile)>)/i',
+            '$1***BINARY DATA TRUNCATED***$2',
             $xml
         );
     }

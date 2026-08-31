@@ -104,5 +104,18 @@ interface ClientInterface
         Credentials $credentials,
         string $shipmentId
     ): TrackingResult;
+
+    /**
+     * Get shipment labels via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param array $itemsToPrint Array of items to print [['shipmentId' => string, 'labelType' => string]]
+     *
+     * @return GetLabelsResult
+     */
+    public function getLabels(
+        Credentials $credentials,
+        array $itemsToPrint
+    ): GetLabelsResult;
 }
 

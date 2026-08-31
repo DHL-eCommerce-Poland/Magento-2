@@ -14,14 +14,10 @@ class UpdateStatusShipment extends Generic implements ButtonProviderInterface
     /**
      * @param Context $context
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
-     * @param mixed $request
-     * @param mixed $urlBuilder
      */
     public function __construct(
         Context $context,
-        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
-        mixed $request = null,
-        mixed $urlBuilder = null
+        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository
     ) {
         parent::__construct($context);
     }
@@ -56,7 +52,7 @@ class UpdateStatusShipment extends Generic implements ButtonProviderInterface
                 "location.href = '%s'",
                 $this->getUrl('ideo_dhl/shipment/updateStatus', ['entity_id' => $entityId, 'redirect_to_edit' => 1])
             ),
-            'sort_order' => 15,
+            'sort_order' => 60,
         ];
     }
 }

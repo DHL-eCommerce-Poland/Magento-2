@@ -18,10 +18,11 @@ class ShipmentActionsTest extends TestCase
         $uiComponentFactory = $this->createStub(UiComponentFactory::class);
         $urlBuilder = $this->createMock(UrlInterface::class);
 
-        $urlBuilder->expects($this->exactly(4))
+        $urlBuilder->expects($this->exactly(5))
             ->method('getUrl')
             ->willReturnMap([
                 ['ideo_dhl/shipment/edit', ['entity_id' => 10], 'http://example.com/dhl/shipment/edit/entity_id/10'],
+                ['ideo_dhl/shipment/printLabel', ['entity_id' => 10], 'http://example.com/dhl/shipment/printLabel/entity_id/10'],
                 ['ideo_dhl/shipment/updateStatus', ['entity_id' => 10], 'http://example.com/dhl/shipment/updateStatus/entity_id/10'],
                 ['sales/order/view', ['order_id' => 100], 'http://example.com/sales/order/view/order_id/100'],
                 ['ideo_dhl/shipment/delete', ['entity_id' => 10], 'http://example.com/dhl/shipment/delete/entity_id/10'],
@@ -55,6 +56,9 @@ class ShipmentActionsTest extends TestCase
         $this->assertEquals('http://example.com/dhl/shipment/edit/entity_id/10', $actions['edit']['href']);
         $this->assertEquals('Details', (string)$actions['edit']['label']);
 
+        $this->assertEquals('http://example.com/dhl/shipment/printLabel/entity_id/10', $actions['print_label']['href']);
+        $this->assertEquals('Print Label', (string)$actions['print_label']['label']);
+
         $this->assertEquals('http://example.com/sales/order/view/order_id/100', $actions['view_order']['href']);
         $this->assertEquals('View Order', (string)$actions['view_order']['label']);
 
@@ -68,10 +72,11 @@ class ShipmentActionsTest extends TestCase
         $uiComponentFactory = $this->createStub(UiComponentFactory::class);
         $urlBuilder = $this->createMock(UrlInterface::class);
 
-        $urlBuilder->expects($this->exactly(3))
+        $urlBuilder->expects($this->exactly(4))
             ->method('getUrl')
             ->willReturnMap([
                 ['ideo_dhl/shipment/edit', ['entity_id' => 15], 'http://example.com/dhl/shipment/edit/entity_id/15'],
+                ['ideo_dhl/shipment/printLabel', ['entity_id' => 15], 'http://example.com/dhl/shipment/printLabel/entity_id/15'],
                 ['ideo_dhl/shipment/updateStatus', ['entity_id' => 15], 'http://example.com/dhl/shipment/updateStatus/entity_id/15'],
                 ['ideo_dhl/shipment/delete', ['entity_id' => 15], 'http://example.com/dhl/shipment/delete/entity_id/15'],
             ]);
@@ -99,6 +104,7 @@ class ShipmentActionsTest extends TestCase
 
         $actions = $result['data']['items'][0]['actions'];
         $this->assertArrayHasKey('edit', $actions);
+        $this->assertArrayHasKey('print_label', $actions);
         $this->assertArrayHasKey('delete', $actions);
         $this->assertArrayNotHasKey('view_order', $actions);
     }

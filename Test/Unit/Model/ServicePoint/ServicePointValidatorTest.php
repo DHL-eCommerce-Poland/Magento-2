@@ -18,8 +18,8 @@ class ServicePointValidatorTest extends TestCase
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $validator = new ServicePointValidator($scopeConfigStub);
 
+        $this->expectNotToPerformAssertions();
         $validator->validate('flatrate', 'flatrate', null);
-        $this->assertTrue(true);
     }
 
     public function testValidationPassesForDhlNonPointMethod(): void
@@ -27,8 +27,8 @@ class ServicePointValidatorTest extends TestCase
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $validator = new ServicePointValidator($scopeConfigStub);
 
+        $this->expectNotToPerformAssertions();
         $validator->validate(Carrier::CODE, 'courier_express', null);
-        $this->assertTrue(true);
     }
 
     public function testValidationPassesForEconomyWhenNearestModeConfigured(): void
@@ -37,8 +37,8 @@ class ServicePointValidatorTest extends TestCase
         $scopeConfigStub->method('getValue')->willReturn('nearest');
 
         $validator = new ServicePointValidator($scopeConfigStub);
+        $this->expectNotToPerformAssertions();
         $validator->validate(Carrier::CODE, 'economy', null);
-        $this->assertTrue(true);
     }
 
     public function testValidationThrowsExceptionWhenPointMissingForMapMode(): void
@@ -76,8 +76,8 @@ class ServicePointValidatorTest extends TestCase
         $validator = new ServicePointValidator($scopeConfigStub);
         $validPoint = new ServicePointValueObject('SAP123', 'Żabka');
 
+        $this->expectNotToPerformAssertions();
         $validator->validate(Carrier::CODE, 'economy', $validPoint);
-        $this->assertTrue(true);
     }
 
     public function testValidationThrowsExceptionForGermanPackstationWithoutPostnummer(): void
@@ -143,7 +143,7 @@ class ServicePointValidatorTest extends TestCase
             'DE'
         );
 
+        $this->expectNotToPerformAssertions();
         $validator->validate(Carrier::CODE, 'connect', $point);
-        $this->assertTrue(true);
     }
 }

@@ -64,7 +64,6 @@ class UpdateStatusShipmentTest extends TestCase
             ->willReturn(null);
 
         $this->shipmentRepositoryStub->method('getById')
-            ->with(10)
             ->willReturn($shipmentMock);
 
         $this->assertEmpty($this->button->getButtonData());
@@ -83,11 +82,9 @@ class UpdateStatusShipmentTest extends TestCase
             ->willReturn('1234567890');
 
         $this->shipmentRepositoryStub->method('getById')
-            ->with(10)
             ->willReturn($shipmentMock);
 
         $this->urlBuilderStub->method('getUrl')
-            ->with('ideo_dhl/shipment/updateStatus', ['entity_id' => 10, 'redirect_to_edit' => 1])
             ->willReturn('http://magento.local/admin/ideo_dhl/shipment/updateStatus/entity_id/10');
 
         $buttonData = $this->button->getButtonData();

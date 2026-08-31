@@ -86,6 +86,7 @@ class ShipmentDataValidatorTest extends TestCase
         $shipmentData = new DhlShipmentData();
 
         $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('Sender Name is required.');
         $this->validator->validate($shipmentData);
     }
 
@@ -122,6 +123,7 @@ class ShipmentDataValidatorTest extends TestCase
         );
 
         $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('Package #1 weight must be greater than zero.');
         $this->validator->validate($shipmentData);
     }
 
@@ -162,6 +164,7 @@ class ShipmentDataValidatorTest extends TestCase
         );
 
         $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('Only single-piece (1 package) shipments are allowed for ServicePoint, Return, or POP point deliveries.');
         $this->validator->validate($shipmentData);
     }
 
@@ -201,6 +204,7 @@ class ShipmentDataValidatorTest extends TestCase
         );
 
         $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('Non-standard (NST) packages are not allowed for ServicePoint, Return, or POP point deliveries.');
         $this->validator->validate($shipmentData);
     }
 
@@ -233,6 +237,7 @@ class ShipmentDataValidatorTest extends TestCase
         );
 
         $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('Insurance Value must be greater than zero when Insurance is selected.');
         $this->validator->validate($shipmentData);
     }
 
@@ -265,6 +270,7 @@ class ShipmentDataValidatorTest extends TestCase
         );
 
         $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('ROD Document Name is required when ROD is selected.');
         $this->validator->validate($shipmentData);
     }
 
