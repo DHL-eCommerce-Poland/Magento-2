@@ -35,6 +35,13 @@
         <filterSearch name="fulltext"/>
         <filters name="listing_filters"/>
         <massaction name="listing_massaction">
+            <action name="print_label">
+                <settings>
+                    <url path="ideo_dhl/shipment/massPrintLabel"/>
+                    <type>print_label</type>
+                    <label translate="true">Print Labels</label>
+                </settings>
+            </action>
             <action name="update_status">
                 <settings>
                     <url path="ideo_dhl/shipment/massUpdateStatus"/>

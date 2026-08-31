@@ -56,6 +56,15 @@ class ShipmentActions extends Column
                     ];
 
                     if (!empty($item['shipment_id'])) {
+                        $actions['print_label'] = [
+                            'href' => $this->urlBuilder->getUrl(
+                                'ideo_dhl/shipment/printLabel',
+                                ['entity_id' => $item['entity_id']]
+                            ),
+                            'label' => __('Print Label'),
+                            'target' => '_blank',
+                        ];
+
                         $actions['update_status'] = [
                             'href' => $this->urlBuilder->getUrl(
                                 self::URL_PATH_UPDATE_STATUS,

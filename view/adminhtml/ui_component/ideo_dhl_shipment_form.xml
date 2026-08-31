@@ -11,6 +11,7 @@
     <settings>
         <buttons>
             <button name="back" class="Ideo\Dhl\Block\Adminhtml\Button\Back"/>
+            <button name="print_label" class="Ideo\Dhl\Block\Adminhtml\Button\PrintLabel"/>
             <button name="track_shipment" class="Ideo\Dhl\Block\Adminhtml\Button\TrackShipment"/>
             <button name="update_status" class="Ideo\Dhl\Block\Adminhtml\Button\UpdateStatusShipment"/>
             <button name="book_courier" class="Ideo\Dhl\Block\Adminhtml\Button\BookCourierShipment"/>
