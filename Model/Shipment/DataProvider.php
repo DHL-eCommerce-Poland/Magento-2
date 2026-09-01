@@ -79,13 +79,15 @@ class DataProvider extends AbstractDataProvider
                             $status = (string)($item->getStatus() ?? '');
                             $createdAt = (string)($item->getCreatedAt() ?? '');
                             $dispatchNumber = (string)($item->getDispatchNumber() ?? '');
+                            $returnShipmentId = (string)($item->getReturnShipmentId() ?? '');
                             $data['shipmentSettings'] = $this->normalizeShipmentSettings(
                                 $payload['shipmentSettings'],
                                 $shipmentId,
                                 $status,
                                 $createdAt,
                                 $payload['sender'] ?? [],
-                                $dispatchNumber
+                                $dispatchNumber,
+                                $returnShipmentId
                             );
                             if (isset($payload['shipmentSettings']['packages']) && is_array($payload['shipmentSettings']['packages'])) {
                                 $data['packages'] = $this->normalizePackages($payload['shipmentSettings']['packages']);
@@ -155,6 +157,7 @@ class DataProvider extends AbstractDataProvider
      * @param string $createdAt
      * @param array $sender
      * @param string $dispatchNumber
+     * @param string $returnShipmentId
      *
      * @return array
      */
@@ -164,7 +167,8 @@ class DataProvider extends AbstractDataProvider
         string $status = '',
         string $createdAt = '',
         array $sender = [],
-        string $dispatchNumber = ''
+        string $dispatchNumber = '',
+        string $returnShipmentId = ''
     ): array {
         $settings['autoCreateReturnShipment'] = !empty($settings['autoCreateReturnShipment']) ? '1' : '0';
         if (empty($settings['shipmentId']) && !empty($shipmentId)) {
@@ -177,6 +181,11 @@ class DataProvider extends AbstractDataProvider
             $settings['dispatchNumber'] = $dispatchNumber;
         } else {
             $settings['dispatchNumber'] = null;
+        }
+        if (!empty($returnShipmentId)) {
+            $settings['returnShipmentId'] = $returnShipmentId;
+        } else {
+            $settings['returnShipmentId'] = null;
         }
         $today = date('Y-m-d');
         $rawDate = $settings['shipmentDate'] ?? $settings['dispatchDate'] ?? null;

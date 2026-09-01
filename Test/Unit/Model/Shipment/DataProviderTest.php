@@ -30,6 +30,8 @@ class DataProviderTest extends TestCase
         $shipmentDataModel->method('getStatus')->willReturn('CREATED');
         $shipmentDataModel->method('getShipmentData')->willReturn('{"sender":{"name":"Sender Co"}}');
 
+        $shipmentDataModel->method('getReturnShipmentId')->willReturn('RET554433');
+
         $collection->method('getItems')->willReturn([$shipmentDataModel]);
         $collectionFactory->method('create')->willReturn($collection);
 
@@ -58,6 +60,7 @@ class DataProviderTest extends TestCase
         $this->assertEquals('John', $data[42]['recipient']['firstName']);
         $this->assertEquals('AH', $data[42]['shipmentSettings']['serviceType']);
         $this->assertEquals('CREATED', $data[42]['shipmentSettings']['status']);
+        $this->assertEquals('RET554433', $data[42]['shipmentSettings']['returnShipmentId']);
         $this->assertEquals('1', $data[42]['specialServices']['insurance']);
         $this->assertCount(1, $data[42]['packages']);
     }

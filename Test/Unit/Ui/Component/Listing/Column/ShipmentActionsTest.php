@@ -18,11 +18,12 @@ class ShipmentActionsTest extends TestCase
         $uiComponentFactory = $this->createStub(UiComponentFactory::class);
         $urlBuilder = $this->createMock(UrlInterface::class);
 
-        $urlBuilder->expects($this->exactly(7))
+        $urlBuilder->expects($this->exactly(8))
             ->method('getUrl')
             ->willReturnMap([
                 ['ideo_dhl/shipment/edit', ['entity_id' => 10], 'http://example.com/dhl/shipment/edit/entity_id/10'],
                 ['ideo_dhl/shipment/printLabel', ['entity_id' => 10], 'http://example.com/dhl/shipment/printLabel/entity_id/10'],
+                ['ideo_dhl/shipment/createReturnShipment', ['entity_id' => 10], 'http://example.com/dhl/shipment/createReturnShipment/entity_id/10'],
                 ['ideo_dhl/shipment/downloadScan', ['entity_id' => 10], 'http://example.com/dhl/shipment/downloadScan/entity_id/10'],
                 ['ideo_dhl/shipment/downloadEpod', ['entity_id' => 10], 'http://example.com/dhl/shipment/downloadEpod/entity_id/10'],
                 ['ideo_dhl/shipment/updateStatus', ['entity_id' => 10], 'http://example.com/dhl/shipment/updateStatus/entity_id/10'],
@@ -61,6 +62,9 @@ class ShipmentActionsTest extends TestCase
         $this->assertEquals('http://example.com/dhl/shipment/printLabel/entity_id/10', $actions['print_label']['href']);
         $this->assertEquals('Print Label', (string)$actions['print_label']['label']);
 
+        $this->assertEquals('http://example.com/dhl/shipment/createReturnShipment/entity_id/10', $actions['create_return']['href']);
+        $this->assertEquals('Create Return Shipment', (string)$actions['create_return']['label']);
+
         $this->assertEquals('http://example.com/dhl/shipment/downloadScan/entity_id/10', $actions['download_scan']['href']);
         $this->assertEquals('Download Scan', (string)$actions['download_scan']['label']);
 
@@ -80,11 +84,12 @@ class ShipmentActionsTest extends TestCase
         $uiComponentFactory = $this->createStub(UiComponentFactory::class);
         $urlBuilder = $this->createMock(UrlInterface::class);
 
-        $urlBuilder->expects($this->exactly(6))
+        $urlBuilder->expects($this->exactly(7))
             ->method('getUrl')
             ->willReturnMap([
                 ['ideo_dhl/shipment/edit', ['entity_id' => 15], 'http://example.com/dhl/shipment/edit/entity_id/15'],
                 ['ideo_dhl/shipment/printLabel', ['entity_id' => 15], 'http://example.com/dhl/shipment/printLabel/entity_id/15'],
+                ['ideo_dhl/shipment/createReturnShipment', ['entity_id' => 15], 'http://example.com/dhl/shipment/createReturnShipment/entity_id/15'],
                 ['ideo_dhl/shipment/downloadScan', ['entity_id' => 15], 'http://example.com/dhl/shipment/downloadScan/entity_id/15'],
                 ['ideo_dhl/shipment/downloadEpod', ['entity_id' => 15], 'http://example.com/dhl/shipment/downloadEpod/entity_id/15'],
                 ['ideo_dhl/shipment/updateStatus', ['entity_id' => 15], 'http://example.com/dhl/shipment/updateStatus/entity_id/15'],
@@ -119,5 +124,49 @@ class ShipmentActionsTest extends TestCase
         $this->assertArrayHasKey('download_epod', $actions);
         $this->assertArrayHasKey('delete', $actions);
         $this->assertArrayNotHasKey('view_order', $actions);
+    }
+
+    public function testPrepareDataSourceWithReturnShipmentIdHidesCreateReturnAction(): void
+    {
+        $context = $this->createStub(ContextInterface::class);
+        $uiComponentFactory = $this->createStub(UiComponentFactory::class);
+        $urlBuilder = $this->createMock(UrlInterface::class);
+
+        $urlBuilder->expects($this->exactly(6))
+            ->method('getUrl')
+            ->willReturnMap([
+                ['ideo_dhl/shipment/edit', ['entity_id' => 20], 'http://example.com/dhl/shipment/edit/entity_id/20'],
+                ['ideo_dhl/shipment/printLabel', ['entity_id' => 20], 'http://example.com/dhl/shipment/printLabel/entity_id/20'],
+                ['ideo_dhl/shipment/downloadScan', ['entity_id' => 20], 'http://example.com/dhl/shipment/downloadScan/entity_id/20'],
+                ['ideo_dhl/shipment/downloadEpod', ['entity_id' => 20], 'http://example.com/dhl/shipment/downloadEpod/entity_id/20'],
+                ['ideo_dhl/shipment/updateStatus', ['entity_id' => 20], 'http://example.com/dhl/shipment/updateStatus/entity_id/20'],
+                ['ideo_dhl/shipment/delete', ['entity_id' => 20], 'http://example.com/dhl/shipment/delete/entity_id/20'],
+            ]);
+
+        $actionColumn = new ShipmentActions(
+            $context,
+            $uiComponentFactory,
+            $urlBuilder,
+            [],
+            ['name' => 'actions']
+        );
+
+        $dataSource = [
+            'data' => [
+                'items' => [
+                    [
+                        'entity_id' => 20,
+                        'shipment_id' => '123456789',
+                        'return_shipment_id' => 'RET987654',
+                    ],
+                ],
+            ],
+        ];
+
+        $result = $actionColumn->prepareDataSource($dataSource);
+
+        $actions = $result['data']['items'][0]['actions'];
+        $this->assertArrayHasKey('edit', $actions);
+        $this->assertArrayNotHasKey('create_return', $actions);
     }
 }

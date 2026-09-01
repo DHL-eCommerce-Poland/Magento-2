@@ -158,4 +158,19 @@ interface ClientInterface
         string $date,
         string $typePackage
     ): GetPnpResult;
+
+    /**
+     * Create return shipment via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param array $returnShipmentFullData
+     * @param int|null $orderId Optional Magento order ID for diagnostic logging context
+     *
+     * @return CreateShipmentReturnResult
+     */
+    public function createShipmentReturn(
+        Credentials $credentials,
+        array $returnShipmentFullData,
+        ?int $orderId = null
+    ): CreateShipmentReturnResult;
 }

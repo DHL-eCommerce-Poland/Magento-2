@@ -89,6 +89,29 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
     }
 
     /**
+     * Get DHL return shipment ID / waybill.
+     *
+     * @return string|null
+     */
+    public function getReturnShipmentId(): ?string
+    {
+        $val = $this->getData(self::RETURN_SHIPMENT_ID);
+        return $val !== null ? (string)$val : null;
+    }
+
+    /**
+     * Set DHL return shipment ID / waybill.
+     *
+     * @param string|null $returnShipmentId
+     *
+     * @return $this
+     */
+    public function setReturnShipmentId(?string $returnShipmentId): static
+    {
+        return $this->setData(self::RETURN_SHIPMENT_ID, $returnShipmentId);
+    }
+
+    /**
      * Get DHL courier order / dispatch number.
      *
      * @return string|null

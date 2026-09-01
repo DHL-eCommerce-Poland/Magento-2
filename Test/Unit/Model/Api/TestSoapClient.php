@@ -234,6 +234,32 @@ class TestSoapClient extends SoapClient
     }
 
     /**
+     * Dummy createShipmentReturn method for SoapClient mocking.
+     *
+     * @param mixed $args
+     *
+     * @return mixed
+     * @throws SoapFault
+     */
+    public function createShipmentReturn(mixed $args): mixed
+    {
+        if ($this->shouldThrowFault) {
+            throw new SoapFault('RETURN_ERR', 'Error creating return shipment');
+        }
+
+        return (object) [
+            'createShipmentReturnResult' => (object) [
+                'shipmentNotificationNumber' => 'RET987654321',
+                'waybill' => 'RET987654321',
+                'label' => (object) [
+                    'labelContent' => base64_encode('%PDF-1.4 Return Label Data'),
+                    'labelMimeType' => 'application/pdf',
+                ],
+            ],
+        ];
+    }
+
+    /**
      * Dummy __getLastRequest method.
      *
      * @return string

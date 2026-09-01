@@ -12,6 +12,7 @@ use Magento\Ui\Component\Listing\Columns\Column;
 class ShipmentActions extends Column
 {
     private const URL_PATH_EDIT = 'ideo_dhl/shipment/edit';
+    private const URL_PATH_CREATE_RETURN = 'ideo_dhl/shipment/createReturnShipment';
     private const URL_PATH_UPDATE_STATUS = 'ideo_dhl/shipment/updateStatus';
     private const URL_PATH_DELETE = 'ideo_dhl/shipment/delete';
     private const URL_PATH_VIEW_ORDER = 'sales/order/view';
@@ -64,6 +65,23 @@ class ShipmentActions extends Column
                             'label' => __('Print Label'),
                             'target' => '_blank',
                         ];
+
+                        if (empty($item['return_shipment_id'])) {
+                            $actions['create_return'] = [
+                                'href' => $this->urlBuilder->getUrl(
+                                    self::URL_PATH_CREATE_RETURN,
+                                    ['entity_id' => $item['entity_id']]
+                                ),
+                                'label' => __('Create Return Shipment'),
+                                'confirm' => [
+                                    'title' => __('Create Return Shipment'),
+                                    'message' => __(
+                                        'Are you sure you want to create a return shipment for this parcel?'
+                                    ),
+                                ],
+                                'post' => true,
+                            ];
+                        }
 
                         $actions['download_scan'] = [
                             'href' => $this->urlBuilder->getUrl(

@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\Config\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
+use Magento\Framework\View\Element\Block\ArgumentInterface;
 
-class PnpPackageType implements OptionSourceInterface
+class PnpPackageType implements OptionSourceInterface, ArgumentInterface
 {
     public const TYPE_EX = 'EX';
     public const TYPE_DR = 'DR';

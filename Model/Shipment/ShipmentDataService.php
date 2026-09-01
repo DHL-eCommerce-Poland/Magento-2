@@ -68,10 +68,23 @@ class ShipmentDataService
     public function loadShipmentData(int $entityId): DhlShipmentData
     {
         $entity = $this->shipmentDataRepository->getById($entityId);
+        return $this->loadShipmentDataFromEntity($entity);
+    }
+
+    /**
+     * Load DhlShipmentData DTO from a ShipmentDataInterface entity.
+     *
+     * @param ShipmentDataInterface $entity
+     *
+     * @return DhlShipmentData
+     * @throws LocalizedException
+     */
+    public function loadShipmentDataFromEntity(ShipmentDataInterface $entity): DhlShipmentData
+    {
         $payload = $entity->getShipmentData();
 
         if (empty($payload)) {
-            throw new LocalizedException(__('Shipment data payload is empty for entity #%1.', $entityId));
+            throw new LocalizedException(__('Shipment data payload is empty for entity #%1.', $entity->getEntityId()));
         }
 
         try {
@@ -81,7 +94,7 @@ class ShipmentDataService
         }
 
         if (!is_array($dataArr)) {
-            throw new LocalizedException(__('Invalid JSON shipment payload for entity #%1.', $entityId));
+            throw new LocalizedException(__('Invalid JSON shipment payload for entity #%1.', $entity->getEntityId()));
         }
 
         return DhlShipmentData::fromArray($dataArr);
@@ -175,6 +188,7 @@ class ShipmentDataService
      * @param string|null $presetSenderId
      * @param string|null $presetShipmentId
      * @param string|null $shipmentId
+     * @param string|null $returnShipmentId
      *
      * @return ShipmentDataInterface
      * @throws LocalizedException
@@ -186,7 +200,8 @@ class ShipmentDataService
         ?string $errorMessages = null,
         ?string $presetSenderId = null,
         ?string $presetShipmentId = null,
-        ?string $shipmentId = null
+        ?string $shipmentId = null,
+        ?string $returnShipmentId = null
     ): ShipmentDataInterface {
         $this->validator->validate($shipmentData);
 
@@ -197,17 +212,39 @@ class ShipmentDataService
         if ($shipmentId !== null && trim($shipmentId) !== '') {
             $payloadArr['shipmentId'] = (string)$shipmentId;
         }
+        if ($returnShipmentId !== null && trim($returnShipmentId) !== '') {
+            $payloadArr['returnShipmentId'] = (string)$returnShipmentId;
+        }
 
         $entity->setOrderId($orderId);
         $entity->setStatus($status);
         if ($shipmentId !== null && trim($shipmentId) !== '') {
             $entity->setShipmentId($shipmentId);
         }
+        if ($returnShipmentId !== null && trim($returnShipmentId) !== '') {
+            $entity->setReturnShipmentId($returnShipmentId);
+        }
         $entity->setPresetSenderId($presetSenderId);
         $entity->setPresetShipmentId($presetShipmentId);
         $entity->setShipmentData($this->serializer->serialize($payloadArr));
         $entity->setErrorMessages($errorMessages);
 
+        return $this->shipmentDataRepository->save($entity);
+    }
+
+    /**
+     * Update return shipment ID for an existing shipment entity in DB.
+     *
+     * @param int $entityId
+     * @param string $returnShipmentId
+     *
+     * @return ShipmentDataInterface
+     * @throws LocalizedException
+     */
+    public function updateReturnShipmentId(int $entityId, string $returnShipmentId): ShipmentDataInterface
+    {
+        $entity = $this->shipmentDataRepository->getById($entityId);
+        $entity->setReturnShipmentId($returnShipmentId);
         return $this->shipmentDataRepository->save($entity);
     }
 

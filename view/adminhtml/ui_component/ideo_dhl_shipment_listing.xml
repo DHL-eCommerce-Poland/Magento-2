@@ -116,6 +116,12 @@
                 <label translate="true">Shipment ID</label>
             </settings>
         </column>
+        <column name="return_shipment_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Return Shipment ID</label>
+            </settings>
+        </column>
         <column name="dispatch_number">
             <settings>
                 <filter>text</filter>

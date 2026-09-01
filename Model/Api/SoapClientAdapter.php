@@ -1065,6 +1065,11 @@ class SoapClientAdapter implements ClientInterface
         $context = stream_context_create([
             'http' => [
                 'header' => 'DHLApiOrgin: ' . $apiOrigin,
+                'user_agent' => 'PHP-SOAP/' . PHP_VERSION . ' (Magento 2 Ideo_Dhl)',
+            ],
+            'ssl' => [
+                'verify_peer' => true,
+                'verify_peer_name' => true,
             ],
         ]);
 
@@ -1079,7 +1084,11 @@ class SoapClientAdapter implements ClientInterface
             'encoding' => 'UTF-8',
         ];
 
-        return new SoapClient($wsdlUrl, $options);
+        $finalWsdlUrl = !str_contains($wsdlUrl, '?wsdl') && !str_starts_with($wsdlUrl, 'http://localhost')
+            ? $wsdlUrl . '?wsdl'
+            : $wsdlUrl;
+
+        return new SoapClient($finalWsdlUrl, $options);
     }
 
     /**
@@ -1169,6 +1178,136 @@ class SoapClientAdapter implements ClientInterface
             $this->logger->info(sprintf('[DHL SOAP Response - %s] %s', $action, $responseXml));
         } catch (Throwable $e) {
             $this->logger->warning('Failed to log SOAP communication: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Create return shipment via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param array $returnShipmentFullData
+     * @param int|null $orderId Optional Magento order ID for diagnostic logging context
+     *
+     * @return CreateShipmentReturnResult
+     */
+    public function createShipmentReturn(
+        Credentials $credentials,
+        array $returnShipmentFullData,
+        ?int $orderId = null
+    ): CreateShipmentReturnResult {
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $orderContext = $orderId !== null ? sprintf(' (Order #%d)', $orderId) : '';
+
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
+
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+                'shipment' => $returnShipmentFullData,
+            ];
+
+            $response = $client->createShipmentReturn($params);
+            $this->logSoapCommunication($client, 'createShipmentReturn' . $orderContext);
+
+            $result = $response->createShipmentReturnResult->item ?? $response->createShipmentReturnResult ?? null;
+            if (is_array($result)) {
+                $result = $result[0] ?? null;
+            }
+
+            if (is_object($result)) {
+                if (!empty($result->error)) {
+                    return new CreateShipmentReturnResult(
+                        false,
+                        false,
+                        null,
+                        null,
+                        null,
+                        null,
+                        'CREATE_RETURN_ERROR',
+                        (string) $result->error
+                    );
+                }
+
+                $shipmentId = !empty($result->shipmentNotificationNumber)
+                    ? (string) $result->shipmentNotificationNumber
+                    : (!empty($result->shipmentIdentification)
+                        ? (string) $result->shipmentIdentification
+                        : (!empty($result->shipmentId) ? (string) $result->shipmentId : null));
+
+                $waybill = !empty($result->waybill) ? (string) $result->waybill : $shipmentId;
+
+                $labelData = null;
+                $labelMimeType = null;
+
+                if (!empty($result->label)) {
+                    $labelObj = $result->label;
+                    if (!empty($labelObj->labelContent)) {
+                        $labelData = base64_decode((string) $labelObj->labelContent);
+                    }
+                    if (!empty($labelObj->labelMimeType)) {
+                        $labelMimeType = (string) $labelObj->labelMimeType;
+                    }
+                }
+
+                if (!empty($shipmentId)) {
+                    return new CreateShipmentReturnResult(
+                        true,
+                        false,
+                        $shipmentId,
+                        $waybill,
+                        $labelData,
+                        $labelMimeType
+                    );
+                }
+            }
+
+            $errorMsg = is_object($result) && !empty($result->error)
+                ? (string) $result->error
+                : 'DHL API returned an invalid response structure for createShipmentReturn.';
+
+            return new CreateShipmentReturnResult(false, false, null, null, null, null, 'CREATE_RETURN_ERROR', $errorMsg);
+        } catch (SoapFault $fault) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] SoapFault during createShipmentReturn%s: [%s] %s',
+                $orderContext,
+                $fault->faultcode ?? 'FAULT',
+                $fault->getMessage()
+            ));
+
+            $isTimeout = $this->isTimeoutException($fault);
+
+            return new CreateShipmentReturnResult(
+                false,
+                $isTimeout,
+                null,
+                null,
+                null,
+                null,
+                $fault->faultcode ?? 'SOAP_FAULT',
+                'DHL API error: ' . $fault->getMessage()
+            );
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] Exception during createShipmentReturn%s: %s',
+                $orderContext,
+                $e->getMessage()
+            ));
+
+            $isTimeout = $this->isTimeoutException($e);
+
+            return new CreateShipmentReturnResult(
+                false,
+                $isTimeout,
+                null,
+                null,
+                null,
+                null,
+                'CONNECTION_ERROR',
+                'An error occurred while connecting to DHL: ' . $e->getMessage()
+            );
         }
     }
 }
