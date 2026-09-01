@@ -125,7 +125,7 @@
         <column name="dispatch_number">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Courier Dispatch No.</label>
+                <label translate="true">Courier Dispatch ID</label>
             </settings>
         </column>
         <column name="status">

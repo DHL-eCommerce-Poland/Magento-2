@@ -374,7 +374,7 @@
         <field name="shipmentSettings[dispatchNumber]" formElement="input">
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Courier Dispatch No.</label>
+                <label translate="true">Courier Dispatch ID</label>
                 <dataScope>shipmentSettings.dispatchNumber</dataScope>
                 <disabled>true</disabled>
                 <imports>
