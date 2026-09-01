@@ -86,7 +86,7 @@
         <column name="sap_number">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Numer SAP</label>
+                <label translate="true">SAP Number</label>
             </settings>
         </column>
         <column name="sender_name">

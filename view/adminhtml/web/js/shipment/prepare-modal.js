@@ -569,7 +569,7 @@ define([
                                     }).done(function (saveRes) {
                                         if (saveRes.success) {
                                             selfModal.closeModal();
-                                            var successMsg = saveRes.message || ($.mage.__('Przesyłka DHL o numerze %1 została pomyślnie utworzona.').replace('%1', saveRes.shipmentId || ''));
+                                            var successMsg = saveRes.message || ($.mage.__('DHL shipment %1 has been created successfully.').replace('%1', saveRes.shipmentId || ''));
                                             showAdminMessage('success', successMsg);
                                             setTimeout(function () {
                                                 window.location.reload();

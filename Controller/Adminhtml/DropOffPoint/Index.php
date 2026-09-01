@@ -34,7 +34,7 @@ class Index extends Action implements HttpGetActionInterface
     {
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('Ideo_Dhl::drop_off_point');
-        $resultPage->getConfig()->getTitle()->prepend(__('DHL Drop-Off Points'));
+        $resultPage->getConfig()->getTitle()->prepend(__('Drop-Off Points'));
         return $resultPage;
     }
 }
