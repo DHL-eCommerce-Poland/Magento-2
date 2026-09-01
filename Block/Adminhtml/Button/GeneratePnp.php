@@ -16,7 +16,7 @@ class GeneratePnp extends Generic implements ButtonProviderInterface
     public function getButtonData(): array
     {
         return [
-            'label' => __('Generate Courier Report (PnP)'),
+            'label' => __('Generate PNP Report'),
             'class' => 'action-secondary',
             'on_click' => "require(['jquery'], function($) {
                 var modal = $('#ideo-dhl-pnp-modal');
