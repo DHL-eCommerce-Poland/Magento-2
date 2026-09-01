@@ -6,6 +6,11 @@
         <referenceContainer name="content">
             <uiComponent name="ideo_dhl_shipment_listing"/>
             <block name="ideo_dhl_book_courier_modal" template="Ideo_Dhl::shipment/book_courier_modal.phtml"/>
+            <block name="ideo_dhl_pnp_modal" template="Ideo_Dhl::shipment/pnp_modal.phtml">
+                <arguments>
+                    <argument name="pnp_package_type_source" xsi:type="object">Ideo\Dhl\Model\Config\Source\PnpPackageType</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>

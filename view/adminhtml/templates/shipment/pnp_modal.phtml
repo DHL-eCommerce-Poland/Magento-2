@@ -1,0 +1,61 @@
+<?php
+
+declare(strict_types=1);
+
+use Ideo\Dhl\Model\Config\Source\PnpPackageType;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+
+$generateUrl = $block->getUrl('ideo_dhl/shipment/generatePnpReport');
+$todayDate = date('Y-m-d');
+
+/** @var PnpPackageType $pnpPackageTypeSource */
+$pnpPackageTypeSource = $block->getData('pnp_package_type_source') ?? new PnpPackageType();
+$packageTypeOptions = $pnpPackageTypeSource->toOptionArray();
+?>
+<div id="ideo-dhl-pnp-modal" style="display: none;" data-bind="scope: 'dhlPnpModal'">
+    <form id="ideo-dhl-pnp-form" action="<?= $escaper->escapeUrl($generateUrl) ?>" method="post">
+        <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>" />
+        <div class="admin__fieldset" style="margin-bottom: 0;">
+
+            <div class="admin__field required">
+                <label class="admin__field-label" for="pnp_date"><span><?= $escaper->escapeHtml(__('Date')) ?></span></label>
+                <div class="admin__field-control">
+                    <input type="date" id="pnp_date" name="pnp[date]" class="admin__control-text" value="<?= $escaper->escapeHtmlAttr($todayDate) ?>" style="width: 200px;" required />
+                </div>
+            </div>
+
+            <div class="form-group row admin__field required">
+                <label class="form-control-label required admin__field-label" for="pnp_typePackage"><span><?= $escaper->escapeHtml(__('Package Type')) ?></span></label>
+                <div class="col-sm admin__field-control">
+                    <select id="pnp_typePackage" name="pnp[typePackage]" class="custom-select admin__control-select" aria-label="pnp_typePackage input" style="width: 320px;">
+                        <?php foreach ($packageTypeOptions as $option): ?>
+                            <option value="<?= $escaper->escapeHtmlAttr($option['value']) ?>"<?= $option['value'] === PnpPackageType::TYPE_ALL ? ' selected="selected"' : '' ?>>
+                                <?= $escaper->escapeHtml($option['label']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script type="text/x-magento-init">
+{
+    "#ideo-dhl-pnp-modal": {
+        "Magento_Ui/js/core/app": {
+            "components": {
+                "dhlPnpModal": {
+                    "component": "Ideo_Dhl/js/shipment/pnp-modal",
+                    "generateUrl": "<?= $escaper->escapeUrl($generateUrl) ?>"
+                }
+            }
+        }
+    }
+}
+</script>

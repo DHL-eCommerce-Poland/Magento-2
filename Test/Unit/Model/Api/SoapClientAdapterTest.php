@@ -379,4 +379,57 @@ class SoapClientAdapterTest extends TestCase
         $this->assertEquals('TRACK_ERR', $result->getErrorCode());
         $this->assertStringContainsString('Error fetching tracking info', (string) $result->getErrorMessage());
     }
+
+    /**
+     * Test getPnp success.
+     *
+     * @return void
+     */
+    public function testGetPnpSuccess(): void
+    {
+        $soapClientStub = new TestSoapClient();
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->getPnp($credentials, '2026-09-01', 'ALL');
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals('dummy_pnp_pdf_content', $result->getFileData());
+        $this->assertEquals('PNP_2026-09-01.pdf', $result->getFileName());
+        $this->assertEquals('application/pdf', $result->getMimeType());
+    }
+
+    /**
+     * Test getPnp with SoapFault failure.
+     *
+     * @return void
+     */
+    public function testGetPnpFault(): void
+    {
+        $soapClientStub = new TestSoapClient(true);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->getPnp($credentials, '2026-09-01', 'ALL');
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertEquals('PNP_ERR', $result->getErrorCode());
+        $this->assertStringContainsString('Error fetching PNP report', (string) $result->getErrorMessage());
+    }
 }

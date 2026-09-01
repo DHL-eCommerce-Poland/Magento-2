@@ -212,6 +212,28 @@ class TestSoapClient extends SoapClient
     }
 
     /**
+     * Dummy getPnp method for SoapClient mocking.
+     *
+     * @param mixed $args
+     * @return mixed
+     * @throws SoapFault
+     */
+    public function getPnp(mixed $args): mixed
+    {
+        if ($this->shouldThrowFault) {
+            throw new SoapFault('PNP_ERR', 'Error fetching PNP report');
+        }
+
+        return (object) [
+            'getPnpResult' => (object) [
+                'fileName' => 'PNP_2026-09-01.pdf',
+                'fileData' => base64_encode('dummy_pnp_pdf_content'),
+                'fileMimeType' => 'application/pdf',
+            ],
+        ];
+    }
+
+    /**
      * Dummy __getLastRequest method.
      *
      * @return string

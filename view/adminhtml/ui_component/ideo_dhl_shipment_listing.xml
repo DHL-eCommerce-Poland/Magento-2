@@ -7,6 +7,9 @@
         </item>
     </argument>
     <settings>
+        <buttons>
+            <button name="generate_pnp" class="Ideo\Dhl\Block\Adminhtml\Button\GeneratePnp"/>
+        </buttons>
         <spinner>ideo_dhl_shipment_columns</spinner>
         <deps>
             <dep>ideo_dhl_shipment_listing.ideo_dhl_shipment_listing_data_source</dep>

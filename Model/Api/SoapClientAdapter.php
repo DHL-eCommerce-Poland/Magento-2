@@ -952,6 +952,87 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
+     * Get courier confirmation report (PnP) via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string $date Format YYYY-MM-DD
+     * @param string $typePackage EX, DR, ALL, 2EUROPE, PR
+     *
+     * @return GetPnpResult
+     */
+    public function getPnp(
+        Credentials $credentials,
+        string $date,
+        string $typePackage
+    ): GetPnpResult {
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
+
+            $params = [
+                'pnpRequest' => [
+                    'authData' => [
+                        'username' => $this->ensureUtf8($credentials->getUsername()),
+                        'password' => $this->ensureUtf8($credentials->getPassword()),
+                    ],
+                    'date' => $this->ensureUtf8($date),
+                    'type' => $this->ensureUtf8($typePackage),
+                ],
+            ];
+
+            $response = $client->getPnp($params);
+            $this->logSoapCommunication($client, 'getPnp');
+
+            $pnpResult = $response->getPnpResult ?? null;
+
+            if ($pnpResult === null) {
+                return new GetPnpResult(false, null, null, null, 'INVALID_RESPONSE', 'DHL WebAPI2 returned invalid response for getPnp.');
+            }
+
+            $rawBase64 = (string) ($pnpResult->fileData ?? $pnpResult->labelData ?? '');
+            $fileData = !empty($rawBase64) ? base64_decode($rawBase64) : null;
+            $fileName = (string) ($pnpResult->fileName ?? sprintf('PNP_%s.pdf', $date));
+            $mimeType = (string) ($pnpResult->fileMimeType ?? 'application/pdf');
+
+            if (empty($fileData)) {
+                return new GetPnpResult(false, null, null, null, 'EMPTY_PNP', 'DHL WebAPI2 returned no PnP report data for date ' . $date);
+            }
+
+            return new GetPnpResult(true, $fileData, $fileName, $mimeType);
+        } catch (SoapFault $fault) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] SoapFault during getPnp: [%s] %s',
+                $fault->faultcode ?? 'FAULT',
+                $fault->getMessage()
+            ));
+
+            return new GetPnpResult(
+                false,
+                null,
+                null,
+                null,
+                $fault->faultcode ?? 'SOAP_FAULT',
+                $fault->getMessage()
+            );
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] Exception during getPnp: %s',
+                $e->getMessage()
+            ));
+
+            return new GetPnpResult(
+                false,
+                null,
+                null,
+                null,
+                'CONNECTION_ERROR',
+                'An error occurred while connecting to DHL: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
      * Create SoapClient instance with custom timeout, DHLApiOrgin header and WSDL caching rules.
      *
      * @param string $wsdlUrl

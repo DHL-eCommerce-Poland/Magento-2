@@ -143,4 +143,19 @@ interface ClientInterface
         Credentials $credentials,
         string $shipmentId
     ): GetEpodResult;
+
+    /**
+     * Get courier confirmation report (PnP) via DHL WebAPI2 API.
+     *
+     * @param Credentials $credentials
+     * @param string $date Format YYYY-MM-DD
+     * @param string $typePackage EX, DR, ALL, 2EUROPE, PR
+     *
+     * @return GetPnpResult
+     */
+    public function getPnp(
+        Credentials $credentials,
+        string $date,
+        string $typePackage
+    ): GetPnpResult;
 }
