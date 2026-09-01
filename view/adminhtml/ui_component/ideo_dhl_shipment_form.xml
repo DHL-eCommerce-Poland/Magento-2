@@ -17,6 +17,8 @@
             <button name="track_shipment" class="Ideo\Dhl\Block\Adminhtml\Button\TrackShipment"/>
             <button name="update_status" class="Ideo\Dhl\Block\Adminhtml\Button\UpdateStatusShipment"/>
             <button name="create_return" class="Ideo\Dhl\Block\Adminhtml\Button\CreateReturnShipment"/>
+            <button name="print_return_label" class="Ideo\Dhl\Block\Adminhtml\Button\PrintReturnLabel"/>
+            <button name="print_return_qr" class="Ideo\Dhl\Block\Adminhtml\Button\PrintReturnQrCode"/>
             <button name="book_courier" class="Ideo\Dhl\Block\Adminhtml\Button\BookCourierShipment"/>
             <button name="cancel_courier" class="Ideo\Dhl\Block\Adminhtml\Button\CancelCourierShipment"/>
             <button name="recreate" class="Ideo\Dhl\Block\Adminhtml\Button\RecreateShipment"/>

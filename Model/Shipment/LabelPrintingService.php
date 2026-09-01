@@ -129,6 +129,173 @@ class LabelPrintingService
     }
 
     /**
+     * Get return label PDF/binary content for given shipment entity IDs.
+     *
+     * @param int[] $entityIds Array of Magento DHL shipment entity IDs
+     * @param string|null $overrideLabelType Optional explicit label type override
+     *
+     * @return array{content: string, mimeType: string, filename: string}
+     * @throws LocalizedException
+     */
+    public function getReturnLabelContent(array $entityIds, ?string $overrideLabelType = null): array
+    {
+        $entityIds = array_values(array_unique(array_filter(array_map('intval', $entityIds))));
+        if (empty($entityIds)) {
+            throw new LocalizedException(__('No shipments selected for return label printing.'));
+        }
+
+        $defaultConfigLabelType = (string) $this->scopeConfig->getValue(self::XML_PATH_DEFAULT_LABEL_TYPE) ?: 'BLP';
+        $itemsToPrint = [];
+
+        foreach ($entityIds as $id) {
+            try {
+                $shipment = $this->shipmentDataRepository->getById($id);
+                $returnShipmentId = $shipment->getReturnShipmentId();
+                if (empty($returnShipmentId)) {
+                    continue;
+                }
+
+                $labelType = $overrideLabelType;
+                if (empty($labelType)) {
+                    $rawPayload = $shipment->getShipmentData();
+                    if (!empty($rawPayload) && is_string($rawPayload)) {
+                        try {
+                            $payload = (array) json_decode($rawPayload, true);
+                            if (!empty($payload['labelType'])) {
+                                $labelType = (string) $payload['labelType'];
+                            }
+                        } catch (Throwable) {
+                            $labelType = null;
+                        }
+                    }
+                }
+
+                $itemsToPrint[] = [
+                    'shipmentId' => (string) $returnShipmentId,
+                    'labelType' => $labelType ?: $defaultConfigLabelType,
+                ];
+            } catch (Throwable $e) {
+                $this->logger?->warning(sprintf(
+                    '[LabelPrintingService] Could not load shipment entity #%d for return label: %s',
+                    $id,
+                    $e->getMessage()
+                ));
+            }
+        }
+
+        if (empty($itemsToPrint)) {
+            throw new LocalizedException(
+                __('None of the selected shipments have valid DHL return shipment IDs.')
+            );
+        }
+
+        $isSandbox = (bool) $this->scopeConfig->getValue(self::XML_PATH_SANDBOX);
+        $environment = $isSandbox ? 'sandbox' : 'production';
+        $credentials = $this->credentialsProvider->getCredentials($environment);
+
+        $result = $this->client->getLabels($credentials, $itemsToPrint);
+
+        if (!$result->isSuccess()) {
+            throw new LocalizedException(
+                __('Failed to retrieve return labels from DHL: %1', $result->getErrorMessage() ?? __('Unknown API error'))
+            );
+        }
+
+        $items = $result->getItems();
+        if (empty($items)) {
+            throw new LocalizedException(__('No return label data returned by DHL.'));
+        }
+
+        if (count($items) === 1) {
+            $single = $items[0];
+            $ext = str_contains($single['mimeType'], 'pdf') ? 'pdf' : 'txt';
+            return [
+                'content' => $single['labelData'],
+                'mimeType' => $single['mimeType'],
+                'filename' => sprintf('dhl_return_label_%s.%s', $single['shipmentId'], $ext),
+            ];
+        }
+
+        return $this->combineLabels($items);
+    }
+
+    /**
+     * Get return QR code PDF/binary content for given shipment entity IDs.
+     *
+     * @param int[] $entityIds Array of Magento DHL shipment entity IDs
+     * @param string|null $overrideLabelType Defaults to 'QR_PDF'
+     *
+     * @return array{content: string, mimeType: string, filename: string}
+     * @throws LocalizedException
+     */
+    public function getReturnQrCodeContent(array $entityIds, ?string $overrideLabelType = 'QR_PDF'): array
+    {
+        $entityIds = array_values(array_unique(array_filter(array_map('intval', $entityIds))));
+        if (empty($entityIds)) {
+            throw new LocalizedException(__('No shipments selected for return QR code printing.'));
+        }
+
+        $qrLabelType = $overrideLabelType ?: 'QR_PDF';
+        $itemsToPrint = [];
+
+        foreach ($entityIds as $id) {
+            try {
+                $shipment = $this->shipmentDataRepository->getById($id);
+                $returnShipmentId = $shipment->getReturnShipmentId();
+                if (empty($returnShipmentId)) {
+                    continue;
+                }
+
+                $itemsToPrint[] = [
+                    'shipmentId' => (string) $returnShipmentId,
+                    'labelType' => $qrLabelType,
+                ];
+            } catch (Throwable $e) {
+                $this->logger?->warning(sprintf(
+                    '[LabelPrintingService] Could not load shipment entity #%d for return QR code: %s',
+                    $id,
+                    $e->getMessage()
+                ));
+            }
+        }
+
+        if (empty($itemsToPrint)) {
+            throw new LocalizedException(
+                __('None of the selected shipments have valid DHL return shipment IDs.')
+            );
+        }
+
+        $isSandbox = (bool) $this->scopeConfig->getValue(self::XML_PATH_SANDBOX);
+        $environment = $isSandbox ? 'sandbox' : 'production';
+        $credentials = $this->credentialsProvider->getCredentials($environment);
+
+        $result = $this->client->getLabels($credentials, $itemsToPrint);
+
+        if (!$result->isSuccess()) {
+            throw new LocalizedException(
+                __('Failed to retrieve return QR code from DHL: %1', $result->getErrorMessage() ?? __('Unknown API error'))
+            );
+        }
+
+        $items = $result->getItems();
+        if (empty($items)) {
+            throw new LocalizedException(__('No return QR code data returned by DHL.'));
+        }
+
+        if (count($items) === 1) {
+            $single = $items[0];
+            $ext = str_contains($single['mimeType'], 'png') ? 'png' : (str_contains($single['mimeType'], 'pdf') ? 'pdf' : 'pdf');
+            return [
+                'content' => $single['labelData'],
+                'mimeType' => $single['mimeType'],
+                'filename' => sprintf('dhl_return_qr_%s.%s', $single['shipmentId'], $ext),
+            ];
+        }
+
+        return $this->combineLabels($items);
+    }
+
+    /**
      * Combine multiple label binary data items into a single document.
      *
      * @param array $items Array of label items [['shipmentId' => string, 'labelData' => string, 'mimeType' => string]]

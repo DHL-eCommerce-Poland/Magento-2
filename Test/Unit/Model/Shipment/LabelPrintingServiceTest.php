@@ -149,4 +149,73 @@ class LabelPrintingServiceTest extends TestCase
         $this->assertStringContainsString('dhl_labels_', $result['filename']);
         $this->assertNotEmpty($result['content']);
     }
+
+    public function testGetReturnLabelContentSuccessSingleLabel(): void
+    {
+        $shipmentStub = $this->createStub(ShipmentDataInterface::class);
+        $shipmentStub->method('getReturnShipmentId')->willReturn('RET1234567890');
+
+        $this->repositoryStub->method('getById')->willReturn($shipmentStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+
+        $labelsResult = new GetLabelsResult(true, [
+            [
+                'shipmentId' => 'RET1234567890',
+                'labelType' => 'BLP',
+                'labelData' => '%PDF-1.4 dummy return label content',
+                'mimeType' => 'application/pdf',
+            ],
+        ]);
+
+        $this->clientStub->method('getLabels')->willReturn($labelsResult);
+
+        $result = $this->service->getReturnLabelContent([1]);
+
+        $this->assertEquals('application/pdf', $result['mimeType']);
+        $this->assertEquals('%PDF-1.4 dummy return label content', $result['content']);
+        $this->assertEquals('dhl_return_label_RET1234567890.pdf', $result['filename']);
+    }
+
+    public function testGetReturnQrCodeContentSuccessSingleQrCode(): void
+    {
+        $shipmentStub = $this->createStub(ShipmentDataInterface::class);
+        $shipmentStub->method('getReturnShipmentId')->willReturn('RET1234567890');
+
+        $this->repositoryStub->method('getById')->willReturn($shipmentStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+
+        $labelsResult = new GetLabelsResult(true, [
+            [
+                'shipmentId' => 'RET1234567890',
+                'labelType' => 'QR_PDF',
+                'labelData' => '%PDF-1.4 dummy return QR code content',
+                'mimeType' => 'application/pdf',
+            ],
+        ]);
+
+        $this->clientStub->method('getLabels')->willReturn($labelsResult);
+
+        $result = $this->service->getReturnQrCodeContent([1]);
+
+        $this->assertEquals('application/pdf', $result['mimeType']);
+        $this->assertEquals('%PDF-1.4 dummy return QR code content', $result['content']);
+        $this->assertEquals('dhl_return_qr_RET1234567890.pdf', $result['filename']);
+    }
+
+    public function testGetReturnLabelContentThrowsExceptionWhenNoValidReturnShipmentId(): void
+    {
+        $shipmentStub = $this->createStub(ShipmentDataInterface::class);
+        $shipmentStub->method('getReturnShipmentId')->willReturn(null);
+
+        $this->repositoryStub->method('getById')->willReturn($shipmentStub);
+
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('None of the selected shipments have valid DHL return shipment IDs.');
+
+        $this->service->getReturnLabelContent([1]);
+    }
 }

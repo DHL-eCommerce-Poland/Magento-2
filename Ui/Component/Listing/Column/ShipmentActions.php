@@ -13,6 +13,8 @@ class ShipmentActions extends Column
 {
     private const URL_PATH_EDIT = 'ideo_dhl/shipment/edit';
     private const URL_PATH_CREATE_RETURN = 'ideo_dhl/shipment/createReturnShipment';
+    private const URL_PATH_PRINT_RETURN_LABEL = 'ideo_dhl/shipment/printReturnLabel';
+    private const URL_PATH_PRINT_RETURN_QR = 'ideo_dhl/shipment/printReturnQrCode';
     private const URL_PATH_UPDATE_STATUS = 'ideo_dhl/shipment/updateStatus';
     private const URL_PATH_DELETE = 'ideo_dhl/shipment/delete';
     private const URL_PATH_VIEW_ORDER = 'sales/order/view';
@@ -80,6 +82,24 @@ class ShipmentActions extends Column
                                     ),
                                 ],
                                 'post' => true,
+                            ];
+                        } else {
+                            $actions['print_return_label'] = [
+                                'href' => $this->urlBuilder->getUrl(
+                                    self::URL_PATH_PRINT_RETURN_LABEL,
+                                    ['entity_id' => $item['entity_id']]
+                                ),
+                                'label' => __('Print Return Label'),
+                                'target' => '_blank',
+                            ];
+
+                            $actions['print_return_qr'] = [
+                                'href' => $this->urlBuilder->getUrl(
+                                    self::URL_PATH_PRINT_RETURN_QR,
+                                    ['entity_id' => $item['entity_id']]
+                                ),
+                                'label' => __('Print Return QR Code'),
+                                'target' => '_blank',
                             ];
                         }
 

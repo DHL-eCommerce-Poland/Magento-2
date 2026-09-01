@@ -126,17 +126,19 @@ class ShipmentActionsTest extends TestCase
         $this->assertArrayNotHasKey('view_order', $actions);
     }
 
-    public function testPrepareDataSourceWithReturnShipmentIdHidesCreateReturnAction(): void
+    public function testPrepareDataSourceWithReturnShipmentIdShowsReturnLabelAndQrActions(): void
     {
         $context = $this->createStub(ContextInterface::class);
         $uiComponentFactory = $this->createStub(UiComponentFactory::class);
         $urlBuilder = $this->createMock(UrlInterface::class);
 
-        $urlBuilder->expects($this->exactly(6))
+        $urlBuilder->expects($this->exactly(8))
             ->method('getUrl')
             ->willReturnMap([
                 ['ideo_dhl/shipment/edit', ['entity_id' => 20], 'http://example.com/dhl/shipment/edit/entity_id/20'],
                 ['ideo_dhl/shipment/printLabel', ['entity_id' => 20], 'http://example.com/dhl/shipment/printLabel/entity_id/20'],
+                ['ideo_dhl/shipment/printReturnLabel', ['entity_id' => 20], 'http://example.com/dhl/shipment/printReturnLabel/entity_id/20'],
+                ['ideo_dhl/shipment/printReturnQrCode', ['entity_id' => 20], 'http://example.com/dhl/shipment/printReturnQrCode/entity_id/20'],
                 ['ideo_dhl/shipment/downloadScan', ['entity_id' => 20], 'http://example.com/dhl/shipment/downloadScan/entity_id/20'],
                 ['ideo_dhl/shipment/downloadEpod', ['entity_id' => 20], 'http://example.com/dhl/shipment/downloadEpod/entity_id/20'],
                 ['ideo_dhl/shipment/updateStatus', ['entity_id' => 20], 'http://example.com/dhl/shipment/updateStatus/entity_id/20'],
@@ -168,5 +170,11 @@ class ShipmentActionsTest extends TestCase
         $actions = $result['data']['items'][0]['actions'];
         $this->assertArrayHasKey('edit', $actions);
         $this->assertArrayNotHasKey('create_return', $actions);
+        $this->assertArrayHasKey('print_return_label', $actions);
+        $this->assertEquals('http://example.com/dhl/shipment/printReturnLabel/entity_id/20', $actions['print_return_label']['href']);
+        $this->assertEquals('Print Return Label', (string)$actions['print_return_label']['label']);
+        $this->assertArrayHasKey('print_return_qr', $actions);
+        $this->assertEquals('http://example.com/dhl/shipment/printReturnQrCode/entity_id/20', $actions['print_return_qr']['href']);
+        $this->assertEquals('Print Return QR Code', (string)$actions['print_return_qr']['label']);
     }
 }

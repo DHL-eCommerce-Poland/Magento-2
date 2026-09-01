@@ -764,7 +764,7 @@ class SoapClientAdapter implements ClientInterface
                 $labelType = (string) ($itemObj->labelType ?? 'BLP');
                 $rawBase64 = (string) ($itemObj->labelData ?? '');
                 $labelBinary = !empty($rawBase64) ? base64_decode($rawBase64) : '';
-                $mimeType = (string) ($itemObj->labelMimeType ?? $itemObj->mimeType ?? (str_contains($labelType, 'ZBLP') ? 'text/plain' : 'application/pdf'));
+                $mimeType = (string) ($itemObj->labelMimeType ?? $itemObj->mimeType ?? (str_contains($labelType, 'ZBLP') ? 'text/plain' : (str_contains($labelType, 'IMG') ? 'image/png' : 'application/pdf')));
 
                 if (!empty($labelBinary)) {
                     $parsedItems[] = [
