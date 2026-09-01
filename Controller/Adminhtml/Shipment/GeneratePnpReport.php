@@ -60,8 +60,9 @@ class GeneratePnpReport extends Action implements HttpGetActionInterface, HttpPo
                 [
                     'type' => 'string',
                     'value' => $reportData['content'],
+                    'rm' => true,
                 ],
-                'var',
+                'tmp',
                 $reportData['mimeType']
             );
         } catch (Throwable $e) {

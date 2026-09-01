@@ -78,8 +78,9 @@ class MassDownloadScan extends Action implements HttpGetActionInterface, HttpPos
                 [
                     'type' => 'string',
                     'value' => $scanData['content'],
+                    'rm' => true,
                 ],
-                'var',
+                'tmp',
                 $scanData['mimeType']
             );
         } catch (Exception $e) {

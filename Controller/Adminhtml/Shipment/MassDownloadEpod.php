@@ -78,8 +78,9 @@ class MassDownloadEpod extends Action implements HttpGetActionInterface, HttpPos
                 [
                     'type' => 'string',
                     'value' => $epodData['content'],
+                    'rm' => true,
                 ],
-                'var',
+                'tmp',
                 $epodData['mimeType']
             );
         } catch (Exception $e) {

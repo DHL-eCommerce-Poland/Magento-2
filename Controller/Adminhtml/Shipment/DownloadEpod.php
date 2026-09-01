@@ -54,8 +54,9 @@ class DownloadEpod extends Action implements HttpGetActionInterface, HttpPostAct
                 [
                     'type' => 'string',
                     'value' => $epodData['content'],
+                    'rm' => true,
                 ],
-                'var',
+                'tmp',
                 $epodData['mimeType']
             );
         } catch (Throwable $e) {

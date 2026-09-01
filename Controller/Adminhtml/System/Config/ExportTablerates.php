@@ -88,8 +88,12 @@ class ExportTablerates extends Action
 
         return $this->fileFactory->create(
             $fileName,
-            $content,
-            DirectoryList::VAR_DIR,
+            [
+                'type' => 'string',
+                'value' => $content,
+                'rm' => true,
+            ],
+            'tmp',
             'text/csv'
         );
     }

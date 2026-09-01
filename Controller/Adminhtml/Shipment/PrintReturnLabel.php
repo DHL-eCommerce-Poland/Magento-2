@@ -54,8 +54,9 @@ class PrintReturnLabel extends Action implements HttpGetActionInterface, HttpPos
                 [
                     'type' => 'string',
                     'value' => $labelData['content'],
+                    'rm' => true,
                 ],
-                'var',
+                'tmp',
                 $labelData['mimeType']
             );
         } catch (Throwable $e) {

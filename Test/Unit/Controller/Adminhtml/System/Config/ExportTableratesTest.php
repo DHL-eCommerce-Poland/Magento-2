@@ -76,8 +76,14 @@ class ExportTableratesTest extends TestCase
             ->method('create')
             ->with(
                 'dhl_tablerates.csv',
-                $this->stringContains($expectedCsvContent),
-                $this->anything(),
+                $this->callback(static function ($content) use ($expectedCsvContent): bool {
+                    return is_array($content)
+                        && isset($content['type'], $content['value'], $content['rm'])
+                        && $content['type'] === 'string'
+                        && $content['rm'] === true
+                        && str_contains($content['value'], $expectedCsvContent);
+                }),
+                'tmp',
                 'text/csv'
             )
             ->willReturn($responseStub);

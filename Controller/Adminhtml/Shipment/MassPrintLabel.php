@@ -77,8 +77,9 @@ class MassPrintLabel extends Action implements HttpGetActionInterface, HttpPostA
                 [
                     'type' => 'string',
                     'value' => $labelData['content'],
+                    'rm' => true,
                 ],
-                'var',
+                'tmp',
                 $labelData['mimeType']
             );
         } catch (Exception $e) {

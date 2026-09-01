@@ -54,8 +54,9 @@ class DownloadScan extends Action implements HttpGetActionInterface, HttpPostAct
                 [
                     'type' => 'string',
                     'value' => $scanData['content'],
+                    'rm' => true,
                 ],
-                'var',
+                'tmp',
                 $scanData['mimeType']
             );
         } catch (Throwable $e) {

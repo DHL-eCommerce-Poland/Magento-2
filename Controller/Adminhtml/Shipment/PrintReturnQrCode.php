@@ -54,8 +54,9 @@ class PrintReturnQrCode extends Action implements HttpGetActionInterface, HttpPo
                 [
                     'type' => 'string',
                     'value' => $labelData['content'],
+                    'rm' => true,
                 ],
-                'var',
+                'tmp',
                 $labelData['mimeType']
             );
         } catch (Throwable $e) {

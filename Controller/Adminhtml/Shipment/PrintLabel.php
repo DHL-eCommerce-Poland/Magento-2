@@ -54,8 +54,9 @@ class PrintLabel extends Action implements HttpGetActionInterface, HttpPostActio
                 [
                     'type' => 'string',
                     'value' => $labelData['content'],
+                    'rm' => true,
                 ],
-                'var',
+                'tmp',
                 $labelData['mimeType']
             );
         } catch (Throwable $e) {
