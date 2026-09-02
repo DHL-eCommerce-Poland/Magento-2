@@ -6,6 +6,8 @@ namespace Ideo\Dhl\Test\Unit\Model\Api;
 
 use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\SoapClientAdapter;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -23,9 +25,14 @@ class SoapClientAdapterTest extends TestCase
     private SoapClientAdapter $adapter;
 
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface|MockObject
+     * @var ScopeConfigInterface|MockObject
      */
-    private \Magento\Framework\App\Config\ScopeConfigInterface|MockObject $scopeConfigStub;
+    private ScopeConfigInterface|MockObject $scopeConfigStub;
+
+    /**
+     * @var TimezoneInterface|MockObject
+     */
+    private TimezoneInterface|MockObject $timezoneMock;
 
     /**
      * Set up test dependencies.
@@ -35,11 +42,15 @@ class SoapClientAdapterTest extends TestCase
     protected function setUp(): void
     {
         $this->loggerStub = $this->createStub(LoggerInterface::class);
-        $this->scopeConfigStub = $this->createStub(\Magento\Framework\App\Config\ScopeConfigInterface::class);
+        $this->scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+        $this->timezoneMock = $this->createMock(TimezoneInterface::class);
+        $this->timezoneMock->method('scopeDate')
+            ->willReturn(new \DateTime('2026-09-02'));
 
         $this->adapter = new SoapClientAdapter(
             $this->loggerStub,
-            $this->scopeConfigStub
+            $this->scopeConfigStub,
+            $this->timezoneMock
         );
     }
 
@@ -259,7 +270,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 

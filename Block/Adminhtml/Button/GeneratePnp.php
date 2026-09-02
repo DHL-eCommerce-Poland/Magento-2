@@ -25,7 +25,7 @@ class GeneratePnp extends Generic implements ButtonProviderInterface
                 } else if (window.IdeoDhlPnp && typeof window.IdeoDhlPnp.openModal === 'function') {
                     window.IdeoDhlPnp.openModal();
                 } else {
-                    alert('" . addslashes((string) __('Courier report dialog is loading. Please try again.')) . "');
+                    alert('" . addslashes((string) __('PNP report dialog is loading. Please try again.')) . "');
                 }
             });",
             'sort_order' => 10,

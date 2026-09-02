@@ -13,23 +13,32 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
+use DateTime;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+
 class CourierPickupTimeResolverTest extends TestCase
 {
     private ClientInterface|MockObject $clientMock;
     private CredentialsProvider|Stub $credentialsProviderStub;
+    private TimezoneInterface|MockObject $timezoneMock;
     private CourierPickupTimeResolver $resolver;
 
     protected function setUp(): void
     {
         $this->clientMock = $this->createMock(ClientInterface::class);
         $this->credentialsProviderStub = $this->createStub(CredentialsProvider::class);
+        $this->timezoneMock = $this->createMock(TimezoneInterface::class);
+
+        $this->timezoneMock->method('date')
+            ->willReturnCallback(fn($d) => new DateTime($d));
 
         $this->credentialsProviderStub->method('getCredentials')
             ->willReturn(new Credentials('user', 'pass', true));
 
         $this->resolver = new CourierPickupTimeResolver(
             $this->clientMock,
-            $this->credentialsProviderStub
+            $this->credentialsProviderStub,
+            $this->timezoneMock
         );
     }
 
@@ -131,5 +140,21 @@ class CourierPickupTimeResolverTest extends TestCase
         $this->assertEquals('12:00', $result['dr_pickup_from']);
         $this->assertEquals('16:00', $result['dr_pickup_to']);
         $this->assertEquals([['from' => '12:00', 'to' => '16:00', 'label' => '12:00 - 16:00']], $result['available_hours']);
+    }
+
+    public function testResolveAvailableHoursNormalizesLocaleDateStringToIsoFormat(): void
+    {
+        $apiResult = new PostalCodeServicesResult(true, '10:00', '16:00', '10:00', '16:00', false);
+
+        $this->clientMock->expects($this->once())
+            ->method('getPostalCodeServices')
+            ->with($this->anything(), '00-001', '2026-09-02')
+            ->willReturn($apiResult);
+
+        // Pass locale date string "09/02/2026"
+        $result = $this->resolver->resolveAvailableHours('00-001', '09/02/2026', 'sandbox', '08:00');
+
+        $this->assertTrue($result['is_date_available']);
+        $this->assertEquals('10:00', $result['dr_pickup_from']);
     }
 }

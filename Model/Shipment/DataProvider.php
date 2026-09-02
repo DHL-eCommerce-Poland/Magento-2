@@ -6,8 +6,8 @@ namespace Ideo\Dhl\Model\Shipment;
 
 use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
-use InvalidArgumentException;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -25,6 +25,8 @@ class DataProvider extends AbstractDataProvider
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
      * @param SerializerInterface $serializer
+     * @param TimezoneInterface $timezone
+     * @param LoggerInterface|null $logger
      * @param array $meta
      * @param array $data
      */
@@ -34,6 +36,7 @@ class DataProvider extends AbstractDataProvider
         string $requestFieldName,
         CollectionFactory $collectionFactory,
         private readonly SerializerInterface $serializer,
+        private readonly TimezoneInterface $timezone,
         private readonly ?LoggerInterface $logger = null,
         array $meta = [],
         array $data = []
@@ -187,14 +190,10 @@ class DataProvider extends AbstractDataProvider
         } else {
             $settings['returnShipmentId'] = null;
         }
-        $today = date('Y-m-d');
-        $rawDate = $settings['shipmentDate'] ?? $settings['dispatchDate'] ?? null;
+        $today = $this->timezone->scopeDate()->format('Y-m-d');
+        $rawDate = $settings['shipmentDate'] ?? null;
         $finalDate = (empty($rawDate) || $rawDate < $today) ? $today : $rawDate;
         $settings['shipmentDate'] = $finalDate;
-        $settings['dispatchDate'] = $finalDate;
-
-        $senderPickupFrom = $sender['pickupHourFrom'] ?? $sender['pickup_time_from'] ?? null;
-        $senderPickupTo = $sender['pickupHourTo'] ?? $sender['pickup_time_to'] ?? null;
 
         if (!empty($settings['pickupHourFrom'])) {
             $settings['pickupHourFrom'] = substr((string)$settings['pickupHourFrom'], 0, 5);

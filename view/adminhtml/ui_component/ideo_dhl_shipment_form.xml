@@ -201,21 +201,41 @@
                 </date>
             </formElements>
         </field>
-        <field name="shipmentSettings[pickupHourFrom]" formElement="input">
+        <field name="shipmentSettings[pickupHourFrom]" formElement="date">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Courier Pickup Time [From]</label>
                 <dataScope>shipmentSettings.pickupHourFrom</dataScope>
-                <elementTmpl>Ideo_Dhl/form/element/time</elementTmpl>
             </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="showsTime" xsi:type="boolean">true</option>
+                            <option name="timeOnly" xsi:type="boolean">true</option>
+                            <option name="timeFormat" xsi:type="string">HH:mm</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
         </field>
-        <field name="shipmentSettings[pickupHourTo]" formElement="input">
+        <field name="shipmentSettings[pickupHourTo]" formElement="date">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Courier Pickup Time [To]</label>
                 <dataScope>shipmentSettings.pickupHourTo</dataScope>
-                <elementTmpl>Ideo_Dhl/form/element/time</elementTmpl>
             </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="showsTime" xsi:type="boolean">true</option>
+                            <option name="timeOnly" xsi:type="boolean">true</option>
+                            <option name="timeFormat" xsi:type="string">HH:mm</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
         </field>
     </fieldset>
 
@@ -489,7 +509,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">UBEZP - Insurance</label>
+                <label translate="true">Insurance</label>
                 <dataScope>specialServices.insurance</dataScope>
                 <switcherConfig>
                     <rules>
@@ -545,7 +565,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">COD - Cash On Delivery</label>
+                <label translate="true">Cash On Delivery</label>
                 <dataScope>specialServices.cod</dataScope>
                 <switcherConfig>
                     <rules>
@@ -601,7 +621,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">1722 - Evening Delivery (18-22)</label>
+                <label translate="true">Evening Delivery (18-22)</label>
                 <dataScope>specialServices.eveningDelivery</dataScope>
             </settings>
             <formElements>
@@ -624,7 +644,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">SOBOTA - Saturday Delivery</label>
+                <label translate="true">Saturday Delivery</label>
                 <dataScope>specialServices.saturdayDelivery</dataScope>
             </settings>
             <formElements>
@@ -647,7 +667,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">NAD_SOBOTA - Saturday Pickup</label>
+                <label translate="true">Saturday Pickup</label>
                 <dataScope>specialServices.saturdayDispatch</dataScope>
             </settings>
             <formElements>
@@ -670,7 +690,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">PDI - Pre-delivery Information</label>
+                <label translate="true">Pre-delivery Information</label>
                 <dataScope>specialServices.pdi</dataScope>
             </settings>
             <formElements>
@@ -693,7 +713,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">ROD - Return Confirmed Documents</label>
+                <label translate="true">Return Confirmed Documents</label>
                 <dataScope>specialServices.rod</dataScope>
                 <switcherConfig>
                     <rules>
@@ -749,7 +769,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">POD - Proof of Delivery</label>
+                <label translate="true">Proof of Delivery</label>
                 <dataScope>specialServices.pod</dataScope>
             </settings>
             <formElements>
@@ -772,7 +792,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">AGEVER - Adult Verification / Delivery</label>
+                <label translate="true">Adult Verification / Delivery</label>
                 <dataScope>specialServices.agever</dataScope>
             </settings>
             <formElements>
@@ -795,7 +815,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">ODB - Self Pickup</label>
+                <label translate="true">Self Pickup</label>
                 <dataScope>specialServices.odb</dataScope>
             </settings>
             <formElements>

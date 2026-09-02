@@ -14,11 +14,16 @@ use Magento\Framework\Exception\LocalizedException;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
+use DateTime;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+
 class PnpReportServiceTest extends TestCase
 {
     private ClientInterface|Stub $clientStub;
     private CredentialsProvider|Stub $credentialsProviderStub;
     private ScopeConfigInterface|Stub $scopeConfigStub;
+    private TimezoneInterface|MockObject $timezoneMock;
     private PnpReportService $service;
 
     protected function setUp(): void
@@ -26,11 +31,16 @@ class PnpReportServiceTest extends TestCase
         $this->clientStub = $this->createStub(ClientInterface::class);
         $this->credentialsProviderStub = $this->createStub(CredentialsProvider::class);
         $this->scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+        $this->timezoneMock = $this->createMock(TimezoneInterface::class);
+
+        $this->timezoneMock->method('date')
+            ->willReturnCallback(fn($d) => new DateTime($d));
 
         $this->service = new PnpReportService(
             $this->clientStub,
             $this->credentialsProviderStub,
-            $this->scopeConfigStub
+            $this->scopeConfigStub,
+            $this->timezoneMock
         );
     }
 

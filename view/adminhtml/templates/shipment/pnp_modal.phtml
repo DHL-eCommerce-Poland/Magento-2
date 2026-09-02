@@ -3,14 +3,18 @@
 declare(strict_types=1);
 
 use Ideo\Dhl\Model\Config\Source\PnpPackageType;
+use Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\Template;
 
 /** @var Template $block */
 /** @var Escaper $escaper */
+/** @var DatePickerConfig $viewModel */
 
+$viewModel = $block->getViewModel();
+$dateFormat = $viewModel->getDateFormat();
+$todayDate = $viewModel->getFormattedDate();
 $generateUrl = $block->getUrl('ideo_dhl/shipment/generatePnpReport');
-$todayDate = date('Y-m-d');
 
 /** @var PnpPackageType $pnpPackageTypeSource */
 $pnpPackageTypeSource = $block->getData('pnp_package_type_source') ?? new PnpPackageType();
@@ -24,7 +28,7 @@ $packageTypeOptions = $pnpPackageTypeSource->toOptionArray();
             <div class="admin__field required">
                 <label class="admin__field-label" for="pnp_date"><span><?= $escaper->escapeHtml(__('Date')) ?></span></label>
                 <div class="admin__field-control">
-                    <input type="date" id="pnp_date" name="pnp[date]" class="admin__control-text" value="<?= $escaper->escapeHtmlAttr($todayDate) ?>" style="width: 200px;" required />
+                    <input type="text" id="pnp_date" name="pnp[date]" class="admin__control-text" value="<?= $escaper->escapeHtmlAttr($todayDate) ?>" data-bind="dhlDatepicker: date, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', maxDate: new Date() }" style="width: 200px; box-sizing: border-box;" required />
                 </div>
             </div>
 
@@ -52,7 +56,8 @@ $packageTypeOptions = $pnpPackageTypeSource->toOptionArray();
             "components": {
                 "dhlPnpModal": {
                     "component": "Ideo_Dhl/js/shipment/pnp-modal",
-                    "generateUrl": "<?= $escaper->escapeUrl($generateUrl) ?>"
+                    "generateUrl": "<?= $escaper->escapeUrl($generateUrl) ?>",
+                    "dateFormat": "<?= $escaper->escapeJs($dateFormat) ?>"
                 }
             }
         }

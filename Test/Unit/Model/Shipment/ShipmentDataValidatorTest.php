@@ -13,6 +13,9 @@ use Ideo\Dhl\Model\Shipment\ShipmentDataValidator;
 use Magento\Framework\Exception\LocalizedException;
 use PHPUnit\Framework\TestCase;
 
+use DateTime;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+
 class ShipmentDataValidatorTest extends TestCase
 {
     /**
@@ -22,7 +25,11 @@ class ShipmentDataValidatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->validator = new ShipmentDataValidator();
+        $timezoneMock = $this->createMock(TimezoneInterface::class);
+        $timezoneMock->method('scopeDate')
+            ->willReturn(new DateTime('2026-09-02'));
+
+        $this->validator = new ShipmentDataValidator($timezoneMock);
     }
 
     /**

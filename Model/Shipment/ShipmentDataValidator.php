@@ -5,9 +5,18 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\Shipment;
 
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class ShipmentDataValidator
 {
+    /**
+     * @param TimezoneInterface $timezone
+     */
+    public function __construct(
+        private readonly TimezoneInterface $timezone
+    ) {
+    }
+
     /**
      * Validate DhlShipmentData object and throw LocalizedException on validation failure.
      *
@@ -137,6 +146,15 @@ class ShipmentDataValidator
                         $errors[] = __('Package #%1 height must be greater than zero.', $rowNum)->render();
                     }
                 }
+            }
+        }
+
+        // 3.1 Shipment date validation
+        $shipmentDate = trim((string)$settings->getShipmentDate());
+        if (!empty($shipmentDate)) {
+            $today = $this->timezone->scopeDate()->format('Y-m-d');
+            if ($shipmentDate < $today) {
+                $errors[] = __('Shipment date cannot be in the past.')->render();
             }
         }
 

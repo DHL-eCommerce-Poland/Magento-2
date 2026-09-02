@@ -10,6 +10,8 @@ use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Config\Source\PnpPackageType;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Throwable;
 
 class PnpReportService
 {
@@ -26,11 +28,13 @@ class PnpReportService
      * @param ClientInterface $client
      * @param CredentialsProvider $credentialsProvider
      * @param ScopeConfigInterface $scopeConfig
+     * @param TimezoneInterface $timezone
      */
     public function __construct(
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
-        private readonly ScopeConfigInterface $scopeConfig
+        private readonly ScopeConfigInterface $scopeConfig,
+        private readonly TimezoneInterface $timezone
     ) {
     }
 
@@ -48,7 +52,13 @@ class PnpReportService
         $date = trim($date);
         $typePackage = strtoupper(trim($typePackage));
 
-        if (empty($date) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+        if (empty($date)) {
+            throw new LocalizedException(__('Invalid date format. Please specify date in YYYY-MM-DD format.'));
+        }
+        try {
+            $dt = $this->timezone->date($date);
+            $date = $dt->format('Y-m-d');
+        } catch (Throwable) {
             throw new LocalizedException(__('Invalid date format. Please specify date in YYYY-MM-DD format.'));
         }
 

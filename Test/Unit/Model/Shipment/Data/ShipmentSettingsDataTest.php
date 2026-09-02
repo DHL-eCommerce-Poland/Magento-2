@@ -45,7 +45,7 @@ class ShipmentSettingsDataTest extends TestCase
         $this->assertEquals('MPK123', $settings->getMpk());
         $this->assertEquals('Komentarz do zamowienia', $settings->getComment());
         $this->assertEquals('REF-001', $settings->getReference());
-        $this->assertEquals('2026-08-20', $settings->getDispatchDate());
+        $this->assertEquals('2026-08-20', $settings->getShipmentDate());
         $this->assertEquals('PACKAGE', $settings->getPackageType());
         $this->assertEquals(3.5, $settings->getWeight());
         $this->assertEquals(25.0, $settings->getWidth());
@@ -96,7 +96,7 @@ class ShipmentSettingsDataTest extends TestCase
             'comment' => 'Dostawa po 16',
             'reference' => '10001',
             'shipmentDate' => '2026-08-19',
-            'dispatchDate' => '2026-08-19',
+            'shipmentDate' => '2026-08-19',
             'pickupHourFrom' => null,
             'pickupHourTo' => null,
             'packageType' => 'PACKAGE',

@@ -16,7 +16,9 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class Save extends Action implements HttpPostActionInterface
 {
@@ -31,6 +33,7 @@ class Save extends Action implements HttpPostActionInterface
      * @param ScopeConfigInterface $scopeConfig
      * @param JsonFactory $jsonFactory
      * @param SerializerInterface $serializer
+     * @param TimezoneInterface $timezone
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -39,6 +42,7 @@ class Save extends Action implements HttpPostActionInterface
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly JsonFactory $jsonFactory,
         private readonly SerializerInterface $serializer,
+        private readonly TimezoneInterface $timezone,
         private readonly ?LoggerInterface $logger = null
     ) {
         parent::__construct($context);
@@ -88,19 +92,36 @@ class Save extends Action implements HttpPostActionInterface
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
         }
 
-        // Sanitize shipmentDate to YYYY-MM-DD and enforce at least today's date
+        // Validate and sanitize shipmentDate (must be valid and not in the past)
         if (isset($payload['shipmentSettings']) && is_array($payload['shipmentSettings'])) {
-            $today = date('Y-m-d');
-            $rawDate = (string)($payload['shipmentSettings']['shipmentDate'] ?? $payload['shipmentSettings']['dispatchDate'] ?? '');
+            $today = $this->timezone->scopeDate()->format('Y-m-d');
+            $rawDate = trim((string)($payload['shipmentSettings']['shipmentDate'] ?? ''));
+
             if (!empty($rawDate)) {
-                $ts = strtotime($rawDate);
-                $parsed = $ts ? date('Y-m-d', $ts) : $today;
-                $finalDate = ($parsed < $today) ? $today : $parsed;
+                try {
+                    $parsedDate = $this->timezone->date($rawDate)->format('Y-m-d');
+                } catch (Throwable) {
+                    $msg = __('Invalid shipment date format provided.');
+                    if ($isAjax) {
+                        return $resultJson->setData(['success' => false, 'message' => (string) $msg]);
+                    }
+                    $this->messageManager->addErrorMessage($msg);
+                    return $this->resultRedirectFactory->create()->setPath('*/*/index');
+                }
+
+                if ($parsedDate < $today) {
+                    $msg = __('Shipment date cannot be in the past.');
+                    if ($isAjax) {
+                        return $resultJson->setData(['success' => false, 'message' => (string) $msg]);
+                    }
+                    $this->messageManager->addErrorMessage($msg);
+                    return $this->resultRedirectFactory->create()->setPath('*/*/index');
+                }
+                $finalDate = $parsedDate;
             } else {
                 $finalDate = $today;
             }
             $payload['shipmentSettings']['shipmentDate'] = $finalDate;
-            $payload['shipmentSettings']['dispatchDate'] = $finalDate;
 
             if (!empty($payload['shipmentSettings']['pickupHourFrom'])) {
                 $payload['shipmentSettings']['pickupHourFrom'] = substr((string)$payload['shipmentSettings']['pickupHourFrom'], 0, 5);

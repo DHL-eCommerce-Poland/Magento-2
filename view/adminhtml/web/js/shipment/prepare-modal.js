@@ -9,6 +9,92 @@ define([
 ], function ($, ko, Component, modal, alert) {
     'use strict';
 
+    if (!ko.bindingHandlers.dhlTimepicker) {
+        ko.bindingHandlers.dhlTimepicker = {
+            init: function (element, valueAccessor) {
+                var value = valueAccessor();
+                require(['jquery', 'mage/calendar', 'mage/translate'], function ($) {
+                    var $el = $(element);
+                    if ($el.hasClass('_has-datepicker')) {
+                        return;
+                    }
+
+                    $el.calendar({
+                        showsTime: true,
+                        timeOnly: true,
+                        timeFormat: 'HH:mm',
+                        buttonText: $.mage.__('Select Time')
+                    });
+                    $el.next('.ui-datepicker-trigger').addClass('v-middle').empty();
+
+                    $el.on('change.dhltimepicker', function () {
+                        if (ko.isObservable(value)) {
+                            value($el.val());
+                        }
+                    });
+
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        $el.off('.dhltimepicker');
+                        $el.next('.ui-datepicker-trigger').remove();
+                        $el.removeClass('_has-datepicker');
+                    });
+                });
+            },
+            update: function (element, valueAccessor) {
+                var value = ko.unwrap(valueAccessor());
+                var $el = $(element);
+                if ($el.val() !== (value || '')) {
+                    $el.val(value || '');
+                }
+            }
+        };
+    }
+
+    if (!ko.bindingHandlers.dhlDatepicker) {
+        ko.bindingHandlers.dhlDatepicker = {
+            init: function (element, valueAccessor, allBindings) {
+                var value = valueAccessor();
+                var options = allBindings.get('datepickerOptions') || {};
+                require(['jquery', 'mage/calendar', 'mage/translate'], function ($) {
+                    var $el = $(element);
+                    if ($el.hasClass('_has-datepicker')) {
+                        return;
+                    }
+
+                    var config = $.extend({
+                        buttonText: $.mage.__('Select Date')
+                    }, options);
+
+                    if (options.dateFormat) {
+                        config.dateFormat = options.dateFormat;
+                    }
+
+                    $el.calendar(config);
+                    $el.next('.ui-datepicker-trigger').addClass('v-middle').empty();
+
+                    $el.on('change.dhldatepicker', function () {
+                        if (ko.isObservable(value)) {
+                            value($el.val());
+                        }
+                    });
+
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        $el.off('.dhldatepicker');
+                        $el.next('.ui-datepicker-trigger').remove();
+                        $el.removeClass('_has-datepicker');
+                    });
+                });
+            },
+            update: function (element, valueAccessor) {
+                var value = ko.unwrap(valueAccessor());
+                var $el = $(element);
+                if ($el.val() !== (value || '')) {
+                    $el.val(value || '');
+                }
+            }
+        };
+    }
+
     function formatDecimal4(val) {
         if (val === null || val === undefined || val === '') return '';
         var num = parseFloat(val);
@@ -96,7 +182,7 @@ define([
         }
 
         var todayStr = new Date().toISOString().split('T')[0];
-        var dDate = st.shipmentDate || st.dispatchDate || todayStr;
+        var dDate = st.shipmentDate || todayStr;
         if (dDate < todayStr) {
             dDate = todayStr;
         }
@@ -105,7 +191,6 @@ define([
             selectedDeliveryServiceId: ko.observable(defaultServiceId),
             serviceType: ko.observable(st.serviceType || ''),
             shipmentDate: ko.observable(dDate),
-            dispatchDate: ko.observable(dDate),
             content: ko.observable(st.content !== undefined ? st.content : ''),
             mpk: ko.observable(st.mpk || ''),
             comment: ko.observable(st.comment || ''),

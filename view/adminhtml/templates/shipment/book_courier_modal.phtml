@@ -2,11 +2,16 @@
 
 declare(strict_types=1);
 
+use Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\Template;
 
 /** @var Template $block */
 /** @var Escaper $escaper */
+/** @var DatePickerConfig $viewModel */
+
+$viewModel = $block->getViewModel();
+$dateFormat = $viewModel->getDateFormat();
 
 $hoursUrl = $block->getUrl('ideo_dhl/shipment/getPickupHours');
 $bookUrl = $block->getUrl('ideo_dhl/shipment/bookCourier');
@@ -40,7 +45,7 @@ $bookUrl = $block->getUrl('ideo_dhl/shipment/bookCourier');
             <div class="admin__field required">
                 <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Pickup Date')) ?></span></label>
                 <div class="admin__field-control">
-                    <input type="date" id="ideo_dhl_pickup_date" class="admin__control-text" data-bind="value: pickupDate" style="width: 200px;" required />
+                    <input type="text" id="ideo_dhl_pickup_date" class="admin__control-text" data-bind="dhlDatepicker: pickupDate, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', minDate: new Date() }" style="width: 200px; box-sizing: border-box;" required />
                 </div>
             </div>
 
@@ -81,7 +86,8 @@ $bookUrl = $block->getUrl('ideo_dhl/shipment/bookCourier');
                 "dhlBookCourierModal": {
                     "component": "Ideo_Dhl/js/shipment/book-courier-modal",
                     "hoursUrl": "<?= $escaper->escapeUrl($hoursUrl) ?>",
-                    "bookUrl": "<?= $escaper->escapeUrl($bookUrl) ?>"
+                    "bookUrl": "<?= $escaper->escapeUrl($bookUrl) ?>",
+                    "dateFormat": "<?= $escaper->escapeJs($dateFormat) ?>"
                 }
             }
         }

@@ -12,6 +12,7 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Throwable;
 
 class GeneratePnpReport extends Action implements HttpGetActionInterface, HttpPostActionInterface
@@ -22,11 +23,13 @@ class GeneratePnpReport extends Action implements HttpGetActionInterface, HttpPo
      * @param Context $context
      * @param PnpReportService $pnpReportService
      * @param FileFactory $fileFactory
+     * @param TimezoneInterface $timezone
      */
     public function __construct(
         Context $context,
         private readonly PnpReportService $pnpReportService,
-        private readonly FileFactory $fileFactory
+        private readonly FileFactory $fileFactory,
+        private readonly TimezoneInterface $timezone
     ) {
         parent::__construct($context);
     }
@@ -45,7 +48,7 @@ class GeneratePnpReport extends Action implements HttpGetActionInterface, HttpPo
         $typePackage = is_array($pnpData) ? ($pnpData['typePackage'] ?? '') : (string) $this->getRequest()->getParam('type_package', $this->getRequest()->getParam('typePackage', ''));
 
         if (empty($date)) {
-            $date = date('Y-m-d');
+            $date = $this->timezone->scopeDate()->format('Y-m-d');
         }
 
         if (empty($typePackage)) {

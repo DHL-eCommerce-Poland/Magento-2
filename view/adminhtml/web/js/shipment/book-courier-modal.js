@@ -8,10 +8,64 @@ define([
 ], function ($, ko, Component, modal, alert, $t) {
     'use strict';
 
+    if (!ko.bindingHandlers.dhlDatepicker) {
+        ko.bindingHandlers.dhlDatepicker = {
+            init: function (element, valueAccessor, allBindings) {
+                var value = valueAccessor();
+                var options = allBindings.get('datepickerOptions') || {};
+                require(['jquery', 'mage/calendar', 'mage/translate'], function ($) {
+                    var $el = $(element);
+                    if ($el.hasClass('_has-datepicker')) {
+                        return;
+                    }
+
+                    var config = $.extend({
+                        buttonText: $.mage.__('Select Date')
+                    }, options);
+
+                    if (options.dateFormat) {
+                        config.dateFormat = options.dateFormat;
+                    }
+
+                    $el.calendar(config);
+                    $el.next('.ui-datepicker-trigger').addClass('v-middle').empty();
+
+                    $el.on('change.dhldatepicker', function () {
+                        if (ko.isObservable(value)) {
+                            var dateObj = $el.datepicker('getDate');
+                            if (dateObj instanceof Date && !isNaN(dateObj.getTime())) {
+                                var yyyy = dateObj.getFullYear();
+                                var mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+                                var dd = String(dateObj.getDate()).padStart(2, '0');
+                                value(yyyy + '-' + mm + '-' + dd);
+                            } else {
+                                value($el.val());
+                            }
+                        }
+                    });
+
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        $el.off('.dhldatepicker');
+                        $el.next('.ui-datepicker-trigger').remove();
+                        $el.removeClass('_has-datepicker');
+                    });
+                });
+            },
+            update: function (element, valueAccessor) {
+                var value = ko.unwrap(valueAccessor());
+                var $el = $(element);
+                if ($el.val() !== (value || '')) {
+                    $el.val(value || '');
+                }
+            }
+        };
+    }
+
     return Component.extend({
         defaults: {
             hoursUrl: '',
-            bookUrl: ''
+            bookUrl: '',
+            dateFormat: ''
         },
 
         initObservable: function () {
@@ -64,7 +118,6 @@ define([
             var self = this;
             var ids = Array.isArray(shipmentIds) ? shipmentIds : [shipmentIds];
             var numbers = (Array.isArray(shipmentNumbers) && shipmentNumbers.length) ? shipmentNumbers : ids;
-            var todayStr = new Date().toISOString().slice(0, 10);
 
             self.selectedShipmentIds(ids);
             self.selectedShipmentNumbers(numbers);
@@ -80,12 +133,20 @@ define([
             }
 
             self.isUpdatingDate = true;
-            self.pickupDate(todayStr);
             self.warningMessage('');
             self.additionalInfo('');
-            self.isUpdatingDate = false;
 
-            $('#ideo_dhl_pickup_date').attr('min', todayStr);
+            var $dateInput = $('#ideo_dhl_pickup_date');
+            if ($dateInput.length && $dateInput.data('datepicker')) {
+                $dateInput.datepicker('option', 'minDate', new Date());
+                $dateInput.datepicker('setDate', new Date());
+                $dateInput.next('.ui-datepicker-trigger').addClass('v-middle').empty();
+                if ($dateInput.val()) {
+                    self.pickupDate($dateInput.val());
+                }
+            }
+
+            self.isUpdatingDate = false;
 
             var $modal = $('#ideo-dhl-book-courier-modal');
             if (!$modal.data('mageModal')) {
@@ -109,21 +170,26 @@ define([
             }
 
             $modal.modal('openModal');
-            self.loadPickupHours();
+            self.loadPickupHours(true);
         },
 
         onDateChange: function () {
             this.loadPickupHours();
         },
 
-        loadPickupHours: function () {
+        loadPickupHours: function (immediate) {
             var self = this;
             var ids = self.selectedShipmentIds();
-            var firstId = ids.length ? ids[0] : null;
+            var firstId = (ids && ids.length) ? ids[0] : null;
             var date = self.pickupDate();
+
+            if (!ids || !ids.length) {
+                return;
+            }
 
             if (self.debounceTimer) {
                 clearTimeout(self.debounceTimer);
+                self.debounceTimer = null;
             }
 
             if (self.currentXhr) {
@@ -137,12 +203,12 @@ define([
                 return;
             }
 
-            self.debounceTimer = setTimeout(function () {
-                self.isLoading(true);
-                self.availableHours([]);
-                self.selectedHourSlot('');
-                self.warningMessage('');
+            self.isLoading(true);
+            self.availableHours([]);
+            self.selectedHourSlot('');
+            self.warningMessage('');
 
+            var doRequest = function () {
                 self.currentXhr = $.ajax({
                     url: self.hoursUrl,
                     type: 'GET',
@@ -169,7 +235,13 @@ define([
                         self.warningMessage($t('Courier pickup is not available for the selected date. Please select another date in the calendar.'));
                     }
                 });
-            }, 300);
+            };
+
+            if (immediate) {
+                doRequest();
+            } else {
+                self.debounceTimer = setTimeout(doRequest, 300);
+            }
         },
 
         applyPickupHoursResponse: function (response) {

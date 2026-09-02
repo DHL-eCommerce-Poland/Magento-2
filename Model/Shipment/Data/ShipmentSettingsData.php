@@ -16,7 +16,7 @@ class ShipmentSettingsData
      * @param string $mpk
      * @param string $comment
      * @param string $reference
-     * @param string $dispatchDate
+     * @param string $shipmentDate
      * @param string|null $pickupHourFrom
      * @param string|null $pickupHourTo
      * @param string $packageType
@@ -57,13 +57,6 @@ class ShipmentSettingsData
         private ?string $addressType = 'N',
         array $packages = []
     ) {
-        if (!empty($this->shipmentDate)) {
-            $timestamp = strtotime($this->shipmentDate);
-            if ($timestamp !== false) {
-                $this->shipmentDate = date('Y-m-d', $timestamp);
-            }
-        }
-
         if (!empty($packages)) {
             foreach ($packages as $pkg) {
                 if ($pkg instanceof PackageData) {
@@ -156,16 +149,6 @@ class ShipmentSettingsData
     public function getShipmentDate(): string
     {
         return $this->shipmentDate;
-    }
-
-    /**
-     * Get dispatch date string (YYYY-MM-DD). Alias for getShipmentDate().
-     *
-     * @return string
-     */
-    public function getDispatchDate(): string
-    {
-        return $this->getShipmentDate();
     }
 
     /**
@@ -339,7 +322,6 @@ class ShipmentSettingsData
             'comment' => $this->comment,
             'reference' => $this->reference,
             'shipmentDate' => $this->shipmentDate,
-            'dispatchDate' => $this->shipmentDate,
             'pickupHourFrom' => $this->pickupHourFrom,
             'pickupHourTo' => $this->pickupHourTo,
             'packageType' => $firstPkg->getPackageType(),
@@ -386,7 +368,7 @@ class ShipmentSettingsData
             mpk: (string)($data['mpk'] ?? ''),
             comment: (string)($data['comment'] ?? ''),
             reference: (string)($data['reference'] ?? ''),
-            shipmentDate: (string)($data['shipmentDate'] ?? $data['dispatchDate'] ?? date('Y-m-d')),
+            shipmentDate: (string)($data['shipmentDate'] ?? ''),
             pickupHourFrom: $data['pickupHourFrom'] ?? null,
             pickupHourTo: $data['pickupHourTo'] ?? null,
             packageType: (string)($data['packageType'] ?? 'PACKAGE'),

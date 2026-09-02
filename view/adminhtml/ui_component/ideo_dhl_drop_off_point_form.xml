@@ -213,21 +213,41 @@
             <collapsible>true</collapsible>
             <opened>true</opened>
         </settings>
-        <field name="pickup_time_from" formElement="input">
+        <field name="pickup_time_from" formElement="date">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Courier Pickup Time [From]</label>
                 <dataScope>pickup_time_from</dataScope>
-                <elementTmpl>Ideo_Dhl/form/element/time</elementTmpl>
             </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="showsTime" xsi:type="boolean">true</option>
+                            <option name="timeOnly" xsi:type="boolean">true</option>
+                            <option name="timeFormat" xsi:type="string">HH:mm</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
         </field>
-        <field name="pickup_time_to" formElement="input">
+        <field name="pickup_time_to" formElement="date">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Courier Pickup Time [To]</label>
                 <dataScope>pickup_time_to</dataScope>
-                <elementTmpl>Ideo_Dhl/form/element/time</elementTmpl>
             </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="showsTime" xsi:type="boolean">true</option>
+                            <option name="timeOnly" xsi:type="boolean">true</option>
+                            <option name="timeFormat" xsi:type="string">HH:mm</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
         </field>
     </fieldset>
 </form>

@@ -243,7 +243,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">UBEZP - Insurance</label>
+                <label translate="true">Insurance</label>
                 <dataScope>additional_services.insurance</dataScope>
             </settings>
             <formElements>
@@ -266,7 +266,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">COD - Cash On Delivery</label>
+                <label translate="true">Cash On Delivery</label>
                 <dataScope>additional_services.cod</dataScope>
             </settings>
             <formElements>
@@ -289,7 +289,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">1722 - Evening Delivery (18-22)</label>
+                <label translate="true">Evening Delivery (18-22)</label>
                 <dataScope>additional_services.eveningDelivery</dataScope>
             </settings>
             <formElements>
@@ -312,7 +312,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">SOBOTA - Saturday Delivery</label>
+                <label translate="true">Saturday Delivery</label>
                 <dataScope>additional_services.saturdayDelivery</dataScope>
             </settings>
             <formElements>
@@ -335,7 +335,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">NAD_SOBOTA - Saturday Pickup</label>
+                <label translate="true">Saturday Pickup</label>
                 <dataScope>additional_services.pickupOnSaturday</dataScope>
             </settings>
             <formElements>
@@ -358,7 +358,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">PDI - Pre-delivery Information</label>
+                <label translate="true">Pre-delivery Information</label>
                 <dataScope>additional_services.predeliveryInformation</dataScope>
             </settings>
             <formElements>
@@ -381,7 +381,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">ROD - Return Confirmed Documents</label>
+                <label translate="true">Return Confirmed Documents</label>
                 <dataScope>additional_services.returnOnDelivery</dataScope>
             </settings>
             <formElements>
@@ -404,7 +404,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">POD - Proof of Delivery</label>
+                <label translate="true">Proof of Delivery</label>
                 <dataScope>additional_services.proofOfDelivery</dataScope>
             </settings>
             <formElements>
@@ -427,7 +427,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">AGEVER - Adult Verification / Delivery</label>
+                <label translate="true">Adult Verification / Delivery</label>
                 <dataScope>additional_services.agever</dataScope>
             </settings>
             <formElements>
@@ -450,7 +450,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">ODB - Self Pickup</label>
+                <label translate="true">Self Pickup</label>
                 <dataScope>additional_services.odb</dataScope>
             </settings>
             <formElements>

@@ -11,6 +11,8 @@ use SoapClient;
 use SoapFault;
 use Throwable;
 
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+
 class SoapClientAdapter implements ClientInterface
 {
     private const WSDL_URL_PRODUCTION = 'https://dhl24.com.pl/webapi2';
@@ -21,11 +23,13 @@ class SoapClientAdapter implements ClientInterface
     /**
      * @param LoggerInterface $logger
      * @param ScopeConfigInterface $scopeConfig
+     * @param TimezoneInterface $timezone
      * @param FileDriver|null $fileDriver
      */
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly ScopeConfigInterface $scopeConfig,
+        private readonly TimezoneInterface $timezone,
         private readonly ?FileDriver $fileDriver = null
     ) {
     }
@@ -50,7 +54,7 @@ class SoapClientAdapter implements ClientInterface
                     'password' => $this->ensureUtf8($credentials->getPassword()),
                 ],
                 'postCode' => '00001',
-                'pickupDate' => date('Y-m-d'),
+                'pickupDate' => $this->timezone->scopeDate()->format('Y-m-d'),
             ];
 
             $client->getPostalCodeServices($params);
@@ -306,13 +310,24 @@ class SoapClientAdapter implements ClientInterface
                 $cleanPostCode = str_pad($cleanPostCode, 5, '0', STR_PAD_LEFT);
             }
 
+            try {
+                $cleanDate = $this->timezone->date($pickupDate)->format('Y-m-d');
+            } catch (Throwable) {
+                $cleanDate = $this->timezone->scopeDate()->format('Y-m-d');
+            }
+
+            $year = (int) substr($cleanDate, 0, 4);
+            if ($year < 2024 || $year > 2050) {
+                $cleanDate = $this->timezone->scopeDate()->format('Y-m-d');
+            }
+
             $params = [
                 'authData' => [
                     'username' => $this->ensureUtf8($credentials->getUsername()),
                     'password' => $this->ensureUtf8($credentials->getPassword()),
                 ],
                 'postCode' => $this->ensureUtf8($cleanPostCode),
-                'pickupDate' => $this->ensureUtf8($pickupDate),
+                'pickupDate' => $this->ensureUtf8($cleanDate),
             ];
 
             $response = $client->getPostalCodeServices($params);
@@ -410,12 +425,23 @@ class SoapClientAdapter implements ClientInterface
 
             $formattedShipmentIds = array_map([$this, 'ensureUtf8'], array_values($shipmentIds));
 
+            try {
+                $cleanDate = $this->timezone->date($pickupDate)->format('Y-m-d');
+            } catch (Throwable) {
+                $cleanDate = $this->timezone->scopeDate()->format('Y-m-d');
+            }
+
+            $year = (int) substr($cleanDate, 0, 4);
+            if ($year < 2024 || $year > 2050) {
+                $cleanDate = $this->timezone->scopeDate()->format('Y-m-d');
+            }
+
             $params = [
                 'authData' => [
                     'username' => $this->ensureUtf8($credentials->getUsername()),
                     'password' => $this->ensureUtf8($credentials->getPassword()),
                 ],
-                'pickupDate' => $this->ensureUtf8($pickupDate),
+                'pickupDate' => $this->ensureUtf8($cleanDate),
                 'pickupTimeFrom' => $this->ensureUtf8($pickupTimeFrom),
                 'pickupTimeTo' => $this->ensureUtf8($pickupTimeTo),
                 'shipmentIdList' => [

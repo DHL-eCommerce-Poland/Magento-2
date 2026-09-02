@@ -20,8 +20,8 @@ use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use InvalidArgumentException;
 use Magento\Directory\Model\Config\Source\Country as CountrySource;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
@@ -33,17 +33,16 @@ class TemplateManager
      * @param DeliveryServiceCollectionFactory $deliveryServiceCollectionFactory
      * @param DropOffPointRepositoryInterface $dropOffPointRepository
      * @param DeliveryServiceRepositoryInterface $deliveryServiceRepository
-     * @param ScopeConfigInterface $scopeConfig
      * @param CountrySource $countrySource
      * @param ServiceCodeSource $serviceCodeSource
      * @param LabelTypeSource $labelTypeSource
      * @param PackageTypeSource $packageTypeSource
      * @param AddressTypeSource $addressTypeSource
      * @param ContentSource $contentSource
-     * @param PickupTime $pickupTimeSource
      * @param OrderRepositoryInterface $orderRepository
      * @param OrderToShipmentDataMapper $mapper
      * @param SerializerInterface $serializer
+     * @param TimezoneInterface $timezone
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -51,7 +50,6 @@ class TemplateManager
         private readonly DeliveryServiceCollectionFactory $deliveryServiceCollectionFactory,
         private readonly DropOffPointRepositoryInterface $dropOffPointRepository,
         private readonly DeliveryServiceRepositoryInterface $deliveryServiceRepository,
-        private readonly ScopeConfigInterface $scopeConfig,
         private readonly CountrySource $countrySource,
         private readonly ServiceCodeSource $serviceCodeSource,
         private readonly LabelTypeSource $labelTypeSource,
@@ -61,6 +59,7 @@ class TemplateManager
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly OrderToShipmentDataMapper $mapper,
         private readonly SerializerInterface $serializer,
+        private readonly TimezoneInterface $timezone,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -339,7 +338,7 @@ class TemplateManager
                 mpk: (string)($service->getMpk() ?? ''),
                 comment: (string)($service->getComment() ?? ''),
                 reference: (string)($service->getReference() ?? ''),
-                shipmentDate: date('Y-m-d'),
+                shipmentDate: $this->timezone->scopeDate()->format('Y-m-d'),
                 packageType: (string)($service->getPackageType() ?: 'PACKAGE'),
                 weight: (float)number_format((float)($service->getWeight() ?: 1.0), 4, '.', ''),
                 width: $service->getWidth() ? (float)number_format((float)$service->getWidth(), 4, '.', '') : null,

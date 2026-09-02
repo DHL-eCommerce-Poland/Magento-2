@@ -4,13 +4,21 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Api;
 
-use DateTimeImmutable;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentRestrictions;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class ShipmentReturnDataMapper
 {
     private const DEFAULT_EXPIRATION_DAYS = 14;
+
+    /**
+     * @param TimezoneInterface $timezone
+     */
+    public function __construct(
+        private readonly TimezoneInterface $timezone
+    ) {
+    }
 
     /**
      * Map inverted DhlShipmentData into DHL WebAPI2 createShipmentReturn SOAP request array.
@@ -58,7 +66,9 @@ class ShipmentReturnDataMapper
             ? $merchantRecipient->getName()
             : $merchantContact;
 
-        $expDate = (new DateTimeImmutable())->modify('+' . max(1, $expirationDays) . ' days')->format('Y-m-d');
+        $expDate = $this->timezone->scopeDate()
+            ->modify('+' . max(1, $expirationDays) . ' days')
+            ->format('Y-m-d');
 
         $countryCode = strtoupper($merchantRecipient->getCountry() ?: 'PL');
         $serviceType = ($countryCode === 'PL') ? 'ZK' : 'ZC';

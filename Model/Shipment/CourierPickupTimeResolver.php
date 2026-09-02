@@ -7,16 +7,20 @@ namespace Ideo\Dhl\Model\Shipment;
 use Exception;
 use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Throwable;
 
 class CourierPickupTimeResolver
 {
     /**
      * @param ClientInterface $client
      * @param CredentialsProvider $credentialsProvider
+     * @param TimezoneInterface $timezone
      */
     public function __construct(
         private readonly ClientInterface $client,
-        private readonly CredentialsProvider $credentialsProvider
+        private readonly CredentialsProvider $credentialsProvider,
+        private readonly TimezoneInterface $timezone
     ) {
     }
 
@@ -37,11 +41,39 @@ class CourierPickupTimeResolver
         string $environment = 'sandbox',
         ?string $currentTime = null
     ): array {
-        $today = date('Y-m-d');
-        $requestedDate = $requestedDate ?: $today;
-        $currentTime = $currentTime ?: date('H:i');
+        $today = $this->timezone->scopeDate()->format('Y-m-d');
+        $formattedDate = $today;
 
-        $requestedDt = new \DateTime($requestedDate);
+        $rawDate = trim((string) $requestedDate);
+        if (!empty($rawDate)) {
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $rawDate)) {
+                $formattedDate = $rawDate;
+            } elseif (preg_match('/^(\d{1,2})[\.\/](\d{1,2})[\.\/](\d{4})$/', $rawDate, $m)) {
+                $d = (int)$m[1];
+                $mNum = (int)$m[2];
+                $y = (int)$m[3];
+                if (str_contains($rawDate, '.') || $d > 12) {
+                    $formattedDate = sprintf('%04d-%02d-%02d', $y, $mNum, $d);
+                } else {
+                    $formattedDate = sprintf('%04d-%02d-%02d', $y, $d, $mNum);
+                }
+            } else {
+                try {
+                    $formattedDate = $this->timezone->date($rawDate)->format('Y-m-d');
+                } catch (Throwable) {
+                    $formattedDate = $today;
+                }
+            }
+        }
+
+        $year = (int) substr($formattedDate, 0, 4);
+        if ($year < 2024 || $year > 2050) {
+            $formattedDate = $today;
+        }
+
+        $currentTime = $currentTime ?: $this->timezone->scopeDate()->format('H:i');
+
+        $requestedDt = $this->timezone->date($formattedDate);
         if ((int) $requestedDt->format('N') >= 6) {
             return [
                 'is_today_possible' => false,
@@ -54,9 +86,9 @@ class CourierPickupTimeResolver
         }
 
         $credentials = $this->credentialsProvider->getCredentials($environment);
-        $result = $this->client->getPostalCodeServices($credentials, $postalCode, $requestedDate);
+        $result = $this->client->getPostalCodeServices($credentials, $postalCode, $formattedDate);
 
-        $isTodayRequested = ($requestedDate === $today);
+        $isTodayRequested = ($formattedDate === $today);
 
         if (!$result->isSuccess()) {
             return [

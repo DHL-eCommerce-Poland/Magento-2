@@ -16,11 +16,15 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
+use DateTime;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+
 class CourierBookingServiceTest extends TestCase
 {
     private ClientInterface|Stub $clientStub;
     private CredentialsProvider|Stub $credentialsProviderStub;
     private ShipmentDataRepositoryInterface|Stub $shipmentDataRepositoryStub;
+    private TimezoneInterface|MockObject $timezoneMock;
     private CourierBookingService $service;
 
     protected function setUp(): void
@@ -28,6 +32,10 @@ class CourierBookingServiceTest extends TestCase
         $this->clientStub = $this->createStub(ClientInterface::class);
         $this->credentialsProviderStub = $this->createStub(CredentialsProvider::class);
         $this->shipmentDataRepositoryStub = $this->createStub(ShipmentDataRepositoryInterface::class);
+        $this->timezoneMock = $this->createMock(TimezoneInterface::class);
+
+        $this->timezoneMock->method('date')
+            ->willReturnCallback(fn($d) => new DateTime($d));
 
         $this->credentialsProviderStub->method('getCredentials')
             ->willReturn(new Credentials('user', 'pass', true));
@@ -35,7 +43,8 @@ class CourierBookingServiceTest extends TestCase
         $this->service = new CourierBookingService(
             $this->clientStub,
             $this->credentialsProviderStub,
-            $this->shipmentDataRepositoryStub
+            $this->shipmentDataRepositoryStub,
+            $this->timezoneMock
         );
     }
 

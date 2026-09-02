@@ -3,11 +3,16 @@
 declare(strict_types=1);
 
 use Ideo\Dhl\Model\Shipment\DhlShipmentRestrictions;
+use Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\Template;
 
 /** @var Template $block */
 /** @var Escaper $escaper */
+/** @var DatePickerConfig $viewModel */
+
+$viewModel = $block->getViewModel();
+$dateFormat = $viewModel->getDateFormat();
 ?>
 <div id="ideo-dhl-prepare-modal" style="display: none;" data-bind="scope: 'dhlShipmentForm'">
     <form id="ideo-dhl-prepare-modal-form" data-mage-init='{"validation":{}}' onsubmit="return false;">
@@ -73,8 +78,12 @@ use Magento\Framework\View\Element\Template;
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Courier Pickup Time [From - To]')) ?></span></label>
                             <div class="admin__field-control">
                                 <div style="display: flex; gap: 8px;">
-                                    <input type="time" class="admin__control-text" placeholder="10:00" data-bind="value: pickupHourFrom" style="flex: 1;" />
-                                    <input type="time" class="admin__control-text" placeholder="14:00" data-bind="value: pickupHourTo" style="flex: 1;" />
+                                    <div style="flex: 1;">
+                                        <input type="text" class="admin__control-text" placeholder="10:00" data-bind="dhlTimepicker: pickupHourFrom" style="width: 100%; box-sizing: border-box;" />
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <input type="text" class="admin__control-text" placeholder="14:00" data-bind="dhlTimepicker: pickupHourTo" style="width: 100%; box-sizing: border-box;" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -182,7 +191,7 @@ use Magento\Framework\View\Element\Template;
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipment Date')) ?></span></label>
                             <div class="admin__field-control">
-                                <input type="date" class="admin__control-text" min="<?= date('Y-m-d') ?>" data-bind="value: shipmentDate" required />
+                                <input type="text" class="admin__control-text" data-bind="dhlDatepicker: shipmentDate, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', minDate: new Date() }" style="width: 100%; box-sizing: border-box;" required />
                             </div>
                         </div>
                         <div class="admin__field required">
@@ -243,43 +252,43 @@ use Magento\Framework\View\Element\Template;
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Services')) ?></span></label>
                             <div class="admin__field-control" style="display: flex; flex-direction: column; gap: 6px; padding-top: 6px;">
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: insurance" /> <?= $escaper->escapeHtml(__('UBEZP - Insurance')) ?>
+                                    <input type="checkbox" data-bind="checked: insurance" /> <?= $escaper->escapeHtml(__('Insurance')) ?>
                                 </label>
                                 <div style="margin-left: 24px; margin-top: 4px; margin-bottom: 8px; max-width: 250px;" data-bind="visible: insurance">
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Insurance Value')) ?>" data-bind="value: insuranceValue, attr: {required: insurance() ? 'required' : null}" data-validate="{'required-entry': true, 'validate-number': true, 'greater-than-zero': true}" />
                                 </div>
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: cod" /> <?= $escaper->escapeHtml(__('COD - Cash On Delivery')) ?>
+                                    <input type="checkbox" data-bind="checked: cod" /> <?= $escaper->escapeHtml(__('Cash On Delivery')) ?>
                                 </label>
                                 <div style="margin-left: 24px; margin-top: 4px; margin-bottom: 8px; max-width: 250px;" data-bind="visible: cod">
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('COD Amount')) ?>" data-bind="value: codAmount, attr: {required: cod() ? 'required' : null}" data-validate="{'required-entry': true, 'validate-number': true, 'greater-than-zero': true}" />
                                 </div>
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: eveningDelivery" /> <?= $escaper->escapeHtml(__('1722 - Evening Delivery (18-22)')) ?>
+                                    <input type="checkbox" data-bind="checked: eveningDelivery" /> <?= $escaper->escapeHtml(__('Evening Delivery (18-22)')) ?>
                                 </label>
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: saturdayDelivery" /> <?= $escaper->escapeHtml(__('SOBOTA - Saturday Delivery')) ?>
+                                    <input type="checkbox" data-bind="checked: saturdayDelivery" /> <?= $escaper->escapeHtml(__('Saturday Delivery')) ?>
                                 </label>
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: saturdayDispatch" /> <?= $escaper->escapeHtml(__('NAD_SOBOTA - Saturday Pickup')) ?>
+                                    <input type="checkbox" data-bind="checked: saturdayDispatch" /> <?= $escaper->escapeHtml(__('Saturday Pickup')) ?>
                                 </label>
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: pdi" /> <?= $escaper->escapeHtml(__('PDI - Pre-delivery Information')) ?>
+                                    <input type="checkbox" data-bind="checked: pdi" /> <?= $escaper->escapeHtml(__('Pre-delivery Information')) ?>
                                 </label>
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: rod" /> <?= $escaper->escapeHtml(__('ROD - Return Confirmed Documents')) ?>
+                                    <input type="checkbox" data-bind="checked: rod" /> <?= $escaper->escapeHtml(__('Return Confirmed Documents')) ?>
                                 </label>
                                 <div style="margin-left: 24px; margin-top: 4px; margin-bottom: 8px; max-width: 250px;" data-bind="visible: rod">
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('ROD Document Name')) ?>" data-bind="value: rodDocumentText, attr: {required: rod() ? 'required' : null}" data-validate="{'required-entry': true}" />
                                 </div>
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: pod" /> <?= $escaper->escapeHtml(__('POD - Proof of Delivery')) ?>
+                                    <input type="checkbox" data-bind="checked: pod" /> <?= $escaper->escapeHtml(__('Proof of Delivery')) ?>
                                 </label>
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: agever" /> <?= $escaper->escapeHtml(__('AGEVER - Adult Verification / Delivery')) ?>
+                                    <input type="checkbox" data-bind="checked: agever" /> <?= $escaper->escapeHtml(__('Adult Verification / Delivery')) ?>
                                 </label>
                                 <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: odb" /> <?= $escaper->escapeHtml(__('ODB - Self Pickup')) ?>
+                                    <input type="checkbox" data-bind="checked: odb" /> <?= $escaper->escapeHtml(__('Self Pickup')) ?>
                                 </label>
                             </div>
                         </div>
@@ -379,7 +388,8 @@ use Magento\Framework\View\Element\Template;
                 "dhlShipmentForm": {
                     "component": "Ideo_Dhl/js/shipment/prepare-modal",
                     "saveUrl": "<?= $escaper->escapeUrl($block->getUrl('ideo_dhl/shipment/save')) ?>",
-                    "loadTemplateUrl": "<?= $escaper->escapeUrl($block->getUrl('ideo_dhl/shipment/loadTemplate')) ?>"
+                    "loadTemplateUrl": "<?= $escaper->escapeUrl($block->getUrl('ideo_dhl/shipment/loadTemplate')) ?>",
+                    "dateFormat": "<?= $escaper->escapeJs($dateFormat) ?>"
                 }
             }
         }

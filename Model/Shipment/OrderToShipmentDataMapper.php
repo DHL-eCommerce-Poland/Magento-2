@@ -13,6 +13,7 @@ use Ideo\Dhl\Model\Template\TemplateVariableResolver;
 use InvalidArgumentException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -24,6 +25,7 @@ class OrderToShipmentDataMapper
      * @param OrderWeightAggregator $weightAggregator
      * @param TemplateVariableResolver $variableResolver
      * @param SerializerInterface $serializer
+     * @param TimezoneInterface $timezone
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -31,6 +33,7 @@ class OrderToShipmentDataMapper
         private readonly OrderWeightAggregator $weightAggregator,
         private readonly TemplateVariableResolver $variableResolver,
         private readonly SerializerInterface $serializer,
+        private readonly TimezoneInterface $timezone,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -360,7 +363,7 @@ class OrderToShipmentDataMapper
             mpk: (string)($defaultShipmentDefaults['mpk'] ?? $resolvedMpk),
             comment: (string)($defaultShipmentDefaults['comment'] ?? $resolvedComment),
             reference: (string)($defaultShipmentDefaults['reference'] ?? $resolvedReference),
-            shipmentDate: date('Y-m-d'),
+            shipmentDate: $this->timezone->scopeDate()->format('Y-m-d'),
             pickupHourFrom: $pickupHourFrom,
             pickupHourTo: $pickupHourTo,
             packageType: (string)($defaultShipmentDefaults['packageType'] ?? 'PACKAGE'),

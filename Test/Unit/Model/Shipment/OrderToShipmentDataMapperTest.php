@@ -12,6 +12,8 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\Order\Payment;
+use DateTime;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\TestCase;
 
 class OrderToShipmentDataMapperTest extends TestCase
@@ -26,14 +28,18 @@ class OrderToShipmentDataMapperTest extends TestCase
         $addressParser = new StreetAddressParser();
         $weightAggregator = new OrderWeightAggregator();
         $variableResolver = new TemplateVariableResolver();
-
         $serializer = new \Magento\Framework\Serialize\Serializer\Json();
+
+        $timezoneMock = $this->createMock(TimezoneInterface::class);
+        $timezoneMock->method('scopeDate')
+            ->willReturn(new DateTime('2026-09-02'));
 
         $this->mapper = new OrderToShipmentDataMapper(
             $addressParser,
             $weightAggregator,
             $variableResolver,
-            $serializer
+            $serializer,
+            $timezoneMock
         );
     }
 

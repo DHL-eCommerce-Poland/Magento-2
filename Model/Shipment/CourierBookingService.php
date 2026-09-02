@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
-use DateTime;
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CourierBookingResult;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -19,12 +19,14 @@ class CourierBookingService
      * @param ClientInterface $client
      * @param CredentialsProvider $credentialsProvider
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
+     * @param TimezoneInterface $timezone
      * @param LoggerInterface|null $logger
      */
     public function __construct(
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
+        private readonly TimezoneInterface $timezone,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -55,13 +57,15 @@ class CourierBookingService
         }
 
         try {
-            $pickupDt = new DateTime($pickupDate);
+            $pickupDt = $this->timezone->date($pickupDate);
+            $formattedPickupDate = $pickupDt->format('Y-m-d');
             if ((int) $pickupDt->format('N') >= 6) {
                 throw new LocalizedException(__('Courier pickup is not available for weekends. Please select a business day in the calendar.'));
             }
         } catch (LocalizedException $le) {
             throw $le;
         } catch (Throwable $e) {
+            $formattedPickupDate = $this->timezone->scopeDate()->format('Y-m-d');
             $this->logger?->warning(sprintf(
                 '[CourierBookingService] Could not parse pickup date "%s": %s',
                 $pickupDate,
@@ -104,7 +108,7 @@ class CourierBookingService
         $result = $this->client->bookCourier(
             $credentials,
             $dhlShipmentIds,
-            $pickupDate,
+            $formattedPickupDate,
             $pickupTimeFrom,
             $pickupTimeTo,
             $additionalInfo
