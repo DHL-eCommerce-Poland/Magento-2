@@ -104,6 +104,7 @@
     <table name="dhlparcel_shipment_data" resource="default" engine="innodb" comment="DHL Shipment Data Entities">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Magento Order ID"/>
+        <column xsi:type="int" name="magento_shipment_id" unsigned="true" nullable="true" comment="Magento Sales Shipment ID"/>
         <column xsi:type="varchar" name="shipment_id" length="64" nullable="true" comment="DHL Shipment ID"/>
         <column xsi:type="varchar" name="return_shipment_id" length="64" nullable="true" comment="DHL Return Shipment ID / Waybill"/>
         <column xsi:type="varchar" name="dispatch_number" length="64" nullable="true" comment="DHL Courier Order / Dispatch Number"/>
@@ -119,6 +120,9 @@
         </constraint>
         <index referenceId="IDX_DHLPARCEL_SHIPMENT_DATA_ORDER_ID" indexType="btree">
             <column name="order_id"/>
+        </index>
+        <index referenceId="IDX_DHLPARCEL_SHIPMENT_DATA_MAGENTO_SHIPMENT_ID" indexType="btree">
+            <column name="magento_shipment_id"/>
         </index>
         <index referenceId="IDX_DHLPARCEL_SHIPMENT_DATA_SHIPMENT_ID" indexType="btree">
             <column name="shipment_id"/>

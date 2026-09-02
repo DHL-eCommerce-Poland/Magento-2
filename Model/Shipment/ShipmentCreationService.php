@@ -28,6 +28,7 @@ class ShipmentCreationService
      * @param LockManagerInterface $lockManager
      * @param LoggerInterface $logger
      * @param SerializerInterface $serializer
+     * @param MagentoShipmentSyncService|null $magentoShipmentSyncService
      */
     public function __construct(
         private readonly ShipmentDataService $shipmentDataService,
@@ -37,7 +38,8 @@ class ShipmentCreationService
         private readonly ClientInterface $client,
         private readonly LockManagerInterface $lockManager,
         private readonly LoggerInterface $logger,
-        private readonly SerializerInterface $serializer
+        private readonly SerializerInterface $serializer,
+        private readonly ?MagentoShipmentSyncService $magentoShipmentSyncService = null
     ) {
     }
 
@@ -86,7 +88,29 @@ class ShipmentCreationService
                 return $apiResult;
             }
 
-            // 5. Handle API Success scenario (save DB entity with DHL order status or CREATED fallback)
+            // 5. Create native Magento shipment if sync service is available
+            $magentoShipmentId = null;
+            if ($this->magentoShipmentSyncService && $orderId !== null) {
+                try {
+                    $packageNumbers = $apiResult->getPackageNumbers()
+                        ?: ($apiResult->getShipmentId() ? [(string)$apiResult->getShipmentId()] : []);
+                    $itemsQty = $shipmentData->getItemsQty();
+                    $magentoShipment = $this->magentoShipmentSyncService->createMagentoShipment(
+                        (int)$orderId,
+                        $packageNumbers,
+                        $itemsQty
+                    );
+                    $magentoShipmentId = (int)$magentoShipment->getEntityId();
+                } catch (Throwable $e) {
+                    $this->logger->error(sprintf(
+                        '[ShipmentCreation] Failed to create native Magento shipment for order #%d: %s',
+                        $orderId,
+                        $e->getMessage()
+                    ));
+                }
+            }
+
+            // 6. Handle API Success scenario (save DB entity with DHL order status or CREATED fallback)
             $status = $apiResult->getOrderStatus() ?: ShipmentDataInterface::DEFAULT_STATUS;
             $this->shipmentDataService->saveShipmentDataWithStatus(
                 $shipmentData,
@@ -96,7 +120,8 @@ class ShipmentCreationService
                 $presetShipmentId,
                 $apiResult->getShipmentId(),
                 null,
-                $apiResult->getPackageNumbers()
+                $apiResult->getPackageNumbers(),
+                $magentoShipmentId
             );
 
             return $apiResult;
@@ -159,13 +184,34 @@ class ShipmentCreationService
 
             $newShipmentId = (string) $apiResult->getShipmentId();
             $status = $apiResult->getOrderStatus() ?: ShipmentDataInterface::DEFAULT_STATUS;
+
+            // Update tracks on existing Magento shipment
+            $magentoShipmentId = $existingEntity->getMagentoShipmentId();
+            if ($this->magentoShipmentSyncService && $magentoShipmentId) {
+                try {
+                    $packageNumbers = $apiResult->getPackageNumbers()
+                        ?: ($newShipmentId !== '' ? [$newShipmentId] : []);
+                    $this->magentoShipmentSyncService->updateMagentoShipmentTracks(
+                        $magentoShipmentId,
+                        $packageNumbers
+                    );
+                } catch (Throwable $e) {
+                    $this->logger->warning(sprintf(
+                        '[DHL Recreate] Failed to update native Magento shipment tracks #%d: %s',
+                        $magentoShipmentId,
+                        $e->getMessage()
+                    ));
+                }
+            }
+
             $this->shipmentDataService->updateExistingShipmentPayload(
                 $entityId,
                 $shipmentData,
                 $status,
                 $newShipmentId,
                 null,
-                $apiResult->getPackageNumbers()
+                $apiResult->getPackageNumbers(),
+                $magentoShipmentId
             );
 
             return $apiResult;

@@ -66,6 +66,28 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
     }
 
     /**
+     * Get Magento sales shipment ID.
+     *
+     * @return int|null
+     */
+    public function getMagentoShipmentId(): ?int
+    {
+        return $this->getData(self::MAGENTO_SHIPMENT_ID) !== null ? (int)$this->getData(self::MAGENTO_SHIPMENT_ID) : null;
+    }
+
+    /**
+     * Set Magento sales shipment ID.
+     *
+     * @param int|null $magentoShipmentId
+     *
+     * @return $this
+     */
+    public function setMagentoShipmentId(?int $magentoShipmentId): static
+    {
+        return $this->setData(self::MAGENTO_SHIPMENT_ID, $magentoShipmentId);
+    }
+
+    /**
      * Get DHL shipment ID.
      *
      * @return string|null

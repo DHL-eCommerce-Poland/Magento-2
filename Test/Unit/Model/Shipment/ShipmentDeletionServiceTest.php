@@ -121,4 +121,43 @@ class ShipmentDeletionServiceTest extends TestCase
 
         $this->deletionService->deleteShipment($entityId);
     }
+
+    public function testDeleteShipmentCallsCancelDhlTrackingWhenMagentoShipmentIdExists(): void
+    {
+        $entityId = 456;
+        $shipmentId = 'DHL999';
+        $magentoShipmentId = 77;
+        $credentials = new Credentials('user', 'pass', true);
+
+        $syncServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+        $service = new ShipmentDeletionService(
+            $this->repositoryMock,
+            $this->clientMock,
+            $this->credentialsProviderMock,
+            $this->scopeConfigMock,
+            $this->loggerMock,
+            $syncServiceMock
+        );
+
+        $shipmentMock = $this->createMock(ShipmentDataInterface::class);
+        $shipmentMock->method('getShipmentId')->willReturn($shipmentId);
+        $shipmentMock->method('getMagentoShipmentId')->willReturn($magentoShipmentId);
+
+        $this->repositoryMock->method('getById')->with($entityId)->willReturn($shipmentMock);
+        $this->scopeConfigMock->method('getValue')->willReturn(1);
+        $this->credentialsProviderMock->method('getCredentials')->willReturn($credentials);
+        $this->clientMock->method('deleteShipment')->willReturn(new DeleteShipmentResult(true, $shipmentId));
+
+        $syncServiceMock->expects($this->once())
+            ->method('cancelDhlTracking')
+            ->with($magentoShipmentId);
+
+        $this->repositoryMock->expects($this->once())
+            ->method('delete')
+            ->with($shipmentMock)
+            ->willReturn(true);
+
+        $result = $service->deleteShipment($entityId);
+        $this->assertTrue($result);
+    }
 }

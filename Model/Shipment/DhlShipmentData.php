@@ -17,13 +17,15 @@ class DhlShipmentData
      * @param RecipientData|null $recipient
      * @param SpecialServicesData|null $specialServices
      * @param ShipmentSettingsData|null $shipmentSettings
+     * @param array $itemsQty
      */
     public function __construct(
-        private ?int $orderId = null,
+        private readonly ?int $orderId = null,
         private ?SenderData $sender = null,
         private ?RecipientData $recipient = null,
         private ?SpecialServicesData $specialServices = null,
-        private ?ShipmentSettingsData $shipmentSettings = null
+        private ?ShipmentSettingsData $shipmentSettings = null,
+        private array $itemsQty = []
     ) {
         $this->sender = $sender ?? new SenderData();
         $this->recipient = $recipient ?? new RecipientData();
@@ -39,6 +41,29 @@ class DhlShipmentData
     public function getOrderId(): ?int
     {
         return $this->orderId;
+    }
+
+    /**
+     * Get items quantities per order item ID.
+     *
+     * @return array
+     */
+    public function getItemsQty(): array
+    {
+        return $this->itemsQty;
+    }
+
+    /**
+     * Set items quantities per order item ID.
+     *
+     * @param array $itemsQty
+     *
+     * @return self
+     */
+    public function setItemsQty(array $itemsQty): self
+    {
+        $this->itemsQty = $itemsQty;
+        return $this;
     }
 
     /**
@@ -90,6 +115,7 @@ class DhlShipmentData
     {
         return [
             'orderId' => $this->orderId,
+            'itemsQty' => $this->itemsQty,
             'sender' => $this->sender->toArray(),
             'recipient' => $this->recipient->toArray(),
             'specialServices' => $this->specialServices->toArray(),
@@ -112,7 +138,8 @@ class DhlShipmentData
             SenderData::fromArray($data['sender'] ?? []),
             RecipientData::fromArray($data['recipient'] ?? []),
             SpecialServicesData::fromArray($data['specialServices'] ?? []),
-            ShipmentSettingsData::fromArray($data['shipmentSettings'] ?? [])
+            ShipmentSettingsData::fromArray($data['shipmentSettings'] ?? []),
+            is_array($data['itemsQty'] ?? null) ? $data['itemsQty'] : []
         );
     }
 }

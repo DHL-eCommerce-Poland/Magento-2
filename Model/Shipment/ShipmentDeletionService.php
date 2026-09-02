@@ -10,6 +10,7 @@ use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class ShipmentDeletionService
 {
@@ -21,13 +22,15 @@ class ShipmentDeletionService
      * @param CredentialsProvider $credentialsProvider
      * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface|null $logger
+     * @param MagentoShipmentSyncService|null $magentoShipmentSyncService
      */
     public function __construct(
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly ?LoggerInterface $logger = null
+        private readonly ?LoggerInterface $logger = null,
+        private readonly ?MagentoShipmentSyncService $magentoShipmentSyncService = null
     ) {
     }
 
@@ -61,6 +64,19 @@ class ShipmentDeletionService
                 ));
 
                 throw new LocalizedException(__('Failed to delete shipment in DHL: %1', $errorMsg));
+            }
+        }
+
+        $magentoShipmentId = $shipment->getMagentoShipmentId();
+        if ($this->magentoShipmentSyncService && $magentoShipmentId) {
+            try {
+                $this->magentoShipmentSyncService->cancelDhlTracking((int)$magentoShipmentId);
+            } catch (Throwable $e) {
+                $this->logger?->error(sprintf(
+                    '[DHL] Failed to cancel tracking on Magento shipment #%d: %s',
+                    $magentoShipmentId,
+                    $e->getMessage()
+                ));
             }
         }
 

@@ -49,6 +49,7 @@ class DhlShipmentDataTest extends TestCase
     {
         $data = [
             'orderId' => 202,
+            'itemsQty' => [],
             'sender' => (new SenderData(name: 'Sender Inc'))->toArray(),
             'recipient' => (new RecipientData(name: 'Recipient Ltd'))->toArray(),
             'specialServices' => (new SpecialServicesData(insurance: true, insuranceValue: 500.0))->toArray(),

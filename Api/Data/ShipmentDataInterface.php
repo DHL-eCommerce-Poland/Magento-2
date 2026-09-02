@@ -8,6 +8,7 @@ interface ShipmentDataInterface
 {
     public const ENTITY_ID = 'entity_id';
     public const ORDER_ID = 'order_id';
+    public const MAGENTO_SHIPMENT_ID = 'magento_shipment_id';
     public const SHIPMENT_ID = 'shipment_id';
     public const RETURN_SHIPMENT_ID = 'return_shipment_id';
     public const DISPATCH_NUMBER = 'dispatch_number';
@@ -52,6 +53,22 @@ interface ShipmentDataInterface
      * @return $this
      */
     public function setOrderId(?int $orderId): static;
+
+    /**
+     * Get Magento sales shipment ID.
+     *
+     * @return int|null
+     */
+    public function getMagentoShipmentId(): ?int;
+
+    /**
+     * Set Magento sales shipment ID.
+     *
+     * @param int|null $magentoShipmentId
+     *
+     * @return $this
+     */
+    public function setMagentoShipmentId(?int $magentoShipmentId): static;
 
     /**
      * Get DHL shipment ID.

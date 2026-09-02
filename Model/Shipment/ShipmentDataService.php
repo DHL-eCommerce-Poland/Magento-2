@@ -190,6 +190,7 @@ class ShipmentDataService
      * @param string|null $shipmentId
      * @param string|null $returnShipmentId
      * @param array|null $packageNumbers
+     * @param int|null $magentoShipmentId
      *
      * @return ShipmentDataInterface
      * @throws CouldNotSaveException
@@ -203,7 +204,8 @@ class ShipmentDataService
         ?string $presetShipmentId = null,
         ?string $shipmentId = null,
         ?string $returnShipmentId = null,
-        ?array $packageNumbers = null
+        ?array $packageNumbers = null,
+        ?int $magentoShipmentId = null
     ): ShipmentDataInterface {
         $this->validator->validate($shipmentData);
 
@@ -220,8 +222,12 @@ class ShipmentDataService
         if ($packageNumbers !== null && !empty($packageNumbers)) {
             $payloadArr['packageNumbers'] = array_values($packageNumbers);
         }
+        if ($magentoShipmentId !== null) {
+            $payloadArr['magentoShipmentId'] = $magentoShipmentId;
+        }
 
         $entity->setOrderId($orderId);
+        $entity->setMagentoShipmentId($magentoShipmentId);
         $entity->setStatus($status);
         if ($shipmentId !== null && trim($shipmentId) !== '') {
             $entity->setShipmentId($shipmentId);
@@ -262,6 +268,7 @@ class ShipmentDataService
      * @param string|null $shipmentId
      * @param string|null $errorMessages
      * @param array|null $packageNumbers
+     * @param int|null $magentoShipmentId
      *
      * @return ShipmentDataInterface
      * @throws LocalizedException
@@ -272,7 +279,8 @@ class ShipmentDataService
         string $status = 'created',
         ?string $shipmentId = null,
         ?string $errorMessages = null,
-        ?array $packageNumbers = null
+        ?array $packageNumbers = null,
+        ?int $magentoShipmentId = null
     ): ShipmentDataInterface {
         $this->validator->validate($shipmentData);
 
@@ -285,6 +293,10 @@ class ShipmentDataService
         }
         if ($packageNumbers !== null && !empty($packageNumbers)) {
             $payloadArr['packageNumbers'] = array_values($packageNumbers);
+        }
+        if ($magentoShipmentId !== null) {
+            $payloadArr['magentoShipmentId'] = $magentoShipmentId;
+            $entity->setMagentoShipmentId($magentoShipmentId);
         }
 
         $entity->setStatus($status);
