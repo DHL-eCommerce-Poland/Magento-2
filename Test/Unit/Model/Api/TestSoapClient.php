@@ -107,7 +107,16 @@ class TestSoapClient extends SoapClient
         return (object) [
             'createShipmentsResult' => (object) [
                 'item' => [
-                    (object) ['shipmentId' => '1234567890', 'orderStatus' => 'Nowa'],
+                    (object) [
+                        'shipmentId' => '1234567890',
+                        'orderStatus' => 'Nowa',
+                        'pieceList' => (object) [
+                            'item' => [
+                                (object) ['blpPieceId' => 'BLP1001'],
+                                (object) ['blpPieceId' => 'BLP1002'],
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ];

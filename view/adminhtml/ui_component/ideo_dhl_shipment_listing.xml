@@ -128,6 +128,11 @@
                 <label translate="true">Courier Dispatch ID</label>
             </settings>
         </column>
+        <column name="package_numbers" class="Ideo\Dhl\Ui\Component\Listing\Column\PackageNumbers">
+            <settings>
+                <label translate="true">Package Numbers</label>
+            </settings>
+        </column>
         <column name="status">
             <settings>
                 <filter>text</filter>

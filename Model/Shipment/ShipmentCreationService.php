@@ -8,7 +8,6 @@ use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\CreateShipmentsResult;
 use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
-use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Lock\LockManagerInterface;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -27,7 +26,6 @@ class ShipmentCreationService
      * @param CredentialsProvider $credentialsProvider
      * @param ClientInterface $client
      * @param LockManagerInterface $lockManager
-     * @param ResourceConnection $resourceConnection
      * @param LoggerInterface $logger
      * @param SerializerInterface $serializer
      */
@@ -38,7 +36,6 @@ class ShipmentCreationService
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ClientInterface $client,
         private readonly LockManagerInterface $lockManager,
-        private readonly ResourceConnection $resourceConnection,
         private readonly LoggerInterface $logger,
         private readonly SerializerInterface $serializer
     ) {
@@ -97,12 +94,16 @@ class ShipmentCreationService
                 null,
                 $presetSenderId,
                 $presetShipmentId,
-                $apiResult->getShipmentId()
+                $apiResult->getShipmentId(),
+                null,
+                $apiResult->getPackageNumbers()
             );
 
             return $apiResult;
         } finally {
-            $this->lockManager->unlock($lockName);
+            if (!$this->lockManager->unlock($lockName)) {
+                $this->logger->warning(sprintf('[ShipmentCreation] Failed to release lock: %s', $lockName));
+            }
         }
     }
 
@@ -162,12 +163,16 @@ class ShipmentCreationService
                 $entityId,
                 $shipmentData,
                 $status,
-                $newShipmentId
+                $newShipmentId,
+                null,
+                $apiResult->getPackageNumbers()
             );
 
             return $apiResult;
         } finally {
-            $this->lockManager->unlock($lockName);
+            if (!$this->lockManager->unlock($lockName)) {
+                $this->logger->warning(sprintf('[ShipmentCreation] Failed to release lock: %s', $lockName));
+            }
         }
     }
 }

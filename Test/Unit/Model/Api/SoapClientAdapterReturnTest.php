@@ -25,8 +25,10 @@ class SoapClientAdapterReturnTest extends TestCase
     {
         $soapClientStub = new TestSoapClient(false);
 
+        $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $timezoneStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 

@@ -15,7 +15,9 @@ use PHPUnit\Framework\TestCase;
 
 use DateTime;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
+#[AllowMockObjectsWithoutExpectations]
 class ShipmentDataValidatorTest extends TestCase
 {
     /**

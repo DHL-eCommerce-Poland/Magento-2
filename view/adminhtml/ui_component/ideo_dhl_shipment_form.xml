@@ -413,6 +413,17 @@
                 </imports>
             </settings>
         </field>
+        <field name="shipmentSettings[packageNumbers]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Package Numbers</label>
+                <dataScope>shipmentSettings.packageNumbers</dataScope>
+                <disabled>true</disabled>
+                <imports>
+                    <link name="visible">${$.provider}:data.shipmentSettings.packageNumbers</link>
+                </imports>
+            </settings>
+        </field>
         <field name="shipmentSettings[serviceType]" formElement="select">
             <settings>
                 <dataType>text</dataType>
@@ -839,10 +850,20 @@
             <opened>true</opened>
         </settings>
         <dynamicRows name="packages">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dndConfig" xsi:type="array">
+                        <item name="enabled" xsi:type="boolean">false</item>
+                    </item>
+                </item>
+            </argument>
             <settings>
                 <label translate="true">Packages</label>
                 <componentType>dynamicRows</componentType>
                 <addButton>false</addButton>
+                <dndConfig>
+                    <param name="enabled" xsi:type="boolean">false</param>
+                </dndConfig>
             </settings>
             <container name="record" component="Magento_Ui/js/dynamic-rows/record">
                 <argument name="data" xsi:type="array">
@@ -852,6 +873,20 @@
                         <item name="componentType" xsi:type="string">container</item>
                     </item>
                 </argument>
+                <field name="packageNumber" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="cols" xsi:type="number">18</item>
+                            <item name="size" xsi:type="number">18</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Package Number (BLP)</label>
+                        <dataScope>packageNumber</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
+                </field>
                 <field name="packageType" formElement="select">
                     <settings>
                         <dataType>text</dataType>
@@ -867,6 +902,14 @@
                     </formElements>
                 </field>
                 <field name="quantity" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="cols" xsi:type="number">3</item>
+                            <item name="size" xsi:type="number">3</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>text</dataType>
                         <label translate="true">Qty</label>
@@ -874,6 +917,14 @@
                     </settings>
                 </field>
                 <field name="weight" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="cols" xsi:type="number">5</item>
+                            <item name="size" xsi:type="number">5</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>text</dataType>
                         <label translate="true">Weight (kg)</label>
@@ -881,6 +932,14 @@
                     </settings>
                 </field>
                 <field name="width" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="cols" xsi:type="number">5</item>
+                            <item name="size" xsi:type="number">5</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>text</dataType>
                         <label translate="true">Width (cm)</label>
@@ -888,6 +947,14 @@
                     </settings>
                 </field>
                 <field name="length" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="cols" xsi:type="number">5</item>
+                            <item name="size" xsi:type="number">5</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>text</dataType>
                         <label translate="true">Length (cm)</label>
@@ -895,6 +962,14 @@
                     </settings>
                 </field>
                 <field name="height" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="cols" xsi:type="number">5</item>
+                            <item name="size" xsi:type="number">5</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>text</dataType>
                         <label translate="true">Height (cm)</label>
@@ -905,6 +980,7 @@
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
                             <item name="default" xsi:type="number">0</item>
+                            <item name="fit" xsi:type="boolean">true</item>
                         </item>
                     </argument>
                     <settings>
@@ -927,6 +1003,7 @@
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
                             <item name="default" xsi:type="number">0</item>
+                            <item name="fit" xsi:type="boolean">true</item>
                         </item>
                     </argument>
                     <settings>

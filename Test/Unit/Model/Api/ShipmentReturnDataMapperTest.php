@@ -19,7 +19,10 @@ class ShipmentReturnDataMapperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mapper = new ShipmentReturnDataMapper();
+        $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+        $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
+
+        $this->mapper = new ShipmentReturnDataMapper($timezoneStub);
     }
 
     public function testMapDomesticReturnShipment(): void

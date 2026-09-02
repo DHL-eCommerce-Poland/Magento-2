@@ -14,8 +14,10 @@ use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\Order\Payment;
 use DateTime;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class OrderToShipmentDataMapperTest extends TestCase
 {
     /**

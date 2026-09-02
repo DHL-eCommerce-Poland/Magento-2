@@ -14,6 +14,7 @@ use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -27,6 +28,7 @@ class GeneratePnpReportTest extends TestCase
     private ManagerInterface|Stub $messageManagerStub;
     private PnpReportService|MockObject $serviceMock;
     private FileFactory|Stub $fileFactoryStub;
+    private TimezoneInterface|Stub $timezoneStub;
     private GeneratePnpReport $controller;
 
     protected function setUp(): void
@@ -38,6 +40,8 @@ class GeneratePnpReportTest extends TestCase
         $this->messageManagerStub = $this->createStub(ManagerInterface::class);
         $this->serviceMock = $this->createMock(PnpReportService::class);
         $this->fileFactoryStub = $this->createStub(FileFactory::class);
+        $this->timezoneStub = $this->createStub(TimezoneInterface::class);
+        $this->timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
 
         $this->contextStub->method('getRequest')->willReturn($this->requestStub);
         $this->contextStub->method('getResultRedirectFactory')->willReturn($this->redirectFactoryStub);
@@ -47,7 +51,8 @@ class GeneratePnpReportTest extends TestCase
         $this->controller = new GeneratePnpReport(
             $this->contextStub,
             $this->serviceMock,
-            $this->fileFactoryStub
+            $this->fileFactoryStub,
+            $this->timezoneStub
         );
     }
 

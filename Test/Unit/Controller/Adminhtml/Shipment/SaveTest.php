@@ -92,12 +92,17 @@ class SaveTest extends TestCase
             return is_string($data) ? json_decode($data, true) : null;
         });
 
+        $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+        $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
+        $timezoneStub->method('date')->willReturnCallback(fn($d) => new \DateTime((string)$d));
+
         $this->controller = new Save(
             $this->contextStub,
             $this->shipmentCreationServiceMock,
             $this->scopeConfigMock,
             $this->jsonFactoryStub,
             $serializerStub,
+            $timezoneStub,
             $this->loggerStub
         );
     }
@@ -214,7 +219,7 @@ class SaveTest extends TestCase
             ->with('carriers/dhlparcel/sandbox')
             ->willReturn('0');
 
-        $apiResult = new CreateShipmentsResult(false, false, null, 'ERR_01', 'Nieprawidłowy kod pocztowy');
+        $apiResult = new CreateShipmentsResult(false, false, null, null, [], 'ERR_01', 'Nieprawidłowy kod pocztowy');
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('createShipment')
             ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'production', null, null)

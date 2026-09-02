@@ -8,10 +8,12 @@ use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\SoapClientAdapter;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class SoapClientAdapterTest extends TestCase
 {
     /**
@@ -117,7 +119,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -142,7 +144,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -168,7 +170,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -182,6 +184,7 @@ class SoapClientAdapterTest extends TestCase
         $this->assertTrue($result->isSuccess());
         $this->assertFalse($result->isTimeout());
         $this->assertEquals('1234567890', $result->getShipmentId());
+        $this->assertEquals(['BLP1001', 'BLP1002'], $result->getPackageNumbers());
     }
 
     /**
@@ -194,7 +197,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -220,7 +223,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -245,7 +248,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -297,7 +300,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -322,7 +325,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -347,7 +350,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -375,7 +378,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -401,7 +404,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient();
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -428,7 +431,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 

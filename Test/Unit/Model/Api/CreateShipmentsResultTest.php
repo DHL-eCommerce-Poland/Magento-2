@@ -23,6 +23,23 @@ class CreateShipmentsResultTest extends TestCase
         $this->assertEquals('1234567890', $result->getShipmentId());
         $this->assertNull($result->getErrorCode());
         $this->assertNull($result->getErrorMessage());
+        $this->assertEmpty($result->getPackageNumbers());
+    }
+
+    /**
+     * Test result with package numbers.
+     *
+     * @return void
+     */
+    public function testResultWithPackageNumbers(): void
+    {
+        $packageNumbers = ['BLP1001', 'BLP1002'];
+        $result = new CreateShipmentsResult(true, false, '1234567890', 'Nowa', $packageNumbers);
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals('1234567890', $result->getShipmentId());
+        $this->assertEquals('Nowa', $result->getOrderStatus());
+        $this->assertEquals($packageNumbers, $result->getPackageNumbers());
     }
 
     /**
@@ -32,7 +49,7 @@ class CreateShipmentsResultTest extends TestCase
      */
     public function testErrorResult(): void
     {
-        $result = new CreateShipmentsResult(false, false, null, 'ERR_POSTCODE', 'Invalid postal code');
+        $result = new CreateShipmentsResult(false, false, null, null, [], 'ERR_POSTCODE', 'Invalid postal code');
 
         $this->assertFalse($result->isSuccess());
         $this->assertFalse($result->isTimeout());
@@ -48,7 +65,7 @@ class CreateShipmentsResultTest extends TestCase
      */
     public function testTimeoutResult(): void
     {
-        $result = new CreateShipmentsResult(false, true, null, 'TIMEOUT', 'Connection timed out');
+        $result = new CreateShipmentsResult(false, true, null, null, [], 'TIMEOUT', 'Connection timed out');
 
         $this->assertFalse($result->isSuccess());
         $this->assertTrue($result->isTimeout());

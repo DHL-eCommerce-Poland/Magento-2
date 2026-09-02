@@ -78,6 +78,9 @@ class DataProvider extends AbstractDataProvider
                             $data['recipient'] = $payload['recipient'];
                         }
                         if (isset($payload['shipmentSettings']) && is_array($payload['shipmentSettings'])) {
+                            if (empty($payload['shipmentSettings']['packageNumbers']) && !empty($payload['packageNumbers'])) {
+                                $payload['shipmentSettings']['packageNumbers'] = $payload['packageNumbers'];
+                            }
                             $shipmentId = (string)($item->getShipmentId() ?? ($payload['shipmentId'] ?? ''));
                             $status = (string)($item->getStatus() ?? '');
                             $createdAt = (string)($item->getCreatedAt() ?? '');
@@ -92,8 +95,12 @@ class DataProvider extends AbstractDataProvider
                                 $dispatchNumber,
                                 $returnShipmentId
                             );
+                            $packageNumbers = is_array($payload['packageNumbers'] ?? null)
+                                ? $payload['packageNumbers']
+                                : (is_array($payload['shipmentSettings']['packageNumbers'] ?? null) ? $payload['shipmentSettings']['packageNumbers'] : []);
+
                             if (isset($payload['shipmentSettings']['packages']) && is_array($payload['shipmentSettings']['packages'])) {
-                                $data['packages'] = $this->normalizePackages($payload['shipmentSettings']['packages']);
+                                $data['packages'] = $this->normalizePackages($payload['shipmentSettings']['packages'], $packageNumbers);
                                 $data['packages_fieldset'] = ['packages' => $data['packages']];
                             }
                         }
@@ -102,7 +109,8 @@ class DataProvider extends AbstractDataProvider
                             $data['special_services'] = ['specialServices' => $data['specialServices']];
                         }
                         if (!isset($data['packages']) && isset($payload['packages']) && is_array($payload['packages'])) {
-                            $data['packages'] = $this->normalizePackages($payload['packages']);
+                            $packageNumbers = is_array($payload['packageNumbers'] ?? null) ? $payload['packageNumbers'] : [];
+                            $data['packages'] = $this->normalizePackages($payload['packages'], $packageNumbers);
                             $data['packages_fieldset'] = ['packages' => $data['packages']];
                         }
                     }
@@ -190,6 +198,21 @@ class DataProvider extends AbstractDataProvider
         } else {
             $settings['returnShipmentId'] = null;
         }
+
+        $pkgNums = $settings['packageNumbers'] ?? null;
+        if (!empty($pkgNums)) {
+            if (is_array($pkgNums)) {
+                $filtered = array_filter(array_map('trim', $pkgNums));
+                $settings['packageNumbers'] = !empty($filtered) ? implode(', ', $filtered) : null;
+            } elseif (is_string($pkgNums) && trim($pkgNums) !== '') {
+                $settings['packageNumbers'] = trim($pkgNums);
+            } else {
+                $settings['packageNumbers'] = null;
+            }
+        } else {
+            $settings['packageNumbers'] = null;
+        }
+
         $today = $this->timezone->scopeDate()->format('Y-m-d');
         $rawDate = $settings['shipmentDate'] ?? null;
         $finalDate = (empty($rawDate) || $rawDate < $today) ? $today : $rawDate;
@@ -211,13 +234,14 @@ class DataProvider extends AbstractDataProvider
     }
 
     /**
-     * Normalize packages array flags to string '1'/'0' and add record_id.
+     * Normalize packages array flags to string '1'/'0', add record_id and packageNumber.
      *
      * @param array $packages
+     * @param array $packageNumbers
      *
      * @return array
      */
-    private function normalizePackages(array $packages): array
+    private function normalizePackages(array $packages, array $packageNumbers = []): array
     {
         $result = [];
         foreach ($packages as $index => $pkg) {
@@ -225,6 +249,7 @@ class DataProvider extends AbstractDataProvider
                 $pkg['record_id'] = (string)$index;
                 $pkg['isNonStandard'] = !empty($pkg['isNonStandard']) ? '1' : '0';
                 $pkg['hasEuroReturn'] = !empty($pkg['hasEuroReturn']) ? '1' : '0';
+                $pkg['packageNumber'] = (string)($packageNumbers[$index] ?? ($pkg['packageNumber'] ?? $pkg['blpPieceId'] ?? ''));
                 $result[$index] = $pkg;
             }
         }

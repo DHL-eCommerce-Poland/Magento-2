@@ -15,7 +15,9 @@ use PHPUnit\Framework\TestCase;
 
 use DateTime;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
+#[AllowMockObjectsWithoutExpectations]
 class CourierPickupTimeResolverTest extends TestCase
 {
     private ClientInterface|MockObject $clientMock;
@@ -29,8 +31,11 @@ class CourierPickupTimeResolverTest extends TestCase
         $this->credentialsProviderStub = $this->createStub(CredentialsProvider::class);
         $this->timezoneMock = $this->createMock(TimezoneInterface::class);
 
+        $this->timezoneMock->method('scopeDate')
+            ->willReturn(new DateTime('today'));
+
         $this->timezoneMock->method('date')
-            ->willReturnCallback(fn($d) => new DateTime($d));
+            ->willReturnCallback(fn($d) => new DateTime((string)$d));
 
         $this->credentialsProviderStub->method('getCredentials')
             ->willReturn(new Credentials('user', 'pass', true));

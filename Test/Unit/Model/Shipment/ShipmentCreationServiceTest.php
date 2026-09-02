@@ -98,7 +98,6 @@ class ShipmentCreationServiceTest extends TestCase
             $this->credentialsProviderStub,
             $this->clientStub,
             $this->lockManagerMock,
-            $this->resourceConnectionStub,
             $this->loggerStub,
             $serializer
         );
@@ -155,7 +154,7 @@ class ShipmentCreationServiceTest extends TestCase
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
         $this->mapperStub->method('map')->willReturn(['content' => 'Test']);
 
-        $apiResult = new CreateShipmentsResult(false, false, null, 'ERR_POSTCODE', 'Błędny kod pocztowy');
+        $apiResult = new CreateShipmentsResult(false, false, null, null, [], 'ERR_POSTCODE', 'Błędny kod pocztowy');
         $this->clientStub->method('createShipments')->willReturn($apiResult);
 
         // Expect NO DB save on API error

@@ -14,11 +14,12 @@ use Ideo\Dhl\Model\Shipment\CourierBookingService;
 use Magento\Framework\Exception\LocalizedException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
-use PHPUnit\Framework\TestCase;
-
 use DateTime;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class CourierBookingServiceTest extends TestCase
 {
     private ClientInterface|Stub $clientStub;

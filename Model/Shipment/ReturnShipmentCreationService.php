@@ -104,7 +104,9 @@ class ReturnShipmentCreationService
 
             return $apiResult;
         } finally {
-            $this->lockManager->unlock($lockName);
+            if (!$this->lockManager->unlock($lockName)) {
+                $this->logger->warning(sprintf('[ReturnShipmentCreation] Failed to release lock: %s', $lockName));
+            }
         }
     }
 }

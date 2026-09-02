@@ -131,7 +131,8 @@ class SoapClientAdapter implements ClientInterface
 
             if (is_object($shipmentResult) && !empty($shipmentResult->shipmentId)) {
                 $orderStatus = !empty($shipmentResult->orderStatus) ? (string) $shipmentResult->orderStatus : null;
-                return new CreateShipmentsResult(true, false, (string) $shipmentResult->shipmentId, null, null, $orderStatus);
+                $packageNumbers = $this->extractPackageNumbers($shipmentResult);
+                return new CreateShipmentsResult(true, false, (string) $shipmentResult->shipmentId, $orderStatus, $packageNumbers);
             }
 
             $errorMsg = is_object($shipmentResult) && !empty($shipmentResult->error)
@@ -144,7 +145,11 @@ class SoapClientAdapter implements ClientInterface
                 $errorMsg
             ));
 
-            return new CreateShipmentsResult(false, false, null, 'CREATE_SHIPMENT_ERROR', $errorMsg);
+            return new CreateShipmentsResult(
+                success: false,
+                errorCode: 'CREATE_SHIPMENT_ERROR',
+                errorMessage: $errorMsg
+            );
         } catch (SoapFault $fault) {
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during createShipments%s: [%s] %s',
@@ -156,11 +161,10 @@ class SoapClientAdapter implements ClientInterface
             $isTimeout = $this->isTimeoutException($fault);
 
             return new CreateShipmentsResult(
-                false,
-                $isTimeout,
-                null,
-                $fault->faultcode ?? 'SOAP_FAULT',
-                'DHL API error: ' . $fault->getMessage()
+                success: false,
+                timeout: $isTimeout,
+                errorCode: $fault->faultcode ?? 'SOAP_FAULT',
+                errorMessage: 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
             $this->logger->error(sprintf(
@@ -172,11 +176,10 @@ class SoapClientAdapter implements ClientInterface
             $isTimeout = $this->isTimeoutException($e);
 
             return new CreateShipmentsResult(
-                false,
-                $isTimeout,
-                null,
-                'CONNECTION_ERROR',
-                'An error occurred while connecting to DHL: ' . $e->getMessage()
+                success: false,
+                timeout: $isTimeout,
+                errorCode: 'CONNECTION_ERROR',
+                errorMessage: 'An error occurred while connecting to DHL: ' . $e->getMessage()
             );
         }
     }
@@ -1335,5 +1338,38 @@ class SoapClientAdapter implements ClientInterface
                 'An error occurred while connecting to DHL: ' . $e->getMessage()
             );
         }
+    }
+
+    /**
+     * Extract package numbers / piece IDs from DHL SOAP shipment result object.
+     *
+     * @param mixed $shipmentResult
+     *
+     * @return string[]
+     */
+    private function extractPackageNumbers(mixed $shipmentResult): array
+    {
+        if (!is_object($shipmentResult)) {
+            return [];
+        }
+
+        $packageNumbers = [];
+
+        $pieceList = $shipmentResult->pieceList->item ?? $shipmentResult->pieceList ?? $shipmentResult->pieces ?? null;
+        if ($pieceList) {
+            $pieces = is_array($pieceList) ? $pieceList : [$pieceList];
+            foreach ($pieces as $piece) {
+                if (is_object($piece)) {
+                    $pieceId = $piece->blpPieceId ?? $piece->pieceId ?? $piece->packageNumber ?? $piece->id ?? null;
+                    if ($pieceId !== null && (string) $pieceId !== '') {
+                        $packageNumbers[] = (string) $pieceId;
+                    }
+                } elseif (is_string($piece) || is_numeric($piece)) {
+                    $packageNumbers[] = (string) $piece;
+                }
+            }
+        }
+
+        return array_values(array_unique($packageNumbers));
     }
 }

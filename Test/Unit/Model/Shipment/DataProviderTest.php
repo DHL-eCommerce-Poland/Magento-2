@@ -40,17 +40,22 @@ class DataProviderTest extends TestCase
             'recipient' => ['firstName' => 'John', 'lastName' => 'Doe'],
             'shipmentSettings' => ['serviceType' => 'AH', 'packages' => [['weight' => 2.5]]],
             'specialServices' => ['insurance' => true],
+            'packageNumbers' => ['BLP10001', 'BLP10002'],
         ];
 
         $serializer->method('unserialize')
             ->willReturn($payloadArray);
+
+        $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+        $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
 
         $dataProvider = new DataProvider(
             'ideo_dhl_shipment_form_data_source',
             'entity_id',
             'entity_id',
             $collectionFactory,
-            $serializer
+            $serializer,
+            $timezoneStub
         );
 
         $data = $dataProvider->getData();
@@ -61,7 +66,9 @@ class DataProviderTest extends TestCase
         $this->assertEquals('AH', $data[42]['shipmentSettings']['serviceType']);
         $this->assertEquals('CREATED', $data[42]['shipmentSettings']['status']);
         $this->assertEquals('RET554433', $data[42]['shipmentSettings']['returnShipmentId']);
+        $this->assertEquals('BLP10001, BLP10002', $data[42]['shipmentSettings']['packageNumbers']);
         $this->assertEquals('1', $data[42]['specialServices']['insurance']);
         $this->assertCount(1, $data[42]['packages']);
+        $this->assertEquals('BLP10001', $data[42]['packages'][0]['packageNumber']);
     }
 }

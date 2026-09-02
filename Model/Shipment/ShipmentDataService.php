@@ -189,10 +189,11 @@ class ShipmentDataService
      * @param string|null $presetShipmentId
      * @param string|null $shipmentId
      * @param string|null $returnShipmentId
+     * @param array|null $packageNumbers
      *
      * @return ShipmentDataInterface
-     * @throws LocalizedException
      * @throws CouldNotSaveException
+     * @throws LocalizedException
      */
     public function saveShipmentDataWithStatus(
         DhlShipmentData $shipmentData,
@@ -201,7 +202,8 @@ class ShipmentDataService
         ?string $presetSenderId = null,
         ?string $presetShipmentId = null,
         ?string $shipmentId = null,
-        ?string $returnShipmentId = null
+        ?string $returnShipmentId = null,
+        ?array $packageNumbers = null
     ): ShipmentDataInterface {
         $this->validator->validate($shipmentData);
 
@@ -214,6 +216,9 @@ class ShipmentDataService
         }
         if ($returnShipmentId !== null && trim($returnShipmentId) !== '') {
             $payloadArr['returnShipmentId'] = (string)$returnShipmentId;
+        }
+        if ($packageNumbers !== null && !empty($packageNumbers)) {
+            $payloadArr['packageNumbers'] = array_values($packageNumbers);
         }
 
         $entity->setOrderId($orderId);
@@ -256,6 +261,7 @@ class ShipmentDataService
      * @param string $status
      * @param string|null $shipmentId
      * @param string|null $errorMessages
+     * @param array|null $packageNumbers
      *
      * @return ShipmentDataInterface
      * @throws LocalizedException
@@ -265,7 +271,8 @@ class ShipmentDataService
         DhlShipmentData $shipmentData,
         string $status = 'created',
         ?string $shipmentId = null,
-        ?string $errorMessages = null
+        ?string $errorMessages = null,
+        ?array $packageNumbers = null
     ): ShipmentDataInterface {
         $this->validator->validate($shipmentData);
 
@@ -275,6 +282,9 @@ class ShipmentDataService
         if ($shipmentId !== null && trim($shipmentId) !== '') {
             $payloadArr['shipmentId'] = (string)$shipmentId;
             $entity->setShipmentId($shipmentId);
+        }
+        if ($packageNumbers !== null && !empty($packageNumbers)) {
+            $payloadArr['packageNumbers'] = array_values($packageNumbers);
         }
 
         $entity->setStatus($status);
