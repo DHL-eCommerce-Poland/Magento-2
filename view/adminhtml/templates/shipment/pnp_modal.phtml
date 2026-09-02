@@ -14,7 +14,7 @@ use Magento\Framework\View\Element\Template;
 $viewModel = $block->getViewModel();
 $dateFormat = $viewModel->getDateFormat();
 $todayDate = $viewModel->getFormattedDate();
-$generateUrl = $block->getUrl('ideo_dhl/shipment/generatePnpReport');
+$generateUrl = $block->getUrl('dhlparcel/shipment/generatePnpReport');
 
 /** @var PnpPackageType $pnpPackageTypeSource */
 $pnpPackageTypeSource = $block->getData('pnp_package_type_source') ?? new PnpPackageType();

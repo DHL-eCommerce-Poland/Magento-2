@@ -3,7 +3,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">ideo_dhl_shipment_form.ideo_dhl_shipment_form_data_source</item>
+            <item name="provider" xsi:type="string">dhlparcel_shipment_form.dhlparcel_shipment_form_data_source</item>
         </item>
         <item name="label" xsi:type="string" translate="true">DHL Shipment Details</item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
@@ -24,22 +24,22 @@
             <button name="recreate" class="Ideo\Dhl\Block\Adminhtml\Button\RecreateShipment"/>
             <button name="delete" class="Ideo\Dhl\Block\Adminhtml\Button\DeleteShipment"/>
         </buttons>
-        <namespace>ideo_dhl_shipment_form</namespace>
+        <namespace>dhlparcel_shipment_form</namespace>
         <dataScope>data</dataScope>
         <deps>
-            <dep>ideo_dhl_shipment_form.ideo_dhl_shipment_form_data_source</dep>
+            <dep>dhlparcel_shipment_form.dhlparcel_shipment_form_data_source</dep>
         </deps>
     </settings>
-    <dataSource name="ideo_dhl_shipment_form_data_source">
+    <dataSource name="dhlparcel_shipment_form_data_source">
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
                 <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
             </item>
         </argument>
         <settings>
-            <submitUrl path="ideo_dhl/shipment/save"/>
+            <submitUrl path="dhlparcel/shipment/save"/>
         </settings>
-        <dataProvider class="Ideo\Dhl\Model\Shipment\DataProvider" name="ideo_dhl_shipment_form_data_source">
+        <dataProvider class="Ideo\Dhl\Model\Shipment\DataProvider" name="dhlparcel_shipment_form_data_source">
             <settings>
                 <requestFieldName>entity_id</requestFieldName>
                 <primaryFieldName>entity_id</primaryFieldName>
@@ -528,7 +528,7 @@
                             <value>0</value>
                             <actions>
                                 <action name="0">
-                                    <target>ideo_dhl_shipment_form.ideo_dhl_shipment_form.special_services.specialServices[insuranceValue]</target>
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[insuranceValue]</target>
                                     <callback>hide</callback>
                                 </action>
                             </actions>
@@ -537,7 +537,7 @@
                             <value>1</value>
                             <actions>
                                 <action name="0">
-                                    <target>ideo_dhl_shipment_form.ideo_dhl_shipment_form.special_services.specialServices[insuranceValue]</target>
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[insuranceValue]</target>
                                     <callback>show</callback>
                                 </action>
                             </actions>
@@ -584,7 +584,7 @@
                             <value>0</value>
                             <actions>
                                 <action name="0">
-                                    <target>ideo_dhl_shipment_form.ideo_dhl_shipment_form.special_services.specialServices[codAmount]</target>
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[codAmount]</target>
                                     <callback>hide</callback>
                                 </action>
                             </actions>
@@ -593,7 +593,7 @@
                             <value>1</value>
                             <actions>
                                 <action name="0">
-                                    <target>ideo_dhl_shipment_form.ideo_dhl_shipment_form.special_services.specialServices[codAmount]</target>
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[codAmount]</target>
                                     <callback>show</callback>
                                 </action>
                             </actions>
@@ -732,7 +732,7 @@
                             <value>0</value>
                             <actions>
                                 <action name="0">
-                                    <target>ideo_dhl_shipment_form.ideo_dhl_shipment_form.special_services.specialServices[rodDocumentText]</target>
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[rodDocumentText]</target>
                                     <callback>hide</callback>
                                 </action>
                             </actions>
@@ -741,7 +741,7 @@
                             <value>1</value>
                             <actions>
                                 <action name="0">
-                                    <target>ideo_dhl_shipment_form.ideo_dhl_shipment_form.special_services.specialServices[rodDocumentText]</target>
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[rodDocumentText]</target>
                                     <callback>show</callback>
                                 </action>
                             </actions>

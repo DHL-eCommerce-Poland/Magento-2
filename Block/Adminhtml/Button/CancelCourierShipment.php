@@ -51,7 +51,7 @@ class CancelCourierShipment extends Generic implements ButtonProviderInterface
             'on_click' => sprintf(
                 "deleteConfirm('%s', '%s')",
                 __('Are you sure you want to cancel courier booking for this shipment?'),
-                $this->getUrl('ideo_dhl/shipment/cancelCourierBooking', ['entity_id' => $entityId])
+                $this->getUrl('dhlparcel/shipment/cancelCourierBooking', ['entity_id' => $entityId])
             ),
             'sort_order' => 30,
         ];

@@ -21,8 +21,8 @@ class DeliveryServiceActionsTest extends TestCase
         $urlBuilder->expects($this->exactly(2))
             ->method('getUrl')
             ->willReturnMap([
-                ['ideo_dhl/deliveryservice/edit', ['entity_id' => 1], 'http://example.com/edit/1'],
-                ['ideo_dhl/deliveryservice/delete', ['entity_id' => 1], 'http://example.com/delete/1'],
+                ['dhlparcel/deliveryservice/edit', ['entity_id' => 1], 'http://example.com/edit/1'],
+                ['dhlparcel/deliveryservice/delete', ['entity_id' => 1], 'http://example.com/delete/1'],
             ]);
 
         $actionColumn = new DeliveryServiceActions(

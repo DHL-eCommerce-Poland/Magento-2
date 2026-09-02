@@ -58,12 +58,12 @@ class RecreateShipment extends Generic implements ButtonProviderInterface
                         content: '%s',
                         actions: {
                             confirm: function() {
-                                var formComponent = registry.get('ideo_dhl_shipment_form.ideo_dhl_shipment_form');
+                                var formComponent = registry.get('dhlparcel_shipment_form.dhlparcel_shipment_form');
                                 if (formComponent && typeof formComponent.save === 'function') {
                                     formComponent.save();
                                 } else {
                                     var \$form = $('form').filter(function() {
-                                        return $(this).attr('action') && $(this).attr('action').indexOf('ideo_dhl/shipment/save') !== -1;
+                                        return $(this).attr('action') && $(this).attr('action').indexOf('dhlparcel/shipment/save') !== -1;
                                     });
                                     if (\$form.length) {
                                         \$form.trigger('submit');

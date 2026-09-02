@@ -31,7 +31,7 @@ class Collection extends SearchResult
         LoggerInterface $logger,
         FetchStrategyInterface $fetchStrategy,
         ManagerInterface $eventManager,
-        $mainTable = 'ideo_dhl_delivery_service',
+        $mainTable = 'dhlparcel_delivery_service',
         $resourceModel = DeliveryService::class,
         $identifierName = null,
         $connectionName = null

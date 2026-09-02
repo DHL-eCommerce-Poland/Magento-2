@@ -4,7 +4,7 @@
     <update handle="styles"/>
     <body>
         <referenceContainer name="content">
-            <uiComponent name="ideo_dhl_delivery_service_form"/>
+            <uiComponent name="dhlparcel_delivery_service_listing"/>
         </referenceContainer>
     </body>
 </page>

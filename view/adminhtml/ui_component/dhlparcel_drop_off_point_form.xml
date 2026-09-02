@@ -3,7 +3,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">ideo_dhl_drop_off_point_form.ideo_dhl_drop_off_point_form_data_source</item>
+            <item name="provider" xsi:type="string">dhlparcel_drop_off_point_form.dhlparcel_drop_off_point_form_data_source</item>
         </item>
         <item name="label" xsi:type="string" translate="true">Drop-Off Point Details</item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
@@ -15,22 +15,22 @@
             <button name="delete" class="Ideo\Dhl\Block\Adminhtml\Button\Delete"/>
             <button name="back" class="Ideo\Dhl\Block\Adminhtml\Button\Back"/>
         </buttons>
-        <namespace>ideo_dhl_drop_off_point_form</namespace>
+        <namespace>dhlparcel_drop_off_point_form</namespace>
         <dataScope>data</dataScope>
         <deps>
-            <dep>ideo_dhl_drop_off_point_form.ideo_dhl_drop_off_point_form_data_source</dep>
+            <dep>dhlparcel_drop_off_point_form.dhlparcel_drop_off_point_form_data_source</dep>
         </deps>
     </settings>
-    <dataSource name="ideo_dhl_drop_off_point_form_data_source">
+    <dataSource name="dhlparcel_drop_off_point_form_data_source">
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
                 <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
             </item>
         </argument>
         <settings>
-            <submitUrl path="ideo_dhl/dropoffpoint/save"/>
+            <submitUrl path="dhlparcel/dropoffpoint/save"/>
         </settings>
-        <dataProvider class="Ideo\Dhl\Model\DropOffPoint\DataProvider" name="ideo_dhl_drop_off_point_form_data_source">
+        <dataProvider class="Ideo\Dhl\Model\DropOffPoint\DataProvider" name="dhlparcel_drop_off_point_form_data_source">
             <settings>
                 <requestFieldName>entity_id</requestFieldName>
                 <primaryFieldName>entity_id</primaryFieldName>

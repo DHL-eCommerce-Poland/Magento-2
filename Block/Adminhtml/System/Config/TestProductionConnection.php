@@ -21,7 +21,7 @@ class TestProductionConnection extends Field
      */
     protected function _getElementHtml(AbstractElement $element): string
     {
-        $url = $this->getUrl('ideo_dhl/system_config/testConnection');
+        $url = $this->getUrl('dhlparcel/system_config/testConnection');
 
         $button = $this->getLayout()->createBlock(Button::class)->setData([
             'id' => 'dhl_test_connection_production_button',

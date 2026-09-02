@@ -4,13 +4,13 @@
     <update handle="styles"/>
     <body>
         <referenceContainer name="content">
-            <uiComponent name="ideo_dhl_shipment_listing"/>
-            <block name="ideo_dhl_book_courier_modal" template="Ideo_Dhl::shipment/book_courier_modal.phtml">
+            <uiComponent name="dhlparcel_shipment_listing"/>
+            <block name="dhlparcel_book_courier_modal" template="Ideo_Dhl::shipment/book_courier_modal.phtml">
                 <arguments>
                     <argument name="view_model" xsi:type="object">Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig</argument>
                 </arguments>
             </block>
-            <block name="ideo_dhl_pnp_modal" template="Ideo_Dhl::shipment/pnp_modal.phtml">
+            <block name="dhlparcel_pnp_modal" template="Ideo_Dhl::shipment/pnp_modal.phtml">
                 <arguments>
                     <argument name="pnp_package_type_source" xsi:type="object">Ideo\Dhl\Model\Config\Source\PnpPackageType</argument>
                     <argument name="view_model" xsi:type="object">Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig</argument>

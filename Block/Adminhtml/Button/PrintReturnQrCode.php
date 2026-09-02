@@ -46,7 +46,7 @@ class PrintReturnQrCode implements ButtonProviderInterface
             return [];
         }
 
-        $printUrl = $this->urlBuilder->getUrl('ideo_dhl/shipment/printReturnQrCode', ['entity_id' => $entityId]);
+        $printUrl = $this->urlBuilder->getUrl('dhlparcel/shipment/printReturnQrCode', ['entity_id' => $entityId]);
 
         return [
             'label' => __('Print Return QR Code'),

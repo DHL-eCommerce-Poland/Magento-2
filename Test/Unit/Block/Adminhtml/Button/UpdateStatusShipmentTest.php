@@ -85,7 +85,7 @@ class UpdateStatusShipmentTest extends TestCase
             ->willReturn($shipmentMock);
 
         $this->urlBuilderStub->method('getUrl')
-            ->willReturn('http://magento.local/admin/ideo_dhl/shipment/updateStatus/entity_id/10');
+            ->willReturn('http://magento.local/admin/dhlparcel/shipment/updateStatus/entity_id/10');
 
         $buttonData = $this->button->getButtonData();
 

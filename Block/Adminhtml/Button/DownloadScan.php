@@ -46,7 +46,7 @@ class DownloadScan implements ButtonProviderInterface
             return [];
         }
 
-        $downloadUrl = $this->urlBuilder->getUrl('ideo_dhl/shipment/downloadScan', ['entity_id' => $entityId]);
+        $downloadUrl = $this->urlBuilder->getUrl('dhlparcel/shipment/downloadScan', ['entity_id' => $entityId]);
 
         return [
             'label' => __('Download Scan'),

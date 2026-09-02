@@ -33,7 +33,7 @@ class PopulateDefaultTableRatesTest extends TestCase
 
         $resourceConnectionStub
             ->method('getTableName')
-            ->willReturn('ideo_dhl_tablerate');
+            ->willReturn('dhlparcel_tablerate');
 
         $moduleDirReaderMock
             ->expects($this->once())
@@ -101,7 +101,7 @@ class PopulateDefaultTableRatesTest extends TestCase
 
         $resourceConnectionStub
             ->method('getTableName')
-            ->willReturn('ideo_dhl_tablerate');
+            ->willReturn('dhlparcel_tablerate');
 
         $connectionMock
             ->expects($this->once())

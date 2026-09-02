@@ -46,7 +46,7 @@ class PrintReturnLabel implements ButtonProviderInterface
             return [];
         }
 
-        $printUrl = $this->urlBuilder->getUrl('ideo_dhl/shipment/printReturnLabel', ['entity_id' => $entityId]);
+        $printUrl = $this->urlBuilder->getUrl('dhlparcel/shipment/printReturnLabel', ['entity_id' => $entityId]);
 
         return [
             'label' => __('Print Return Label'),

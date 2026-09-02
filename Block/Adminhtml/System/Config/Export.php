@@ -21,7 +21,7 @@ class Export extends Field
      */
     protected function _getElementHtml(AbstractElement $element): string
     {
-        $url = $this->getUrl('ideo_dhl/system_config/exportTablerates');
+        $url = $this->getUrl('dhlparcel/system_config/exportTablerates');
 
         $button = $this->getLayout()->createBlock(Button::class)->setData([
             'id' => 'export_dhl_tablerates_button',

@@ -42,7 +42,7 @@ class ExportTablerates extends Action
     {
         $fileName = 'dhl_tablerates.csv';
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('ideo_dhl_tablerate');
+        $tableName = $this->resourceConnection->getTableName('dhlparcel_tablerate');
 
         $select = $connection->select()
             ->from($tableName, [

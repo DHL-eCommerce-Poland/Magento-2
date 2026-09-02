@@ -387,8 +387,8 @@ $dateFormat = $viewModel->getDateFormat();
             "components": {
                 "dhlShipmentForm": {
                     "component": "Ideo_Dhl/js/shipment/prepare-modal",
-                    "saveUrl": "<?= $escaper->escapeUrl($block->getUrl('ideo_dhl/shipment/save')) ?>",
-                    "loadTemplateUrl": "<?= $escaper->escapeUrl($block->getUrl('ideo_dhl/shipment/loadTemplate')) ?>",
+                    "saveUrl": "<?= $escaper->escapeUrl($block->getUrl('dhlparcel/shipment/save')) ?>",
+                    "loadTemplateUrl": "<?= $escaper->escapeUrl($block->getUrl('dhlparcel/shipment/loadTemplate')) ?>",
                     "dateFormat": "<?= $escaper->escapeJs($dateFormat) ?>"
                 }
             }

@@ -136,7 +136,7 @@ define([
             self.warningMessage('');
             self.additionalInfo('');
 
-            var $dateInput = $('#ideo_dhl_pickup_date');
+            var $dateInput = $('#dhlparcel_pickup_date');
             if ($dateInput.length && $dateInput.data('datepicker')) {
                 $dateInput.datepicker('option', 'minDate', new Date());
                 $dateInput.datepicker('setDate', new Date());

@@ -37,7 +37,7 @@ class PopulateDefaultTableRates implements DataPatchInterface, PatchRevertableIn
     public function apply(): self
     {
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('ideo_dhl_tablerate');
+        $tableName = $this->resourceConnection->getTableName('dhlparcel_tablerate');
 
         $count = (int)$connection->fetchOne($connection->select()->from($tableName, ['COUNT(*)']));
         if ($count > 0) {
@@ -77,7 +77,7 @@ class PopulateDefaultTableRates implements DataPatchInterface, PatchRevertableIn
     public function revert(): void
     {
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('ideo_dhl_tablerate');
+        $tableName = $this->resourceConnection->getTableName('dhlparcel_tablerate');
         $connection->delete($tableName);
     }
 

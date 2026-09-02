@@ -179,7 +179,7 @@ class Tablerate extends File
     public function saveTableRates(array $rows): void
     {
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('ideo_dhl_tablerate');
+        $tableName = $this->resourceConnection->getTableName('dhlparcel_tablerate');
 
         $connection->beginTransaction();
         try {

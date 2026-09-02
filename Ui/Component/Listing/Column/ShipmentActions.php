@@ -11,12 +11,12 @@ use Magento\Ui\Component\Listing\Columns\Column;
 
 class ShipmentActions extends Column
 {
-    private const URL_PATH_EDIT = 'ideo_dhl/shipment/edit';
-    private const URL_PATH_CREATE_RETURN = 'ideo_dhl/shipment/createReturnShipment';
-    private const URL_PATH_PRINT_RETURN_LABEL = 'ideo_dhl/shipment/printReturnLabel';
-    private const URL_PATH_PRINT_RETURN_QR = 'ideo_dhl/shipment/printReturnQrCode';
-    private const URL_PATH_UPDATE_STATUS = 'ideo_dhl/shipment/updateStatus';
-    private const URL_PATH_DELETE = 'ideo_dhl/shipment/delete';
+    private const URL_PATH_EDIT = 'dhlparcel/shipment/edit';
+    private const URL_PATH_CREATE_RETURN = 'dhlparcel/shipment/createReturnShipment';
+    private const URL_PATH_PRINT_RETURN_LABEL = 'dhlparcel/shipment/printReturnLabel';
+    private const URL_PATH_PRINT_RETURN_QR = 'dhlparcel/shipment/printReturnQrCode';
+    private const URL_PATH_UPDATE_STATUS = 'dhlparcel/shipment/updateStatus';
+    private const URL_PATH_DELETE = 'dhlparcel/shipment/delete';
     private const URL_PATH_VIEW_ORDER = 'sales/order/view';
 
     /**
@@ -61,7 +61,7 @@ class ShipmentActions extends Column
                     if (!empty($item['shipment_id'])) {
                         $actions['print_label'] = [
                             'href' => $this->urlBuilder->getUrl(
-                                'ideo_dhl/shipment/printLabel',
+                                'dhlparcel/shipment/printLabel',
                                 ['entity_id' => $item['entity_id']]
                             ),
                             'label' => __('Print Label'),
@@ -105,7 +105,7 @@ class ShipmentActions extends Column
 
                         $actions['download_scan'] = [
                             'href' => $this->urlBuilder->getUrl(
-                                'ideo_dhl/shipment/downloadScan',
+                                'dhlparcel/shipment/downloadScan',
                                 ['entity_id' => $item['entity_id']]
                             ),
                             'label' => __('Download Scan'),
@@ -114,7 +114,7 @@ class ShipmentActions extends Column
 
                         $actions['download_epod'] = [
                             'href' => $this->urlBuilder->getUrl(
-                                'ideo_dhl/shipment/downloadEpod',
+                                'dhlparcel/shipment/downloadEpod',
                                 ['entity_id' => $item['entity_id']]
                             ),
                             'label' => __('Download ePOD'),
@@ -135,14 +135,14 @@ class ShipmentActions extends Column
                             'href' => '#',
                             'label' => __('Order Courier'),
                             'callback' => [
-                                'provider' => 'ideo_dhl_shipment_listing.ideo_dhl_shipment_listing.ideo_dhl_shipment_columns.actions',
+                                'provider' => 'dhlparcel_shipment_listing.dhlparcel_shipment_listing.dhlparcel_shipment_columns.actions',
                                 'target' => 'bookCourierRow',
                             ],
                         ];
                     } else {
                         $actions['cancel_courier'] = [
                             'href' => $this->urlBuilder->getUrl(
-                                'ideo_dhl/shipment/cancelCourierBooking',
+                                'dhlparcel/shipment/cancelCourierBooking',
                                 ['entity_id' => $item['entity_id']]
                             ),
                             'label' => __('Cancel Courier'),

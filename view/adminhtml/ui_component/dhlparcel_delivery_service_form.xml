@@ -3,7 +3,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form_data_source</item>
+            <item name="provider" xsi:type="string">dhlparcel_delivery_service_form.dhlparcel_delivery_service_form_data_source</item>
         </item>
         <item name="label" xsi:type="string" translate="true">Delivery Service Details</item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
@@ -15,22 +15,22 @@
             <button name="delete" class="Ideo\Dhl\Block\Adminhtml\Button\Delete"/>
             <button name="back" class="Ideo\Dhl\Block\Adminhtml\Button\Back"/>
         </buttons>
-        <namespace>ideo_dhl_delivery_service_form</namespace>
+        <namespace>dhlparcel_delivery_service_form</namespace>
         <dataScope>data</dataScope>
         <deps>
-            <dep>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form_data_source</dep>
+            <dep>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form_data_source</dep>
         </deps>
     </settings>
-    <dataSource name="ideo_dhl_delivery_service_form_data_source">
+    <dataSource name="dhlparcel_delivery_service_form_data_source">
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
                 <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
             </item>
         </argument>
         <settings>
-            <submitUrl path="ideo_dhl/deliveryservice/save"/>
+            <submitUrl path="dhlparcel/deliveryservice/save"/>
         </settings>
-        <dataProvider class="Ideo\Dhl\Model\DeliveryService\DataProvider" name="ideo_dhl_delivery_service_form_data_source">
+        <dataProvider class="Ideo\Dhl\Model\DeliveryService\DataProvider" name="dhlparcel_delivery_service_form_data_source">
             <settings>
                 <requestFieldName>entity_id</requestFieldName>
                 <primaryFieldName>entity_id</primaryFieldName>
@@ -484,19 +484,19 @@
                             <value>ENVELOPE</value>
                             <actions>
                                 <action name="0">
-                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.width</target>
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.width</target>
                                     <callback>hide</callback>
                                 </action>
                                 <action name="1">
-                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.length</target>
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.length</target>
                                     <callback>hide</callback>
                                 </action>
                                 <action name="2">
-                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.height</target>
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.height</target>
                                     <callback>hide</callback>
                                 </action>
                                 <action name="3">
-                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.weight</target>
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.weight</target>
                                     <callback>hide</callback>
                                 </action>
                             </actions>
@@ -505,19 +505,19 @@
                             <value>PACKAGE</value>
                             <actions>
                                 <action name="0">
-                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.width</target>
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.width</target>
                                     <callback>show</callback>
                                 </action>
                                 <action name="1">
-                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.length</target>
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.length</target>
                                     <callback>show</callback>
                                 </action>
                                 <action name="2">
-                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.height</target>
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.height</target>
                                     <callback>show</callback>
                                 </action>
                                 <action name="3">
-                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.weight</target>
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.weight</target>
                                     <callback>show</callback>
                                 </action>
                             </actions>
@@ -526,19 +526,19 @@
                             <value>PALLET</value>
                             <actions>
                                 <action name="0">
-                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.width</target>
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.width</target>
                                     <callback>show</callback>
                                 </action>
                                 <action name="1">
-                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.length</target>
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.length</target>
                                     <callback>show</callback>
                                 </action>
                                 <action name="2">
-                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.height</target>
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.height</target>
                                     <callback>show</callback>
                                 </action>
                                 <action name="3">
-                                    <target>ideo_dhl_delivery_service_form.ideo_dhl_delivery_service_form.dimensions.weight</target>
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.weight</target>
                                     <callback>show</callback>
                                 </action>
                             </actions>

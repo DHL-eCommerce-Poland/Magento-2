@@ -51,7 +51,7 @@ class DeleteShipment extends Generic implements ButtonProviderInterface
             'on_click' => sprintf(
                 "deleteConfirm('%s', '%s')",
                 __('Are you sure you want to delete this shipment? It will be cancelled in DHL and removed from Magento.'),
-                $this->getUrl('ideo_dhl/shipment/delete', ['entity_id' => $entityId])
+                $this->getUrl('dhlparcel/shipment/delete', ['entity_id' => $entityId])
             ),
             'sort_order' => 20,
         ];

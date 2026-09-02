@@ -50,7 +50,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
         $block->expects($this->once())
             ->method('addButton')
             ->with(
-                'ideo_dhl_prepare_shipment',
+                'dhlparcel_prepare_shipment',
                 $this->callback(fn($arg) => is_array($arg) && isset($arg['label'])),
                 0,
                 95

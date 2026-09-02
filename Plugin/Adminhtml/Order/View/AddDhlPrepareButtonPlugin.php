@@ -72,7 +72,7 @@ class AddDhlPrepareButtonPlugin
                 return;
             }
 
-            $prepareUrl = $this->urlBuilder->getUrl('ideo_dhl/shipment/prepare', ['order_id' => $orderId]);
+            $prepareUrl = $this->urlBuilder->getUrl('dhlparcel/shipment/prepare', ['order_id' => $orderId]);
             $onClickJs = sprintf(
                 'window.ideoDhlOpenPrepareModal && window.ideoDhlOpenPrepareModal(%d, "%s")',
                 $orderId,
@@ -80,7 +80,7 @@ class AddDhlPrepareButtonPlugin
             );
 
             $subject->addButton(
-                'ideo_dhl_prepare_shipment',
+                'dhlparcel_prepare_shipment',
                 [
                     'label' => __('DHL Shipment'),
                     'class' => 'action-secondary dhl-prepare-shipment-btn',

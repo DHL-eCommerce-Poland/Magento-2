@@ -4,7 +4,7 @@
     <update handle="styles"/>
     <body>
         <referenceContainer name="content">
-            <uiComponent name="ideo_dhl_drop_off_point_listing"/>
+            <uiComponent name="dhlparcel_drop_off_point_listing"/>
         </referenceContainer>
     </body>
 </page>

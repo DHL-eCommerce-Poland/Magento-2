@@ -26,7 +26,7 @@ class PrintReturnQrCodeTest extends TestCase
 
         $urlBuilder = $this->createMock(UrlInterface::class);
         $urlBuilder->method('getUrl')
-            ->with('ideo_dhl/shipment/printReturnQrCode', ['entity_id' => 10])
+            ->with('dhlparcel/shipment/printReturnQrCode', ['entity_id' => 10])
             ->willReturn('http://example.com/dhl/shipment/printReturnQrCode/entity_id/10');
 
         $button = new PrintReturnQrCode($request, $repository, $urlBuilder);

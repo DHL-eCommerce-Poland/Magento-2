@@ -55,7 +55,7 @@ class ExportTableratesTest extends TestCase
 
         $resourceConnectionStub
             ->method('getTableName')
-            ->willReturn('ideo_dhl_tablerate');
+            ->willReturn('dhlparcel_tablerate');
 
         $this->controller = new ExportTablerates(
             $context,

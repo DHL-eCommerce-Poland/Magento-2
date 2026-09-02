@@ -50,7 +50,7 @@ class DataProviderTest extends TestCase
         $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
 
         $dataProvider = new DataProvider(
-            'ideo_dhl_shipment_form_data_source',
+            'dhlparcel_shipment_form_data_source',
             'entity_id',
             'entity_id',
             $collectionFactory,

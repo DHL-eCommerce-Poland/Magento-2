@@ -51,7 +51,7 @@ class CreateReturnShipment extends Generic implements ButtonProviderInterface
             'on_click' => sprintf(
                 "confirmSetLocation('%s', '%s')",
                 __('Are you sure you want to create a return shipment for this parcel?'),
-                $this->getUrl('ideo_dhl/shipment/createReturnShipment', ['entity_id' => $entityId])
+                $this->getUrl('dhlparcel/shipment/createReturnShipment', ['entity_id' => $entityId])
             ),
             'sort_order' => 65,
         ];

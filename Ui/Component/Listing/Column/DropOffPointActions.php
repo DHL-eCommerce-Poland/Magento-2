@@ -11,8 +11,8 @@ use Magento\Ui\Component\Listing\Columns\Column;
 
 class DropOffPointActions extends Column
 {
-    private const URL_PATH_EDIT = 'ideo_dhl/dropoffpoint/edit';
-    private const URL_PATH_DELETE = 'ideo_dhl/dropoffpoint/delete';
+    private const URL_PATH_EDIT = 'dhlparcel/dropoffpoint/edit';
+    private const URL_PATH_DELETE = 'dhlparcel/dropoffpoint/delete';
 
     /**
      * @param ContextInterface $context

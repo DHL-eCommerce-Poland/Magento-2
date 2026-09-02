@@ -35,7 +35,7 @@ class TablerateTest extends TestCase
 
         $resourceConnectionStub
             ->method('getTableName')
-            ->willReturn('ideo_dhl_tablerate');
+            ->willReturn('dhlparcel_tablerate');
 
         $context = $this->createStub(Context::class);
         $registry = $this->createStub(Registry::class);

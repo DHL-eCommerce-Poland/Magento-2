@@ -11,8 +11,8 @@ use Magento\Ui\Component\Listing\Columns\Column;
 
 class DeliveryServiceActions extends Column
 {
-    private const URL_PATH_EDIT = 'ideo_dhl/deliveryservice/edit';
-    private const URL_PATH_DELETE = 'ideo_dhl/deliveryservice/delete';
+    private const URL_PATH_EDIT = 'dhlparcel/deliveryservice/edit';
+    private const URL_PATH_DELETE = 'dhlparcel/deliveryservice/delete';
 
     /**
      * @param ContextInterface $context

@@ -1,24 +1,4 @@
 {
-    "ideo_dhl_tablerate": {
-        "column": {
-            "entity_id": true,
-            "website_id": true,
-            "method_code": true,
-            "condition_type": true,
-            "condition_from": true,
-            "condition_to": true,
-            "price": true
-        },
-        "index": {
-            "IDX_IDEO_DHL_TABLERATE_MATCH": true,
-            "IDEO_DHL_TABLERATE_WEBSITE_ID_METHOD_CODE_CONDITION_TYPE": true
-        },
-        "constraint": {
-            "PRIMARY": true,
-            "UNQ_IDEO_DHL_TABLERATE_LOOKUP": true,
-            "UNQ_F7001E7F6A7A3B5890CF20A3A1077A2E": true
-        }
-    },
     "quote_address": {
         "column": {
             "dhl_service_point_id": true,
@@ -43,7 +23,25 @@
             "dhl_postnummer": true
         }
     },
-    "ideo_dhl_drop_off_point": {
+    "dhlparcel_tablerate": {
+        "column": {
+            "entity_id": true,
+            "website_id": true,
+            "method_code": true,
+            "condition_type": true,
+            "condition_from": true,
+            "condition_to": true,
+            "price": true
+        },
+        "index": {
+            "DHLPARCEL_TABLERATE_WEBSITE_ID_METHOD_CODE_CONDITION_TYPE": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "UNQ_F5F03F8FE6902A90B58D330ACDD2E21D": true
+        }
+    },
+    "dhlparcel_drop_off_point": {
         "column": {
             "entity_id": true,
             "website_id": true,
@@ -64,14 +62,13 @@
             "is_default": true
         },
         "index": {
-            "IDX_IDEO_DHL_DROP_OFF_POINT_WEBSITE": true,
-            "IDEO_DHL_DROP_OFF_POINT_WEBSITE_ID": true
+            "DHLPARCEL_DROP_OFF_POINT_WEBSITE_ID": true
         },
         "constraint": {
             "PRIMARY": true
         }
     },
-    "ideo_dhl_delivery_service": {
+    "dhlparcel_delivery_service": {
         "column": {
             "entity_id": true,
             "website_id": true,
@@ -96,18 +93,19 @@
             "auto_create_return_shipment": true
         },
         "index": {
-            "IDX_IDEO_DHL_DELIVERY_SERVICE_WEBSITE_METHOD": true,
-            "IDEO_DHL_DELIVERY_SERVICE_WEBSITE_ID_METHOD_CODE": true
+            "DHLPARCEL_DELIVERY_SERVICE_WEBSITE_ID_METHOD_CODE": true
         },
         "constraint": {
             "PRIMARY": true
         }
     },
-    "ideo_dhl_shipment_data": {
+    "dhlparcel_shipment_data": {
         "column": {
             "entity_id": true,
             "order_id": true,
             "shipment_id": true,
+            "return_shipment_id": true,
+            "dispatch_number": true,
             "status": true,
             "preset_sender_id": true,
             "preset_shipment_id": true,
@@ -117,12 +115,10 @@
             "updated_at": true
         },
         "index": {
-            "IDX_IDEO_DHL_SHIPMENT_DATA_ORDER_ID": true,
-            "IDX_IDEO_DHL_SHIPMENT_DATA_SHIPMENT_ID": true,
-            "IDX_IDEO_DHL_SHIPMENT_DATA_STATUS": true,
-            "IDEO_DHL_SHIPMENT_DATA_ORDER_ID": true,
-            "IDEO_DHL_SHIPMENT_DATA_SHIPMENT_ID": true,
-            "IDEO_DHL_SHIPMENT_DATA_STATUS": true
+            "DHLPARCEL_SHIPMENT_DATA_ORDER_ID": true,
+            "DHLPARCEL_SHIPMENT_DATA_SHIPMENT_ID": true,
+            "DHLPARCEL_SHIPMENT_DATA_RETURN_SHIPMENT_ID": true,
+            "DHLPARCEL_SHIPMENT_DATA_STATUS": true
         },
         "constraint": {
             "PRIMARY": true

@@ -21,14 +21,14 @@ class ShipmentActionsTest extends TestCase
         $urlBuilder->expects($this->exactly(8))
             ->method('getUrl')
             ->willReturnMap([
-                ['ideo_dhl/shipment/edit', ['entity_id' => 10], 'http://example.com/dhl/shipment/edit/entity_id/10'],
-                ['ideo_dhl/shipment/printLabel', ['entity_id' => 10], 'http://example.com/dhl/shipment/printLabel/entity_id/10'],
-                ['ideo_dhl/shipment/createReturnShipment', ['entity_id' => 10], 'http://example.com/dhl/shipment/createReturnShipment/entity_id/10'],
-                ['ideo_dhl/shipment/downloadScan', ['entity_id' => 10], 'http://example.com/dhl/shipment/downloadScan/entity_id/10'],
-                ['ideo_dhl/shipment/downloadEpod', ['entity_id' => 10], 'http://example.com/dhl/shipment/downloadEpod/entity_id/10'],
-                ['ideo_dhl/shipment/updateStatus', ['entity_id' => 10], 'http://example.com/dhl/shipment/updateStatus/entity_id/10'],
+                ['dhlparcel/shipment/edit', ['entity_id' => 10], 'http://example.com/dhl/shipment/edit/entity_id/10'],
+                ['dhlparcel/shipment/printLabel', ['entity_id' => 10], 'http://example.com/dhl/shipment/printLabel/entity_id/10'],
+                ['dhlparcel/shipment/createReturnShipment', ['entity_id' => 10], 'http://example.com/dhl/shipment/createReturnShipment/entity_id/10'],
+                ['dhlparcel/shipment/downloadScan', ['entity_id' => 10], 'http://example.com/dhl/shipment/downloadScan/entity_id/10'],
+                ['dhlparcel/shipment/downloadEpod', ['entity_id' => 10], 'http://example.com/dhl/shipment/downloadEpod/entity_id/10'],
+                ['dhlparcel/shipment/updateStatus', ['entity_id' => 10], 'http://example.com/dhl/shipment/updateStatus/entity_id/10'],
                 ['sales/order/view', ['order_id' => 100], 'http://example.com/sales/order/view/order_id/100'],
-                ['ideo_dhl/shipment/delete', ['entity_id' => 10], 'http://example.com/dhl/shipment/delete/entity_id/10'],
+                ['dhlparcel/shipment/delete', ['entity_id' => 10], 'http://example.com/dhl/shipment/delete/entity_id/10'],
             ]);
 
         $actionColumn = new ShipmentActions(
@@ -87,13 +87,13 @@ class ShipmentActionsTest extends TestCase
         $urlBuilder->expects($this->exactly(7))
             ->method('getUrl')
             ->willReturnMap([
-                ['ideo_dhl/shipment/edit', ['entity_id' => 15], 'http://example.com/dhl/shipment/edit/entity_id/15'],
-                ['ideo_dhl/shipment/printLabel', ['entity_id' => 15], 'http://example.com/dhl/shipment/printLabel/entity_id/15'],
-                ['ideo_dhl/shipment/createReturnShipment', ['entity_id' => 15], 'http://example.com/dhl/shipment/createReturnShipment/entity_id/15'],
-                ['ideo_dhl/shipment/downloadScan', ['entity_id' => 15], 'http://example.com/dhl/shipment/downloadScan/entity_id/15'],
-                ['ideo_dhl/shipment/downloadEpod', ['entity_id' => 15], 'http://example.com/dhl/shipment/downloadEpod/entity_id/15'],
-                ['ideo_dhl/shipment/updateStatus', ['entity_id' => 15], 'http://example.com/dhl/shipment/updateStatus/entity_id/15'],
-                ['ideo_dhl/shipment/delete', ['entity_id' => 15], 'http://example.com/dhl/shipment/delete/entity_id/15'],
+                ['dhlparcel/shipment/edit', ['entity_id' => 15], 'http://example.com/dhl/shipment/edit/entity_id/15'],
+                ['dhlparcel/shipment/printLabel', ['entity_id' => 15], 'http://example.com/dhl/shipment/printLabel/entity_id/15'],
+                ['dhlparcel/shipment/createReturnShipment', ['entity_id' => 15], 'http://example.com/dhl/shipment/createReturnShipment/entity_id/15'],
+                ['dhlparcel/shipment/downloadScan', ['entity_id' => 15], 'http://example.com/dhl/shipment/downloadScan/entity_id/15'],
+                ['dhlparcel/shipment/downloadEpod', ['entity_id' => 15], 'http://example.com/dhl/shipment/downloadEpod/entity_id/15'],
+                ['dhlparcel/shipment/updateStatus', ['entity_id' => 15], 'http://example.com/dhl/shipment/updateStatus/entity_id/15'],
+                ['dhlparcel/shipment/delete', ['entity_id' => 15], 'http://example.com/dhl/shipment/delete/entity_id/15'],
             ]);
 
         $actionColumn = new ShipmentActions(
@@ -135,14 +135,14 @@ class ShipmentActionsTest extends TestCase
         $urlBuilder->expects($this->exactly(8))
             ->method('getUrl')
             ->willReturnMap([
-                ['ideo_dhl/shipment/edit', ['entity_id' => 20], 'http://example.com/dhl/shipment/edit/entity_id/20'],
-                ['ideo_dhl/shipment/printLabel', ['entity_id' => 20], 'http://example.com/dhl/shipment/printLabel/entity_id/20'],
-                ['ideo_dhl/shipment/printReturnLabel', ['entity_id' => 20], 'http://example.com/dhl/shipment/printReturnLabel/entity_id/20'],
-                ['ideo_dhl/shipment/printReturnQrCode', ['entity_id' => 20], 'http://example.com/dhl/shipment/printReturnQrCode/entity_id/20'],
-                ['ideo_dhl/shipment/downloadScan', ['entity_id' => 20], 'http://example.com/dhl/shipment/downloadScan/entity_id/20'],
-                ['ideo_dhl/shipment/downloadEpod', ['entity_id' => 20], 'http://example.com/dhl/shipment/downloadEpod/entity_id/20'],
-                ['ideo_dhl/shipment/updateStatus', ['entity_id' => 20], 'http://example.com/dhl/shipment/updateStatus/entity_id/20'],
-                ['ideo_dhl/shipment/delete', ['entity_id' => 20], 'http://example.com/dhl/shipment/delete/entity_id/20'],
+                ['dhlparcel/shipment/edit', ['entity_id' => 20], 'http://example.com/dhl/shipment/edit/entity_id/20'],
+                ['dhlparcel/shipment/printLabel', ['entity_id' => 20], 'http://example.com/dhl/shipment/printLabel/entity_id/20'],
+                ['dhlparcel/shipment/printReturnLabel', ['entity_id' => 20], 'http://example.com/dhl/shipment/printReturnLabel/entity_id/20'],
+                ['dhlparcel/shipment/printReturnQrCode', ['entity_id' => 20], 'http://example.com/dhl/shipment/printReturnQrCode/entity_id/20'],
+                ['dhlparcel/shipment/downloadScan', ['entity_id' => 20], 'http://example.com/dhl/shipment/downloadScan/entity_id/20'],
+                ['dhlparcel/shipment/downloadEpod', ['entity_id' => 20], 'http://example.com/dhl/shipment/downloadEpod/entity_id/20'],
+                ['dhlparcel/shipment/updateStatus', ['entity_id' => 20], 'http://example.com/dhl/shipment/updateStatus/entity_id/20'],
+                ['dhlparcel/shipment/delete', ['entity_id' => 20], 'http://example.com/dhl/shipment/delete/entity_id/20'],
             ]);
 
         $actionColumn = new ShipmentActions(
