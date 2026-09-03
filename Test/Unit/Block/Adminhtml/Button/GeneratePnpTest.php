@@ -6,6 +6,7 @@ namespace Ideo\Dhl\Test\Unit\Block\Adminhtml\Button;
 
 use Ideo\Dhl\Block\Adminhtml\Button\GeneratePnp;
 use Magento\Backend\Block\Widget\Context;
+use Magento\Framework\Escaper;
 use PHPUnit\Framework\TestCase;
 
 class GeneratePnpTest extends TestCase
@@ -13,7 +14,10 @@ class GeneratePnpTest extends TestCase
     public function testGetButtonDataReturnsExpectedArray(): void
     {
         $contextStub = $this->createStub(Context::class);
-        $button = new GeneratePnp($contextStub);
+        $escaperStub = $this->createStub(Escaper::class);
+        $escaperStub->method('escapeJs')->willReturnCallback(fn(string $str) => addslashes($str));
+
+        $button = new GeneratePnp($contextStub, $escaperStub);
         $data = $button->getButtonData();
 
         $this->assertIsArray($data);

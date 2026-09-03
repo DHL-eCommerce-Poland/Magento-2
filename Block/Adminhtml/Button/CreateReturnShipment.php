@@ -6,6 +6,7 @@ namespace Ideo\Dhl\Block\Adminhtml\Button;
 
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Magento\Backend\Block\Widget\Context;
+use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 use Throwable;
 
@@ -13,13 +14,15 @@ class CreateReturnShipment extends Generic implements ButtonProviderInterface
 {
     /**
      * @param Context $context
+     * @param Escaper $escaper
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      */
     public function __construct(
         Context $context,
+        Escaper $escaper,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository
     ) {
-        parent::__construct($context);
+        parent::__construct($context, $escaper);
     }
 
     /**

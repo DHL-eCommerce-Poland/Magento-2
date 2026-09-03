@@ -117,7 +117,10 @@ class SaveServicePointToQuoteAddress
             return null;
         }
 
-        $country = ($shippingAddress && is_object($shippingAddress) && (method_exists($shippingAddress, 'getCountryId') || is_callable([$shippingAddress, 'getCountryId'])))
+        $hasCountryMethod = $shippingAddress
+            && is_object($shippingAddress)
+            && method_exists($shippingAddress, 'getCountryId');
+        $country = $hasCountryMethod
             ? (string) $shippingAddress->getCountryId()
             : '';
 

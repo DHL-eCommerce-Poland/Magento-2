@@ -13,7 +13,6 @@ use Ideo\Dhl\Model\Config\Source\LabelType as LabelTypeSource;
 use Ideo\Dhl\Model\Config\Source\PackageType as PackageTypeSource;
 use Ideo\Dhl\Model\Config\Source\ReturnBookCourier as ReturnBookCourierSource;
 use Ideo\Dhl\Model\Config\Source\ReturnQrCodeType as ReturnQrCodeTypeSource;
-use Ideo\Dhl\Model\Config\Source\PickupTime;
 use Ideo\Dhl\Model\Config\Source\ServiceCode as ServiceCodeSource;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory as DeliveryServiceCollectionFactory;
 use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory as DropOffPointCollectionFactory;
@@ -46,6 +45,8 @@ class TemplateManager
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
      * @param LoggerInterface|null $logger
+     * @param ReturnQrCodeTypeSource|null $returnQrCodeTypeSource
+     * @param ReturnBookCourierSource|null $returnBookCourierSource
      */
     public function __construct(
         private readonly DropOffPointCollectionFactory $dropOffPointCollectionFactory,
@@ -81,7 +82,7 @@ class TemplateManager
             return $value;
         }
         if (is_numeric($value)) {
-            return (int)$value > 0;
+            return (int) $value > 0;
         }
         if (is_string($value)) {
             $trimmed = strtolower(trim($value));
@@ -130,7 +131,7 @@ class TemplateManager
     public function getCountryOptions(): array
     {
         $options = $this->countrySource->toOptionArray(false);
-        return array_values(array_filter($options, fn($opt) => !empty($opt['value'])));
+        return array_values(array_filter($options, fn ($opt) => !empty($opt['value'])));
     }
 
     /**
@@ -141,7 +142,7 @@ class TemplateManager
     public function getServiceCodeOptions(): array
     {
         $options = $this->serviceCodeSource->toOptionArray();
-        return array_values(array_filter($options, fn($opt) => !empty($opt['value'])));
+        return array_values(array_filter($options, fn ($opt) => !empty($opt['value'])));
     }
 
     /**
@@ -152,7 +153,7 @@ class TemplateManager
     public function getLabelTypeOptions(): array
     {
         $options = $this->labelTypeSource->toOptionArray();
-        return array_values(array_filter($options, fn($opt) => !empty($opt['value'])));
+        return array_values(array_filter($options, fn ($opt) => !empty($opt['value'])));
     }
 
     /**
@@ -163,7 +164,7 @@ class TemplateManager
     public function getPackageTypeOptions(): array
     {
         $options = $this->packageTypeSource->toOptionArray();
-        return array_values(array_filter($options, fn($opt) => !empty($opt['value'])));
+        return array_values(array_filter($options, fn ($opt) => !empty($opt['value'])));
     }
 
     /**
@@ -174,7 +175,7 @@ class TemplateManager
     public function getAddressTypeOptions(): array
     {
         $options = $this->addressTypeSource->toOptionArray();
-        return array_values(array_filter($options, fn($opt) => !empty($opt['value'])));
+        return array_values(array_filter($options, fn ($opt) => !empty($opt['value'])));
     }
 
     /**
@@ -185,7 +186,7 @@ class TemplateManager
     public function getContentSourceOptions(): array
     {
         $options = $this->contentSource->toOptionArray();
-        return array_values(array_filter($options, fn($opt) => !empty($opt['value'])));
+        return array_values(array_filter($options, fn ($opt) => !empty($opt['value'])));
     }
 
     /**
@@ -197,7 +198,7 @@ class TemplateManager
     {
         $source = $this->returnQrCodeTypeSource ?? new ReturnQrCodeTypeSource();
         $options = $source->toOptionArray();
-        return array_values(array_filter($options, fn($opt) => isset($opt['value']) && $opt['value'] !== ''));
+        return array_values(array_filter($options, fn ($opt) => isset($opt['value']) && $opt['value'] !== ''));
     }
 
     /**
@@ -209,7 +210,7 @@ class TemplateManager
     {
         $source = $this->returnBookCourierSource ?? new ReturnBookCourierSource();
         $options = $source->toOptionArray();
-        return array_values(array_filter($options, fn($opt) => isset($opt['value']) && $opt['value'] !== ''));
+        return array_values(array_filter($options, fn ($opt) => isset($opt['value']) && $opt['value'] !== ''));
     }
 
     /**

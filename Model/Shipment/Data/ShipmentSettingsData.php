@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+// phpcs:disable Generic.Files.LineLength.TooLong
+
 namespace Ideo\Dhl\Model\Shipment\Data;
 
 class ShipmentSettingsData
@@ -29,6 +31,10 @@ class ShipmentSettingsData
      * @param bool $isNonStandard
      * @param bool $hasEuroReturn
      * @param bool $autoCreateReturnShipment
+     * @param string|null $returnLabelType
+     * @param string|null $returnQrCodeType
+     * @param int|null $returnLabelExpDays
+     * @param int|null $returnBookCourier
      * @param int|null $dropOffPointId
      * @param string|null $addressType
      * @param PackageData[] $packages
@@ -384,7 +390,7 @@ class ShipmentSettingsData
             'returnBookCourier' => $this->returnBookCourier,
             'dropOffPointId' => $this->dropOffPointId,
             'addressType' => $this->addressType,
-            'packages' => array_map(fn(PackageData $p) => $p->toArray(), $this->packages),
+            'packages' => array_map(fn (PackageData $p) => $p->toArray(), $this->packages),
         ];
     }
 

@@ -78,7 +78,10 @@ class BookCourier extends Action implements HttpPostActionInterface
 
             if ($bookingResult->isSuccess()) {
                 $orderMsg = $bookingResult->getCourierOrderId()
-                    ? __('Courier booked successfully. Confirmation / Order ID: %1', $bookingResult->getCourierOrderId())
+                    ? __(
+                        'Courier booked successfully. Confirmation / Order ID: %1',
+                        $bookingResult->getCourierOrderId()
+                    )
                     : __('Courier booked successfully.');
 
                 return $resultJson->setData([
@@ -88,9 +91,12 @@ class BookCourier extends Action implements HttpPostActionInterface
                 ]);
             }
 
+            $errMsg = $bookingResult->getErrorMessage()
+                ?: (string) __('Failed to book courier via DHL WebAPI2.');
+
             return $resultJson->setData([
                 'success' => false,
-                'message' => $bookingResult->getErrorMessage() ?: (string) __('Failed to book courier via DHL WebAPI2.'),
+                'message' => $errMsg,
             ]);
         } catch (Exception $e) {
             $this->logger?->error('[BookCourier Controller] Error: ' . $e->getMessage());

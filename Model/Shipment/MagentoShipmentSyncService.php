@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+// phpcs:disable Generic.Files.LineLength.TooLong
+
 namespace Ideo\Dhl\Model\Shipment;
 
 use Exception;
@@ -173,8 +175,9 @@ class MagentoShipmentSyncService
     }
 
     /**
-     * Update tracking numbers on existing Magento shipment by physically removing old tracks via TrackRepository
-     * and clearing memory collection.
+     * Update tracking numbers on existing Magento shipment.
+     *
+     * Removes old tracks via TrackRepository and clears memory collection.
      *
      * @param int $magentoShipmentId
      * @param array $newTrackingNumbers

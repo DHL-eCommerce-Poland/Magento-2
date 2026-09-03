@@ -10,7 +10,9 @@ use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filesystem;
 use Magento\Shipping\Model\Shipping\LabelGenerator;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -26,16 +28,18 @@ class DocumentDownloadService
      * @param ClientInterface $client
      * @param CredentialsProvider $credentialsProvider
      * @param ScopeConfigInterface $scopeConfig
-     * @param LabelGenerator|null $labelGenerator
-     * @param LoggerInterface|null $logger
+     * @param Filesystem $filesystem
+     * @param LabelGenerator $labelGenerator
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly ?LabelGenerator $labelGenerator = null,
-        private readonly ?LoggerInterface $logger = null
+        private readonly Filesystem $filesystem,
+        private readonly LabelGenerator $labelGenerator,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -60,8 +64,9 @@ class DocumentDownloadService
         $result = $this->client->getShipmentScan($credentials, (string) $dhlShipmentId);
 
         if (!$result->isSuccess()) {
+            $errorMsg = $result->getErrorMessage() ?? __('Unknown API error');
             throw new LocalizedException(
-                __('Failed to retrieve waybill scan from DHL: %1', $result->getErrorMessage() ?? __('Unknown API error'))
+                __('Failed to retrieve waybill scan from DHL: %1', $errorMsg)
             );
         }
 
@@ -141,7 +146,12 @@ class DocumentDownloadService
             try {
                 $items[] = $this->getScanContent($id);
             } catch (Throwable $e) {
-                $this->logger?->warning(sprintf('[DocumentDownloadService] Could not retrieve scan for shipment #%d: %s', $id, $e->getMessage()));
+                $msg = sprintf(
+                    '[DocumentDownloadService] Could not retrieve scan for shipment #%d: %s',
+                    $id,
+                    $e->getMessage()
+                );
+                $this->logger->warning($msg);
             }
         }
 
@@ -176,7 +186,12 @@ class DocumentDownloadService
             try {
                 $items[] = $this->getEpodContent($id);
             } catch (Throwable $e) {
-                $this->logger?->warning(sprintf('[DocumentDownloadService] Could not retrieve ePOD for shipment #%d: %s', $id, $e->getMessage()));
+                $msg = sprintf(
+                    '[DocumentDownloadService] Could not retrieve ePOD for shipment #%d: %s',
+                    $id,
+                    $e->getMessage()
+                );
+                $this->logger->warning($msg);
             }
         }
 
@@ -235,13 +250,11 @@ class DocumentDownloadService
     {
         $pdfStrings = array_column($items, 'content');
 
-        if ($this->labelGenerator !== null) {
-            try {
-                $combinedPdf = $this->labelGenerator->combineLabelsPdf($pdfStrings);
-                return $combinedPdf->render();
-            } catch (Throwable $e) {
-                $this->logger?->warning('[DocumentDownloadService] LabelGenerator PDF merge failed: ' . $e->getMessage());
-            }
+        try {
+            $combinedPdf = $this->labelGenerator->combineLabelsPdf($pdfStrings);
+            return $combinedPdf->render();
+        } catch (Throwable $e) {
+            $this->logger->warning('[DocumentDownloadService] LabelGenerator PDF merge failed: ' . $e->getMessage());
         }
 
         if (class_exists('\Zend_Pdf')) {
@@ -257,7 +270,7 @@ class DocumentDownloadService
                 }
                 return $targetPdf->render();
             } catch (Throwable $e) {
-                $this->logger?->warning('[DocumentDownloadService] Zend PDF merge failed: ' . $e->getMessage());
+                $this->logger->warning('[DocumentDownloadService] Zend PDF merge failed: ' . $e->getMessage());
             }
         }
 
@@ -280,27 +293,30 @@ class DocumentDownloadService
      */
     private function createZipArchive(array $items, string $prefix): array
     {
-        $tempFile = tempnam(sys_get_temp_dir(), 'dhl_zip_');
-        if (!$tempFile) {
-            throw new LocalizedException(__('Failed to create temporary file for ZIP archive.'));
-        }
+        $varTmpDir = $this->filesystem->getDirectoryWrite(DirectoryList::TMP);
+        $relFileName = 'dhl_zip_' . uniqid('', true) . '.tmp';
+        $absFilePath = $varTmpDir->getAbsolutePath($relFileName);
 
         $zip = new ZipArchive();
-        if ($zip->open($tempFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+        if ($zip->open($absFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new LocalizedException(__('Failed to initialize ZIP archive.'));
         }
 
-        foreach ($items as $index => $item) {
-            $filename = !empty($item['filename']) ? $item['filename'] : sprintf('document_%d.bin', $index + 1);
-            $zip->addFromString($filename, $item['content']);
+        try {
+            foreach ($items as $index => $item) {
+                $filename = !empty($item['filename']) ? $item['filename'] : sprintf('document_%d.bin', $index + 1);
+                $zip->addFromString($filename, $item['content']);
+            }
+            $zip->close();
+
+            $zipContent = $varTmpDir->readFile($relFileName);
+        } finally {
+            if ($varTmpDir->isExist($relFileName)) {
+                $varTmpDir->delete($relFileName);
+            }
         }
 
-        $zip->close();
-
-        $zipContent = file_get_contents($tempFile);
-        @unlink($tempFile);
-
-        if ($zipContent === false || empty($zipContent)) {
+        if ($zipContent === '') {
             throw new LocalizedException(__('Failed to read generated ZIP archive content.'));
         }
 

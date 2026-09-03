@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Block\Adminhtml\Button;
 
 use Magento\Backend\Block\Widget\Context;
+use Magento\Framework\Escaper;
 
 class Generic
 {
     /**
      * @param Context $context
+     * @param Escaper $escaper
      */
     public function __construct(
-        protected Context $context
+        protected Context $context,
+        protected readonly Escaper $escaper
     ) {
     }
 

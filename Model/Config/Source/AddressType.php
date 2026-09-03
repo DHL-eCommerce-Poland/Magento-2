@@ -8,6 +8,10 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class AddressType implements OptionSourceInterface
 {
+    public const TYPE_BASED_ON_CART = 'N';
+    public const TYPE_CONSUMER = 'C';
+    public const TYPE_BUSINESS = 'B';
+
     /**
      * Return option array for Address Type.
      *
@@ -16,9 +20,9 @@ class AddressType implements OptionSourceInterface
     public function toOptionArray(): array
     {
         return [
-            ['value' => 'N', 'label' => __('Based on Cart')],
-            ['value' => 'C', 'label' => __('Private Address')],
-            ['value' => 'B', 'label' => __('Company Address')],
+            ['value' => self::TYPE_BASED_ON_CART, 'label' => __('Based on Cart')],
+            ['value' => self::TYPE_CONSUMER, 'label' => __('Private Address')],
+            ['value' => self::TYPE_BUSINESS, 'label' => __('Company Address')],
         ];
     }
 }

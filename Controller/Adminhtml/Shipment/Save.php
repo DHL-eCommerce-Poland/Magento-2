@@ -124,10 +124,12 @@ class Save extends Action implements HttpPostActionInterface
             $payload['shipmentSettings']['shipmentDate'] = $finalDate;
 
             if (!empty($payload['shipmentSettings']['pickupHourFrom'])) {
-                $payload['shipmentSettings']['pickupHourFrom'] = substr((string)$payload['shipmentSettings']['pickupHourFrom'], 0, 5);
+                $hourFrom = (string) $payload['shipmentSettings']['pickupHourFrom'];
+                $payload['shipmentSettings']['pickupHourFrom'] = substr($hourFrom, 0, 5);
             }
             if (!empty($payload['shipmentSettings']['pickupHourTo'])) {
-                $payload['shipmentSettings']['pickupHourTo'] = substr((string)$payload['shipmentSettings']['pickupHourTo'], 0, 5);
+                $hourTo = (string) $payload['shipmentSettings']['pickupHourTo'];
+                $payload['shipmentSettings']['pickupHourTo'] = substr($hourTo, 0, 5);
             }
 
             if (isset($payload['sender']) && is_array($payload['sender'])) {
@@ -136,7 +138,10 @@ class Save extends Action implements HttpPostActionInterface
             }
         }
 
-        $entityId = (int) ($this->getRequest()->getParam('entity_id') ?? $this->getRequest()->getParam('id') ?? ($payload['entity_id'] ?? 0));
+        $paramId = $this->getRequest()->getParam('entity_id')
+            ?? $this->getRequest()->getParam('id')
+            ?? ($payload['entity_id'] ?? 0);
+        $entityId = (int) $paramId;
 
         try {
             $shipmentData = DhlShipmentData::fromArray($payload);
@@ -188,7 +193,9 @@ class Save extends Action implements HttpPostActionInterface
                 }
 
                 $this->messageManager->addErrorMessage($msg);
-                return $this->resultRedirectFactory->create()->setPath($entityId > 0 ? '*/*/edit' : '*/*/index', ['entity_id' => $entityId]);
+                $redirectPath = $entityId > 0 ? '*/*/edit' : '*/*/index';
+                return $this->resultRedirectFactory->create()
+                    ->setPath($redirectPath, ['entity_id' => $entityId]);
             }
 
             if (!$dispatchResult->isSuccess()) {
@@ -203,7 +210,9 @@ class Save extends Action implements HttpPostActionInterface
                 }
 
                 $this->messageManager->addErrorMessage($errorMsg);
-                return $this->resultRedirectFactory->create()->setPath($entityId > 0 ? '*/*/edit' : '*/*/index', ['entity_id' => $entityId]);
+                $redirectPath = $entityId > 0 ? '*/*/edit' : '*/*/index';
+                return $this->resultRedirectFactory->create()
+                    ->setPath($redirectPath, ['entity_id' => $entityId]);
             }
 
             $createdShipmentId = (string) $dispatchResult->getShipmentId();
@@ -235,7 +244,9 @@ class Save extends Action implements HttpPostActionInterface
             }
 
             $this->messageManager->addErrorMessage(__('Error saving DHL shipment: %1', $e->getMessage()));
-            return $this->resultRedirectFactory->create()->setPath($entityId > 0 ? '*/*/edit' : '*/*/index', ['entity_id' => $entityId]);
+            $redirectPath = $entityId > 0 ? '*/*/edit' : '*/*/index';
+            return $this->resultRedirectFactory->create()
+                ->setPath($redirectPath, ['entity_id' => $entityId]);
         }
     }
 }

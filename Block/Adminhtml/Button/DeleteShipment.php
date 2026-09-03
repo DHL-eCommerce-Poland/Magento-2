@@ -6,6 +6,7 @@ namespace Ideo\Dhl\Block\Adminhtml\Button;
 
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Magento\Backend\Block\Widget\Context;
+use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 use Throwable;
 
@@ -13,13 +14,15 @@ class DeleteShipment extends Generic implements ButtonProviderInterface
 {
     /**
      * @param Context $context
+     * @param Escaper $escaper
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      */
     public function __construct(
         Context $context,
+        Escaper $escaper,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository
     ) {
-        parent::__construct($context);
+        parent::__construct($context, $escaper);
     }
 
     /**
@@ -41,7 +44,7 @@ class DeleteShipment extends Generic implements ButtonProviderInterface
             if (!empty($entity->getDispatchNumber())) {
                 return [];
             }
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return [];
         }
 
@@ -50,7 +53,10 @@ class DeleteShipment extends Generic implements ButtonProviderInterface
             'class' => 'delete',
             'on_click' => sprintf(
                 "deleteConfirm('%s', '%s')",
-                __('Are you sure you want to delete this shipment? It will be cancelled in DHL and removed from Magento.'),
+                __(
+                    'Are you sure you want to delete this shipment?'
+                    . ' It will be cancelled in DHL and removed from Magento.'
+                ),
                 $this->getUrl('dhlparcel/shipment/delete', ['entity_id' => $entityId])
             ),
             'sort_order' => 20,

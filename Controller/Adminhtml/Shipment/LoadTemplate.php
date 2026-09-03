@@ -110,9 +110,15 @@ class LoadTemplate extends Action
                     try {
                         $order = $this->orderRepository->get($orderId);
                         $resolvedContent = $this->mapper->resolveContentValue($resolvedContent, $order);
-                        $resolvedComment = $resolvedComment !== '' ? $this->variableResolver->resolve($resolvedComment, $order) : '';
-                        $resolvedReference = $resolvedReference !== '' ? $this->variableResolver->resolve($resolvedReference, $order) : '';
-                        $resolvedMpk = $resolvedMpk !== '' ? $this->variableResolver->resolve($resolvedMpk, $order) : '';
+                        $resolvedComment = $resolvedComment !== ''
+                            ? $this->variableResolver->resolve($resolvedComment, $order)
+                            : '';
+                        $resolvedReference = $resolvedReference !== ''
+                            ? $this->variableResolver->resolve($resolvedReference, $order)
+                            : '';
+                        $resolvedMpk = $resolvedMpk !== ''
+                            ? $this->variableResolver->resolve($resolvedMpk, $order)
+                            : '';
                     } catch (Exception $e) {
                         $this->logger?->warning(
                             'Could not resolve order content for template: ' . $e->getMessage(),

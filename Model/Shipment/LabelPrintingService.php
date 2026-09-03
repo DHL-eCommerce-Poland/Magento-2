@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+// phpcs:disable Generic.Files.LineLength.TooLong
+// phpcs:disable Generic.Metrics.NestingLevel.TooHigh
+
 namespace Ideo\Dhl\Model\Shipment;
 
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;

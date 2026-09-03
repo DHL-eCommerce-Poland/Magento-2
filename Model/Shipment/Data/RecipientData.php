@@ -22,6 +22,9 @@ class RecipientData
      * @param string $email
      * @param string|null $popId
      * @param string|null $popName
+     * @param bool $isPackstation
+     * @param bool $isPostfiliale
+     * @param string|null $postnummer
      */
     public function __construct(
         private string $name = '',

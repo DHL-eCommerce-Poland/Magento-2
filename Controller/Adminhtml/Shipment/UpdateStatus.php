@@ -54,11 +54,17 @@ class UpdateStatus extends Action implements HttpGetActionInterface, HttpPostAct
                 if ($statusDescription !== null) {
                     $msg = __('DHL shipment status updated to: %1', $statusDescription);
                     if ($result->getReceivedBy() !== null && trim($result->getReceivedBy()) !== '') {
-                        $msg = __('DHL shipment status updated to: %1 (Received by: %2)', $statusDescription, $result->getReceivedBy());
+                        $msg = __(
+                            'DHL shipment status updated to: %1 (Received by: %2)',
+                            $statusDescription,
+                            $result->getReceivedBy()
+                        );
                     }
                     $this->messageManager->addSuccessMessage($msg);
                 } else {
-                    $this->messageManager->addSuccessMessage(__('DHL status updated successfully (no tracking events registered yet).'));
+                    $this->messageManager->addSuccessMessage(
+                        __('DHL status updated successfully (no tracking events registered yet).')
+                    );
                 }
             } else {
                 $errorMsg = $result->getErrorMessage() ?? __('Failed to fetch status from DHL WebAPI2.');

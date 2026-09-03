@@ -6,6 +6,7 @@ namespace Ideo\Dhl\Block\Adminhtml\Button;
 
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Magento\Backend\Block\Widget\Context;
+use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 use Throwable;
 
@@ -13,24 +14,26 @@ class RecreateShipment extends Generic implements ButtonProviderInterface
 {
     /**
      * @param Context $context
+     * @param Escaper $escaper
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      */
     public function __construct(
         Context $context,
+        Escaper $escaper,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository
     ) {
-        parent::__construct($context);
+        parent::__construct($context, $escaper);
     }
 
     /**
-     * Get button data for re-creating/re-dispatching DHL shipment.
+     * Get button data.
      *
      * @return array
      */
     public function getButtonData(): array
     {
-        $entityId = $this->getEntityId();
-        if (!$entityId) {
+        $entityId = $this->getShipmentEntityId();
+        if ($entityId <= 0) {
             return [];
         }
 
@@ -41,12 +44,17 @@ class RecreateShipment extends Generic implements ButtonProviderInterface
             if (!empty($entity->getDispatchNumber())) {
                 return [];
             }
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return [];
         }
 
-        $msg = __('Clicking "Save & Resend to DHL" will cancel the existing DHL shipment and generate a new shipment for the updated data.');
         $title = __('Confirm Shipment Re-creation');
+        $msg = __(
+            'Clicking "Save & Resend to DHL" will cancel the existing DHL shipment'
+            . ' and generate a new shipment for the updated data.'
+        );
+        $safeTitle = $this->escaper->escapeJs((string) $title);
+        $safeMsg = $this->escaper->escapeJs((string) $msg);
 
         return [
             'label' => __('Save & Resend to DHL'),
@@ -63,7 +71,8 @@ class RecreateShipment extends Generic implements ButtonProviderInterface
                                     formComponent.save();
                                 } else {
                                     var \$form = $('form').filter(function() {
-                                        return $(this).attr('action') && $(this).attr('action').indexOf('dhlparcel/shipment/save') !== -1;
+                                        var act = $(this).attr('action');
+                                        return act && act.indexOf('dhlparcel/shipment/save') !== -1;
                                     });
                                     if (\$form.length) {
                                         \$form.trigger('submit');
@@ -73,8 +82,8 @@ class RecreateShipment extends Generic implements ButtonProviderInterface
                         }
                     });
                 });",
-                addslashes((string) $title),
-                addslashes((string) $msg)
+                $safeTitle,
+                $safeMsg
             ),
             'sort_order' => 70,
         ];

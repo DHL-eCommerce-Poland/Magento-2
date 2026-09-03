@@ -50,6 +50,7 @@ class DataProvider extends AbstractDataProvider
      *
      * @return array
      */
+    // phpcs:ignore Generic.Metrics.NestingLevel.TooHigh
     public function getData(): array
     {
         if (!empty($this->loadedData)) {
@@ -70,22 +71,27 @@ class DataProvider extends AbstractDataProvider
                         }
                         if (isset($data['sender']) && is_array($data['sender'])) {
                             $presetId = $item->getData('preset_sender_id');
-                            if (!isset($data['sender']['presetSenderId']) && !empty($presetId) && is_scalar($presetId)) {
-                                $data['sender']['presetSenderId'] = (string)$presetId;
+                            $hasPreset = !isset($data['sender']['presetSenderId'])
+                                && !empty($presetId)
+                                && is_scalar($presetId);
+                            if ($hasPreset) {
+                                $data['sender']['presetSenderId'] = (string) $presetId;
                             }
                         }
                         if (isset($payload['recipient']) && is_array($payload['recipient'])) {
                             $data['recipient'] = $payload['recipient'];
                         }
                         if (isset($payload['shipmentSettings']) && is_array($payload['shipmentSettings'])) {
-                            if (empty($payload['shipmentSettings']['packageNumbers']) && !empty($payload['packageNumbers'])) {
+                            $hasNoPkg = empty($payload['shipmentSettings']['packageNumbers'])
+                                && !empty($payload['packageNumbers']);
+                            if ($hasNoPkg) {
                                 $payload['shipmentSettings']['packageNumbers'] = $payload['packageNumbers'];
                             }
-                            $shipmentId = (string)($item->getShipmentId() ?? ($payload['shipmentId'] ?? ''));
-                            $status = (string)($item->getStatus() ?? '');
-                            $createdAt = (string)($item->getCreatedAt() ?? '');
-                            $dispatchNumber = (string)($item->getDispatchNumber() ?? '');
-                            $returnShipmentId = (string)($item->getReturnShipmentId() ?? '');
+                            $shipmentId = (string) ($item->getShipmentId() ?? ($payload['shipmentId'] ?? ''));
+                            $status = (string) ($item->getStatus() ?? '');
+                            $createdAt = (string) ($item->getCreatedAt() ?? '');
+                            $dispatchNumber = (string) ($item->getDispatchNumber() ?? '');
+                            $returnShipmentId = (string) ($item->getReturnShipmentId() ?? '');
                             $data['shipmentSettings'] = $this->normalizeShipmentSettings(
                                 $payload['shipmentSettings'],
                                 $shipmentId,
@@ -97,10 +103,15 @@ class DataProvider extends AbstractDataProvider
                             );
                             $packageNumbers = is_array($payload['packageNumbers'] ?? null)
                                 ? $payload['packageNumbers']
-                                : (is_array($payload['shipmentSettings']['packageNumbers'] ?? null) ? $payload['shipmentSettings']['packageNumbers'] : []);
+                                : (array) ($payload['shipmentSettings']['packageNumbers'] ?? []);
 
-                            if (isset($payload['shipmentSettings']['packages']) && is_array($payload['shipmentSettings']['packages'])) {
-                                $data['packages'] = $this->normalizePackages($payload['shipmentSettings']['packages'], $packageNumbers);
+                            $hasPackages = isset($payload['shipmentSettings']['packages'])
+                                && is_array($payload['shipmentSettings']['packages']);
+                            if ($hasPackages) {
+                                $data['packages'] = $this->normalizePackages(
+                                    $payload['shipmentSettings']['packages'],
+                                    $packageNumbers
+                                );
                                 $data['packages_fieldset'] = ['packages' => $data['packages']];
                             }
                         }
@@ -108,8 +119,13 @@ class DataProvider extends AbstractDataProvider
                             $data['specialServices'] = $this->normalizeSpecialServices($payload['specialServices']);
                             $data['special_services'] = ['specialServices' => $data['specialServices']];
                         }
-                        if (!isset($data['packages']) && isset($payload['packages']) && is_array($payload['packages'])) {
-                            $packageNumbers = is_array($payload['packageNumbers'] ?? null) ? $payload['packageNumbers'] : [];
+                        $hasRootPackages = !isset($data['packages'])
+                            && isset($payload['packages'])
+                            && is_array($payload['packages']);
+                        if ($hasRootPackages) {
+                            $packageNumbers = is_array($payload['packageNumbers'] ?? null)
+                                ? $payload['packageNumbers']
+                                : [];
                             $data['packages'] = $this->normalizePackages($payload['packages'], $packageNumbers);
                             $data['packages_fieldset'] = ['packages' => $data['packages']];
                         }
@@ -249,7 +265,9 @@ class DataProvider extends AbstractDataProvider
                 $pkg['record_id'] = (string)$index;
                 $pkg['isNonStandard'] = !empty($pkg['isNonStandard']) ? '1' : '0';
                 $pkg['hasEuroReturn'] = !empty($pkg['hasEuroReturn']) ? '1' : '0';
-                $pkg['packageNumber'] = (string)($packageNumbers[$index] ?? ($pkg['packageNumber'] ?? $pkg['blpPieceId'] ?? ''));
+                $pkgNum = $packageNumbers[$index]
+                    ?? ($pkg['packageNumber'] ?? ($pkg['blpPieceId'] ?? ''));
+                $pkg['packageNumber'] = (string) $pkgNum;
                 $result[$index] = $pkg;
             }
         }

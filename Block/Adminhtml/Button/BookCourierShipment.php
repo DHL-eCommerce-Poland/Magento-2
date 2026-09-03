@@ -6,6 +6,7 @@ namespace Ideo\Dhl\Block\Adminhtml\Button;
 
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Magento\Backend\Block\Widget\Context;
+use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 use Throwable;
 
@@ -13,17 +14,19 @@ class BookCourierShipment extends Generic implements ButtonProviderInterface
 {
     /**
      * @param Context $context
+     * @param Escaper $escaper
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      */
     public function __construct(
         Context $context,
+        Escaper $escaper,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository
     ) {
-        parent::__construct($context);
+        parent::__construct($context, $escaper);
     }
 
     /**
-     * Get button data for ordering courier for current shipment.
+     * Get button data.
      *
      * @return array
      */
@@ -41,11 +44,14 @@ class BookCourierShipment extends Generic implements ButtonProviderInterface
             if (!empty($entity->getDispatchNumber())) {
                 return [];
             }
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return [];
         }
 
         $shipmentNumber = $entity->getShipmentId() ?: (string) $entityId;
+
+        $safeShipmentNumber = $this->escaper->escapeJs($shipmentNumber);
+        $safeLoadingMsg = $this->escaper->escapeJs((string) __('Courier booking dialog is loading. Please try again.'));
 
         return [
             'label' => __('Order Courier'),
@@ -62,10 +68,10 @@ class BookCourierShipment extends Generic implements ButtonProviderInterface
                     }
                 });",
                 $entityId,
-                addslashes($shipmentNumber),
+                $safeShipmentNumber,
                 $entityId,
-                addslashes($shipmentNumber),
-                addslashes((string) __('Courier booking dialog is loading. Please try again.'))
+                $safeShipmentNumber,
+                $safeLoadingMsg
             ),
             'sort_order' => 30,
         ];

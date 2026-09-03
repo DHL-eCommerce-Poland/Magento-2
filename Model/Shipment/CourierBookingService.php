@@ -60,7 +60,9 @@ class CourierBookingService
             $pickupDt = $this->timezone->date($pickupDate);
             $formattedPickupDate = $pickupDt->format('Y-m-d');
             if ((int) $pickupDt->format('N') >= 6) {
-                throw new LocalizedException(__('Courier pickup is not available for weekends. Please select a business day in the calendar.'));
+                throw new LocalizedException(
+                    __('Courier pickup is not available for weekends. Please select a business day in the calendar.')
+                );
             }
         } catch (LocalizedException $le) {
             throw $le;

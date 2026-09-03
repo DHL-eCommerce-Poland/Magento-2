@@ -72,7 +72,8 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
      */
     public function getMagentoShipmentId(): ?int
     {
-        return $this->getData(self::MAGENTO_SHIPMENT_ID) !== null ? (int)$this->getData(self::MAGENTO_SHIPMENT_ID) : null;
+        $val = $this->getData(self::MAGENTO_SHIPMENT_ID);
+        return $val !== null ? (int) $val : null;
     }
 
     /**

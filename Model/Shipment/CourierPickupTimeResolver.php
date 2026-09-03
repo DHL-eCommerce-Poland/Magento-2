@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+// phpcs:disable Generic.Files.LineLength.TooLong
+
 namespace Ideo\Dhl\Model\Shipment;
 
 use Exception;
@@ -153,6 +155,7 @@ class CourierPickupTimeResolver
 
     /**
      * Resolve available courier pickup hours for multiple postal codes (e.g. mass action).
+     *
      * Calculates the intersection window (MAX of pickupFrom, MIN of pickupTo) across all postal codes.
      *
      * @param string[] $postalCodes

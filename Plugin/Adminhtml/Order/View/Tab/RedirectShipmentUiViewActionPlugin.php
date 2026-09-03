@@ -70,7 +70,11 @@ class RedirectShipmentUiViewActionPlugin
                 }
             } catch (Throwable $exception) {
                 $this->logger->error(
-                    sprintf('Error modifying ViewAction URL for shipment #%d: %s', $magentoShipmentId, $exception->getMessage()),
+                    sprintf(
+                        'Error modifying ViewAction URL for shipment #%d: %s',
+                        $magentoShipmentId,
+                        $exception->getMessage()
+                    ),
                     ['exception' => $exception]
                 );
             }

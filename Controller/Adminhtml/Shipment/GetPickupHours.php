@@ -46,6 +46,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
      *
      * @return Json
      */
+    // phpcs:ignore Generic.Metrics.NestingLevel.TooHigh
     public function execute(): Json
     {
         $resultJson = $this->jsonFactory->create();
@@ -90,7 +91,9 @@ class GetPickupHours extends Action implements HttpGetActionInterface
                             }
                         }
                     } catch (Exception $e) {
-                        $this->logger?->debug(sprintf('[GetPickupHours] Shipment #%s fallback failed: %s', $sId, $e->getMessage()));
+                        $this->logger?->debug(
+                            sprintf('[GetPickupHours] Shipment #%s fallback failed: %s', $sId, $e->getMessage())
+                        );
                     }
                 }
             }

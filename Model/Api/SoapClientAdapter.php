@@ -132,7 +132,13 @@ class SoapClientAdapter implements ClientInterface
             if (is_object($shipmentResult) && !empty($shipmentResult->shipmentId)) {
                 $orderStatus = !empty($shipmentResult->orderStatus) ? (string) $shipmentResult->orderStatus : null;
                 $packageNumbers = $this->extractPackageNumbers($shipmentResult);
-                return new CreateShipmentsResult(true, false, (string) $shipmentResult->shipmentId, $orderStatus, $packageNumbers);
+                return new CreateShipmentsResult(
+                    true,
+                    false,
+                    (string) $shipmentResult->shipmentId,
+                    $orderStatus,
+                    $packageNumbers
+                );
             }
 
             $errorMsg = is_object($shipmentResult) && !empty($shipmentResult->error)
@@ -237,10 +243,18 @@ class SoapClientAdapter implements ClientInterface
 
             if (is_object($resultItem)) {
                 if (!empty($resultItem->error)) {
-                    return new DeleteShipmentResult(false, $shipmentId, 'DELETE_SHIPMENT_ERROR', (string) $resultItem->error);
+                    return new DeleteShipmentResult(
+                        false,
+                        $shipmentId,
+                        'DELETE_SHIPMENT_ERROR',
+                        (string) $resultItem->error
+                    );
                 }
 
-                if (!empty($resultItem->id) || !empty($resultItem->shipmentIdentification) || (isset($resultItem->result) && (bool) $resultItem->result === true)) {
+                $hasId = !empty($resultItem->id)
+                    || !empty($resultItem->shipmentIdentification)
+                    || (isset($resultItem->result) && (bool) $resultItem->result === true);
+                if ($hasId) {
                     return new DeleteShipmentResult(true, $shipmentId);
                 }
             }
@@ -339,10 +353,18 @@ class SoapClientAdapter implements ClientInterface
             $result = $response->getPostalCodeServicesResult ?? null;
 
             if (is_object($result)) {
-                $drFrom = (!empty($result->drPickupFrom) && (string)$result->drPickupFrom !== 'brak') ? (string) $result->drPickupFrom : null;
-                $drTo = (!empty($result->drPickupTo) && (string)$result->drPickupTo !== 'brak') ? (string) $result->drPickupTo : null;
-                $exFrom = (!empty($result->exPickupFrom) && (string)$result->exPickupFrom !== 'brak') ? (string) $result->exPickupFrom : null;
-                $exTo = (!empty($result->exPickupTo) && (string)$result->exPickupTo !== 'brak') ? (string) $result->exPickupTo : null;
+                $hasDrFrom = !empty($result->drPickupFrom) && (string) $result->drPickupFrom !== 'brak';
+                $drFrom = $hasDrFrom ? (string) $result->drPickupFrom : null;
+
+                $hasDrTo = !empty($result->drPickupTo) && (string) $result->drPickupTo !== 'brak';
+                $drTo = $hasDrTo ? (string) $result->drPickupTo : null;
+
+                $hasExFrom = !empty($result->exPickupFrom) && (string) $result->exPickupFrom !== 'brak';
+                $exFrom = $hasExFrom ? (string) $result->exPickupFrom : null;
+
+                $hasExTo = !empty($result->exPickupTo) && (string) $result->exPickupTo !== 'brak';
+                $exTo = $hasExTo ? (string) $result->exPickupTo : null;
+
                 $sat = !empty($result->pickupOnSaturday) && (bool) $result->pickupOnSaturday;
 
                 return new PostalCodeServicesResult(
@@ -762,7 +784,12 @@ class SoapClientAdapter implements ClientInterface
             }
 
             if (empty($formattedItems)) {
-                return new GetLabelsResult(false, [], 'INVALID_INPUT', 'No valid shipments provided for label printing.');
+                return new GetLabelsResult(
+                    false,
+                    [],
+                    'INVALID_INPUT',
+                    'No valid shipments provided for label printing.'
+                );
             }
 
             $params = [
@@ -779,7 +806,12 @@ class SoapClientAdapter implements ClientInterface
             $result = $response->getLabelsResult ?? null;
 
             if ($result === null) {
-                return new GetLabelsResult(false, [], 'INVALID_RESPONSE', 'DHL WebAPI2 returned invalid response for getLabels.');
+                return new GetLabelsResult(
+                    false,
+                    [],
+                    'INVALID_RESPONSE',
+                    'DHL WebAPI2 returned invalid response for getLabels.'
+                );
             }
 
             $itemsRaw = [];
@@ -792,8 +824,13 @@ class SoapClientAdapter implements ClientInterface
                 $shipmentId = (string) ($itemObj->shipmentId ?? '');
                 $labelType = (string) ($itemObj->labelType ?? 'BLP');
                 $rawBase64 = (string) ($itemObj->labelData ?? '');
+                // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
                 $labelBinary = !empty($rawBase64) ? base64_decode($rawBase64) : '';
-                $mimeType = (string) ($itemObj->labelMimeType ?? $itemObj->mimeType ?? (str_contains($labelType, 'ZBLP') ? 'text/plain' : (str_contains($labelType, 'IMG') ? 'image/png' : 'application/pdf')));
+
+                $defaultMime = str_contains($labelType, 'ZBLP')
+                    ? 'text/plain'
+                    : (str_contains($labelType, 'IMG') ? 'image/png' : 'application/pdf');
+                $mimeType = (string) ($itemObj->labelMimeType ?? ($itemObj->mimeType ?? $defaultMime));
 
                 if (!empty($labelBinary)) {
                     $parsedItems[] = [
@@ -867,15 +904,28 @@ class SoapClientAdapter implements ClientInterface
             $scanResult = $response->getShipmentScanResult ?? null;
 
             if ($scanResult === null) {
-                return new GetScanResult(false, null, null, 'INVALID_RESPONSE', 'DHL WebAPI2 returned invalid response for getShipmentScan.');
+                return new GetScanResult(
+                    false,
+                    null,
+                    null,
+                    'INVALID_RESPONSE',
+                    'DHL WebAPI2 returned invalid response for getShipmentScan.'
+                );
             }
 
             $rawBase64 = (string) ($scanResult->scanData ?? '');
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
             $fileData = !empty($rawBase64) ? base64_decode($rawBase64) : null;
             $mimeType = (string) ($scanResult->scanMimeType ?? 'application/pdf');
 
             if (empty($fileData)) {
-                return new GetScanResult(false, null, null, 'EMPTY_SCAN', 'DHL WebAPI2 returned no scan data for shipment ID ' . $shipmentId);
+                return new GetScanResult(
+                    false,
+                    null,
+                    null,
+                    'EMPTY_SCAN',
+                    'DHL WebAPI2 returned no scan data for shipment ID ' . $shipmentId
+                );
             }
 
             return new GetScanResult(true, $fileData, $mimeType);
@@ -938,15 +988,28 @@ class SoapClientAdapter implements ClientInterface
             $epodResult = $response->getEpodResult ?? null;
 
             if ($epodResult === null) {
-                return new GetEpodResult(false, null, null, 'INVALID_RESPONSE', 'DHL WebAPI2 returned invalid response for getEpod.');
+                return new GetEpodResult(
+                    false,
+                    null,
+                    null,
+                    'INVALID_RESPONSE',
+                    'DHL WebAPI2 returned invalid response for getEpod.'
+                );
             }
 
             $rawBase64 = (string) ($epodResult->scanData ?? '');
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
             $fileData = !empty($rawBase64) ? base64_decode($rawBase64) : null;
             $mimeType = (string) ($epodResult->scanMimeType ?? 'application/pdf');
 
             if (empty($fileData)) {
-                return new GetEpodResult(false, null, null, 'EMPTY_EPOD', 'DHL WebAPI2 returned no ePOD data for shipment ID ' . $shipmentId);
+                return new GetEpodResult(
+                    false,
+                    null,
+                    null,
+                    'EMPTY_EPOD',
+                    'DHL WebAPI2 returned no ePOD data for shipment ID ' . $shipmentId
+                );
             }
 
             return new GetEpodResult(true, $fileData, $mimeType);
@@ -1016,16 +1079,31 @@ class SoapClientAdapter implements ClientInterface
             $pnpResult = $response->getPnpResult ?? null;
 
             if ($pnpResult === null) {
-                return new GetPnpResult(false, null, null, null, 'INVALID_RESPONSE', 'DHL WebAPI2 returned invalid response for getPnp.');
+                return new GetPnpResult(
+                    false,
+                    null,
+                    null,
+                    null,
+                    'INVALID_RESPONSE',
+                    'DHL WebAPI2 returned invalid response for getPnp.'
+                );
             }
 
-            $rawBase64 = (string) ($pnpResult->fileData ?? $pnpResult->labelData ?? '');
+            $rawBase64 = (string) ($pnpResult->fileData ?? ($pnpResult->labelData ?? ''));
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
             $fileData = !empty($rawBase64) ? base64_decode($rawBase64) : null;
             $fileName = (string) ($pnpResult->fileName ?? sprintf('PNP_%s.pdf', $date));
             $mimeType = (string) ($pnpResult->fileMimeType ?? 'application/pdf');
 
             if (empty($fileData)) {
-                return new GetPnpResult(false, null, null, null, 'EMPTY_PNP', 'DHL WebAPI2 returned no PnP report data for date ' . $date);
+                return new GetPnpResult(
+                    false,
+                    null,
+                    null,
+                    null,
+                    'EMPTY_PNP',
+                    'DHL WebAPI2 returned no PnP report data for date ' . $date
+                );
             }
 
             return new GetPnpResult(true, $fileData, $fileName, $mimeType);
@@ -1091,16 +1169,21 @@ class SoapClientAdapter implements ClientInterface
             }
         }
 
-        $context = stream_context_create([
-            'http' => [
-                'header' => 'DHLApiOrgin: ' . $apiOrigin,
-                'user_agent' => 'PHP-SOAP/' . PHP_VERSION . ' (Magento 2 Ideo_Dhl)',
-            ],
-            'ssl' => [
-                'verify_peer' => true,
-                'verify_peer_name' => true,
-            ],
-        ]);
+        try {
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
+            $context = stream_context_create([
+                'http' => [
+                    'header' => 'DHLApiOrgin: ' . $apiOrigin,
+                    'user_agent' => 'PHP-SOAP/' . PHP_VERSION . ' (Magento 2 Ideo_Dhl)',
+                ],
+                'ssl' => [
+                    'verify_peer' => true,
+                    'verify_peer_name' => true,
+                ],
+            ]);
+        } catch (Throwable) {
+            $context = null;
+        }
 
         $options = [
             'trace' => true,
@@ -1141,11 +1224,13 @@ class SoapClientAdapter implements ClientInterface
             $xml
         );
 
-        return (string) preg_replace(
-            '/(<(?:[a-zA-Z0-9_]+:)?(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)[^<]{30,}(<\/(?:[a-zA-Z0-9_]+:)?(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)/i',
-            '$1***BINARY DATA TRUNCATED***$2',
-            $xml
-        );
+        $binPattern = '/(<(?:[a-zA-Z0-9_]+:)?'
+            . '(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)'
+            . '[^<]{30,}'
+            . '(<\/(?:[a-zA-Z0-9_]+:)?'
+            . '(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)/i';
+
+        return (string) preg_replace($binPattern, '$1***BINARY DATA TRUNCATED***$2', $xml);
     }
 
     /**
@@ -1189,7 +1274,8 @@ class SoapClientAdapter implements ClientInterface
             if ($isDebug) {
                 $requestHeaders = (string) $client->__getLastRequestHeaders();
                 if (!empty($requestHeaders)) {
-                    $this->logger->info(sprintf('[DHL SOAP Request Headers - %s] %s', $action, trim($requestHeaders)));
+                    $logMsg = sprintf('[DHL SOAP Request Headers - %s] %s', $action, trim($requestHeaders));
+                    $this->logger->info($logMsg);
                 }
             }
 
@@ -1199,7 +1285,8 @@ class SoapClientAdapter implements ClientInterface
             if ($isDebug) {
                 $responseHeaders = (string) $client->__getLastResponseHeaders();
                 if (!empty($responseHeaders)) {
-                    $this->logger->info(sprintf('[DHL SOAP Response Headers - %s] %s', $action, trim($responseHeaders)));
+                    $logMsg = sprintf('[DHL SOAP Response Headers - %s] %s', $action, trim($responseHeaders));
+                    $this->logger->info($logMsg);
                 }
             }
 
@@ -1274,6 +1361,7 @@ class SoapClientAdapter implements ClientInterface
                 if (!empty($result->label)) {
                     $labelObj = $result->label;
                     if (!empty($labelObj->labelContent)) {
+                        // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
                         $labelData = base64_decode((string) $labelObj->labelContent);
                     }
                     if (!empty($labelObj->labelMimeType)) {
@@ -1297,7 +1385,16 @@ class SoapClientAdapter implements ClientInterface
                 ? (string) $result->error
                 : 'DHL API returned an invalid response structure for createShipmentReturn.';
 
-            return new CreateShipmentReturnResult(false, false, null, null, null, null, 'CREATE_RETURN_ERROR', $errorMsg);
+            return new CreateShipmentReturnResult(
+                false,
+                false,
+                null,
+                null,
+                null,
+                null,
+                'CREATE_RETURN_ERROR',
+                $errorMsg
+            );
         } catch (SoapFault $fault) {
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during createShipmentReturn%s: [%s] %s',

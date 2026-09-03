@@ -45,7 +45,11 @@ class GeneratePnpReport extends Action implements HttpGetActionInterface, HttpPo
 
         $pnpData = $this->getRequest()->getParam('pnp');
         $date = is_array($pnpData) ? ($pnpData['date'] ?? '') : (string) $this->getRequest()->getParam('date', '');
-        $typePackage = is_array($pnpData) ? ($pnpData['typePackage'] ?? '') : (string) $this->getRequest()->getParam('type_package', $this->getRequest()->getParam('typePackage', ''));
+        $paramType = $this->getRequest()->getParam(
+            'type_package',
+            $this->getRequest()->getParam('typePackage', '')
+        );
+        $typePackage = is_array($pnpData) ? ($pnpData['typePackage'] ?? '') : (string) $paramType;
 
         if (empty($date)) {
             $date = $this->timezone->scopeDate()->format('Y-m-d');

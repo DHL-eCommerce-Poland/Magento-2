@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Api;
 
+use Ideo\Dhl\Model\Config\Source\AddressType;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentRestrictions;
 
@@ -90,9 +91,11 @@ class ShipmentFullDataMapper
             ? $this->sanitizeString($recipient->getPopId())
             : null;
 
-        $receiverAddressType = (!empty($recipient->getPopId()) || $recipient->isPackstation() || $recipient->isPostfiliale())
-            ? 'C'
-            : ($recipient->getType() === 'B' ? 'B' : 'C');
+        $isPop = !empty($recipient->getPopId()) || $recipient->isPackstation() || $recipient->isPostfiliale();
+        $isBusiness = $recipient->getType() === AddressType::TYPE_BUSINESS;
+        $receiverAddressType = $isPop
+            ? AddressType::TYPE_CONSUMER
+            : ($isBusiness ? AddressType::TYPE_BUSINESS : AddressType::TYPE_CONSUMER);
 
         $recipientName = $recipient->getName() !== ''
             ? $recipient->getName()

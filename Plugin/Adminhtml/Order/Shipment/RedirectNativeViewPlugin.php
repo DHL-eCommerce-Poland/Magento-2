@@ -54,7 +54,11 @@ class RedirectNativeViewPlugin
                 }
             } catch (Throwable $exception) {
                 $this->logger->error(
-                    sprintf('Error redirecting native shipment view controller for shipment #%d: %s', $magentoShipmentId, $exception->getMessage()),
+                    sprintf(
+                        'Error redirecting native shipment view controller for shipment #%d: %s',
+                        $magentoShipmentId,
+                        $exception->getMessage()
+                    ),
                     ['exception' => $exception]
                 );
             }

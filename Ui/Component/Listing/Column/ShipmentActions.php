@@ -131,11 +131,13 @@ class ShipmentActions extends Column
                     }
 
                     if (empty($item['dispatch_number'])) {
+                        $providerPath = 'dhlparcel_shipment_listing.dhlparcel_shipment_listing.'
+                            . 'dhlparcel_shipment_columns.actions';
                         $actions['book_courier'] = [
                             'href' => '#',
                             'label' => __('Order Courier'),
                             'callback' => [
-                                'provider' => 'dhlparcel_shipment_listing.dhlparcel_shipment_listing.dhlparcel_shipment_columns.actions',
+                                'provider' => $providerPath,
                                 'target' => 'bookCourierRow',
                             ],
                         ];
@@ -176,7 +178,8 @@ class ShipmentActions extends Column
                             'confirm' => [
                                 'title' => __('Delete Shipment'),
                                 'message' => __(
-                                    'Are you sure you want to delete this shipment? It will be cancelled in DHL and removed from Magento.'
+                                    'Are you sure you want to delete this shipment?'
+                                    . ' It will be cancelled in DHL and removed from Magento.'
                                 ),
                             ],
                             'post' => true,

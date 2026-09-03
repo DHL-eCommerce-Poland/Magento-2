@@ -8,6 +8,9 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class ShipmentAddressType implements OptionSourceInterface
 {
+    public const TYPE_CONSUMER = AddressType::TYPE_CONSUMER;
+    public const TYPE_BUSINESS = AddressType::TYPE_BUSINESS;
+
     /**
      * Return option array for Shipment Recipient Address Type (Private vs Company).
      *
@@ -16,8 +19,8 @@ class ShipmentAddressType implements OptionSourceInterface
     public function toOptionArray(): array
     {
         return [
-            ['value' => 'C', 'label' => __('Private Address (C)')],
-            ['value' => 'B', 'label' => __('Company Address (B)')],
+            ['value' => self::TYPE_CONSUMER, 'label' => __('Private Address (C)')],
+            ['value' => self::TYPE_BUSINESS, 'label' => __('Company Address (B)')],
         ];
     }
 }

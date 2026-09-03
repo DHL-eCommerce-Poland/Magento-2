@@ -9,6 +9,7 @@ use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Block\Adminhtml\Button\UpdateStatusShipment;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
@@ -29,6 +30,10 @@ class UpdateStatusShipmentTest extends TestCase
         $this->urlBuilderStub = $this->createStub(UrlInterface::class);
         $this->shipmentRepositoryStub = $this->createStub(ShipmentDataRepositoryInterface::class);
 
+        $escaperStub = $this->createStub(Escaper::class);
+        $escaperStub->method('escapeJs')->willReturnCallback(fn(string $str) => addslashes($str));
+        $this->contextStub->method('getEscaper')->willReturn($escaperStub);
+
         $this->contextStub->method('getRequest')
             ->willReturn($this->requestMock);
 
@@ -37,6 +42,7 @@ class UpdateStatusShipmentTest extends TestCase
 
         $this->button = new UpdateStatusShipment(
             $this->contextStub,
+            $escaperStub,
             $this->shipmentRepositoryStub
         );
     }

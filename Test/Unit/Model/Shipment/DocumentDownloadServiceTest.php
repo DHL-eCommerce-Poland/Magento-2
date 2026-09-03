@@ -17,12 +17,19 @@ use Magento\Framework\Exception\LocalizedException;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
+use Magento\Framework\Filesystem;
+use Magento\Shipping\Model\Shipping\LabelGenerator;
+use Psr\Log\LoggerInterface;
+
 class DocumentDownloadServiceTest extends TestCase
 {
     private ShipmentDataRepositoryInterface|Stub $repositoryStub;
     private ClientInterface|Stub $clientStub;
     private CredentialsProvider|Stub $credentialsProviderStub;
     private ScopeConfigInterface|Stub $scopeConfigStub;
+    private Filesystem|Stub $filesystemStub;
+    private LabelGenerator|Stub $labelGeneratorStub;
+    private LoggerInterface|Stub $loggerStub;
     private DocumentDownloadService $service;
 
     protected function setUp(): void
@@ -31,6 +38,9 @@ class DocumentDownloadServiceTest extends TestCase
         $this->clientStub = $this->createStub(ClientInterface::class);
         $this->credentialsProviderStub = $this->createStub(CredentialsProvider::class);
         $this->scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+        $this->filesystemStub = $this->createStub(Filesystem::class);
+        $this->labelGeneratorStub = $this->createStub(LabelGenerator::class);
+        $this->loggerStub = $this->createStub(LoggerInterface::class);
 
         $credentials = new Credentials('user', 'pass', true);
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
@@ -39,7 +49,10 @@ class DocumentDownloadServiceTest extends TestCase
             $this->repositoryStub,
             $this->clientStub,
             $this->credentialsProviderStub,
-            $this->scopeConfigStub
+            $this->scopeConfigStub,
+            $this->filesystemStub,
+            $this->labelGeneratorStub,
+            $this->loggerStub
         );
     }
 

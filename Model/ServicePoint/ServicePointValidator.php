@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+// phpcs:disable Generic.Files.LineLength.TooLong
+
 namespace Ideo\Dhl\Model\ServicePoint;
 
 use Ideo\Dhl\Model\Carrier;
