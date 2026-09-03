@@ -359,7 +359,7 @@ $dateFormat = $viewModel->getDateFormat();
                                         <input type="checkbox" data-bind="checked: isNonStandard, disable: $parent.isNonStandardForbidden()" title="<?= $escaper->escapeHtmlAttr(__('Non-standard package option')) ?>" />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: middle; text-align: center;">
-                                        <input type="checkbox" data-bind="checked: hasEuroReturn" />
+                                        <input type="checkbox" data-bind="checked: hasEuroReturn, enable: packageType() === 'PALLET'" />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: middle; text-align: center;">
                                         <!-- ko if: $parent.packages().length > 1 && !$parent.isSinglePieceOnly() -->

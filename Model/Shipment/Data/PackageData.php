@@ -26,6 +26,9 @@ class PackageData
         private bool $isNonStandard = false,
         private bool $hasEuroReturn = false
     ) {
+        if ($this->packageType !== 'PALLET') {
+            $this->hasEuroReturn = false;
+        }
     }
 
     /**

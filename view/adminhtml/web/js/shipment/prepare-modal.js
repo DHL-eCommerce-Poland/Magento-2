@@ -113,15 +113,24 @@ define([
 
     function createPackageObservable(p) {
         p = p || {};
+        var pkgTypeObs = ko.observable(p.packageType || 'PACKAGE');
+        var euroReturnObs = ko.observable(pkgTypeObs() === 'PALLET' ? isTruthy(p.hasEuroReturn) : false);
+
+        pkgTypeObs.subscribe(function (newType) {
+            if (newType !== 'PALLET') {
+                euroReturnObs(false);
+            }
+        });
+
         return {
-            packageType: ko.observable(p.packageType || 'PACKAGE'),
+            packageType: pkgTypeObs,
             quantity: ko.observable(p.quantity !== undefined ? p.quantity : 1),
             weight: ko.observable(formatDecimal4(p.weight !== undefined ? p.weight : 1.0)),
             width: ko.observable(formatDecimal4(p.width)),
             length: ko.observable(formatDecimal4(p.length)),
             height: ko.observable(formatDecimal4(p.height)),
             isNonStandard: ko.observable(isTruthy(p.isNonStandard)),
-            hasEuroReturn: ko.observable(isTruthy(p.hasEuroReturn))
+            hasEuroReturn: euroReturnObs
         };
     }
 

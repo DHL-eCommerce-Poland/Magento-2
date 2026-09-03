@@ -63,4 +63,19 @@ class PackageDataTest extends TestCase
         $exported = $package->toArray();
         $this->assertEquals($data, $exported);
     }
+
+    /**
+     * Test that hasEuroReturn is reset to false when packageType is not PALLET.
+     *
+     * @return void
+     */
+    public function testHasEuroReturnIgnoredForNonPallet(): void
+    {
+        $package = new PackageData(
+            packageType: 'PACKAGE',
+            hasEuroReturn: true
+        );
+
+        $this->assertFalse($package->hasEuroReturn());
+    }
 }

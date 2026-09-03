@@ -32,8 +32,8 @@ class RecreateShipment extends Generic implements ButtonProviderInterface
      */
     public function getButtonData(): array
     {
-        $entityId = $this->getShipmentEntityId();
-        if ($entityId <= 0) {
+        $entityId = $this->getEntityId();
+        if (!$entityId || $entityId <= 0) {
             return [];
         }
 

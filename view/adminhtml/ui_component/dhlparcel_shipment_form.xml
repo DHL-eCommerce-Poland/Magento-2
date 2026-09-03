@@ -953,6 +953,52 @@
                         <dataType>text</dataType>
                         <label translate="true">Package Type</label>
                         <dataScope>packageType</dataScope>
+                        <switcherConfig>
+                            <rules>
+                                <rule name="0">
+                                    <value>PACKAGE</value>
+                                    <actions>
+                                        <action name="0">
+                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <callback>disable</callback>
+                                        </action>
+                                        <action name="1">
+                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <callback>value</callback>
+                                            <params>
+                                                <param name="0" xsi:type="number">0</param>
+                                            </params>
+                                        </action>
+                                    </actions>
+                                </rule>
+                                <rule name="1">
+                                    <value>ENVELOPE</value>
+                                    <actions>
+                                        <action name="0">
+                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <callback>disable</callback>
+                                        </action>
+                                        <action name="1">
+                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <callback>value</callback>
+                                            <params>
+                                                <param name="0" xsi:type="number">0</param>
+                                            </params>
+                                        </action>
+                                    </actions>
+                                </rule>
+                                <rule name="2">
+                                    <value>PALLET</value>
+                                    <actions>
+                                        <action name="0">
+                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                    </actions>
+                                </rule>
+                            </rules>
+                            <enabled>true</enabled>
+                        </switcherConfig>
                     </settings>
                     <formElements>
                         <select>
@@ -1071,6 +1117,7 @@
                         <dataType>boolean</dataType>
                         <label translate="true">Euro Return</label>
                         <dataScope>hasEuroReturn</dataScope>
+                        <disabled>true</disabled>
                     </settings>
                     <formElements>
                         <checkbox>
