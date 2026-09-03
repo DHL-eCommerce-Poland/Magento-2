@@ -349,6 +349,9 @@
                 <label translate="true">POP Service Point ID</label>
                 <dataScope>recipient.popId</dataScope>
                 <disabled>true</disabled>
+                <imports>
+                    <link name="visible">${$.provider}:data.recipient.popId</link>
+                </imports>
             </settings>
         </field>
         <field name="recipient[popName]" formElement="input">
@@ -357,6 +360,9 @@
                 <label translate="true">POP Service Point Address</label>
                 <dataScope>recipient.popName</dataScope>
                 <disabled>true</disabled>
+                <imports>
+                    <link name="visible">${$.provider}:data.recipient.popName</link>
+                </imports>
             </settings>
         </field>
         <field name="recipient[postnummer]" formElement="input">
@@ -365,6 +371,9 @@
                 <label translate="true">German Customer Number (Postnummer)</label>
                 <dataScope>recipient.postnummer</dataScope>
                 <disabled>true</disabled>
+                <imports>
+                    <link name="visible">${$.provider}:data.recipient.postnummer</link>
+                </imports>
             </settings>
         </field>
     </fieldset>

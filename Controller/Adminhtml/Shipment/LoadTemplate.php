@@ -73,24 +73,25 @@ class LoadTemplate extends Action
         try {
             if ($templateType === 'sender') {
                 $point = $this->dropOffPointRepository->getById($templateId);
-                $data = $point->getData();
 
                 return $resultJson->setData([
                     'success' => true,
                     'data' => [
                         'presetSenderId' => (string)$point->getId(),
-                        'sapNumber' => $data['sap_number'] ?? '',
-                        'name' => $data['name'] ?? '',
-                        'firstName' => $data['first_name'] ?? '',
-                        'lastName' => $data['last_name'] ?? '',
-                        'street' => $data['street'] ?? '',
-                        'houseNumber' => $data['house_number'] ?? '',
-                        'flatNumber' => $data['flat_number'] ?? '',
-                        'postalCode' => $data['postal_code'] ?? '',
-                        'city' => $data['city'] ?? '',
-                        'country' => $data['country'] ?? 'PL',
-                        'phone' => $data['phone'] ?? '',
-                        'email' => $data['email'] ?? '',
+                        'sapNumber' => $point->getSapNumber() ?? '',
+                        'name' => $point->getSenderName() ?? '',
+                        'firstName' => $point->getFirstName() ?? '',
+                        'lastName' => $point->getLastName() ?? '',
+                        'street' => $point->getStreet() ?? '',
+                        'houseNumber' => $point->getHouseNumber() ?? '',
+                        'flatNumber' => '',
+                        'postalCode' => $point->getPostalCode() ?? '',
+                        'city' => $point->getCity() ?? '',
+                        'country' => $point->getCountryId() ?? 'PL',
+                        'phone' => $point->getPhone() ?? '',
+                        'email' => $point->getEmail() ?? '',
+                        'pickupHourFrom' => $point->getPickupTimeFrom() ?: null,
+                        'pickupHourTo' => $point->getPickupTimeTo() ?: null,
                     ],
                 ]);
             }

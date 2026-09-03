@@ -73,12 +73,11 @@ class AddDhlPrepareButtonPluginTest extends TestCase
         $this->plugin->beforeSetLayout($block);
     }
 
-    public function testBeforeSetLayoutSkipsShippedOrCompleteOrder(): void
+    public function testBeforeSetLayoutSkipsCanceledOrClosedOrder(): void
     {
         $order = $this->createStub(Order::class);
         $order->method('getShippingMethod')->willReturn('dhlparcel_standard');
-        $order->method('getState')->willReturn(Order::STATE_COMPLETE);
-        $order->method('getStatus')->willReturn('shipped');
+        $order->method('getState')->willReturn(Order::STATE_CANCELED);
 
         $this->orderRepository->method('get')->willReturn($order);
 

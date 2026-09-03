@@ -1,0 +1,96 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ideo\Dhl\Test\Unit\Plugin\Adminhtml\Order\View\Tab;
+
+use Ideo\Dhl\Api\Data\ShipmentDataInterface;
+use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
+use Ideo\Dhl\Plugin\Adminhtml\Order\View\Tab\RedirectShipmentUiViewActionPlugin;
+use Magento\Backend\Model\UrlInterface;
+use Magento\Sales\Ui\Component\Listing\Column\ViewAction;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+
+class RedirectShipmentUiViewActionPluginTest extends TestCase
+{
+    private ShipmentDataRepositoryInterface&MockObject $shipmentDataRepository;
+    private UrlInterface&MockObject $urlBuilder;
+    private LoggerInterface&MockObject $logger;
+    private RedirectShipmentUiViewActionPlugin $plugin;
+
+    protected function setUp(): void
+    {
+        $this->shipmentDataRepository = $this->createMock(ShipmentDataRepositoryInterface::class);
+        $this->urlBuilder = $this->createMock(UrlInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+
+        $this->plugin = new RedirectShipmentUiViewActionPlugin(
+            $this->shipmentDataRepository,
+            $this->urlBuilder,
+            $this->logger
+        );
+    }
+
+    public function testAfterPrepareDataSourceIgnoresNonShipmentViewActions(): void
+    {
+        $viewAction = $this->createMock(ViewAction::class);
+        $viewAction->method('getData')->willReturnCallback(function ($key) {
+            return match ($key) {
+                'config/viewUrlPath' => 'sales/order/view',
+                'name' => 'actions',
+                default => null,
+            };
+        });
+
+        $dataSource = [
+            'data' => [
+                'items' => [
+                    ['entity_id' => '3', 'actions' => ['view' => ['href' => 'http://example.com/native']]]
+                ]
+            ]
+        ];
+
+        $result = $this->plugin->afterPrepareDataSource($viewAction, $dataSource);
+
+        $this->assertEquals('http://example.com/native', $result['data']['items'][0]['actions']['view']['href']);
+    }
+
+    public function testAfterPrepareDataSourceUpdatesHrefWhenDhlShipmentExists(): void
+    {
+        $viewAction = $this->createMock(ViewAction::class);
+        $viewAction->method('getData')->willReturnCallback(function ($key) {
+            return match ($key) {
+                'config/viewUrlPath' => 'adminhtml/order_shipment/view',
+                'name' => 'actions',
+                default => null,
+            };
+        });
+
+        $dhlShipment = $this->createMock(ShipmentDataInterface::class);
+        $dhlShipment->method('getEntityId')->willReturn(5);
+
+        $this->shipmentDataRepository->expects($this->once())
+            ->method('getByMagentoShipmentId')
+            ->with(3)
+            ->willReturn($dhlShipment);
+
+        $this->urlBuilder->expects($this->once())
+            ->method('getUrl')
+            ->with('dhlparcel/shipment/edit', ['entity_id' => 5])
+            ->willReturn('http://example.com/admin/dhlparcel/shipment/edit/entity_id/5');
+
+        $dataSource = [
+            'data' => [
+                'items' => [
+                    ['entity_id' => '3', 'actions' => ['view' => ['href' => 'http://example.com/native']]]
+                ]
+            ]
+        ];
+
+        $result = $this->plugin->afterPrepareDataSource($viewAction, $dataSource);
+
+        $this->assertEquals('http://example.com/admin/dhlparcel/shipment/edit/entity_id/5', $result['data']['items'][0]['actions']['view']['href']);
+    }
+}

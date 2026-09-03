@@ -40,6 +40,15 @@ interface ShipmentDataRepositoryInterface
     public function getByOrderId(int $orderId): ?ShipmentDataInterface;
 
     /**
+     * Get DHL shipment data by Magento shipment ID.
+     *
+     * @param int $magentoShipmentId
+     *
+     * @return \Ideo\Dhl\Api\Data\ShipmentDataInterface|null
+     */
+    public function getByMagentoShipmentId(int $magentoShipmentId): ?ShipmentDataInterface;
+
+    /**
      * Get all DHL shipment data entities for a Magento order ID.
      *
      * @param int $orderId

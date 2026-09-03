@@ -6,8 +6,6 @@ namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
 use Ideo\Dhl\Model\Carrier;
 use Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipmentRepositoryInterface;
 use Magento\Sales\Api\ShipmentTrackRepositoryInterface;
@@ -18,10 +16,11 @@ use Magento\Sales\Model\Order\Shipment;
 use Magento\Sales\Model\Order\ShipmentFactory;
 use Magento\Sales\Model\Order\Shipment\Track;
 use Magento\Sales\Model\Order\Shipment\TrackFactory;
-use Magento\Sales\Model\ResourceModel\Order\Shipment\Collection as ShipmentCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Magento\Framework\DB\Transaction;
+use Magento\Framework\DB\TransactionFactory;
 
 class MagentoShipmentSyncServiceTest extends TestCase
 {
@@ -31,6 +30,7 @@ class MagentoShipmentSyncServiceTest extends TestCase
     private ShipmentRepositoryInterface|MockObject $shipmentRepositoryMock;
     private ShipmentTrackRepositoryInterface|MockObject $trackRepositoryMock;
     private EmailSender|MockObject $emailSenderMock;
+    private TransactionFactory|MockObject $transactionFactoryMock;
     private LoggerInterface|MockObject $loggerMock;
 
     private MagentoShipmentSyncService $service;
@@ -43,7 +43,11 @@ class MagentoShipmentSyncServiceTest extends TestCase
         $this->shipmentRepositoryMock = $this->createMock(ShipmentRepositoryInterface::class);
         $this->trackRepositoryMock = $this->createMock(ShipmentTrackRepositoryInterface::class);
         $this->emailSenderMock = $this->createMock(EmailSender::class);
+        $this->transactionFactoryMock = $this->createMock(TransactionFactory::class);
         $this->loggerMock = $this->createMock(LoggerInterface::class);
+
+        $transactionMock = $this->createMock(Transaction::class);
+        $this->transactionFactoryMock->method('create')->willReturn($transactionMock);
 
         $this->service = new MagentoShipmentSyncService(
             $this->orderRepositoryMock,
@@ -52,6 +56,7 @@ class MagentoShipmentSyncServiceTest extends TestCase
             $this->shipmentRepositoryMock,
             $this->trackRepositoryMock,
             $this->emailSenderMock,
+            $this->transactionFactoryMock,
             $this->loggerMock
         );
     }
@@ -133,17 +138,15 @@ class MagentoShipmentSyncServiceTest extends TestCase
             ->method('addTrack')
             ->with($trackMock);
 
-        $this->shipmentRepositoryMock->expects($this->once())
-            ->method('save')
-            ->with($shipmentMock)
-            ->willReturn($savedShipmentMock);
+        $orderMock->expects($this->once())
+            ->method('addCommentToStatusHistory');
 
         $this->emailSenderMock->expects($this->once())
             ->method('send')
-            ->with($orderMock, $savedShipmentMock);
+            ->with($orderMock, $shipmentMock);
 
         $result = $this->service->createMagentoShipment($orderId, $trackingNumbers, [], true);
-        $this->assertSame($savedShipmentMock, $result);
+        $this->assertSame($shipmentMock, $result);
     }
 
     public function testUpdateMagentoShipmentTracksDeletesOldTracksAndAddsNew(): void

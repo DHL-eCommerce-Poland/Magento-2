@@ -6,4 +6,16 @@
                 type="Ideo\Dhl\Plugin\Adminhtml\Order\View\AddDhlPrepareButtonPlugin"
                 sortOrder="10" />
     </type>
+
+    <type name="Magento\Sales\Controller\Adminhtml\Shipment\View">
+        <plugin name="ideo_dhl_redirect_native_shipment_view"
+                type="Ideo\Dhl\Plugin\Adminhtml\Order\Shipment\RedirectNativeViewPlugin"
+                sortOrder="10" />
+    </type>
+
+    <type name="Magento\Sales\Ui\Component\Listing\Column\ViewAction">
+        <plugin name="ideo_dhl_redirect_shipment_ui_view_action"
+                type="Ideo\Dhl\Plugin\Adminhtml\Order\View\Tab\RedirectShipmentUiViewActionPlugin"
+                sortOrder="10" />
+    </type>
 </config>

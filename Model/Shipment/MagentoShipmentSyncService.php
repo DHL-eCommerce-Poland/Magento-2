@@ -15,8 +15,8 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Shipment\Sender\EmailSender;
 use Magento\Sales\Model\Order\Shipment;
 use Magento\Sales\Model\Order\ShipmentFactory;
-use Magento\Sales\Model\Order\Shipment\Track;
 use Magento\Sales\Model\Order\Shipment\TrackFactory;
+use Magento\Framework\DB\TransactionFactory;
 use Psr\Log\LoggerInterface;
 
 class MagentoShipmentSyncService
@@ -28,6 +28,7 @@ class MagentoShipmentSyncService
      * @param ShipmentRepositoryInterface $shipmentRepository
      * @param ShipmentTrackRepositoryInterface $trackRepository
      * @param EmailSender $emailSender
+     * @param TransactionFactory $transactionFactory
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -37,6 +38,7 @@ class MagentoShipmentSyncService
         private readonly ShipmentRepositoryInterface $shipmentRepository,
         private readonly ShipmentTrackRepositoryInterface $trackRepository,
         private readonly EmailSender $emailSender,
+        private readonly TransactionFactory $transactionFactory,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -68,7 +70,11 @@ class MagentoShipmentSyncService
                 try {
                     $targetShipment = $this->shipmentRepository->get($targetShipmentId);
                     $this->appendTracksToShipment($targetShipment, $trackingNumbers);
-                    return $this->shipmentRepository->save($targetShipment);
+                    $savedTarget = $this->shipmentRepository->save($targetShipment);
+                    if ($order instanceof Order) {
+                        $this->addShipmentCreatedOrderComment($order, $savedTarget, $trackingNumbers);
+                    }
+                    return $savedTarget;
                 } catch (Exception $e) {
                     $this->logger->warning(sprintf(
                         '[DHL] Target shipment #%d not found for order #%d, falling back to last shipment: %s',
@@ -85,7 +91,9 @@ class MagentoShipmentSyncService
                     /** @var Shipment $existingShipment */
                     $existingShipment = $shipmentsCollection->getLastItem();
                     $this->appendTracksToShipment($existingShipment, $trackingNumbers);
-                    return $this->shipmentRepository->save($existingShipment);
+                    $savedExisting = $this->shipmentRepository->save($existingShipment);
+                    $this->addShipmentCreatedOrderComment($order, $savedExisting, $trackingNumbers);
+                    return $savedExisting;
                 }
             }
 
@@ -108,21 +116,60 @@ class MagentoShipmentSyncService
 
         $this->appendTracksToShipment($shipment, $trackingNumbers);
 
-        $savedShipment = $this->shipmentRepository->save($shipment);
+        $transaction = $this->transactionFactory->create();
+        $transaction->addObject($shipment);
+        if ($order instanceof Order) {
+            $order->setIsInProcess(true);
+            $transaction->addObject($order);
+        }
+        $transaction->save();
+
+        if ($order instanceof Order) {
+            $this->addShipmentCreatedOrderComment($order, $shipment, $trackingNumbers);
+        }
 
         if ($sendEmail) {
             try {
-                $this->emailSender->send($order, $savedShipment);
+                $this->emailSender->send($order, $shipment);
             } catch (Exception $e) {
                 $this->logger->error(sprintf(
                     '[DHL] Failed to send shipment email for shipment #%s: %s',
-                    $savedShipment->getIncrementId(),
+                    $shipment->getIncrementId(),
                     $e->getMessage()
                 ));
             }
         }
 
-        return $savedShipment;
+        return $shipment;
+    }
+
+    /**
+     * Add order status history comment when DHL shipment or tracking is created.
+     *
+     * @param Order $order
+     * @param ShipmentInterface $shipment
+     * @param array $trackingNumbers
+     *
+     * @return void
+     */
+    private function addShipmentCreatedOrderComment(Order $order, ShipmentInterface $shipment, array $trackingNumbers): void
+    {
+        try {
+            $incrementId = method_exists($shipment, 'getIncrementId') && $shipment->getIncrementId()
+                ? $shipment->getIncrementId()
+                : $shipment->getEntityId();
+            $trackingStr = !empty($trackingNumbers) ? implode(', ', $trackingNumbers) : 'N/A';
+
+            $order->addCommentToStatusHistory(
+                __('DHL shipment #%1 created with tracking number(s): %2.', $incrementId, $trackingStr)
+            );
+            $this->orderRepository->save($order);
+        } catch (Exception $e) {
+            $this->logger->warning(sprintf(
+                '[DHL] Failed to add order history comment for created shipment: %s',
+                $e->getMessage()
+            ));
+        }
     }
 
     /**

@@ -159,6 +159,7 @@ $dateFormat = $viewModel->getDateFormat();
                             </div>
                         </div>
                         <!-- /ko -->
+                        <!-- /ko -->
                         <!-- ko if: postnummer() && postnummer().trim() !== '' -->
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('German Customer Number (Postnummer)')) ?></span></label>
@@ -166,7 +167,6 @@ $dateFormat = $viewModel->getDateFormat();
                                 <input type="text" class="admin__control-text" data-bind="value: postnummer" disabled readonly />
                             </div>
                         </div>
-                        <!-- /ko -->
                         <!-- /ko -->
                     </fieldset>
                 </div>

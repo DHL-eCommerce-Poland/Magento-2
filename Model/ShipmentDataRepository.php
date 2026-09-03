@@ -94,6 +94,23 @@ class ShipmentDataRepository implements ShipmentDataRepositoryInterface
     }
 
     /**
+     * Get DHL shipment data by Magento shipment ID.
+     *
+     * @param int $magentoShipmentId
+     *
+     * @return ShipmentDataInterface|null
+     */
+    public function getByMagentoShipmentId(int $magentoShipmentId): ?ShipmentDataInterface
+    {
+        $collection = $this->collectionFactory->create();
+        $collection->addFieldToFilter(ShipmentDataInterface::MAGENTO_SHIPMENT_ID, $magentoShipmentId);
+        $collection->setOrder(ShipmentDataInterface::ENTITY_ID, CriteriaInterface::SORT_ORDER_DESC);
+        /** @var ShipmentData|null $entity */
+        $entity = $collection->getFirstItem();
+        return ($entity && $entity->getEntityId()) ? $entity : null;
+    }
+
+    /**
      * Get all DHL shipment data entities for a Magento order ID.
      *
      * @param int $orderId
