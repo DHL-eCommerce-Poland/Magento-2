@@ -123,13 +123,6 @@
                 <dataScope>sender.houseNumber</dataScope>
             </settings>
         </field>
-        <field name="sender[flatNumber]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Apt No.</label>
-                <dataScope>sender.flatNumber</dataScope>
-            </settings>
-        </field>
         <field name="sender[postalCode]" formElement="input">
             <settings>
                 <dataType>text</dataType>
@@ -292,13 +285,6 @@
                 <dataType>text</dataType>
                 <label translate="true">House No.</label>
                 <dataScope>recipient.houseNumber</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[flatNumber]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Apt No.</label>
-                <dataScope>recipient.flatNumber</dataScope>
             </settings>
         </field>
         <field name="recipient[postalCode]" formElement="input">
