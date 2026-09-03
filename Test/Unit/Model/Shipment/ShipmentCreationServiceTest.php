@@ -19,10 +19,12 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Lock\LockManagerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class ShipmentCreationServiceTest extends TestCase
 {
     /**
@@ -93,7 +95,7 @@ class ShipmentCreationServiceTest extends TestCase
 
         $returnBuilderMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
         $returnCreationServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
-        $magentoSyncServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+        $magentoSyncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
 
         $this->service = new ShipmentCreationService(
             $this->shipmentDataServiceMock,
@@ -239,7 +241,7 @@ class ShipmentCreationServiceTest extends TestCase
         $apiResult = new CreateShipmentsResult(true, false, '90039521201', 'Nowa');
         $this->clientStub->method('createShipments')->willReturn($apiResult);
 
-        $savedEntityMock = $this->createMock(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $savedEntityMock = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
         $savedEntityMock->method('getEntityId')->willReturn(42);
 
         $this->shipmentDataServiceMock->expects($this->once())
@@ -266,7 +268,7 @@ class ShipmentCreationServiceTest extends TestCase
             );
 
         $serializer = new \Magento\Framework\Serialize\Serializer\Json();
-        $magentoSyncServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+        $magentoSyncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
         $serviceWithReturn = new ShipmentCreationService(
             $this->shipmentDataServiceMock,
             $this->validatorStub,

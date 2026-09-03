@@ -11,11 +11,12 @@ use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Response\Http as HttpResponse;
 use Magento\Sales\Controller\Adminhtml\Shipment\View as NativeShipmentViewController;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-
 use Psr\Log\LoggerInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class RedirectNativeViewPluginTest extends TestCase
 {
     private RequestInterface&MockObject $request;

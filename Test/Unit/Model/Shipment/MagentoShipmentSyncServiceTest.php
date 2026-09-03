@@ -16,12 +16,14 @@ use Magento\Sales\Model\Order\Shipment;
 use Magento\Sales\Model\Order\ShipmentFactory;
 use Magento\Sales\Model\Order\Shipment\Track;
 use Magento\Sales\Model\Order\Shipment\TrackFactory;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\DB\Transaction;
 use Magento\Framework\DB\TransactionFactory;
 
+#[AllowMockObjectsWithoutExpectations]
 class MagentoShipmentSyncServiceTest extends TestCase
 {
     private OrderRepositoryInterface|MockObject $orderRepositoryMock;
@@ -43,10 +45,10 @@ class MagentoShipmentSyncServiceTest extends TestCase
         $this->shipmentRepositoryMock = $this->createMock(ShipmentRepositoryInterface::class);
         $this->trackRepositoryMock = $this->createMock(ShipmentTrackRepositoryInterface::class);
         $this->emailSenderMock = $this->createMock(EmailSender::class);
-        $this->transactionFactoryMock = $this->createMock(TransactionFactory::class);
-        $this->loggerMock = $this->createMock(LoggerInterface::class);
+        $this->transactionFactoryMock = $this->createStub(TransactionFactory::class);
+        $this->loggerMock = $this->createStub(LoggerInterface::class);
 
-        $transactionMock = $this->createMock(Transaction::class);
+        $transactionMock = $this->createStub(Transaction::class);
         $this->transactionFactoryMock->method('create')->willReturn($transactionMock);
 
         $this->service = new MagentoShipmentSyncService(
@@ -67,7 +69,7 @@ class MagentoShipmentSyncServiceTest extends TestCase
         $targetShipmentId = 55;
         $trackingNumbers = ['TRACK999'];
 
-        $orderMock = $this->createMock(Order::class);
+        $orderMock = $this->createStub(Order::class);
         $orderMock->method('canShip')->willReturn(false);
 
         $targetShipmentMock = $this->createMock(Shipment::class);
@@ -82,7 +84,7 @@ class MagentoShipmentSyncServiceTest extends TestCase
             ->with($targetShipmentId)
             ->willReturn($targetShipmentMock);
 
-        $trackMock = $this->createMock(Track::class);
+        $trackMock = $this->createStub(Track::class);
         $this->trackFactoryMock->expects($this->once())
             ->method('create')
             ->willReturn($trackMock);
@@ -105,7 +107,7 @@ class MagentoShipmentSyncServiceTest extends TestCase
         $orderId = 100;
         $trackingNumbers = ['TRACK123', 'TRACK456'];
 
-        $orderItemMock = $this->createMock(OrderItemModel::class);
+        $orderItemMock = $this->createStub(OrderItemModel::class);
         $orderItemMock->method('isDummy')->willReturn(false);
         $orderItemMock->method('getQtyToShip')->willReturn(2.0);
         $orderItemMock->method('getId')->willReturn(10);
@@ -115,7 +117,6 @@ class MagentoShipmentSyncServiceTest extends TestCase
         $orderMock->method('getAllItems')->willReturn([$orderItemMock]);
 
         $shipmentMock = $this->createMock(Shipment::class);
-        $savedShipmentMock = $this->createMock(Shipment::class);
 
         $this->orderRepositoryMock->expects($this->once())
             ->method('get')
@@ -129,7 +130,7 @@ class MagentoShipmentSyncServiceTest extends TestCase
 
         $shipmentMock->expects($this->once())->method('register');
 
-        $trackMock = $this->createMock(Track::class);
+        $trackMock = $this->createStub(Track::class);
         $this->trackFactoryMock->expects($this->exactly(2))
             ->method('create')
             ->willReturn($trackMock);
@@ -154,7 +155,7 @@ class MagentoShipmentSyncServiceTest extends TestCase
         $magentoShipmentId = 50;
         $newTracks = ['NEWTRACK999'];
 
-        $oldTrack = $this->createMock(Track::class);
+        $oldTrack = $this->createStub(Track::class);
         $oldTrack->method('getCarrierCode')->willReturn(Carrier::CODE);
         $oldTrack->method('getEntityId')->willReturn(99);
 
@@ -170,7 +171,7 @@ class MagentoShipmentSyncServiceTest extends TestCase
             ->method('delete')
             ->with($oldTrack);
 
-        $newTrackMock = $this->createMock(Track::class);
+        $newTrackMock = $this->createStub(Track::class);
         $this->trackFactoryMock->expects($this->once())
             ->method('create')
             ->willReturn($newTrackMock);
@@ -191,7 +192,7 @@ class MagentoShipmentSyncServiceTest extends TestCase
         $magentoShipmentId = 50;
         $orderId = 100;
 
-        $oldTrack = $this->createMock(Track::class);
+        $oldTrack = $this->createStub(Track::class);
         $oldTrack->method('getCarrierCode')->willReturn(Carrier::CODE);
         $oldTrack->method('getEntityId')->willReturn(88);
 

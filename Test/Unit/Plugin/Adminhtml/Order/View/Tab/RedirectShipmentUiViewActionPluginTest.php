@@ -9,10 +9,12 @@ use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Plugin\Adminhtml\Order\View\Tab\RedirectShipmentUiViewActionPlugin;
 use Magento\Backend\Model\UrlInterface;
 use Magento\Sales\Ui\Component\Listing\Column\ViewAction;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class RedirectShipmentUiViewActionPluginTest extends TestCase
 {
     private ShipmentDataRepositoryInterface&MockObject $shipmentDataRepository;

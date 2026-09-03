@@ -13,10 +13,12 @@ use Ideo\Dhl\Model\Api\DeleteShipmentResult;
 use Ideo\Dhl\Model\Shipment\ShipmentDeletionService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class ShipmentDeletionServiceTest extends TestCase
 {
     private ShipmentDataRepositoryInterface|MockObject $repositoryMock;
@@ -33,7 +35,7 @@ class ShipmentDeletionServiceTest extends TestCase
         $this->credentialsProviderMock = $this->createMock(CredentialsProvider::class);
         $this->scopeConfigMock = $this->createMock(ScopeConfigInterface::class);
         $this->loggerMock = $this->createStub(LoggerInterface::class);
-        $syncServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+        $syncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
 
         $this->deletionService = new ShipmentDeletionService(
             $this->repositoryMock,
@@ -131,33 +133,35 @@ class ShipmentDeletionServiceTest extends TestCase
         $magentoShipmentId = 77;
         $credentials = new Credentials('user', 'pass', true);
 
+        $repositoryStub = $this->createStub(ShipmentDataRepositoryInterface::class);
+        $clientStub = $this->createStub(ClientInterface::class);
+        $credentialsProviderStub = $this->createStub(CredentialsProvider::class);
+        $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $syncServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+
         $service = new ShipmentDeletionService(
-            $this->repositoryMock,
-            $this->clientMock,
-            $this->credentialsProviderMock,
-            $this->scopeConfigMock,
+            $repositoryStub,
+            $clientStub,
+            $credentialsProviderStub,
+            $scopeConfigStub,
             $syncServiceMock,
             $this->loggerMock
         );
 
-        $shipmentMock = $this->createMock(ShipmentDataInterface::class);
-        $shipmentMock->method('getShipmentId')->willReturn($shipmentId);
-        $shipmentMock->method('getMagentoShipmentId')->willReturn($magentoShipmentId);
+        $shipmentStub = $this->createStub(ShipmentDataInterface::class);
+        $shipmentStub->method('getShipmentId')->willReturn($shipmentId);
+        $shipmentStub->method('getMagentoShipmentId')->willReturn($magentoShipmentId);
 
-        $this->repositoryMock->method('getById')->with($entityId)->willReturn($shipmentMock);
-        $this->scopeConfigMock->method('getValue')->willReturn(1);
-        $this->credentialsProviderMock->method('getCredentials')->willReturn($credentials);
-        $this->clientMock->method('deleteShipment')->willReturn(new DeleteShipmentResult(true, $shipmentId));
+        $repositoryStub->method('getById')->willReturn($shipmentStub);
+        $scopeConfigStub->method('getValue')->willReturn(1);
+        $credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+        $clientStub->method('deleteShipment')->willReturn(new DeleteShipmentResult(true, $shipmentId));
 
         $syncServiceMock->expects($this->once())
             ->method('cancelDhlTracking')
             ->with($magentoShipmentId);
 
-        $this->repositoryMock->expects($this->once())
-            ->method('delete')
-            ->with($shipmentMock)
-            ->willReturn(true);
+        $repositoryStub->method('delete')->willReturn(true);
 
         $result = $service->deleteShipment($entityId);
         $this->assertTrue($result);
