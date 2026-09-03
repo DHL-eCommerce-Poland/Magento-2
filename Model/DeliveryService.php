@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model;
 
 use Ideo\Dhl\Api\Data\DeliveryServiceInterface;
+use Ideo\Dhl\Model\Config\Source\LabelType;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService as DeliveryServiceResource;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\LocalizedException;
@@ -528,7 +529,7 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     public function getAddressType(): ?string
     {
         $val = $this->getData(self::ADDRESS_TYPE);
-        return ($val !== null && $val !== '') ? (string)$val : null;
+        return ($val !== null && $val !== '') ? (string)$val : 'N';
     }
 
     /**
@@ -563,5 +564,97 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     public function setAutoCreateReturnShipment(bool $autoCreateReturnShipment): static
     {
         return $this->setData(self::AUTO_CREATE_RETURN_SHIPMENT, $autoCreateReturnShipment ? 1 : 0);
+    }
+
+    /**
+     * Get return label type.
+     *
+     * @return string|null
+     */
+    public function getReturnLabelType(): ?string
+    {
+        $val = $this->getData(self::RETURN_LABEL_TYPE);
+        return ($val !== null && $val !== '') ? (string)$val : LabelType::BLP;
+    }
+
+    /**
+     * Set return label type.
+     *
+     * @param string|null $returnLabelType
+     *
+     * @return $this
+     */
+    public function setReturnLabelType(?string $returnLabelType): static
+    {
+        return $this->setData(self::RETURN_LABEL_TYPE, $returnLabelType);
+    }
+
+    /**
+     * Get return QR code type.
+     *
+     * @return string|null
+     */
+    public function getReturnQrCodeType(): ?string
+    {
+        $val = $this->getData(self::RETURN_QR_CODE_TYPE);
+        return ($val !== null && $val !== '') ? (string)$val : null;
+    }
+
+    /**
+     * Set return QR code type.
+     *
+     * @param string|null $returnQrCodeType
+     *
+     * @return $this
+     */
+    public function setReturnQrCodeType(?string $returnQrCodeType): static
+    {
+        return $this->setData(self::RETURN_QR_CODE_TYPE, $returnQrCodeType);
+    }
+
+    /**
+     * Get return label expiration days.
+     *
+     * @return int|null
+     */
+    public function getReturnLabelExpDays(): ?int
+    {
+        $val = $this->getData(self::RETURN_LABEL_EXP_DAYS);
+        return ($val !== null && $val !== '') ? (int)$val : null;
+    }
+
+    /**
+     * Set return label expiration days.
+     *
+     * @param int|null $returnLabelExpDays
+     *
+     * @return $this
+     */
+    public function setReturnLabelExpDays(?int $returnLabelExpDays): static
+    {
+        return $this->setData(self::RETURN_LABEL_EXP_DAYS, $returnLabelExpDays);
+    }
+
+    /**
+     * Get return book courier method.
+     *
+     * @return int|null
+     */
+    public function getReturnBookCourier(): ?int
+    {
+        $val = $this->getData(self::RETURN_BOOK_COURIER);
+        return ($val !== null && $val !== '') ? (int)$val : 0;
+    }
+
+    /**
+     * Set return book courier method.
+     *
+     * @param int|null $returnBookCourier
+     *
+     * @return $this
+     */
+    public function setReturnBookCourier(?int $returnBookCourier): static
+    {
+        return $this->setData(self::RETURN_BOOK_COURIER, $returnBookCourier);
     }
 }

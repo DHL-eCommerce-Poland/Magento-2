@@ -53,6 +53,10 @@ class ShipmentSettingsData
         private bool $isNonStandard = false,
         private bool $hasEuroReturn = false,
         private bool $autoCreateReturnShipment = false,
+        private ?string $returnLabelType = null,
+        private ?string $returnQrCodeType = null,
+        private ?int $returnLabelExpDays = null,
+        private ?int $returnBookCourier = null,
         private ?int $dropOffPointId = null,
         private ?string $addressType = 'N',
         array $packages = []
@@ -276,6 +280,46 @@ class ShipmentSettingsData
     }
 
     /**
+     * Get return label format type.
+     *
+     * @return string|null
+     */
+    public function getReturnLabelType(): ?string
+    {
+        return $this->returnLabelType;
+    }
+
+    /**
+     * Get return QR code format type.
+     *
+     * @return string|null
+     */
+    public function getReturnQrCodeType(): ?string
+    {
+        return $this->returnQrCodeType;
+    }
+
+    /**
+     * Get return label expiration days.
+     *
+     * @return int|null
+     */
+    public function getReturnLabelExpDays(): ?int
+    {
+        return $this->returnLabelExpDays;
+    }
+
+    /**
+     * Get return book courier method (0 = Drop-off point, 1 = Drop-off or courier).
+     *
+     * @return int|null
+     */
+    public function getReturnBookCourier(): ?int
+    {
+        return $this->returnBookCourier;
+    }
+
+    /**
      * Get selected drop off point ID.
      *
      * @return int|null
@@ -334,6 +378,10 @@ class ShipmentSettingsData
             'isNonStandard' => $firstPkg->isNonStandard(),
             'hasEuroReturn' => $firstPkg->hasEuroReturn(),
             'autoCreateReturnShipment' => $this->autoCreateReturnShipment,
+            'returnLabelType' => $this->returnLabelType,
+            'returnQrCodeType' => $this->returnQrCodeType,
+            'returnLabelExpDays' => $this->returnLabelExpDays,
+            'returnBookCourier' => $this->returnBookCourier,
             'dropOffPointId' => $this->dropOffPointId,
             'addressType' => $this->addressType,
             'packages' => array_map(fn(PackageData $p) => $p->toArray(), $this->packages),
@@ -381,6 +429,10 @@ class ShipmentSettingsData
             isNonStandard: filter_var($data['isNonStandard'] ?? false, FILTER_VALIDATE_BOOLEAN),
             hasEuroReturn: filter_var($data['hasEuroReturn'] ?? false, FILTER_VALIDATE_BOOLEAN),
             autoCreateReturnShipment: filter_var($data['autoCreateReturnShipment'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            returnLabelType: isset($data['returnLabelType']) && $data['returnLabelType'] !== '' ? (string)$data['returnLabelType'] : null,
+            returnQrCodeType: isset($data['returnQrCodeType']) && $data['returnQrCodeType'] !== '' ? (string)$data['returnQrCodeType'] : null,
+            returnLabelExpDays: isset($data['returnLabelExpDays']) && $data['returnLabelExpDays'] !== '' ? (int)$data['returnLabelExpDays'] : null,
+            returnBookCourier: isset($data['returnBookCourier']) && $data['returnBookCourier'] !== '' ? (int)$data['returnBookCourier'] : null,
             dropOffPointId: isset($data['dropOffPointId']) ? (int)$data['dropOffPointId'] : null,
             addressType: (string)($data['addressType'] ?? 'N'),
             packages: $packages

@@ -35,6 +35,10 @@ class ShipmentSettingsDataTest extends TestCase
             isNonStandard: false,
             hasEuroReturn: false,
             autoCreateReturnShipment: true,
+            returnLabelType: 'BLP',
+            returnQrCodeType: 'QR_PDF',
+            returnLabelExpDays: 14,
+            returnBookCourier: 0,
             dropOffPointId: 5,
             addressType: 'B'
         );
@@ -56,6 +60,10 @@ class ShipmentSettingsDataTest extends TestCase
         $this->assertFalse($settings->isNonStandard());
         $this->assertFalse($settings->hasEuroReturn());
         $this->assertTrue($settings->autoCreateReturnShipment());
+        $this->assertEquals('BLP', $settings->getReturnLabelType());
+        $this->assertEquals('QR_PDF', $settings->getReturnQrCodeType());
+        $this->assertEquals(14, $settings->getReturnLabelExpDays());
+        $this->assertEquals(0, $settings->getReturnBookCourier());
         $this->assertEquals(5, $settings->getDropOffPointId());
         $this->assertEquals('B', $settings->getAddressType());
     }
@@ -109,6 +117,10 @@ class ShipmentSettingsDataTest extends TestCase
             'isNonStandard' => false,
             'hasEuroReturn' => false,
             'autoCreateReturnShipment' => false,
+            'returnLabelType' => null,
+            'returnQrCodeType' => null,
+            'returnLabelExpDays' => null,
+            'returnBookCourier' => null,
             'dropOffPointId' => null,
             'addressType' => 'N',
             'packages' => [

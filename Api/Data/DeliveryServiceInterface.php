@@ -27,6 +27,10 @@ interface DeliveryServiceInterface
     public const DROP_OFF_POINT_ID = 'drop_off_point_id';
     public const ADDRESS_TYPE = 'address_type';
     public const AUTO_CREATE_RETURN_SHIPMENT = 'auto_create_return_shipment';
+    public const RETURN_LABEL_TYPE = 'return_label_type';
+    public const RETURN_QR_CODE_TYPE = 'return_qr_code_type';
+    public const RETURN_LABEL_EXP_DAYS = 'return_label_exp_days';
+    public const RETURN_BOOK_COURIER = 'return_book_courier';
 
     /**
      * Get entity ID.
@@ -363,4 +367,68 @@ interface DeliveryServiceInterface
      * @return $this
      */
     public function setAutoCreateReturnShipment(bool $autoCreateReturnShipment): static;
+
+    /**
+     * Get return label type.
+     *
+     * @return string|null
+     */
+    public function getReturnLabelType(): ?string;
+
+    /**
+     * Set return label type.
+     *
+     * @param string|null $returnLabelType
+     *
+     * @return $this
+     */
+    public function setReturnLabelType(?string $returnLabelType): static;
+
+    /**
+     * Get return QR code type.
+     *
+     * @return string|null
+     */
+    public function getReturnQrCodeType(): ?string;
+
+    /**
+     * Set return QR code type.
+     *
+     * @param string|null $returnQrCodeType
+     *
+     * @return $this
+     */
+    public function setReturnQrCodeType(?string $returnQrCodeType): static;
+
+    /**
+     * Get return label expiration days.
+     *
+     * @return int|null
+     */
+    public function getReturnLabelExpDays(): ?int;
+
+    /**
+     * Set return label expiration days.
+     *
+     * @param int|null $returnLabelExpDays
+     *
+     * @return $this
+     */
+    public function setReturnLabelExpDays(?int $returnLabelExpDays): static;
+
+    /**
+     * Get return book courier method.
+     *
+     * @return int|null
+     */
+    public function getReturnBookCourier(): ?int;
+
+    /**
+     * Set return book courier method.
+     *
+     * @param int|null $returnBookCourier
+     *
+     * @return $this
+     */
+    public function setReturnBookCourier(?int $returnBookCourier): static;
 }

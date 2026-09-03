@@ -16,10 +16,9 @@ class AddressType implements OptionSourceInterface
     public function toOptionArray(): array
     {
         return [
-            ['value' => '', 'label' => __('-- Please Select --')],
+            ['value' => 'N', 'label' => __('Based on Cart')],
             ['value' => 'C', 'label' => __('Private Address')],
             ['value' => 'B', 'label' => __('Company Address')],
-            ['value' => 'N', 'label' => __('Based on Cart')],
         ];
     }
 }

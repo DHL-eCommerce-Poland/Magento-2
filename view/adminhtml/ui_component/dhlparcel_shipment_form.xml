@@ -504,6 +504,72 @@
                 </checkbox>
             </formElements>
         </field>
+        <field name="shipmentSettings[returnLabelType]" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Return Label Format</label>
+                <dataScope>shipmentSettings.returnLabelType</dataScope>
+                <imports>
+                    <link name="visible">${$.provider}:data.shipmentSettings.autoCreateReturnShipment</link>
+                </imports>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\LabelType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="shipmentSettings[returnQrCodeType]" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Return QR Code Type</label>
+                <dataScope>shipmentSettings.returnQrCodeType</dataScope>
+                <imports>
+                    <link name="visible">${$.provider}:data.shipmentSettings.autoCreateReturnShipment</link>
+                </imports>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\ReturnQrCodeType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="shipmentSettings[returnLabelExpDays]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Return Label Expiration Days</label>
+                <dataScope>shipmentSettings.returnLabelExpDays</dataScope>
+                <imports>
+                    <link name="visible">${$.provider}:data.shipmentSettings.autoCreateReturnShipment</link>
+                </imports>
+            </settings>
+        </field>
+        <field name="shipmentSettings[returnBookCourier]" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Return Dispatch Method</label>
+                <dataScope>shipmentSettings.returnBookCourier</dataScope>
+                <imports>
+                    <link name="visible">${$.provider}:data.shipmentSettings.autoCreateReturnShipment</link>
+                </imports>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\ReturnBookCourier"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
     </fieldset>
 
     <fieldset name="special_services">

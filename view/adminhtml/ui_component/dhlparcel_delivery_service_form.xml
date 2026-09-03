@@ -113,7 +113,7 @@
         <field name="address_type" formElement="select">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="default" xsi:type="string">B</item>
+                    <item name="default" xsi:type="string">N</item>
                 </item>
             </argument>
             <settings>
@@ -215,6 +215,53 @@
                 <dataType>boolean</dataType>
                 <label translate="true">Generate return label automatically when creating shipment</label>
                 <dataScope>auto_create_return_shipment</dataScope>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>0</value>
+                            <actions>
+                                <action name="0">
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.general.return_label_type</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="1">
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.general.return_qr_code_type</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="2">
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.general.return_label_exp_days</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="3">
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.general.return_book_courier</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.general.return_label_type</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="1">
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.general.return_qr_code_type</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.general.return_label_exp_days</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="3">
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.general.return_book_courier</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
             </settings>
             <formElements>
                 <checkbox>
@@ -226,6 +273,76 @@
                         <prefer>toggle</prefer>
                     </settings>
                 </checkbox>
+            </formElements>
+        </field>
+        <field name="return_label_type" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Return Label Format</label>
+                <dataScope>return_label_type</dataScope>
+                <imports>
+                    <link name="visible">${$.provider}:data.auto_create_return_shipment</link>
+                </imports>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\LabelType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="return_qr_code_type" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Return QR Code Type</label>
+                <dataScope>return_qr_code_type</dataScope>
+                <imports>
+                    <link name="visible">${$.provider}:data.auto_create_return_shipment</link>
+                </imports>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\ReturnQrCodeType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="return_label_exp_days" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Return Label Expiration (Days)</label>
+                <dataScope>return_label_exp_days</dataScope>
+                <imports>
+                    <link name="visible">${$.provider}:data.auto_create_return_shipment</link>
+                </imports>
+            </settings>
+        </field>
+        <field name="return_book_courier" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Return Dispatch Method</label>
+                <dataScope>return_book_courier</dataScope>
+                <imports>
+                    <link name="visible">${$.provider}:data.auto_create_return_shipment</link>
+                </imports>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Config\Source\ReturnBookCourier"/>
+                    </settings>
+                </select>
             </formElements>
         </field>
     </fieldset>

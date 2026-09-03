@@ -97,6 +97,18 @@ class DeliveryServiceTest extends TestCase
 
         $this->model->setAutoCreateReturnShipment(true);
         $this->assertTrue($this->model->getAutoCreateReturnShipment());
+
+        $this->model->setReturnLabelType('BLP');
+        $this->assertSame('BLP', $this->model->getReturnLabelType());
+
+        $this->model->setReturnQrCodeType('QR_PDF');
+        $this->assertSame('QR_PDF', $this->model->getReturnQrCodeType());
+
+        $this->model->setReturnLabelExpDays(14);
+        $this->assertSame(14, $this->model->getReturnLabelExpDays());
+
+        $this->model->setReturnBookCourier(0);
+        $this->assertSame(0, $this->model->getReturnBookCourier());
     }
 
     public function testSetMethodCodeAcceptsArrayAndImplodesToString(): void

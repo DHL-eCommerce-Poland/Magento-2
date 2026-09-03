@@ -198,7 +198,11 @@ define([
             pickupHourFrom: pickupHourFromObs,
             pickupHourTo: pickupHourToObs,
             labelType: ko.observable(st.labelType || 'BLP'),
-            autoCreateReturnShipment: ko.observable(!!st.autoCreateReturnShipment),
+            autoCreateReturnShipment: ko.observable(isTruthy(st.autoCreateReturnShipment)),
+            returnLabelType: ko.observable(st.returnLabelType || 'BLP'),
+            returnQrCodeType: ko.observable(st.returnQrCodeType || 'QR_PDF'),
+            returnLabelExpDays: ko.observable(st.returnLabelExpDays !== undefined && st.returnLabelExpDays !== null ? st.returnLabelExpDays : 14),
+            returnBookCourier: ko.observable(st.returnBookCourier !== undefined && st.returnBookCourier !== null ? st.returnBookCourier : 0),
             addressType: ko.observable(st.addressType || 'N'),
             packages: packagesObsArr
         };
@@ -333,6 +337,8 @@ define([
             this.packageTypeOptions = ko.observableArray([]);
             this.addressTypeOptions = ko.observableArray([]);
             this.contentSourceOptions = ko.observableArray([]);
+            this.returnQrCodeTypeOptions = ko.observableArray([]);
+            this.returnBookCourierOptions = ko.observableArray([]);
 
             var self = this;
             window.ideoDhlOpenPrepareModal = function (orderId, prepareUrl) {
@@ -428,6 +434,10 @@ define([
                 settings.reference('');
                 settings.labelType('BLP');
                 settings.autoCreateReturnShipment(false);
+                settings.returnLabelType('BLP');
+                settings.returnQrCodeType('QR_PDF');
+                settings.returnLabelExpDays(14);
+                settings.returnBookCourier(0);
                 settings.addressType('N');
                 if (settings.packages && settings.packages().length > 0) {
                     var p0 = settings.packages()[0];
@@ -480,6 +490,9 @@ define([
                             if (typeof currentSettings[key] === 'function') {
                                 if (typeof val === 'string') {
                                     val = val.trim();
+                                }
+                                if (key === 'autoCreateReturnShipment') {
+                                    val = isTruthy(val);
                                 }
                                 currentSettings[key](val);
                             }
@@ -583,6 +596,8 @@ define([
                         self.packageTypeOptions(response.packageTypeOptions || []);
                         self.addressTypeOptions(response.addressTypeOptions || []);
                         self.contentSourceOptions(response.contentSourceOptions || []);
+                        self.returnQrCodeTypeOptions(response.returnQrCodeTypeOptions || []);
+                        self.returnBookCourierOptions(response.returnBookCourierOptions || []);
 
                         // 2. Set default IDs if missing
                         var defaultPointId = response.defaultDropOffPointId || (response.data.sender ? response.data.sender.selectedDropOffPointId : null);

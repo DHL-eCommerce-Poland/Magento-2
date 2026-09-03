@@ -90,7 +90,11 @@
             "label_type": true,
             "drop_off_point_id": true,
             "address_type": true,
-            "auto_create_return_shipment": true
+            "auto_create_return_shipment": true,
+            "return_label_type": true,
+            "return_qr_code_type": true,
+            "return_label_exp_days": true,
+            "return_book_courier": true
         },
         "index": {
             "DHLPARCEL_DELIVERY_SERVICE_WEBSITE_ID_METHOD_CODE": true
@@ -112,13 +116,15 @@
             "shipment_data": true,
             "error_messages": true,
             "created_at": true,
-            "updated_at": true
+            "updated_at": true,
+            "magento_shipment_id": true
         },
         "index": {
             "DHLPARCEL_SHIPMENT_DATA_ORDER_ID": true,
             "DHLPARCEL_SHIPMENT_DATA_SHIPMENT_ID": true,
             "DHLPARCEL_SHIPMENT_DATA_RETURN_SHIPMENT_ID": true,
-            "DHLPARCEL_SHIPMENT_DATA_STATUS": true
+            "DHLPARCEL_SHIPMENT_DATA_STATUS": true,
+            "DHLPARCEL_SHIPMENT_DATA_MAGENTO_SHIPMENT_ID": true
         },
         "constraint": {
             "PRIMARY": true

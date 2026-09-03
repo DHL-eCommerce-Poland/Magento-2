@@ -76,7 +76,11 @@ class ReturnShipmentDataBuilder
             mpk: $origSettings->getMpk(),
             comment: $origSettings->getComment(),
             reference: $origSettings->getReference() ?: (string) $originalShipmentData->getOrderId(),
-            labelType: $origSettings->getLabelType() ?: 'BLP',
+            labelType: $origSettings->getReturnLabelType() ?: ($origSettings->getLabelType() ?: 'BLP'),
+            returnLabelType: $origSettings->getReturnLabelType(),
+            returnQrCodeType: $origSettings->getReturnQrCodeType(),
+            returnLabelExpDays: $origSettings->getReturnLabelExpDays(),
+            returnBookCourier: $origSettings->getReturnBookCourier(),
             packages: $origSettings->getPackages()
         );
 

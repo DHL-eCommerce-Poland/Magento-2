@@ -11,6 +11,8 @@ use Ideo\Dhl\Model\Config\Source\AddressType as AddressTypeSource;
 use Ideo\Dhl\Model\Config\Source\ContentSource;
 use Ideo\Dhl\Model\Config\Source\LabelType as LabelTypeSource;
 use Ideo\Dhl\Model\Config\Source\PackageType as PackageTypeSource;
+use Ideo\Dhl\Model\Config\Source\ReturnBookCourier as ReturnBookCourierSource;
+use Ideo\Dhl\Model\Config\Source\ReturnQrCodeType as ReturnQrCodeTypeSource;
 use Ideo\Dhl\Model\Config\Source\PickupTime;
 use Ideo\Dhl\Model\Config\Source\ServiceCode as ServiceCodeSource;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory as DeliveryServiceCollectionFactory;
@@ -60,7 +62,9 @@ class TemplateManager
         private readonly OrderToShipmentDataMapper $mapper,
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
-        private readonly ?LoggerInterface $logger = null
+        private readonly ?LoggerInterface $logger = null,
+        private readonly ?ReturnQrCodeTypeSource $returnQrCodeTypeSource = null,
+        private readonly ?ReturnBookCourierSource $returnBookCourierSource = null
     ) {
     }
 
@@ -182,6 +186,30 @@ class TemplateManager
     {
         $options = $this->contentSource->toOptionArray();
         return array_values(array_filter($options, fn($opt) => !empty($opt['value'])));
+    }
+
+    /**
+     * Get Return QR Code Type options from source model.
+     *
+     * @return array
+     */
+    public function getReturnQrCodeTypeOptions(): array
+    {
+        $source = $this->returnQrCodeTypeSource ?? new ReturnQrCodeTypeSource();
+        $options = $source->toOptionArray();
+        return array_values(array_filter($options, fn($opt) => isset($opt['value']) && $opt['value'] !== ''));
+    }
+
+    /**
+     * Get Return Book Courier options from source model.
+     *
+     * @return array
+     */
+    public function getReturnBookCourierOptions(): array
+    {
+        $source = $this->returnBookCourierSource ?? new ReturnBookCourierSource();
+        $options = $source->toOptionArray();
+        return array_values(array_filter($options, fn($opt) => isset($opt['value']) && $opt['value'] !== ''));
     }
 
     /**
@@ -348,6 +376,10 @@ class TemplateManager
                 isNonStandard: $service->getIsNonStandard(),
                 hasEuroReturn: $service->getHasEuroReturn(),
                 autoCreateReturnShipment: $service->getAutoCreateReturnShipment(),
+                returnLabelType: $service->getReturnLabelType(),
+                returnQrCodeType: $service->getReturnQrCodeType(),
+                returnLabelExpDays: $service->getReturnLabelExpDays(),
+                returnBookCourier: $service->getReturnBookCourier(),
                 dropOffPointId: $service->getDropOffPointId(),
                 addressType: (string)($service->getAddressType() ?: 'N')
             );

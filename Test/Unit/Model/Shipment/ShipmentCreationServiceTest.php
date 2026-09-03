@@ -91,6 +91,10 @@ class ShipmentCreationServiceTest extends TestCase
 
         $serializer = new \Magento\Framework\Serialize\Serializer\Json();
 
+        $returnBuilderMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
+        $returnCreationServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
+        $magentoSyncServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+
         $this->service = new ShipmentCreationService(
             $this->shipmentDataServiceMock,
             $this->validatorStub,
@@ -99,7 +103,10 @@ class ShipmentCreationServiceTest extends TestCase
             $this->clientStub,
             $this->lockManagerMock,
             $this->loggerStub,
-            $serializer
+            $serializer,
+            $returnBuilderMock,
+            $returnCreationServiceMock,
+            $magentoSyncServiceMock
         );
     }
 
@@ -128,7 +135,7 @@ class ShipmentCreationServiceTest extends TestCase
         // Expect DB save with status Nowa
         $this->shipmentDataServiceMock->expects($this->once())
             ->method('saveShipmentDataWithStatus')
-            ->with($shipmentData, 'Nowa', null, '1', '2');
+            ->with($shipmentData, 'Nowa', null, '1', '2', '90039521201', null, ['90039521201']);
 
         $result = $this->service->createShipment($shipmentData, 'sandbox', '1', '2');
         $this->assertTrue($result->isSuccess());
@@ -205,5 +212,76 @@ class ShipmentCreationServiceTest extends TestCase
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('999888777', $result->getShipmentId());
+    }
+
+    /**
+     * Test auto-creation of return shipment when autoCreateReturnShipment is true.
+     *
+     * @return void
+     */
+    public function testCreateShipmentTriggersAutoReturnCreationWhenEnabled(): void
+    {
+        $shipmentSettings = $this->createStub(\Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData::class);
+        $shipmentSettings->method('autoCreateReturnShipment')->willReturn(true);
+        $shipmentSettings->method('getReturnLabelExpDays')->willReturn(14);
+
+        $shipmentData = $this->createStub(DhlShipmentData::class);
+        $shipmentData->method('getOrderId')->willReturn(100);
+        $shipmentData->method('toArray')->willReturn(['orderId' => 100]);
+        $shipmentData->method('getShipmentSettings')->willReturn($shipmentSettings);
+
+        $this->lockManagerMock->method('lock')->willReturn(true);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+        $this->mapperStub->method('map')->willReturn(['content' => 'Test']);
+
+        $apiResult = new CreateShipmentsResult(true, false, '90039521201', 'Nowa');
+        $this->clientStub->method('createShipments')->willReturn($apiResult);
+
+        $savedEntityMock = $this->createMock(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $savedEntityMock->method('getEntityId')->willReturn(42);
+
+        $this->shipmentDataServiceMock->expects($this->once())
+            ->method('saveShipmentDataWithStatus')
+            ->willReturn($savedEntityMock);
+
+        $returnBuilderMock = $this->createMock(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
+        $returnCreationServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
+
+        $returnShipmentDataStub = $this->createStub(DhlShipmentData::class);
+        $returnBuilderMock->expects($this->once())
+            ->method('buildReturnShipmentData')
+            ->with($shipmentData)
+            ->willReturn($returnShipmentDataStub);
+
+        $returnCreationServiceMock->expects($this->once())
+            ->method('createReturnShipment')
+            ->with(
+                returnShipmentData: $returnShipmentDataStub,
+                environment: 'sandbox',
+                expirationDays: 14,
+                primaryWaybillNumber: '90039521201',
+                originalEntityId: 42
+            );
+
+        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
+        $magentoSyncServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+        $serviceWithReturn = new ShipmentCreationService(
+            $this->shipmentDataServiceMock,
+            $this->validatorStub,
+            $this->mapperStub,
+            $this->credentialsProviderStub,
+            $this->clientStub,
+            $this->lockManagerMock,
+            $this->loggerStub,
+            $serializer,
+            $returnBuilderMock,
+            $returnCreationServiceMock,
+            $magentoSyncServiceMock
+        );
+
+        $result = $serviceWithReturn->createShipment($shipmentData, 'sandbox');
+        $this->assertTrue($result->isSuccess());
     }
 }

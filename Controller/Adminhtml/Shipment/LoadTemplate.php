@@ -9,6 +9,7 @@ use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use Ideo\Dhl\Model\Template\TemplateManager;
+use Ideo\Dhl\Model\Template\TemplateVariableResolver;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
@@ -31,6 +32,7 @@ class LoadTemplate extends Action
      * @param OrderToShipmentDataMapper $mapper
      * @param TemplateManager $templateManager
      * @param JsonFactory $jsonFactory
+     * @param TemplateVariableResolver $variableResolver
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -41,6 +43,7 @@ class LoadTemplate extends Action
         private readonly OrderToShipmentDataMapper $mapper,
         private readonly TemplateManager $templateManager,
         private readonly JsonFactory $jsonFactory,
+        private readonly TemplateVariableResolver $variableResolver,
         private readonly ?LoggerInterface $logger = null
     ) {
         parent::__construct($context);
@@ -58,36 +61,37 @@ class LoadTemplate extends Action
             ?? $this->getRequest()->getParam('preset_id'));
         $templateType = (string)($this->getRequest()->getParam('template_type')
             ?? $this->getRequest()->getParam('preset_type'));
-        $orderId = $this->getRequest()->getParam('order_id') ? (int)$this->getRequest()->getParam('order_id') : null;
+        $orderId = (int)$this->getRequest()->getParam('order_id');
 
-        if (!$templateId || !$templateType) {
+        if (!$templateId || empty($templateType)) {
             return $resultJson->setData([
                 'success' => false,
-                'message' => __('Template ID and Type are required.')->render(),
+                'message' => __('Missing template_id or template_type parameter.'),
             ]);
         }
 
         try {
             if ($templateType === 'sender') {
-                $sender = $this->dropOffPointRepository->getById($templateId);
+                $point = $this->dropOffPointRepository->getById($templateId);
+                $data = $point->getData();
+
                 return $resultJson->setData([
                     'success' => true,
                     'data' => [
-                        'sapNumber' => $sender->getSapNumber(),
-                        'name' => $sender->getSenderName(),
-                        'firstName' => $sender->getFirstName(),
-                        'lastName' => $sender->getLastName(),
-                        'street' => $sender->getStreet(),
-                        'houseNumber' => $sender->getHouseNumber(),
-                        'flatNumber' => '',
-                        'city' => $sender->getCity(),
-                        'postalCode' => $sender->getPostalCode(),
-                        'country' => $sender->getCountryId(),
-                        'phone' => $sender->getPhone(),
-                        'email' => $sender->getEmail(),
-                        'pickupHourFrom' => $sender->getData('pickup_time_from') ?: null,
-                        'pickupHourTo' => $sender->getData('pickup_time_to') ?: null,
-                    ]
+                        'presetSenderId' => (string)$point->getId(),
+                        'sapNumber' => $data['sap_number'] ?? '',
+                        'name' => $data['name'] ?? '',
+                        'firstName' => $data['first_name'] ?? '',
+                        'lastName' => $data['last_name'] ?? '',
+                        'street' => $data['street'] ?? '',
+                        'houseNumber' => $data['house_number'] ?? '',
+                        'flatNumber' => $data['flat_number'] ?? '',
+                        'postalCode' => $data['postal_code'] ?? '',
+                        'city' => $data['city'] ?? '',
+                        'country' => $data['country'] ?? 'PL',
+                        'phone' => $data['phone'] ?? '',
+                        'email' => $data['email'] ?? '',
+                    ],
                 ]);
             }
 
@@ -105,6 +109,9 @@ class LoadTemplate extends Action
                     try {
                         $order = $this->orderRepository->get($orderId);
                         $resolvedContent = $this->mapper->resolveContentValue($resolvedContent, $order);
+                        $resolvedComment = $resolvedComment !== '' ? $this->variableResolver->resolve($resolvedComment, $order) : '';
+                        $resolvedReference = $resolvedReference !== '' ? $this->variableResolver->resolve($resolvedReference, $order) : '';
+                        $resolvedMpk = $resolvedMpk !== '' ? $this->variableResolver->resolve($resolvedMpk, $order) : '';
                     } catch (Exception $e) {
                         $this->logger?->warning(
                             'Could not resolve order content for template: ' . $e->getMessage(),
@@ -130,6 +137,10 @@ class LoadTemplate extends Action
                         'mpk' => $resolvedMpk,
                         'labelType' => $serviceData['label_type'] ?? 'BLP',
                         'autoCreateReturnShipment' => !empty($serviceData['auto_create_return_shipment']),
+                        'returnLabelType' => $service->getReturnLabelType() ?: 'BLP',
+                        'returnQrCodeType' => $service->getReturnQrCodeType() ?: 'QR_PDF',
+                        'returnLabelExpDays' => $service->getReturnLabelExpDays() ?? 14,
+                        'returnBookCourier' => $service->getReturnBookCourier() ?? 0,
                         'dropOffPointId' => isset($serviceData['drop_off_point_id'])
                             ? (int)$serviceData['drop_off_point_id']
                             : null,

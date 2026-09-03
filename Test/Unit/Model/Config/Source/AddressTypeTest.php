@@ -14,10 +14,9 @@ class AddressTypeTest extends TestCase
         $source = new AddressType();
         $options = $source->toOptionArray();
 
-        self::assertCount(4, $options);
-        self::assertSame('', $options[0]['value']);
+        self::assertCount(3, $options);
+        self::assertSame('N', $options[0]['value']);
         self::assertSame('C', $options[1]['value']);
         self::assertSame('B', $options[2]['value']);
-        self::assertSame('N', $options[3]['value']);
     }
 }

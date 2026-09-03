@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Api;
 
+use Ideo\Dhl\Model\Config\Source\ReturnBookCourier;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentRestrictions;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
@@ -66,8 +67,10 @@ class ShipmentReturnDataMapper
             ? $merchantRecipient->getName()
             : $merchantContact;
 
+        $effectiveExpDays = $settings->getReturnLabelExpDays() ?: $expirationDays;
+
         $expDate = $this->timezone->scopeDate()
-            ->modify('+' . max(1, $expirationDays) . ' days')
+            ->modify('+' . max(1, $effectiveExpDays) . ' days')
             ->format('Y-m-d');
 
         $countryCode = strtoupper($merchantRecipient->getCountry() ?: 'PL');
@@ -87,14 +90,18 @@ class ShipmentReturnDataMapper
             $billing['costsCenter'] = $this->sanitizeString($settings->getMpk());
         }
 
+        $returnBookCourierVal = (string) ($settings->getReturnBookCourier() ?? ReturnBookCourier::DROP_OFF_OR_COURIER);
+        $bookCourier = $returnBookCourierVal === ReturnBookCourier::DROP_OFF_OR_COURIER;
+        $labelType = $settings->getReturnLabelType() ?: ($settings->getLabelType() ?: 'BLP');
+
         $shipmentInfo = [
             'serviceType' => $serviceType,
-            'bookCourier' => false,
+            'bookCourier' => $bookCourier,
             'billing' => $billing,
             'shipmentTime' => [
                 'labelExpDate' => $expDate,
             ],
-            'labelType' => $settings->getLabelType() ?: 'BLP',
+            'labelType' => $labelType,
         ];
 
         $specialServices = [];

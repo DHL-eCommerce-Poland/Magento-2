@@ -33,12 +33,14 @@ class ShipmentDeletionServiceTest extends TestCase
         $this->credentialsProviderMock = $this->createMock(CredentialsProvider::class);
         $this->scopeConfigMock = $this->createMock(ScopeConfigInterface::class);
         $this->loggerMock = $this->createStub(LoggerInterface::class);
+        $syncServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
 
         $this->deletionService = new ShipmentDeletionService(
             $this->repositoryMock,
             $this->clientMock,
             $this->credentialsProviderMock,
             $this->scopeConfigMock,
+            $syncServiceMock,
             $this->loggerMock
         );
     }
@@ -135,8 +137,8 @@ class ShipmentDeletionServiceTest extends TestCase
             $this->clientMock,
             $this->credentialsProviderMock,
             $this->scopeConfigMock,
-            $this->loggerMock,
-            $syncServiceMock
+            $syncServiceMock,
+            $this->loggerMock
         );
 
         $shipmentMock = $this->createMock(ShipmentDataInterface::class);

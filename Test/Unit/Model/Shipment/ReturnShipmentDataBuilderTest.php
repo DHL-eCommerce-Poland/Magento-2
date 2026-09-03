@@ -53,6 +53,9 @@ class ReturnShipmentDataBuilderTest extends TestCase
             comment: '',
             reference: 'REF001',
             labelType: 'BLP',
+            returnLabelType: 'ZBLP',
+            returnBookCourier: 0,
+            returnLabelExpDays: 20,
             packages: [$pkg]
         );
         $services = new SpecialServicesData();
@@ -82,5 +85,8 @@ class ReturnShipmentDataBuilderTest extends TestCase
         // Service type for domestic return = ZK
         $this->assertEquals('ZK', $returnShipment->getShipmentSettings()->getServiceType());
         $this->assertEquals('Zwrot butów', $returnShipment->getShipmentSettings()->getContent());
+        $this->assertEquals('ZBLP', $returnShipment->getShipmentSettings()->getReturnLabelType());
+        $this->assertEquals(0, $returnShipment->getShipmentSettings()->getReturnBookCourier());
+        $this->assertEquals(20, $returnShipment->getShipmentSettings()->getReturnLabelExpDays());
     }
 }

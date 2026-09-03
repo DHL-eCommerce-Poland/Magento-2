@@ -375,6 +375,10 @@ class OrderToShipmentDataMapper
             isNonStandard: !empty($defaultShipmentDefaults['isNonStandard']),
             hasEuroReturn: !empty($defaultShipmentDefaults['hasEuroReturn']),
             autoCreateReturnShipment: !empty($defaultShipmentDefaults['autoCreateReturnShipment']),
+            returnLabelType: isset($defaultShipmentDefaults['returnLabelType']) && (string)$defaultShipmentDefaults['returnLabelType'] !== '' ? (string)$defaultShipmentDefaults['returnLabelType'] : null,
+            returnQrCodeType: isset($defaultShipmentDefaults['returnQrCodeType']) && (string)$defaultShipmentDefaults['returnQrCodeType'] !== '' ? (string)$defaultShipmentDefaults['returnQrCodeType'] : null,
+            returnLabelExpDays: isset($defaultShipmentDefaults['returnLabelExpDays']) && $defaultShipmentDefaults['returnLabelExpDays'] !== '' && $defaultShipmentDefaults['returnLabelExpDays'] !== null ? (int)$defaultShipmentDefaults['returnLabelExpDays'] : null,
+            returnBookCourier: isset($defaultShipmentDefaults['returnBookCourier']) && $defaultShipmentDefaults['returnBookCourier'] !== '' && $defaultShipmentDefaults['returnBookCourier'] !== null ? (int)$defaultShipmentDefaults['returnBookCourier'] : null,
             dropOffPointId: $sDropOff,
             addressType: (string)($defaultShipmentDefaults['addressType'] ?? 'N'),
             packages: [$initialPackage]

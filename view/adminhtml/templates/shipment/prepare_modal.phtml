@@ -205,18 +205,12 @@ $dateFormat = $viewModel->getDateFormat();
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Package Contents Description')) ?></span></label>
                             <div class="admin__field-control">
                                 <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Package Contents Description')) ?>" maxlength="<?= DhlShipmentRestrictions::MAX_LENGTH_CONTENT ?>" data-bind="value: content" required />
-                                <div class="admin__field-note">
-                                    <span><?= $escaper->escapeHtml(__('Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method} (max %1 chars)', DhlShipmentRestrictions::MAX_LENGTH_CONTENT)) ?></span>
-                                </div>
                             </div>
                         </div>
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Additional Comments')) ?></span></label>
                             <div class="admin__field-control">
                                 <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Additional Comments')) ?>" maxlength="<?= DhlShipmentRestrictions::MAX_LENGTH_COMMENT ?>" data-bind="value: comment" />
-                                <div class="admin__field-note">
-                                    <span><?= $escaper->escapeHtml(__('Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method} (max %1 chars)', DhlShipmentRestrictions::MAX_LENGTH_COMMENT)) ?></span>
-                                </div>
                             </div>
                         </div>
                         <div class="admin__field">
@@ -225,9 +219,6 @@ $dateFormat = $viewModel->getDateFormat();
                                 <div style="display: flex; gap: 8px;">
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipment Reference Number')) ?>" maxlength="<?= DhlShipmentRestrictions::MAX_LENGTH_REFERENCE ?>" data-bind="value: reference" style="flex: 1;" />
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('MPK')) ?>" data-bind="value: mpk" style="flex: 1;" />
-                                </div>
-                                <div class="admin__field-note">
-                                    <span><?= $escaper->escapeHtml(__('Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method}')) ?></span>
                                 </div>
                             </div>
                         </div>
@@ -239,6 +230,32 @@ $dateFormat = $viewModel->getDateFormat();
                                 </label>
                             </div>
                         </div>
+                        <!-- ko if: autoCreateReturnShipment -->
+                        <div class="admin__field" style="margin-top: 8px; padding-left: 20px;">
+                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Return Label Format')) ?></span></label>
+                            <div class="admin__field-control">
+                                <select class="admin__control-select" data-bind="options: $parent.labelTypeOptions, optionsText: 'label', optionsValue: 'value', value: returnLabelType"></select>
+                            </div>
+                        </div>
+                        <div class="admin__field" style="margin-top: 8px; padding-left: 20px;">
+                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Return QR Code Type')) ?></span></label>
+                            <div class="admin__field-control">
+                                <select class="admin__control-select" data-bind="options: $parent.returnQrCodeTypeOptions, optionsText: 'label', optionsValue: 'value', value: returnQrCodeType"></select>
+                            </div>
+                        </div>
+                        <div class="admin__field" style="margin-top: 8px; padding-left: 20px;">
+                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Return Label Expiration Days')) ?></span></label>
+                            <div class="admin__field-control">
+                                <input type="number" class="admin__control-text" min="1" max="100" data-bind="value: returnLabelExpDays" style="width: 100px;" />
+                            </div>
+                        </div>
+                        <div class="admin__field" style="margin-top: 8px; padding-left: 20px;">
+                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Return Dispatch Method')) ?></span></label>
+                            <div class="admin__field-control">
+                                <select class="admin__control-select" data-bind="options: $parent.returnBookCourierOptions, optionsText: 'label', optionsValue: 'value', value: returnBookCourier"></select>
+                            </div>
+                        </div>
+                        <!-- /ko -->
                     </fieldset>
                 </div>
                 <!-- /ko -->

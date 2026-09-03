@@ -1142,7 +1142,7 @@ class SoapClientAdapter implements ClientInterface
         );
 
         return (string) preg_replace(
-            '/(<(?:[a-zA-Z0-9_]+:)?(?:labelData|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)[^<]{30,}(<\/(?:[a-zA-Z0-9_]+:)?(?:labelData|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)/i',
+            '/(<(?:[a-zA-Z0-9_]+:)?(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)[^<]{30,}(<\/(?:[a-zA-Z0-9_]+:)?(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)/i',
             '$1***BINARY DATA TRUNCATED***$2',
             $xml
         );

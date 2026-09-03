@@ -28,7 +28,9 @@ class ShipmentCreationService
      * @param LockManagerInterface $lockManager
      * @param LoggerInterface $logger
      * @param SerializerInterface $serializer
-     * @param MagentoShipmentSyncService|null $magentoShipmentSyncService
+     * @param ReturnShipmentDataBuilder $returnBuilder
+     * @param ReturnShipmentCreationService $returnCreationService
+     * @param MagentoShipmentSyncService $magentoShipmentSyncService
      */
     public function __construct(
         private readonly ShipmentDataService $shipmentDataService,
@@ -39,7 +41,9 @@ class ShipmentCreationService
         private readonly LockManagerInterface $lockManager,
         private readonly LoggerInterface $logger,
         private readonly SerializerInterface $serializer,
-        private readonly ?MagentoShipmentSyncService $magentoShipmentSyncService = null
+        private readonly ReturnShipmentDataBuilder $returnBuilder,
+        private readonly ReturnShipmentCreationService $returnCreationService,
+        private readonly MagentoShipmentSyncService $magentoShipmentSyncService
     ) {
     }
 
@@ -88,12 +92,13 @@ class ShipmentCreationService
                 return $apiResult;
             }
 
+            $packageNumbers = $apiResult->getPackageNumbers()
+                ?: ($apiResult->getShipmentId() ? [(string)$apiResult->getShipmentId()] : []);
+
             // 5. Create native Magento shipment if sync service is available
             $magentoShipmentId = null;
             if ($this->magentoShipmentSyncService && $orderId !== null) {
                 try {
-                    $packageNumbers = $apiResult->getPackageNumbers()
-                        ?: ($apiResult->getShipmentId() ? [(string)$apiResult->getShipmentId()] : []);
                     $itemsQty = $shipmentData->getItemsQty();
                     $magentoShipment = $this->magentoShipmentSyncService->createMagentoShipment(
                         (int)$orderId,
@@ -112,7 +117,7 @@ class ShipmentCreationService
 
             // 6. Handle API Success scenario (save DB entity with DHL order status or CREATED fallback)
             $status = $apiResult->getOrderStatus() ?: ShipmentDataInterface::DEFAULT_STATUS;
-            $this->shipmentDataService->saveShipmentDataWithStatus(
+            $savedEntity = $this->shipmentDataService->saveShipmentDataWithStatus(
                 $shipmentData,
                 $status,
                 null,
@@ -120,9 +125,39 @@ class ShipmentCreationService
                 $presetShipmentId,
                 $apiResult->getShipmentId(),
                 null,
-                $apiResult->getPackageNumbers(),
+                $packageNumbers,
                 $magentoShipmentId
             );
+
+            // 7. Auto-create return shipment if requested
+            if ($shipmentData->getShipmentSettings()->autoCreateReturnShipment()
+                && $apiResult->getShipmentId()
+            ) {
+                $this->logger->info(sprintf(
+                    '[ShipmentCreation] Triggering auto return shipment creation for order #%s, primary waybill #%s',
+                    (string) $orderId,
+                    (string) $apiResult->getShipmentId()
+                ));
+                try {
+                    $returnShipmentData = $this->returnBuilder->buildReturnShipmentData($shipmentData);
+                    $expDays = $shipmentData->getShipmentSettings()->getReturnLabelExpDays() ?: 14;
+                    $savedEntityId = $savedEntity ? (int) $savedEntity->getEntityId() : null;
+
+                    $this->returnCreationService->createReturnShipment(
+                        returnShipmentData: $returnShipmentData,
+                        environment: $environment,
+                        expirationDays: $expDays,
+                        primaryWaybillNumber: (string) $apiResult->getShipmentId(),
+                        originalEntityId: $savedEntityId
+                    );
+                } catch (Throwable $e) {
+                    $this->logger->warning(sprintf(
+                        '[ShipmentCreation] Auto return shipment creation failed for order #%s: %s',
+                        (string) $orderId,
+                        $e->getMessage()
+                    ), ['exception' => $e]);
+                }
+            }
 
             return $apiResult;
         } finally {
@@ -185,12 +220,13 @@ class ShipmentCreationService
             $newShipmentId = (string) $apiResult->getShipmentId();
             $status = $apiResult->getOrderStatus() ?: ShipmentDataInterface::DEFAULT_STATUS;
 
+            $packageNumbers = $apiResult->getPackageNumbers()
+                ?: ($newShipmentId !== '' ? [$newShipmentId] : []);
+
             // Update tracks on existing Magento shipment
             $magentoShipmentId = $existingEntity->getMagentoShipmentId();
             if ($this->magentoShipmentSyncService && $magentoShipmentId) {
                 try {
-                    $packageNumbers = $apiResult->getPackageNumbers()
-                        ?: ($newShipmentId !== '' ? [$newShipmentId] : []);
                     $this->magentoShipmentSyncService->updateMagentoShipmentTracks(
                         $magentoShipmentId,
                         $packageNumbers
@@ -210,7 +246,7 @@ class ShipmentCreationService
                 $status,
                 $newShipmentId,
                 null,
-                $apiResult->getPackageNumbers(),
+                $packageNumbers,
                 $magentoShipmentId
             );
 
