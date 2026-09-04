@@ -9,7 +9,14 @@ use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
 
 class DropOffPointResolver
 {
+    /**
+     * @var DropOffPointInterface|null
+     */
     private ?DropOffPointInterface $resolvedDefault = null;
+
+    /**
+     * @var bool
+     */
     private bool $isResolved = false;
 
     /**

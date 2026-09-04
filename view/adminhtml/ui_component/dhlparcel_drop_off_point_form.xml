@@ -177,7 +177,7 @@
             </argument>
             <settings>
                 <dataType>boolean</dataType>
-                <label translate="true">Is Default Sender</label>
+                <label translate="true">Set as Default Template</label>
                 <dataScope>is_default</dataScope>
             </settings>
             <formElements>

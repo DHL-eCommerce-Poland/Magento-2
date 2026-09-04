@@ -6,6 +6,7 @@
         <add id="Ideo_Dhl::shipment" title="Shipments" module="Ideo_Dhl" sortOrder="5" parent="Ideo_Dhl::main" action="dhlparcel/shipment/index" resource="Ideo_Dhl::shipment"/>
         <add id="Ideo_Dhl::drop_off_point" title="Drop-Off Points" module="Ideo_Dhl" sortOrder="10" parent="Ideo_Dhl::main" action="dhlparcel/dropoffpoint/index" resource="Ideo_Dhl::drop_off_point"/>
         <add id="Ideo_Dhl::delivery_service" title="Delivery Services" module="Ideo_Dhl" sortOrder="20" parent="Ideo_Dhl::main" action="dhlparcel/deliveryservice/index" resource="Ideo_Dhl::delivery_service"/>
+        <add id="Ideo_Dhl::customs_template" title="Customs Clearance" module="Ideo_Dhl" sortOrder="25" parent="Ideo_Dhl::main" action="dhlparcel/customstemplate/index" resource="Ideo_Dhl::customs_template"/>
         <add id="Ideo_Dhl::config" title="Configuration" module="Ideo_Dhl" sortOrder="30" parent="Ideo_Dhl::main" action="adminhtml/system_config/edit/section/carriers/_fragment/carriers_dhlparcel-link" resource="Ideo_Dhl::config"/>
         <add id="Ideo_Dhl::help" title="Help" module="Ideo_Dhl" sortOrder="40" parent="Ideo_Dhl::main" action="dhlparcel/help/index" resource="Ideo_Dhl::help"/>
     </menu>

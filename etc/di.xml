@@ -56,6 +56,8 @@
                       xsi:type="string">Ideo\Dhl\Model\ResourceModel\DeliveryService\Grid\Collection</item>
                 <item name="dhlparcel_shipment_listing_data_source"
                       xsi:type="string">Ideo\Dhl\Model\ResourceModel\ShipmentData\Grid\Collection</item>
+                <item name="dhlparcel_customs_template_listing_data_source"
+                      xsi:type="string">Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Grid\Collection</item>
             </argument>
         </arguments>
     </type>

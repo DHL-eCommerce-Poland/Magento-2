@@ -62,7 +62,7 @@
         <column xsi:type="varchar" name="sap_number" length="64" nullable="true" comment="SAP Customer Number"/>
         <column xsi:type="varchar" name="pickup_time_from" length="16" nullable="true" comment="Courier Pickup Time From"/>
         <column xsi:type="varchar" name="pickup_time_to" length="16" nullable="true" comment="Courier Pickup Time To"/>
-        <column xsi:type="smallint" name="is_default" unsigned="true" nullable="false" default="0" comment="Is Default Sender"/>
+        <column xsi:type="smallint" name="is_default" unsigned="true" nullable="false" default="0" comment="Is Default"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
@@ -97,6 +97,40 @@
         </constraint>
         <index referenceId="IDX_DHLPARCEL_DELIVERY_SERVICE_METHOD" indexType="btree">
             <column name="method_code"/>
+        </index>
+    </table>
+    <table name="dhlparcel_customs_template" resource="default" engine="innodb" comment="DHL Customs Clearance Templates">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="template_name" length="255" nullable="false" comment="Template Name"/>
+        <column xsi:type="varchar" name="customs_type" length="1" nullable="false" default="U" comment="Customs Type (U-Simplified, I-Individual, S-Short)"/>
+        <column xsi:type="varchar" name="category_of_item" length="2" nullable="false" default="11" comment="Category Of Item (9, 11, 21, 31, 32, 91)"/>
+        <column xsi:type="varchar" name="currency" length="3" nullable="false" default="PLN" comment="Currency ISO Code"/>
+        <column xsi:type="varchar" name="default_tariff_code" length="10" nullable="true" comment="Default HS Tariff Code"/>
+        <column xsi:type="varchar" name="invoice_date" length="10" nullable="true" comment="Date of Invoice (YYYY-MM-DD)"/>
+        <column xsi:type="varchar" name="invoice_file" length="255" nullable="true" comment="VAT Invoice PDF File Path"/>
+        <column xsi:type="varchar" name="shipper_eori" length="35" nullable="true" comment="Shipper EORI Number"/>
+        <column xsi:type="varchar" name="shipper_nip" length="35" nullable="true" comment="Shipper NIP Number"/>
+        <column xsi:type="varchar" name="shipper_vat_no" length="35" nullable="true" comment="Shipper VAT Registration Number"/>
+        <column xsi:type="varchar" name="country_of_origin" length="2" nullable="true" default="PL" comment="Country Of Origin Code"/>
+        <column xsi:type="decimal" name="costs_of_shipment" precision="12" scale="4" nullable="true" comment="Costs Of Shipment Gross Value"/>
+        <column xsi:type="decimal" name="gross_weight" precision="12" scale="4" nullable="true" comment="Gross Weight in KG"/>
+        <column xsi:type="varchar" name="receiver_eori" length="35" nullable="true" comment="Receiver EORI Number"/>
+        <column xsi:type="varchar" name="receiver_vat_no" length="35" nullable="true" comment="Receiver VAT Registration Number"/>
+        <column xsi:type="varchar" name="contact_first_name" length="30" nullable="true" comment="Contact First Name"/>
+        <column xsi:type="varchar" name="contact_last_name" length="30" nullable="true" comment="Contact Last Name"/>
+        <column xsi:type="varchar" name="additional_info" length="100" nullable="true" comment="Additional Customs Info"/>
+        <column xsi:type="smallint" name="not_exceed_value" unsigned="true" nullable="true" default="1" comment="Agreement: Not Exceed Value Limit"/>
+        <column xsi:type="smallint" name="not_prohibited_goods" unsigned="true" nullable="true" default="1" comment="Agreement: Not Prohibited Goods"/>
+        <column xsi:type="smallint" name="not_restricted_goods" unsigned="true" nullable="true" default="1" comment="Agreement: Not Restricted Goods"/>
+        <column xsi:type="text" name="customs_items" nullable="true" comment="Customs Items JSON Array"/>
+        <column xsi:type="smallint" name="is_default" unsigned="true" nullable="false" default="0" comment="Is Default Template"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="IDX_DHLPARCEL_CUSTOMS_TEMPLATE_DEFAULT" indexType="btree">
+            <column name="is_default"/>
         </index>
     </table>
     <table name="dhlparcel_shipment_data" resource="default" engine="innodb" comment="DHL Shipment Data Entities">
