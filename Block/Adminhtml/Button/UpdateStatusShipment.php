@@ -50,7 +50,7 @@ class UpdateStatusShipment extends Generic implements ButtonProviderInterface
 
         return [
             'label' => __('Update Status'),
-            'class' => 'action-secondary',
+            'class' => '',
             'on_click' => sprintf(
                 "location.href = '%s'",
                 $this->getUrl('dhlparcel/shipment/updateStatus', ['entity_id' => $entityId, 'redirect_to_edit' => 1])

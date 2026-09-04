@@ -50,7 +50,7 @@ class DownloadEpod implements ButtonProviderInterface
 
         return [
             'label' => __('Download ePOD'),
-            'class' => 'action-secondary',
+            'class' => '',
             'on_click' => sprintf("window.open('%s', '_blank');", $downloadUrl),
             'sort_order' => 54,
         ];

@@ -50,20 +50,6 @@
                 <dataScope>entity_id</dataScope>
             </settings>
         </field>
-        <field name="website_id" formElement="select">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Website Scope</label>
-                <dataScope>website_id</dataScope>
-            </settings>
-            <formElements>
-                <select>
-                    <settings>
-                        <options class="Magento\Config\Model\Config\Source\Website"/>
-                    </settings>
-                </select>
-            </formElements>
-        </field>
         <field name="template_name" formElement="input">
             <settings>
                 <validation>

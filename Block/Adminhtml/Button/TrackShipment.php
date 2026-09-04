@@ -45,7 +45,7 @@ class TrackShipment implements ButtonProviderInterface
 
         return [
             'label' => __('Track Shipment'),
-            'class' => 'action-secondary',
+            'class' => '',
             'on_click' => sprintf(
                 "window.open('https://mojdhl.pl/sprawdz?paczki=%s', '_blank');",
                 urlencode($shipmentId)

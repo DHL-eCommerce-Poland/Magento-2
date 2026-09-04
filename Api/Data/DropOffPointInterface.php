@@ -7,7 +7,6 @@ namespace Ideo\Dhl\Api\Data;
 interface DropOffPointInterface
 {
     public const ENTITY_ID = 'entity_id';
-    public const WEBSITE_ID = 'website_id';
     public const TEMPLATE_NAME = 'template_name';
     public const SENDER_NAME = 'sender_name';
     public const FIRST_NAME = 'first_name';
@@ -39,22 +38,6 @@ interface DropOffPointInterface
      * @return $this
      */
     public function setEntityId($entityId);
-
-    /**
-     * Get website ID.
-     *
-     * @return int
-     */
-    public function getWebsiteId(): int;
-
-    /**
-     * Set website ID.
-     *
-     * @param int $websiteId
-     *
-     * @return $this
-     */
-    public function setWebsiteId(int $websiteId): static;
 
     /**
      * Get profile template name.

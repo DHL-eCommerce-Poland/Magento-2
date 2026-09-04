@@ -9,10 +9,8 @@ use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
 
 class DropOffPointResolver
 {
-    /**
-     * @var array<int, DropOffPointInterface|null>
-     */
-    private array $resolvedDropOffPoints = [];
+    private ?DropOffPointInterface $resolvedDefault = null;
+    private bool $isResolved = false;
 
     /**
      * @param DropOffPointRepositoryInterface $dropOffPointRepository
@@ -23,19 +21,17 @@ class DropOffPointResolver
     }
 
     /**
-     * Resolve default drop-off point for the given website ID with in-memory caching.
-     *
-     * @param int $websiteId
+     * Resolve default drop-off point with in-memory caching.
      *
      * @return DropOffPointInterface|null
      */
-    public function resolveForWebsite(int $websiteId): ?DropOffPointInterface
+    public function resolveDefault(): ?DropOffPointInterface
     {
-        if (!array_key_exists($websiteId, $this->resolvedDropOffPoints)) {
-            $this->resolvedDropOffPoints[$websiteId] = $this->dropOffPointRepository
-                ->getDefaultByWebsiteId($websiteId);
+        if (!$this->isResolved) {
+            $this->resolvedDefault = $this->dropOffPointRepository->getDefault();
+            $this->isResolved = true;
         }
 
-        return $this->resolvedDropOffPoints[$websiteId];
+        return $this->resolvedDefault;
     }
 }

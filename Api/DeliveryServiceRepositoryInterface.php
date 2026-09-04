@@ -31,14 +31,13 @@ interface DeliveryServiceRepositoryInterface
     public function getById(int $entityId): DeliveryServiceInterface;
 
     /**
-     * Get Delivery Service for a given Website ID and Shipping Method Code.
+     * Get Delivery Service for a given Shipping Method Code.
      *
-     * @param int $websiteId
      * @param string $methodCode
      *
      * @return \Ideo\Dhl\Api\Data\DeliveryServiceInterface|null
      */
-    public function getByWebsiteAndMethod(int $websiteId, string $methodCode): ?DeliveryServiceInterface;
+    public function getByMethod(string $methodCode): ?DeliveryServiceInterface;
 
     /**
      * Get List of Delivery Services matching Search Criteria.

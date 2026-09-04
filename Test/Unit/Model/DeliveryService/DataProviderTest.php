@@ -8,7 +8,6 @@ use Ideo\Dhl\Model\DeliveryService;
 use Ideo\Dhl\Model\DeliveryService\DataProvider;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\Collection;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory;
-use Magento\Framework\App\RequestInterface;
 use PHPUnit\Framework\TestCase;
 
 class DataProviderTest extends TestCase
@@ -29,7 +28,6 @@ class DataProviderTest extends TestCase
         $collectionFactory = $this->createStub(CollectionFactory::class);
         $collectionFactory->method('create')->willReturn($collection);
 
-        $request = $this->createStub(RequestInterface::class);
         $serializer = new \Magento\Framework\Serialize\Serializer\Json();
 
         $dataProvider = new DataProvider(
@@ -37,7 +35,6 @@ class DataProviderTest extends TestCase
             'entity_id',
             'entity_id',
             $collectionFactory,
-            $request,
             $serializer
         );
 

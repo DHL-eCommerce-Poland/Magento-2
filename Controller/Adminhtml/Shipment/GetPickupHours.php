@@ -99,7 +99,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
             }
 
             if (empty($postalCodes)) {
-                $defaultSender = $this->dropOffPointRepository->getDefaultByWebsiteId(0);
+                $defaultSender = $this->dropOffPointRepository->getDefault();
                 if ($defaultSender && !empty($defaultSender->getPostalCode())) {
                     $postalCodes[] = (string) $defaultSender->getPostalCode();
                 }

@@ -128,9 +128,7 @@ class ShipmentDataService
             }
         }
         if (empty($senderDefaults)) {
-            $store = method_exists($order, 'getStore') ? $order->getStore() : null;
-            $websiteId = $store ? (int)($store->getWebsiteId() ?? 0) : 0;
-            $defaultSender = $this->dropOffPointRepository->getDefaultByWebsiteId($websiteId);
+            $defaultSender = $this->dropOffPointRepository->getDefault();
             if ($defaultSender) {
                 $senderDefaults = $defaultSender->getData();
             }
@@ -167,9 +165,7 @@ class ShipmentDataService
                 ? (string)($order->getShippingMethod() ?? '')
                 : '';
             if (!empty($shippingMethod)) {
-                $store = method_exists($order, 'getStore') ? $order->getStore() : null;
-                $websiteId = $store ? (int)($store->getWebsiteId() ?? 0) : 0;
-                $matchedService = $this->deliveryServiceRepository->getByWebsiteAndMethod($websiteId, $shippingMethod);
+                $matchedService = $this->deliveryServiceRepository->getByMethod($shippingMethod);
                 if ($matchedService) {
                     $shipmentDefaults = $matchedService->getData();
                 }

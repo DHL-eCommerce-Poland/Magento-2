@@ -31,13 +31,11 @@ interface DropOffPointRepositoryInterface
     public function getById(int $entityId): DropOffPointInterface;
 
     /**
-     * Get default Drop-Off Point for a given Website ID (with fallback to default website 0).
-     *
-     * @param int $websiteId
+     * Get default Drop-Off Point.
      *
      * @return \Ideo\Dhl\Api\Data\DropOffPointInterface|null
      */
-    public function getDefaultByWebsiteId(int $websiteId = 0): ?DropOffPointInterface;
+    public function getDefault(): ?DropOffPointInterface;
 
     /**
      * Get List of Drop-Off Points matching Search Criteria.

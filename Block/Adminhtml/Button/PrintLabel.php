@@ -50,7 +50,7 @@ class PrintLabel implements ButtonProviderInterface
 
         return [
             'label' => __('Print Label'),
-            'class' => 'action-secondary',
+            'class' => '',
             'on_click' => sprintf("window.open('%s', '_blank');", $printUrl),
             'sort_order' => 50,
         ];

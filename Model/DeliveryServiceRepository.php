@@ -73,19 +73,16 @@ class DeliveryServiceRepository implements DeliveryServiceRepositoryInterface
     }
 
     /**
-     * Get Delivery Service for a given Website ID and Shipping Method Code.
+     * Get Delivery Service for a given Shipping Method Code.
      *
-     * @param int $websiteId
      * @param string $methodCode
      *
      * @return DeliveryServiceInterface|null
      */
-    public function getByWebsiteAndMethod(int $websiteId, string $methodCode): ?DeliveryServiceInterface
+    public function getByMethod(string $methodCode): ?DeliveryServiceInterface
     {
         $collection = $this->collectionFactory->create();
-        $collection->addFieldToFilter('website_id', ['in' => [$websiteId, 0]]);
-        $collection->addFieldToFilter('method_code', $methodCode);
-        $collection->addOrder('website_id', \Magento\Framework\Data\Collection::SORT_ORDER_DESC);
+        $collection->addFieldToFilter('method_code', ['finset' => $methodCode]);
 
         $item = $collection->getFirstItem();
         return $item->getId() ? $item : null;

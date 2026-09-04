@@ -38,9 +38,6 @@ class DeliveryServiceTest extends TestCase
 
     public function testGettersAndSetters(): void
     {
-        $this->model->setWebsiteId(1);
-        $this->assertSame(1, $this->model->getWebsiteId());
-
         $this->model->setTemplateName('Standard Shipping');
         $this->assertSame('Standard Shipping', $this->model->getTemplateName());
 

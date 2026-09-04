@@ -50,7 +50,7 @@ class DownloadScan implements ButtonProviderInterface
 
         return [
             'label' => __('Download Scan'),
-            'class' => 'action-secondary',
+            'class' => '',
             'on_click' => sprintf("window.open('%s', '_blank');", $downloadUrl),
             'sort_order' => 52,
         ];

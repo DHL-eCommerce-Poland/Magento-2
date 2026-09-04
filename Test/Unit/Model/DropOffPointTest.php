@@ -31,9 +31,6 @@ class DropOffPointTest extends TestCase
 
     public function testGettersAndSetters(): void
     {
-        $this->model->setWebsiteId(2);
-        $this->assertEquals(2, $this->model->getWebsiteId());
-
         $this->model->setTemplateName('Main Hub');
         $this->assertEquals('Main Hub', $this->model->getTemplateName());
 

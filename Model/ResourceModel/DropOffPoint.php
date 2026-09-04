@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\ResourceModel;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
@@ -25,11 +26,11 @@ class DropOffPoint extends AbstractDb
      * @param AbstractModel $object
      *
      * @return static
+     * @throws LocalizedException
      */
     protected function _beforeSave(AbstractModel $object): static
     {
         if ($object->getData('is_default')) {
-            $websiteId = (int)$object->getData('website_id');
             $entityId = (int)$object->getData('entity_id');
 
             $connection = $this->getConnection();
@@ -37,7 +38,6 @@ class DropOffPoint extends AbstractDb
                 $this->getMainTable(),
                 ['is_default' => 0],
                 [
-                    'website_id = ?' => $websiteId,
                     'entity_id != ?' => $entityId,
                 ]
             );

@@ -36,7 +36,7 @@ class ShipmentDataServiceTest extends TestCase
 
         $order = $this->createStub(OrderInterface::class);
         $orderRepository->method('get')->willReturn($order);
-        $dropOffPointRepository->method('getDefaultByWebsiteId')->willReturn(null);
+        $dropOffPointRepository->method('getDefault')->willReturn(null);
 
         $expectedData = new DhlShipmentData(orderId: 101);
         $mapper->expects($this->once())

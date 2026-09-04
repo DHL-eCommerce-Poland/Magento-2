@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\DropOffPoint;
 
 use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory;
-use Magento\Framework\App\RequestInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 
 class DataProvider extends AbstractDataProvider
@@ -20,7 +19,6 @@ class DataProvider extends AbstractDataProvider
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
-     * @param RequestInterface $request
      * @param array $meta
      * @param array $data
      */
@@ -29,7 +27,6 @@ class DataProvider extends AbstractDataProvider
         string $primaryFieldName,
         string $requestFieldName,
         CollectionFactory $collectionFactory,
-        private readonly RequestInterface $request,
         array $meta = [],
         array $data = []
     ) {
@@ -51,12 +48,6 @@ class DataProvider extends AbstractDataProvider
         $items = $this->collection->getItems();
         foreach ($items as $item) {
             $this->loadedData[$item->getId()] = $item->getData();
-        }
-
-        // Scope support: if adding a new drop-off point, pre-bind website_id from URL parameter
-        $websiteParam = $this->request->getParam('website');
-        if ($websiteParam !== null) {
-            $this->loadedData['']['website_id'] = (int)$websiteParam;
         }
 
         return $this->loadedData;

@@ -44,13 +44,13 @@ class CreateReturnShipment extends Generic implements ButtonProviderInterface
             if (empty($entity->getShipmentId()) || !empty($entity->getReturnShipmentId())) {
                 return [];
             }
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return [];
         }
 
         return [
             'label' => __('Create Return Shipment'),
-            'class' => 'action-secondary',
+            'class' => '',
             'on_click' => sprintf(
                 "confirmSetLocation('%s', '%s')",
                 __('Are you sure you want to create a return shipment for this parcel?'),

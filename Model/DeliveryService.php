@@ -82,28 +82,6 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
-     * Get website ID.
-     *
-     * @return int
-     */
-    public function getWebsiteId(): int
-    {
-        return (int)$this->getData(self::WEBSITE_ID);
-    }
-
-    /**
-     * Set website ID.
-     *
-     * @param int $websiteId
-     *
-     * @return $this
-     */
-    public function setWebsiteId(int $websiteId): static
-    {
-        return $this->setData(self::WEBSITE_ID, $websiteId);
-    }
-
-    /**
      * Get template name.
      *
      * @return string

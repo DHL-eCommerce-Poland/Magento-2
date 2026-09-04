@@ -73,18 +73,14 @@ class DropOffPointRepository implements DropOffPointRepositoryInterface
     }
 
     /**
-     * Get default Drop-Off Point for a given Website ID (with fallback to website 0).
-     *
-     * @param int $websiteId
+     * Get default Drop-Off Point.
      *
      * @return DropOffPointInterface|null
      */
-    public function getDefaultByWebsiteId(int $websiteId = 0): ?DropOffPointInterface
+    public function getDefault(): ?DropOffPointInterface
     {
         $collection = $this->collectionFactory->create();
-        $collection->addFieldToFilter('website_id', ['in' => [$websiteId, 0]]);
         $collection->addFieldToFilter('is_default', 1);
-        $collection->addOrder('website_id', \Magento\Framework\Data\Collection::SORT_ORDER_DESC);
 
         $item = $collection->getFirstItem();
         return $item->getId() ? $item : null;

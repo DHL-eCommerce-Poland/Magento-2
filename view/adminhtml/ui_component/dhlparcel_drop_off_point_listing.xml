@@ -69,14 +69,6 @@
                 <sorting>asc</sorting>
             </settings>
         </column>
-        <column name="website_id" component="Magento_Ui/js/grid/columns/select">
-            <settings>
-                <options class="Magento\Config\Model\Config\Source\Website"/>
-                <filter>select</filter>
-                <dataType>select</dataType>
-                <label translate="true">Website</label>
-            </settings>
-        </column>
         <column name="template_name">
             <settings>
                 <filter>text</filter>

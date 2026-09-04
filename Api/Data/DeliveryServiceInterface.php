@@ -7,7 +7,6 @@ namespace Ideo\Dhl\Api\Data;
 interface DeliveryServiceInterface
 {
     public const ENTITY_ID = 'entity_id';
-    public const WEBSITE_ID = 'website_id';
     public const TEMPLATE_NAME = 'template_name';
     public const SERVICE_CODE = 'service_code';
     public const METHOD_CODE = 'method_code';
@@ -47,22 +46,6 @@ interface DeliveryServiceInterface
      * @return $this
      */
     public function setEntityId($entityId): static;
-
-    /**
-     * Get website ID.
-     *
-     * @return int
-     */
-    public function getWebsiteId(): int;
-
-    /**
-     * Set website ID.
-     *
-     * @param int $websiteId
-     *
-     * @return $this
-     */
-    public function setWebsiteId(int $websiteId): static;
 
     /**
      * Get template name.

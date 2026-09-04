@@ -30,48 +30,41 @@ class DropOffPointResolverTest extends TestCase
         );
     }
 
-    public function testResolveForWebsiteReturnsResolvedDropOffPoint(): void
+    public function testResolveDefaultReturnsResolvedDropOffPoint(): void
     {
-        $websiteId = 1;
         $dropOffPointMock = $this->createStub(DropOffPointInterface::class);
 
         $this->repositoryMock->expects($this->once())
-            ->method('getDefaultByWebsiteId')
-            ->with($websiteId)
+            ->method('getDefault')
             ->willReturn($dropOffPointMock);
 
-        $result = $this->resolver->resolveForWebsite($websiteId);
+        $result = $this->resolver->resolveDefault();
 
         $this->assertSame($dropOffPointMock, $result);
     }
 
-    public function testResolveForWebsiteCachesResultInMemory(): void
+    public function testResolveDefaultCachesResultInMemory(): void
     {
-        $websiteId = 1;
         $dropOffPointMock = $this->createStub(DropOffPointInterface::class);
 
         $this->repositoryMock->expects($this->once())
-            ->method('getDefaultByWebsiteId')
-            ->with($websiteId)
+            ->method('getDefault')
             ->willReturn($dropOffPointMock);
 
-        $firstResult = $this->resolver->resolveForWebsite($websiteId);
-        $secondResult = $this->resolver->resolveForWebsite($websiteId);
+        $firstResult = $this->resolver->resolveDefault();
+        $secondResult = $this->resolver->resolveDefault();
 
         $this->assertSame($dropOffPointMock, $firstResult);
         $this->assertSame($dropOffPointMock, $secondResult);
     }
 
-    public function testResolveForWebsiteReturnsNullWhenNoDefaultFound(): void
+    public function testResolveDefaultReturnsNullWhenNoDefaultFound(): void
     {
-        $websiteId = 2;
-
         $this->repositoryMock->expects($this->once())
-            ->method('getDefaultByWebsiteId')
-            ->with($websiteId)
+            ->method('getDefault')
             ->willReturn(null);
 
-        $result = $this->resolver->resolveForWebsite($websiteId);
+        $result = $this->resolver->resolveDefault();
 
         $this->assertNull($result);
     }

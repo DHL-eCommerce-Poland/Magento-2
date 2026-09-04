@@ -23,21 +23,19 @@ class DeliveryServiceResolver
     }
 
     /**
-     * Resolve delivery service for the given website ID and method code with in-memory caching.
+     * Resolve delivery service for the given method code with in-memory caching.
      *
-     * @param int $websiteId
      * @param string $methodCode
      *
      * @return DeliveryServiceInterface|null
      */
-    public function resolveForMethod(int $websiteId, string $methodCode): ?DeliveryServiceInterface
+    public function resolveForMethod(string $methodCode): ?DeliveryServiceInterface
     {
-        $cacheKey = $websiteId . '_' . $methodCode;
-        if (!array_key_exists($cacheKey, $this->resolvedServices)) {
-            $this->resolvedServices[$cacheKey] = $this->deliveryServiceRepository
-                ->getByWebsiteAndMethod($websiteId, $methodCode);
+        if (!array_key_exists($methodCode, $this->resolvedServices)) {
+            $this->resolvedServices[$methodCode] = $this->deliveryServiceRepository
+                ->getByMethod($methodCode);
         }
 
-        return $this->resolvedServices[$cacheKey];
+        return $this->resolvedServices[$methodCode];
     }
 }

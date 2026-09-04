@@ -30,33 +30,31 @@ class DeliveryServiceResolverTest extends TestCase
 
     public function testResolveForMethodReturnsResolvedService(): void
     {
-        $websiteId = 1;
         $methodCode = 'courier';
         $serviceMock = $this->createStub(DeliveryServiceInterface::class);
 
         $this->repositoryMock->expects($this->once())
-            ->method('getByWebsiteAndMethod')
-            ->with($websiteId, $methodCode)
+            ->method('getByMethod')
+            ->with($methodCode)
             ->willReturn($serviceMock);
 
-        $result = $this->resolver->resolveForMethod($websiteId, $methodCode);
+        $result = $this->resolver->resolveForMethod($methodCode);
 
         $this->assertSame($serviceMock, $result);
     }
 
     public function testResolveForMethodCachesResultInMemory(): void
     {
-        $websiteId = 1;
         $methodCode = 'courier';
         $serviceMock = $this->createStub(DeliveryServiceInterface::class);
 
         $this->repositoryMock->expects($this->once())
-            ->method('getByWebsiteAndMethod')
-            ->with($websiteId, $methodCode)
+            ->method('getByMethod')
+            ->with($methodCode)
             ->willReturn($serviceMock);
 
-        $firstResult = $this->resolver->resolveForMethod($websiteId, $methodCode);
-        $secondResult = $this->resolver->resolveForMethod($websiteId, $methodCode);
+        $firstResult = $this->resolver->resolveForMethod($methodCode);
+        $secondResult = $this->resolver->resolveForMethod($methodCode);
 
         $this->assertSame($serviceMock, $firstResult);
         $this->assertSame($serviceMock, $secondResult);
@@ -64,15 +62,14 @@ class DeliveryServiceResolverTest extends TestCase
 
     public function testResolveForMethodReturnsNullWhenNotFound(): void
     {
-        $websiteId = 1;
         $methodCode = 'unknown';
 
         $this->repositoryMock->expects($this->once())
-            ->method('getByWebsiteAndMethod')
-            ->with($websiteId, $methodCode)
+            ->method('getByMethod')
+            ->with($methodCode)
             ->willReturn(null);
 
-        $result = $this->resolver->resolveForMethod($websiteId, $methodCode);
+        $result = $this->resolver->resolveForMethod($methodCode);
 
         $this->assertNull($result);
     }

@@ -55,7 +55,7 @@ class BookCourierShipment extends Generic implements ButtonProviderInterface
 
         return [
             'label' => __('Order Courier'),
-            'class' => 'action-secondary',
+            'class' => '',
             'on_click' => sprintf(
                 "require(['jquery'], function($) {
                     var modal = $('#ideo-dhl-book-courier-modal');

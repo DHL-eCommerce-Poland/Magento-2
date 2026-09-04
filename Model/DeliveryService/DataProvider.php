@@ -6,7 +6,6 @@ namespace Ideo\Dhl\Model\DeliveryService;
 
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory;
 use Ideo\Dhl\Model\Shipment\DhlShipmentRestrictions;
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 
@@ -22,7 +21,6 @@ class DataProvider extends AbstractDataProvider
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
-     * @param RequestInterface $request
      * @param SerializerInterface $serializer
      * @param array $meta
      * @param array $data
@@ -32,7 +30,6 @@ class DataProvider extends AbstractDataProvider
         string $primaryFieldName,
         string $requestFieldName,
         CollectionFactory $collectionFactory,
-        private readonly RequestInterface $request,
         private readonly SerializerInterface $serializer,
         array $meta = [],
         array $data = []
@@ -69,12 +66,6 @@ class DataProvider extends AbstractDataProvider
                 $data['method_code'] = explode(',', $data['method_code']);
             }
             $this->loadedData[$item->getId()] = $data;
-        }
-
-        // Scope support: if adding a new delivery service, pre-bind website_id from URL parameter
-        $websiteParam = $this->request->getParam('website');
-        if ($websiteParam !== null) {
-            $this->loadedData['']['website_id'] = (int)$websiteParam;
         }
 
         return $this->loadedData;
