@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\CustomsTemplate;
 
 use Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory;
+use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 
@@ -21,6 +22,7 @@ class DataProvider extends AbstractDataProvider
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
      * @param SerializerInterface $serializer
+     * @param File $fileIo
      * @param array $meta
      * @param array $data
      */
@@ -30,6 +32,7 @@ class DataProvider extends AbstractDataProvider
         string $requestFieldName,
         CollectionFactory $collectionFactory,
         private readonly SerializerInterface $serializer,
+        private readonly File $fileIo,
         array $meta = [],
         array $data = []
     ) {
@@ -58,7 +61,8 @@ class DataProvider extends AbstractDataProvider
                 }
             }
             if (!empty($data['invoice_file']) && is_string($data['invoice_file'])) {
-                $fileName = basename($data['invoice_file']);
+                $pathInfo = $this->fileIo->getPathInfo($data['invoice_file']);
+                $fileName = $pathInfo['basename'] ?? '';
                 $data['invoice_file'] = [
                     [
                         'name' => $fileName,
