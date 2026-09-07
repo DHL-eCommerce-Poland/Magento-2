@@ -93,7 +93,10 @@ class CustomsDataBuilder
         $defaultTemplate = $this->templateRepository->getDefaultTemplate();
         if (!$defaultTemplate) {
             throw new LocalizedException(
-                __('No Customs Clearance configuration found for international shipment. Please configure default Customs.')
+                __(
+                    'No Customs Clearance configuration found for international shipment. '
+                    . 'Please configure default Customs.'
+                )
             );
         }
 
@@ -120,7 +123,10 @@ class CustomsDataBuilder
 
         if (empty($base64Invoice)) {
             throw new LocalizedException(
-                __('A VAT Invoice PDF file is required for individual customs clearance (I). Please upload invoice in Customs Template.')
+                __(
+                    'A VAT Invoice PDF file is required for individual customs clearance (I). '
+                    . 'Please upload invoice in Customs Template.'
+                )
             );
         }
 
@@ -157,19 +163,23 @@ class CustomsDataBuilder
         if (is_string($templateItems) && !empty($templateItems)) {
             $decoded = $this->serializer->unserialize($templateItems);
             if (is_array($decoded) && !empty($decoded)) {
-                return array_map(function ($item) use ($template) {
-                    return [
-                        'namePl' => mb_substr((string)($item['namePl'] ?? ''), 0, 35),
-                        'nameEn' => mb_substr((string)($item['nameEn'] ?? ''), 0, 35),
-                        'quantity' => (float)($item['quantity'] ?? 1.0),
-                        'weight' => (float)($item['weight'] ?? 0.0),
-                        'value' => (float)($item['value'] ?? 0.0),
-                        'tariffCode' => mb_substr((string)($item['tariffCode'] ?? ''), 0, 10),
-                        'countryOfOrigin' => (string)(
-                            $item['countryOfOrigin'] ?? $template->getCountryOfOrigin() ?? 'PL'
-                        ),
-                    ];
-                }, $decoded);
+                $defaultTariffCode = (string)($template->getDefaultTariffCode() ?? '');
+                $countryOfOrigin = (string)($template->getCountryOfOrigin() ?: 'PL');
+
+                return array_map(
+                    function ($item) use ($defaultTariffCode, $countryOfOrigin) {
+                        return [
+                            'namePl' => mb_substr((string)($item['namePl'] ?? ''), 0, 35),
+                            'nameEn' => mb_substr((string)($item['nameEn'] ?? ''), 0, 35),
+                            'quantity' => (float)($item['quantity'] ?? 1.0),
+                            'weight' => (float)($item['weight'] ?? 0.0),
+                            'value' => (float)($item['value'] ?? 0.0),
+                            'tariffCode' => mb_substr($defaultTariffCode, 0, 10),
+                            'countryOfOrigin' => $countryOfOrigin,
+                        ];
+                    },
+                    $decoded
+                );
             }
         }
 

@@ -31,7 +31,7 @@ class UpdateStatusShipmentTest extends TestCase
         $this->shipmentRepositoryStub = $this->createStub(ShipmentDataRepositoryInterface::class);
 
         $escaperStub = $this->createStub(Escaper::class);
-        $escaperStub->method('escapeJs')->willReturnCallback(fn(string $str) => addslashes($str));
+        $escaperStub->method('escapeJs')->willReturnCallback(fn (string $str) => addslashes($str));
         $this->contextStub->method('getEscaper')->willReturn($escaperStub);
 
         $this->contextStub->method('getRequest')

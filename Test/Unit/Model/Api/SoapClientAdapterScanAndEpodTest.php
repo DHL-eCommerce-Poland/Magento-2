@@ -17,6 +17,7 @@ class SoapClientAdapterScanAndEpodTest extends TestCase
     private LoggerInterface|Stub $loggerStub;
     private ScopeConfigInterface|Stub $scopeConfigStub;
     private TimezoneInterface|Stub $timezoneStub;
+    private \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer $dateSanitizer;
     private Credentials $credentials;
 
     protected function setUp(): void
@@ -24,6 +25,7 @@ class SoapClientAdapterScanAndEpodTest extends TestCase
         $this->loggerStub = $this->createStub(LoggerInterface::class);
         $this->scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $this->timezoneStub = $this->createStub(TimezoneInterface::class);
+        $this->dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($this->timezoneStub);
         $this->credentials = new Credentials('user', 'pass', true);
     }
 
@@ -32,7 +34,7 @@ class SoapClientAdapterScanAndEpodTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneStub, $this->dateSanitizer])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -52,7 +54,7 @@ class SoapClientAdapterScanAndEpodTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneStub, $this->dateSanitizer])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -72,7 +74,7 @@ class SoapClientAdapterScanAndEpodTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneStub, $this->dateSanitizer])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -92,7 +94,7 @@ class SoapClientAdapterScanAndEpodTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneStub])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneStub, $this->dateSanitizer])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 

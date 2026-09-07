@@ -27,7 +27,7 @@ class CategoryOfItem implements OptionSourceInterface
             ['value' => self::CATEGORY_OTHER, 'label' => __('Other (9)')],
             ['value' => self::CATEGORY_RETURN_OF_GOODS, 'label' => __('Return of Goods (21)')],
             ['value' => self::CATEGORY_GIFT, 'label' => __('Gift (31)')],
-            ['value' => self::CATEGORY_COMMERCIAL_SAMPLES, 'label' => __('Commercial Samples (32)')],
+            ['value' => self::CATEGORY_COMMERCIAL_SAMPLES, 'label' => __('Patterns and Samples (32)')],
             ['value' => self::CATEGORY_DOCUMENTS, 'label' => __('Documents (91)')],
         ];
     }

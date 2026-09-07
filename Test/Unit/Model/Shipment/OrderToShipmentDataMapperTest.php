@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
+use DateTime;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use Ideo\Dhl\Model\Shipment\OrderWeightAggregator;
 use Ideo\Dhl\Model\Shipment\StreetAddressParser;
 use Ideo\Dhl\Model\Template\TemplateVariableResolver;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\Order\Payment;
-use DateTime;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 

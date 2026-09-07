@@ -13,7 +13,6 @@ use Ideo\Dhl\Model\Api\GetLabelsResult;
 use Ideo\Dhl\Model\Shipment\LabelPrintingService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 

@@ -22,7 +22,7 @@ class ServiceCodeTest extends TestCase
         self::assertSame('PR', $options[4]['value']);
         self::assertSame('SP', $options[5]['value']);
         self::assertSame('EK', $options[6]['value']);
-        self::assertSame('EKSP', $options[7]['value']);
+        self::assertSame('EKS', $options[7]['value']);
         self::assertSame('CP', $options[8]['value']);
         self::assertSame('CM', $options[9]['value']);
     }

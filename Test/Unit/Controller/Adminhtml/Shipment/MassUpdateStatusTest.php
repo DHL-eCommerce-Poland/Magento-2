@@ -10,7 +10,6 @@ use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
 use Ideo\Dhl\Model\Shipment\ShipmentTrackingService;
 use Ideo\Dhl\Model\ShipmentData;
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Message\ManagerInterface;

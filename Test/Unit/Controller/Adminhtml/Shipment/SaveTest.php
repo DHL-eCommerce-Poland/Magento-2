@@ -94,7 +94,9 @@ class SaveTest extends TestCase
 
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
         $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
-        $timezoneStub->method('date')->willReturnCallback(fn($d) => new \DateTime((string)$d));
+        $timezoneStub->method('date')->willReturnCallback(fn ($d) => new \DateTime((string)$d));
+
+        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
 
         $this->controller = new Save(
             $this->contextStub,
@@ -103,6 +105,7 @@ class SaveTest extends TestCase
             $this->jsonFactoryStub,
             $serializerStub,
             $timezoneStub,
+            $dateSanitizer,
             $this->loggerStub
         );
     }

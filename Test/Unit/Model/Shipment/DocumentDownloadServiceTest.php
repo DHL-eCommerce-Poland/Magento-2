@@ -14,11 +14,11 @@ use Ideo\Dhl\Model\Api\GetScanResult;
 use Ideo\Dhl\Model\Shipment\DocumentDownloadService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
-use PHPUnit\Framework\MockObject\Stub;
-use PHPUnit\Framework\TestCase;
-
 use Magento\Framework\Filesystem;
 use Magento\Shipping\Model\Shipping\LabelGenerator;
+
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 class DocumentDownloadServiceTest extends TestCase

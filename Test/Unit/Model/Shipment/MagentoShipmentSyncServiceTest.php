@@ -6,22 +6,22 @@ namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
 use Ideo\Dhl\Model\Carrier;
 use Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService;
+use Magento\Framework\DB\Transaction;
+use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipmentRepositoryInterface;
 use Magento\Sales\Api\ShipmentTrackRepositoryInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Shipment\Sender\EmailSender;
 use Magento\Sales\Model\Order\Item as OrderItemModel;
 use Magento\Sales\Model\Order\Shipment;
-use Magento\Sales\Model\Order\ShipmentFactory;
+use Magento\Sales\Model\Order\Shipment\Sender\EmailSender;
 use Magento\Sales\Model\Order\Shipment\Track;
 use Magento\Sales\Model\Order\Shipment\TrackFactory;
+use Magento\Sales\Model\Order\ShipmentFactory;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Magento\Framework\DB\Transaction;
-use Magento\Framework\DB\TransactionFactory;
 
 #[AllowMockObjectsWithoutExpectations]
 class MagentoShipmentSyncServiceTest extends TestCase

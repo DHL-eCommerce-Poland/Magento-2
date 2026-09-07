@@ -159,12 +159,17 @@
             </formElements>
         </field>
         <field name="currency" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">PLN</item>
+                </item>
+            </argument>
             <settings>
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
                 <dataType>text</dataType>
-                <label translate="true">Currency ISO Code</label>
+                <label translate="true">Currency</label>
                 <notice translate="true">ISO currency code (e.g. PLN, EUR, GBP, USD, CHF)</notice>
                 <dataScope>currency</dataScope>
             </settings>
@@ -179,7 +184,7 @@
         <field name="country_of_origin" formElement="select">
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Default Country Of Origin</label>
+                <label translate="true">Country of Origin (ISO 3166-1 alpha-2)</label>
                 <notice translate="true">Default 2-letter ISO country code if not set on product</notice>
                 <dataScope>country_of_origin</dataScope>
             </settings>
@@ -267,8 +272,8 @@
                 <date>
                     <settings>
                         <options>
-                            <option name="dateFormat" xsi:type="string">yyyy-MM-dd</option>
-                            <option name="outputFormat" xsi:type="string">yyyy-MM-dd</option>
+                            <option name="dateFormat" xsi:type="string">y-MM-dd</option>
+                            <option name="outputFormat" xsi:type="string">y-MM-dd</option>
                         </options>
                     </settings>
                 </date>
@@ -520,30 +525,6 @@
                         <label translate="true">Value</label>
                         <dataScope>value</dataScope>
                     </settings>
-                </field>
-                <field name="tariffCode" formElement="input">
-                    <settings>
-                        <validation>
-                            <rule name="required-entry" xsi:type="boolean">true</rule>
-                        </validation>
-                        <dataType>text</dataType>
-                        <label translate="true">HS Tariff Code</label>
-                        <dataScope>tariffCode</dataScope>
-                    </settings>
-                </field>
-                <field name="countryOfOrigin" formElement="select">
-                    <settings>
-                        <dataType>text</dataType>
-                        <label translate="true">Country Of Origin</label>
-                        <dataScope>countryOfOrigin</dataScope>
-                    </settings>
-                    <formElements>
-                        <select>
-                            <settings>
-                                <options class="Magento\Directory\Model\Config\Source\Country"/>
-                            </settings>
-                        </select>
-                    </formElements>
                 </field>
                 <actionDelete template="Magento_Backend/dynamic-rows/cells/action-delete">
                     <argument name="data" xsi:type="array">

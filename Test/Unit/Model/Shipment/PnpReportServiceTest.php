@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
+use DateTime;
 use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\GetPnpResult;
 use Ideo\Dhl\Model\Shipment\PnpReportService;
+use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
-use PHPUnit\Framework\MockObject\Stub;
-use PHPUnit\Framework\TestCase;
-
-use DateTime;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 class PnpReportServiceTest extends TestCase
@@ -36,13 +37,16 @@ class PnpReportServiceTest extends TestCase
         $this->timezoneMock = $this->createMock(TimezoneInterface::class);
 
         $this->timezoneMock->method('date')
-            ->willReturnCallback(fn($d) => new DateTime($d));
+            ->willReturnCallback(fn ($d) => new DateTime($d));
+
+        $dateSanitizer = new ShipmentDateSanitizer($this->timezoneMock);
 
         $this->service = new PnpReportService(
             $this->clientStub,
             $this->credentialsProviderStub,
             $this->scopeConfigStub,
-            $this->timezoneMock
+            $this->timezoneMock,
+            $dateSanitizer
         );
     }
 

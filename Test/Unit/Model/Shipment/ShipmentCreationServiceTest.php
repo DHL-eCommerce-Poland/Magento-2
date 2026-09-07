@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
-use Exception;
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Ideo\Dhl\Model\Api\ClientInterface;
+use Ideo\Dhl\Model\Api\CreateShipmentsResult;
 use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
-use Ideo\Dhl\Model\Api\CreateShipmentsResult;
 use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Ideo\Dhl\Model\Shipment\ShipmentCreationService;
@@ -17,7 +15,6 @@ use Ideo\Dhl\Model\Shipment\ShipmentDataService;
 use Ideo\Dhl\Model\Shipment\ShipmentDataValidator;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Lock\LockManagerInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;

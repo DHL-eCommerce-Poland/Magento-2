@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Api;
 
+use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Filesystem\Driver\File as FileDriver;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Psr\Log\LoggerInterface;
 use SoapClient;
 use SoapFault;
 use Throwable;
-
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class SoapClientAdapter implements ClientInterface
 {
@@ -24,12 +24,14 @@ class SoapClientAdapter implements ClientInterface
      * @param LoggerInterface $logger
      * @param ScopeConfigInterface $scopeConfig
      * @param TimezoneInterface $timezone
+     * @param ShipmentDateSanitizer $dateSanitizer
      * @param FileDriver|null $fileDriver
      */
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly TimezoneInterface $timezone,
+        private readonly ShipmentDateSanitizer $dateSanitizer,
         private readonly ?FileDriver $fileDriver = null
     ) {
     }
@@ -327,16 +329,7 @@ class SoapClientAdapter implements ClientInterface
                 $cleanPostCode = str_pad($cleanPostCode, 5, '0', STR_PAD_LEFT);
             }
 
-            try {
-                $cleanDate = $this->timezone->date($pickupDate)->format('Y-m-d');
-            } catch (Throwable) {
-                $cleanDate = $this->timezone->scopeDate()->format('Y-m-d');
-            }
-
-            $year = (int) substr($cleanDate, 0, 4);
-            if ($year < 2024 || $year > 2050) {
-                $cleanDate = $this->timezone->scopeDate()->format('Y-m-d');
-            }
+            $cleanDate = $this->dateSanitizer->sanitize($pickupDate);
 
             $params = [
                 'authData' => [
@@ -450,16 +443,7 @@ class SoapClientAdapter implements ClientInterface
 
             $formattedShipmentIds = array_map([$this, 'ensureUtf8'], array_values($shipmentIds));
 
-            try {
-                $cleanDate = $this->timezone->date($pickupDate)->format('Y-m-d');
-            } catch (Throwable) {
-                $cleanDate = $this->timezone->scopeDate()->format('Y-m-d');
-            }
-
-            $year = (int) substr($cleanDate, 0, 4);
-            if ($year < 2024 || $year > 2050) {
-                $cleanDate = $this->timezone->scopeDate()->format('Y-m-d');
-            }
+            $cleanDate = $this->dateSanitizer->sanitize($pickupDate);
 
             $params = [
                 'authData' => [

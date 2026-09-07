@@ -81,7 +81,7 @@ class RedirectNativeViewPluginTest extends TestCase
             ->with('http://example.com/admin/dhlparcel/shipment/edit/entity_id/3');
 
         $subject = $this->createMock(NativeShipmentViewController::class);
-        $proceed = fn() => $this->fail('Proceed should not be called when redirecting');
+        $proceed = fn () => $this->fail('Proceed should not be called when redirecting');
 
         $result = $this->plugin->aroundExecute($subject, $proceed);
 

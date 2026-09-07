@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
+use DateTime;
 use Ideo\Dhl\Model\Shipment\Data\PackageData;
 use Ideo\Dhl\Model\Shipment\Data\RecipientData;
 use Ideo\Dhl\Model\Shipment\Data\SenderData;
@@ -11,11 +12,10 @@ use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Ideo\Dhl\Model\Shipment\ShipmentDataValidator;
 use Magento\Framework\Exception\LocalizedException;
-use PHPUnit\Framework\TestCase;
 
-use DateTime;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 class ShipmentDataValidatorTest extends TestCase

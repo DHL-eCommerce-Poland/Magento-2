@@ -51,7 +51,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
             ->method('addButton')
             ->with(
                 'dhlparcel_prepare_shipment',
-                $this->callback(fn($arg) => is_array($arg) && isset($arg['label'])),
+                $this->callback(fn ($arg) => is_array($arg) && isset($arg['label'])),
                 0,
                 95
             );

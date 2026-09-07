@@ -49,13 +49,16 @@ class DataProviderTest extends TestCase
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
         $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
 
+        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+
         $dataProvider = new DataProvider(
             'dhlparcel_shipment_form_data_source',
             'entity_id',
             'entity_id',
             $collectionFactory,
             $serializer,
-            $timezoneStub
+            $timezoneStub,
+            $dateSanitizer
         );
 
         $data = $dataProvider->getData();

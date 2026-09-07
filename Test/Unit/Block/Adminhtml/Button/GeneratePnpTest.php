@@ -15,7 +15,7 @@ class GeneratePnpTest extends TestCase
     {
         $contextStub = $this->createStub(Context::class);
         $escaperStub = $this->createStub(Escaper::class);
-        $escaperStub->method('escapeJs')->willReturnCallback(fn(string $str) => addslashes($str));
+        $escaperStub->method('escapeJs')->willReturnCallback(fn (string $str) => addslashes($str));
 
         $button = new GeneratePnp($contextStub, $escaperStub);
         $data = $button->getButtonData();

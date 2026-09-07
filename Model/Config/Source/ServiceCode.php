@@ -23,7 +23,7 @@ class ServiceCode implements OptionSourceInterface
             ['value' => 'PR', 'label' => __('PR - Premium Shipment')],
             ['value' => 'SP', 'label' => __('SP - Domestic Service Point Delivery')],
             ['value' => 'EK', 'label' => __('EK - Connect Shipment')],
-            ['value' => 'EKSP', 'label' => __('EKSP - International Service Point Delivery')],
+            ['value' => 'EKS', 'label' => __('EKS - International Service Point Delivery')],
             ['value' => 'CP', 'label' => __('CP - Connect Plus Shipment')],
             ['value' => 'CM', 'label' => __('CM - Connect Plus Pallet Shipment')],
         ];

@@ -26,6 +26,7 @@ class DataProvider extends AbstractDataProvider
      * @param CollectionFactory $collectionFactory
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
+     * @param ShipmentDateSanitizer $dateSanitizer
      * @param LoggerInterface|null $logger
      * @param array $meta
      * @param array $data
@@ -37,6 +38,7 @@ class DataProvider extends AbstractDataProvider
         CollectionFactory $collectionFactory,
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
+        private readonly ShipmentDateSanitizer $dateSanitizer,
         private readonly ?LoggerInterface $logger = null,
         array $meta = [],
         array $data = []
@@ -230,9 +232,8 @@ class DataProvider extends AbstractDataProvider
         }
 
         $today = $this->timezone->scopeDate()->format('Y-m-d');
-        $rawDate = $settings['shipmentDate'] ?? null;
-        $finalDate = (empty($rawDate) || $rawDate < $today) ? $today : $rawDate;
-        $settings['shipmentDate'] = $finalDate;
+        $rawDate = (string)($settings['shipmentDate'] ?? '');
+        $settings['shipmentDate'] = $this->dateSanitizer->sanitize($rawDate, $today);
 
         if (!empty($settings['pickupHourFrom'])) {
             $settings['pickupHourFrom'] = substr((string)$settings['pickupHourFrom'], 0, 5);

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\CreateShipmentsResult;
+use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Lock\LockManagerInterface;
 use Magento\Framework\Serialize\SerializerInterface;
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 

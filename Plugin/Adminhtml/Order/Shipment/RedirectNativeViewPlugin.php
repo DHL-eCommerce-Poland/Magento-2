@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Plugin\Adminhtml\Order\Shipment;
 
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
+use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
-use Magento\Backend\Model\UrlInterface;
 use Magento\Sales\Controller\Adminhtml\Shipment\View as NativeShipmentViewController;
 use Psr\Log\LoggerInterface;
 use Throwable;

@@ -7,6 +7,7 @@ namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
 use Exception;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Ideo\Dhl\Model\Shipment\ShipmentCreationService;
+use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
 use InvalidArgumentException;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -18,7 +19,6 @@ use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Psr\Log\LoggerInterface;
-use Throwable;
 
 class Save extends Action implements HttpPostActionInterface
 {
@@ -34,6 +34,7 @@ class Save extends Action implements HttpPostActionInterface
      * @param JsonFactory $jsonFactory
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
+     * @param ShipmentDateSanitizer $dateSanitizer
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -43,6 +44,7 @@ class Save extends Action implements HttpPostActionInterface
         private readonly JsonFactory $jsonFactory,
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
+        private readonly ShipmentDateSanitizer $dateSanitizer,
         private readonly ?LoggerInterface $logger = null
     ) {
         parent::__construct($context);
@@ -96,31 +98,17 @@ class Save extends Action implements HttpPostActionInterface
         if (isset($payload['shipmentSettings']) && is_array($payload['shipmentSettings'])) {
             $today = $this->timezone->scopeDate()->format('Y-m-d');
             $rawDate = trim((string)($payload['shipmentSettings']['shipmentDate'] ?? ''));
+            $finalDate = $this->dateSanitizer->sanitize($rawDate, $today);
 
-            if (!empty($rawDate)) {
-                try {
-                    $parsedDate = $this->timezone->date($rawDate)->format('Y-m-d');
-                } catch (Throwable) {
-                    $msg = __('Invalid shipment date format provided.');
-                    if ($isAjax) {
-                        return $resultJson->setData(['success' => false, 'message' => (string) $msg]);
-                    }
-                    $this->messageManager->addErrorMessage($msg);
-                    return $this->resultRedirectFactory->create()->setPath('*/*/index');
+            if (!empty($rawDate) && $finalDate < $today) {
+                $msg = __('Shipment date cannot be in the past.');
+                if ($isAjax) {
+                    return $resultJson->setData(['success' => false, 'message' => (string) $msg]);
                 }
-
-                if ($parsedDate < $today) {
-                    $msg = __('Shipment date cannot be in the past.');
-                    if ($isAjax) {
-                        return $resultJson->setData(['success' => false, 'message' => (string) $msg]);
-                    }
-                    $this->messageManager->addErrorMessage($msg);
-                    return $this->resultRedirectFactory->create()->setPath('*/*/index');
-                }
-                $finalDate = $parsedDate;
-            } else {
-                $finalDate = $today;
+                $this->messageManager->addErrorMessage($msg);
+                return $this->resultRedirectFactory->create()->setPath('*/*/index');
             }
+
             $payload['shipmentSettings']['shipmentDate'] = $finalDate;
 
             if (!empty($payload['shipmentSettings']['pickupHourFrom'])) {

@@ -204,7 +204,7 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $sender = new SenderData();
         $specialServices = new SpecialServicesData();
-        $settings = new ShipmentSettingsData(serviceType: 'EKSP', packages: [new PackageData()]);
+        $settings = new ShipmentSettingsData(serviceType: 'EKS', packages: [new PackageData()]);
 
         $shipmentData = new DhlShipmentData(
             orderId: 102,

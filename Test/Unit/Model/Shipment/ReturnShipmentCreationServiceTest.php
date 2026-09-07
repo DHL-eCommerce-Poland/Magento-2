@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
 use Ideo\Dhl\Model\Api\ClientInterface;
+use Ideo\Dhl\Model\Api\CreateShipmentReturnResult;
 use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
-use Ideo\Dhl\Model\Api\CreateShipmentReturnResult;
 use Ideo\Dhl\Model\Api\ShipmentReturnDataMapper;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService;

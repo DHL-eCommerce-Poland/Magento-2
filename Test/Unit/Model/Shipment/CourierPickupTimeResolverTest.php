@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
+use DateTime;
 use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\PostalCodeServicesResult;
 use Ideo\Dhl\Model\Shipment\CourierPickupTimeResolver;
+use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
-
-use DateTime;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
 #[AllowMockObjectsWithoutExpectations]
 class CourierPickupTimeResolverTest extends TestCase
@@ -35,15 +36,18 @@ class CourierPickupTimeResolverTest extends TestCase
             ->willReturn(new DateTime('today'));
 
         $this->timezoneMock->method('date')
-            ->willReturnCallback(fn($d) => new DateTime((string)$d));
+            ->willReturnCallback(fn ($d) => new DateTime((string)$d));
 
         $this->credentialsProviderStub->method('getCredentials')
             ->willReturn(new Credentials('user', 'pass', true));
 
+        $dateSanitizer = new ShipmentDateSanitizer($this->timezoneMock);
+
         $this->resolver = new CourierPickupTimeResolver(
             $this->clientMock,
             $this->credentialsProviderStub,
-            $this->timezoneMock
+            $this->timezoneMock,
+            $dateSanitizer
         );
     }
 

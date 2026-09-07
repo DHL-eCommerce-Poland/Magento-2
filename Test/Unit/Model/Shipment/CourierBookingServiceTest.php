@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
+use DateTime;
 use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Model\Api\ClientInterface;
@@ -12,11 +13,10 @@ use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Shipment\CourierBookingService;
 use Magento\Framework\Exception\LocalizedException;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
-use DateTime;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -36,7 +36,7 @@ class CourierBookingServiceTest extends TestCase
         $this->timezoneMock = $this->createMock(TimezoneInterface::class);
 
         $this->timezoneMock->method('date')
-            ->willReturnCallback(fn($d) => new DateTime($d));
+            ->willReturnCallback(fn ($d) => new DateTime($d));
 
         $this->credentialsProviderStub->method('getCredentials')
             ->willReturn(new Credentials('user', 'pass', true));

@@ -11,7 +11,6 @@ use Ideo\Dhl\Model\Config\Source\PnpPackageType;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
-use Throwable;
 
 class PnpReportService
 {
@@ -29,12 +28,14 @@ class PnpReportService
      * @param CredentialsProvider $credentialsProvider
      * @param ScopeConfigInterface $scopeConfig
      * @param TimezoneInterface $timezone
+     * @param ShipmentDateSanitizer $dateSanitizer
      */
     public function __construct(
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly TimezoneInterface $timezone
+        private readonly TimezoneInterface $timezone,
+        private readonly ShipmentDateSanitizer $dateSanitizer
     ) {
     }
 
@@ -55,12 +56,11 @@ class PnpReportService
         if (empty($date)) {
             throw new LocalizedException(__('Invalid date format. Please specify date in YYYY-MM-DD format.'));
         }
-        try {
-            $dt = $this->timezone->date($date);
-            $date = $dt->format('Y-m-d');
-        } catch (Throwable) {
+        $sanitizedDate = $this->dateSanitizer->sanitize($date, 'INVALID', true);
+        if ($sanitizedDate === 'INVALID') {
             throw new LocalizedException(__('Invalid date format. Please specify date in YYYY-MM-DD format.'));
         }
+        $date = $sanitizedDate;
 
         if (!in_array($typePackage, self::ALLOWED_PACKAGE_TYPES, true)) {
             throw new LocalizedException(__('Invalid package type specified for courier report.'));

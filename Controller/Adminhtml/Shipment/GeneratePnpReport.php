@@ -12,6 +12,7 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Throwable;
 
@@ -72,6 +73,9 @@ class GeneratePnpReport extends Action implements HttpGetActionInterface, HttpPo
                 'tmp',
                 $reportData['mimeType']
             );
+        } catch (LocalizedException $e) {
+            $this->messageManager->addErrorMessage($e->getMessage());
+            return $resultRedirect->setPath('*/*/index');
         } catch (Throwable $e) {
             $this->messageManager->addErrorMessage(
                 __('Could not generate courier report: %1', $e->getMessage())

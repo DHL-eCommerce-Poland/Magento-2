@@ -27,9 +27,7 @@ class CustomsDataBuilderTest extends TestCase
                 'namePl' => 'Custom T-Shirt Pl',
                 'quantity' => 2,
                 'weight' => 0.5,
-                'value' => 49.99,
-                'tariffCode' => '61091000',
-                'countryOfOrigin' => 'DE'
+                'value' => 49.99
             ]
         ];
 
@@ -38,6 +36,7 @@ class CustomsDataBuilderTest extends TestCase
         $templateMock->method('getCurrency')->willReturn('USD');
         $templateMock->method('getCategoryOfItem')->willReturn('11');
         $templateMock->method('getCountryOfOrigin')->willReturn('PL');
+        $templateMock->method('getDefaultTariffCode')->willReturn('61091000');
         $templateMock->method('getCostsOfShipment')->willReturn(16.00);
         $templateMock->method('getGrossWeight')->willReturn(1.0);
         $templateMock->method('getContactFirstName')->willReturn('John');
@@ -79,7 +78,7 @@ class CustomsDataBuilderTest extends TestCase
         $this->assertSame(0.5, $customsData['customsItem'][0]['weight']);
         $this->assertSame(49.99, $customsData['customsItem'][0]['value']);
         $this->assertSame('61091000', $customsData['customsItem'][0]['tariffCode']);
-        $this->assertSame('DE', $customsData['customsItem'][0]['countryOfOrigin']);
+        $this->assertSame('PL', $customsData['customsItem'][0]['countryOfOrigin']);
 
         $this->assertTrue($customsData['customAgreements']['notExceedValue']);
         $this->assertTrue($customsData['customAgreements']['notProhibitedGoods']);
@@ -147,9 +146,7 @@ class CustomsDataBuilderTest extends TestCase
                 'namePl' => 'Sample Product Pl',
                 'quantity' => 1,
                 'weight' => 1.0,
-                'value' => 100.0,
-                'tariffCode' => '12345678',
-                'countryOfOrigin' => 'PL'
+                'value' => 100.0
             ]
         ];
 
@@ -158,6 +155,7 @@ class CustomsDataBuilderTest extends TestCase
         $templateMock->method('getCurrency')->willReturn('EUR');
         $templateMock->method('getCategoryOfItem')->willReturn('11');
         $templateMock->method('getCountryOfOrigin')->willReturn('PL');
+        $templateMock->method('getDefaultTariffCode')->willReturn('12345678');
         $templateMock->method('getShipperEori')->willReturn('PL9999999999');
         $templateMock->method('getShipperNip')->willReturn('9999999999');
         $templateMock->method('getReceiverVatNo')->willReturn('DE987654321');
@@ -205,6 +203,7 @@ class CustomsDataBuilderTest extends TestCase
         $templateMock->method('getCurrency')->willReturn('EUR');
         $templateMock->method('getCategoryOfItem')->willReturn('11');
         $templateMock->method('getCountryOfOrigin')->willReturn('PL');
+        $templateMock->method('getDefaultTariffCode')->willReturn('11223344');
         $templateMock->method('getCostsOfShipment')->willReturn(25.00);
         $templateMock->method('getGrossWeight')->willReturn(3.5);
         $templateMock->method('getContactFirstName')->willReturn('ContactFirst');
@@ -222,9 +221,7 @@ class CustomsDataBuilderTest extends TestCase
                 'namePl' => 'Preset Goods Pl',
                 'quantity' => 5,
                 'weight' => 2.0,
-                'value' => 50.0,
-                'tariffCode' => '11223344',
-                'countryOfOrigin' => 'DE'
+                'value' => 50.0
             ]
         ];
         $templateMock->method('getCustomsItems')->willReturn(json_encode($presetItems));
@@ -256,6 +253,6 @@ class CustomsDataBuilderTest extends TestCase
         $this->assertSame(2.0, $customsData['customsItem'][0]['weight']);
         $this->assertSame(50.0, $customsData['customsItem'][0]['value']);
         $this->assertSame('11223344', $customsData['customsItem'][0]['tariffCode']);
-        $this->assertSame('DE', $customsData['customsItem'][0]['countryOfOrigin']);
+        $this->assertSame('PL', $customsData['customsItem'][0]['countryOfOrigin']);
     }
 }

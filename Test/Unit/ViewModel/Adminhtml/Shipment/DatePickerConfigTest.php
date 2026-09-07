@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\ViewModel\Adminhtml\Shipment;
 
 use DateTime;
-use IntlDateFormatter;
 use Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig;
+use IntlDateFormatter;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

@@ -77,6 +77,17 @@
                     </callback>
                 </settings>
             </action>
+            <action name="cancel_courier">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to cancel courier booking for the selected shipments?</message>
+                        <title translate="true">Cancel Courier Booking</title>
+                    </confirm>
+                    <url path="dhlparcel/shipment/massCancelCourierBooking"/>
+                    <type>cancel_courier</type>
+                    <label translate="true">Cancel Courier Booking</label>
+                </settings>
+            </action>
             <action name="delete">
                 <settings>
                     <confirm>

@@ -8,17 +8,17 @@ namespace Ideo\Dhl\Model\Shipment;
 
 use Exception;
 use Ideo\Dhl\Model\Carrier;
+use Magento\Framework\DB\TransactionFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipmentRepositoryInterface;
 use Magento\Sales\Api\ShipmentTrackRepositoryInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Shipment\Sender\EmailSender;
 use Magento\Sales\Model\Order\Shipment;
-use Magento\Sales\Model\Order\ShipmentFactory;
+use Magento\Sales\Model\Order\Shipment\Sender\EmailSender;
 use Magento\Sales\Model\Order\Shipment\TrackFactory;
-use Magento\Framework\DB\TransactionFactory;
+use Magento\Sales\Model\Order\ShipmentFactory;
 use Psr\Log\LoggerInterface;
 
 class MagentoShipmentSyncService

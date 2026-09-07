@@ -58,7 +58,7 @@ class DataProvider extends AbstractDataProvider
                 }
             }
             if (!empty($data['invoice_file']) && is_string($data['invoice_file'])) {
-                $fileName = pathinfo($data['invoice_file'], PATHINFO_BASENAME);
+                $fileName = basename($data['invoice_file']);
                 $data['invoice_file'] = [
                     [
                         'name' => $fileName,

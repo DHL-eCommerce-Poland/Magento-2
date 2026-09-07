@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
-use Exception;
 use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
