@@ -23,7 +23,7 @@ class ShipmentDataValidatorTest extends TestCase
     /**
      * @var ShipmentDataValidator
      */
-    private ShipmentDataValidator $validator;
+    private $validator;
 
     protected function setUp(): void
     {
@@ -173,7 +173,9 @@ class ShipmentDataValidatorTest extends TestCase
         );
 
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('Only single-piece (1 package) shipments are allowed for ServicePoint, Return, or POP point deliveries.');
+        $this->expectExceptionMessage(
+            'Only single-piece (1 package) shipments are allowed for ServicePoint, Return, or POP point deliveries.'
+        );
         $this->validator->validate($shipmentData);
     }
 
@@ -213,7 +215,9 @@ class ShipmentDataValidatorTest extends TestCase
         );
 
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('Non-standard (NST) packages are not allowed for ServicePoint, Return, or POP point deliveries.');
+        $this->expectExceptionMessage(
+            'Non-standard (NST) packages are not allowed for ServicePoint, Return, or POP point deliveries.'
+        );
         $this->validator->validate($shipmentData);
     }
 
@@ -291,7 +295,14 @@ class ShipmentDataValidatorTest extends TestCase
     public function testValidatePickupHourFromLaterThanToThrowsException(): void
     {
         $sender = new SenderData(name: 'S', street: 'St', houseNumber: '1', postalCode: '00-000', city: 'C');
-        $recipient = new RecipientData(firstName: 'J', lastName: 'K', street: 'St', houseNumber: '2', postalCode: '00-000', city: 'C');
+        $recipient = new RecipientData(
+            firstName: 'J',
+            lastName: 'K',
+            street: 'St',
+            houseNumber: '2',
+            postalCode: '00-000',
+            city: 'C',
+        );
         $packages = [new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 1.0)];
         $settings = new ShipmentSettingsData(
             serviceType: 'AH',
@@ -301,7 +312,12 @@ class ShipmentDataValidatorTest extends TestCase
             packages: $packages
         );
 
-        $shipmentData = new DhlShipmentData(orderId: 1, sender: $sender, recipient: $recipient, shipmentSettings: $settings);
+        $shipmentData = new DhlShipmentData(
+            orderId: 1,
+            sender: $sender,
+            recipient: $recipient,
+            shipmentSettings: $settings,
+        );
 
         $this->expectException(LocalizedException::class);
         $this->expectExceptionMessage('Courier Pickup Time [From] must be earlier than Pickup Time [To].');

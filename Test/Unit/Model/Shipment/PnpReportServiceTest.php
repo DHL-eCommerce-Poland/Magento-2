@@ -23,11 +23,26 @@ use PHPUnit\Framework\TestCase;
 #[AllowMockObjectsWithoutExpectations]
 class PnpReportServiceTest extends TestCase
 {
-    private ClientInterface|Stub $clientStub;
-    private CredentialsProvider|Stub $credentialsProviderStub;
-    private ScopeConfigInterface|Stub $scopeConfigStub;
-    private TimezoneInterface|MockObject $timezoneMock;
-    private PnpReportService $service;
+    /**
+     * @var Stub
+     */
+    private $clientStub;
+    /**
+     * @var Stub
+     */
+    private $credentialsProviderStub;
+    /**
+     * @var Stub
+     */
+    private $scopeConfigStub;
+    /**
+     * @var MockObject
+     */
+    private $timezoneMock;
+    /**
+     * @var PnpReportService
+     */
+    private $service;
 
     protected function setUp(): void
     {

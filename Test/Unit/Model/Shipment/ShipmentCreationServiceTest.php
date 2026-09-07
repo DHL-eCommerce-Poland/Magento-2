@@ -27,52 +27,52 @@ class ShipmentCreationServiceTest extends TestCase
     /**
      * @var ShipmentDataService|MockObject
      */
-    private ShipmentDataService|MockObject $shipmentDataServiceMock;
+    private $shipmentDataServiceMock;
 
     /**
      * @var ShipmentDataValidator|MockObject
      */
-    private ShipmentDataValidator|MockObject $validatorStub;
+    private $validatorStub;
 
     /**
      * @var ShipmentFullDataMapper|MockObject
      */
-    private ShipmentFullDataMapper|MockObject $mapperStub;
+    private $mapperStub;
 
     /**
      * @var CredentialsProvider|MockObject
      */
-    private CredentialsProvider|MockObject $credentialsProviderStub;
+    private $credentialsProviderStub;
 
     /**
      * @var ClientInterface|MockObject
      */
-    private ClientInterface|MockObject $clientStub;
+    private $clientStub;
 
     /**
      * @var LockManagerInterface|MockObject
      */
-    private LockManagerInterface|MockObject $lockManagerMock;
+    private $lockManagerMock;
 
     /**
      * @var ResourceConnection|MockObject
      */
-    private ResourceConnection|MockObject $resourceConnectionStub;
+    private $resourceConnectionStub;
 
     /**
      * @var AdapterInterface|MockObject
      */
-    private AdapterInterface|MockObject $dbAdapterStub;
+    private $dbAdapterStub;
 
     /**
      * @var LoggerInterface|MockObject
      */
-    private LoggerInterface|MockObject $loggerStub;
+    private $loggerStub;
 
     /**
      * @var ShipmentCreationService
      */
-    private ShipmentCreationService $service;
+    private $service;
 
     protected function setUp(): void
     {

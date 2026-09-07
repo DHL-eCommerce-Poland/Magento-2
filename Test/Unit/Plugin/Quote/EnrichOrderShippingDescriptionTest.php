@@ -18,17 +18,17 @@ class EnrichOrderShippingDescriptionTest extends TestCase
     /**
      * @var ServicePointValidator
      */
-    private ServicePointValidator $validator;
+    private $validator;
 
     /**
      * @var ServicePointDescriptionFormatter
      */
-    private ServicePointDescriptionFormatter $formatter;
+    private $formatter;
 
     /**
      * @var EnrichOrderShippingDescription
      */
-    private EnrichOrderShippingDescription $plugin;
+    private $plugin;
 
     protected function setUp(): void
     {

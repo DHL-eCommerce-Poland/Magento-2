@@ -14,11 +14,26 @@ use Psr\Log\LoggerInterface;
 
 class SoapClientAdapterScanAndEpodTest extends TestCase
 {
-    private LoggerInterface|Stub $loggerStub;
-    private ScopeConfigInterface|Stub $scopeConfigStub;
-    private TimezoneInterface|Stub $timezoneStub;
-    private \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer $dateSanitizer;
-    private Credentials $credentials;
+    /**
+     * @var Stub
+     */
+    private $loggerStub;
+    /**
+     * @var Stub
+     */
+    private $scopeConfigStub;
+    /**
+     * @var Stub
+     */
+    private $timezoneStub;
+    /**
+     * @var \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer
+     */
+    private $dateSanitizer;
+    /**
+     * @var Credentials
+     */
+    private $credentials;
 
     protected function setUp(): void
     {

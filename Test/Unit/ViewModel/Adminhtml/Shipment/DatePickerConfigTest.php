@@ -16,12 +16,12 @@ class DatePickerConfigTest extends TestCase
     /**
      * @var TimezoneInterface|MockObject
      */
-    private TimezoneInterface|MockObject $localeDateMock;
+    private $localeDateMock;
 
     /**
      * @var DatePickerConfig
      */
-    private DatePickerConfig $viewModel;
+    private $viewModel;
 
     protected function setUp(): void
     {

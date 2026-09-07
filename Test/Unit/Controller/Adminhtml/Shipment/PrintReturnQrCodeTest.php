@@ -18,14 +18,38 @@ use PHPUnit\Framework\TestCase;
 
 class PrintReturnQrCodeTest extends TestCase
 {
-    private Context|Stub $contextStub;
-    private RequestInterface|Stub $requestStub;
-    private RedirectFactory|Stub $redirectFactoryStub;
-    private Redirect|Stub $redirectStub;
-    private ManagerInterface|Stub $messageManagerStub;
-    private LabelPrintingService|Stub $labelPrintingServiceStub;
-    private FileFactory|Stub $fileFactoryStub;
-    private PrintReturnQrCode $controller;
+    /**
+     * @var Stub
+     */
+    private $contextStub;
+    /**
+     * @var Stub
+     */
+    private $requestStub;
+    /**
+     * @var Stub
+     */
+    private $redirectFactoryStub;
+    /**
+     * @var Stub
+     */
+    private $redirectStub;
+    /**
+     * @var Stub
+     */
+    private $messageManagerStub;
+    /**
+     * @var Stub
+     */
+    private $labelPrintingServiceStub;
+    /**
+     * @var Stub
+     */
+    private $fileFactoryStub;
+    /**
+     * @var PrintReturnQrCode
+     */
+    private $controller;
 
     protected function setUp(): void
     {

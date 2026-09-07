@@ -22,13 +22,37 @@ class ShipmentActionsTest extends TestCase
             ->method('getUrl')
             ->willReturnMap([
                 ['dhlparcel/shipment/edit', ['entity_id' => 10], 'http://example.com/dhl/shipment/edit/entity_id/10'],
-                ['dhlparcel/shipment/printLabel', ['entity_id' => 10], 'http://example.com/dhl/shipment/printLabel/entity_id/10'],
-                ['dhlparcel/shipment/createReturnShipment', ['entity_id' => 10], 'http://example.com/dhl/shipment/createReturnShipment/entity_id/10'],
-                ['dhlparcel/shipment/downloadScan', ['entity_id' => 10], 'http://example.com/dhl/shipment/downloadScan/entity_id/10'],
-                ['dhlparcel/shipment/downloadEpod', ['entity_id' => 10], 'http://example.com/dhl/shipment/downloadEpod/entity_id/10'],
-                ['dhlparcel/shipment/updateStatus', ['entity_id' => 10], 'http://example.com/dhl/shipment/updateStatus/entity_id/10'],
+                [
+                    'dhlparcel/shipment/printLabel',
+                    ['entity_id' => 10],
+                    'http://example.com/dhl/shipment/printLabel/entity_id/10',
+                ],
+                [
+                    'dhlparcel/shipment/createReturnShipment',
+                    ['entity_id' => 10],
+                    'http://example.com/dhl/shipment/createReturnShipment/entity_id/10',
+                ],
+                [
+                    'dhlparcel/shipment/downloadScan',
+                    ['entity_id' => 10],
+                    'http://example.com/dhl/shipment/downloadScan/entity_id/10',
+                ],
+                [
+                    'dhlparcel/shipment/downloadEpod',
+                    ['entity_id' => 10],
+                    'http://example.com/dhl/shipment/downloadEpod/entity_id/10',
+                ],
+                [
+                    'dhlparcel/shipment/updateStatus',
+                    ['entity_id' => 10],
+                    'http://example.com/dhl/shipment/updateStatus/entity_id/10',
+                ],
                 ['sales/order/view', ['order_id' => 100], 'http://example.com/sales/order/view/order_id/100'],
-                ['dhlparcel/shipment/delete', ['entity_id' => 10], 'http://example.com/dhl/shipment/delete/entity_id/10'],
+                [
+                    'dhlparcel/shipment/delete',
+                    ['entity_id' => 10],
+                    'http://example.com/dhl/shipment/delete/entity_id/10',
+                ],
             ]);
 
         $actionColumn = new ShipmentActions(
@@ -62,13 +86,22 @@ class ShipmentActionsTest extends TestCase
         $this->assertEquals('http://example.com/dhl/shipment/printLabel/entity_id/10', $actions['print_label']['href']);
         $this->assertEquals('Print Label', (string)$actions['print_label']['label']);
 
-        $this->assertEquals('http://example.com/dhl/shipment/createReturnShipment/entity_id/10', $actions['create_return']['href']);
+        $this->assertEquals(
+            'http://example.com/dhl/shipment/createReturnShipment/entity_id/10',
+            $actions['create_return']['href']
+        );
         $this->assertEquals('Create Return Shipment', (string)$actions['create_return']['label']);
 
-        $this->assertEquals('http://example.com/dhl/shipment/downloadScan/entity_id/10', $actions['download_scan']['href']);
+        $this->assertEquals(
+            'http://example.com/dhl/shipment/downloadScan/entity_id/10',
+            $actions['download_scan']['href']
+        );
         $this->assertEquals('Download Scan', (string)$actions['download_scan']['label']);
 
-        $this->assertEquals('http://example.com/dhl/shipment/downloadEpod/entity_id/10', $actions['download_epod']['href']);
+        $this->assertEquals(
+            'http://example.com/dhl/shipment/downloadEpod/entity_id/10',
+            $actions['download_epod']['href']
+        );
         $this->assertEquals('Download ePOD', (string)$actions['download_epod']['label']);
 
         $this->assertEquals('http://example.com/sales/order/view/order_id/100', $actions['view_order']['href']);
@@ -88,12 +121,36 @@ class ShipmentActionsTest extends TestCase
             ->method('getUrl')
             ->willReturnMap([
                 ['dhlparcel/shipment/edit', ['entity_id' => 15], 'http://example.com/dhl/shipment/edit/entity_id/15'],
-                ['dhlparcel/shipment/printLabel', ['entity_id' => 15], 'http://example.com/dhl/shipment/printLabel/entity_id/15'],
-                ['dhlparcel/shipment/createReturnShipment', ['entity_id' => 15], 'http://example.com/dhl/shipment/createReturnShipment/entity_id/15'],
-                ['dhlparcel/shipment/downloadScan', ['entity_id' => 15], 'http://example.com/dhl/shipment/downloadScan/entity_id/15'],
-                ['dhlparcel/shipment/downloadEpod', ['entity_id' => 15], 'http://example.com/dhl/shipment/downloadEpod/entity_id/15'],
-                ['dhlparcel/shipment/updateStatus', ['entity_id' => 15], 'http://example.com/dhl/shipment/updateStatus/entity_id/15'],
-                ['dhlparcel/shipment/delete', ['entity_id' => 15], 'http://example.com/dhl/shipment/delete/entity_id/15'],
+                [
+                    'dhlparcel/shipment/printLabel',
+                    ['entity_id' => 15],
+                    'http://example.com/dhl/shipment/printLabel/entity_id/15',
+                ],
+                [
+                    'dhlparcel/shipment/createReturnShipment',
+                    ['entity_id' => 15],
+                    'http://example.com/dhl/shipment/createReturnShipment/entity_id/15',
+                ],
+                [
+                    'dhlparcel/shipment/downloadScan',
+                    ['entity_id' => 15],
+                    'http://example.com/dhl/shipment/downloadScan/entity_id/15',
+                ],
+                [
+                    'dhlparcel/shipment/downloadEpod',
+                    ['entity_id' => 15],
+                    'http://example.com/dhl/shipment/downloadEpod/entity_id/15',
+                ],
+                [
+                    'dhlparcel/shipment/updateStatus',
+                    ['entity_id' => 15],
+                    'http://example.com/dhl/shipment/updateStatus/entity_id/15',
+                ],
+                [
+                    'dhlparcel/shipment/delete',
+                    ['entity_id' => 15],
+                    'http://example.com/dhl/shipment/delete/entity_id/15',
+                ],
             ]);
 
         $actionColumn = new ShipmentActions(
@@ -136,13 +193,41 @@ class ShipmentActionsTest extends TestCase
             ->method('getUrl')
             ->willReturnMap([
                 ['dhlparcel/shipment/edit', ['entity_id' => 20], 'http://example.com/dhl/shipment/edit/entity_id/20'],
-                ['dhlparcel/shipment/printLabel', ['entity_id' => 20], 'http://example.com/dhl/shipment/printLabel/entity_id/20'],
-                ['dhlparcel/shipment/printReturnLabel', ['entity_id' => 20], 'http://example.com/dhl/shipment/printReturnLabel/entity_id/20'],
-                ['dhlparcel/shipment/printReturnQrCode', ['entity_id' => 20], 'http://example.com/dhl/shipment/printReturnQrCode/entity_id/20'],
-                ['dhlparcel/shipment/downloadScan', ['entity_id' => 20], 'http://example.com/dhl/shipment/downloadScan/entity_id/20'],
-                ['dhlparcel/shipment/downloadEpod', ['entity_id' => 20], 'http://example.com/dhl/shipment/downloadEpod/entity_id/20'],
-                ['dhlparcel/shipment/updateStatus', ['entity_id' => 20], 'http://example.com/dhl/shipment/updateStatus/entity_id/20'],
-                ['dhlparcel/shipment/delete', ['entity_id' => 20], 'http://example.com/dhl/shipment/delete/entity_id/20'],
+                [
+                    'dhlparcel/shipment/printLabel',
+                    ['entity_id' => 20],
+                    'http://example.com/dhl/shipment/printLabel/entity_id/20',
+                ],
+                [
+                    'dhlparcel/shipment/printReturnLabel',
+                    ['entity_id' => 20],
+                    'http://example.com/dhl/shipment/printReturnLabel/entity_id/20',
+                ],
+                [
+                    'dhlparcel/shipment/printReturnQrCode',
+                    ['entity_id' => 20],
+                    'http://example.com/dhl/shipment/printReturnQrCode/entity_id/20',
+                ],
+                [
+                    'dhlparcel/shipment/downloadScan',
+                    ['entity_id' => 20],
+                    'http://example.com/dhl/shipment/downloadScan/entity_id/20',
+                ],
+                [
+                    'dhlparcel/shipment/downloadEpod',
+                    ['entity_id' => 20],
+                    'http://example.com/dhl/shipment/downloadEpod/entity_id/20',
+                ],
+                [
+                    'dhlparcel/shipment/updateStatus',
+                    ['entity_id' => 20],
+                    'http://example.com/dhl/shipment/updateStatus/entity_id/20',
+                ],
+                [
+                    'dhlparcel/shipment/delete',
+                    ['entity_id' => 20],
+                    'http://example.com/dhl/shipment/delete/entity_id/20',
+                ],
             ]);
 
         $actionColumn = new ShipmentActions(
@@ -171,10 +256,16 @@ class ShipmentActionsTest extends TestCase
         $this->assertArrayHasKey('edit', $actions);
         $this->assertArrayNotHasKey('create_return', $actions);
         $this->assertArrayHasKey('print_return_label', $actions);
-        $this->assertEquals('http://example.com/dhl/shipment/printReturnLabel/entity_id/20', $actions['print_return_label']['href']);
+        $this->assertEquals(
+            'http://example.com/dhl/shipment/printReturnLabel/entity_id/20',
+            $actions['print_return_label']['href']
+        );
         $this->assertEquals('Print Return Label', (string)$actions['print_return_label']['label']);
         $this->assertArrayHasKey('print_return_qr', $actions);
-        $this->assertEquals('http://example.com/dhl/shipment/printReturnQrCode/entity_id/20', $actions['print_return_qr']['href']);
+        $this->assertEquals(
+            'http://example.com/dhl/shipment/printReturnQrCode/entity_id/20',
+            $actions['print_return_qr']['href']
+        );
         $this->assertEquals('Print Return QR Code', (string)$actions['print_return_qr']['label']);
     }
 }

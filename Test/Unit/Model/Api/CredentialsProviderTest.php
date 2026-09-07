@@ -16,17 +16,17 @@ class CredentialsProviderTest extends TestCase
     /**
      * @var ScopeConfigInterface|MockObject
      */
-    private ScopeConfigInterface|MockObject $scopeConfigMock;
+    private $scopeConfigMock;
 
     /**
      * @var EncryptorInterface|MockObject
      */
-    private EncryptorInterface|MockObject $encryptorMock;
+    private $encryptorMock;
 
     /**
      * @var CredentialsProvider
      */
-    private CredentialsProvider $credentialsProvider;
+    private $credentialsProvider;
 
     /**
      * Set up test dependencies.

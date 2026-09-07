@@ -12,8 +12,14 @@ use PHPUnit\Framework\TestCase;
 
 class ShipmentDateSanitizerTest extends TestCase
 {
-    private TimezoneInterface&Stub $timezoneStub;
-    private ShipmentDateSanitizer $sanitizer;
+    /**
+     * @var Stub
+     */
+    private $timezoneStub;
+    /**
+     * @var ShipmentDateSanitizer
+     */
+    private $sanitizer;
 
     protected function setUp(): void
     {

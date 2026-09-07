@@ -17,10 +17,22 @@ use Psr\Log\LoggerInterface;
 #[AllowMockObjectsWithoutExpectations]
 class RedirectShipmentUiViewActionPluginTest extends TestCase
 {
-    private ShipmentDataRepositoryInterface&MockObject $shipmentDataRepository;
-    private UrlInterface&MockObject $urlBuilder;
-    private LoggerInterface&MockObject $logger;
-    private RedirectShipmentUiViewActionPlugin $plugin;
+    /**
+     * @var MockObject
+     */
+    private $shipmentDataRepository;
+    /**
+     * @var MockObject
+     */
+    private $urlBuilder;
+    /**
+     * @var MockObject
+     */
+    private $logger;
+    /**
+     * @var RedirectShipmentUiViewActionPlugin
+     */
+    private $plugin;
 
     protected function setUp(): void
     {
@@ -93,6 +105,9 @@ class RedirectShipmentUiViewActionPluginTest extends TestCase
 
         $result = $this->plugin->afterPrepareDataSource($viewAction, $dataSource);
 
-        $this->assertEquals('http://example.com/admin/dhlparcel/shipment/edit/entity_id/5', $result['data']['items'][0]['actions']['view']['href']);
+        $this->assertEquals(
+            'http://example.com/admin/dhlparcel/shipment/edit/entity_id/5',
+            $result['data']['items'][0]['actions']['view']['href']
+        );
     }
 }

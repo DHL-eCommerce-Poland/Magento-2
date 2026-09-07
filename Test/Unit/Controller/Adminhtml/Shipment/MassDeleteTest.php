@@ -20,15 +20,42 @@ use Psr\Log\LoggerInterface;
 
 class MassDeleteTest extends TestCase
 {
-    private Context|MockObject $contextMock;
-    private Filter|MockObject $filterMock;
-    private CollectionFactory|MockObject $collectionFactoryMock;
-    private ShipmentDeletionService|MockObject $deletionServiceMock;
-    private LoggerInterface|MockObject $loggerMock;
-    private ManagerInterface|MockObject $messageManagerMock;
-    private RedirectFactory|MockObject $redirectFactoryMock;
-    private Redirect|MockObject $redirectMock;
-    private MassDelete $controller;
+    /**
+     * @var MockObject
+     */
+    private $contextMock;
+    /**
+     * @var MockObject
+     */
+    private $filterMock;
+    /**
+     * @var MockObject
+     */
+    private $collectionFactoryMock;
+    /**
+     * @var MockObject
+     */
+    private $deletionServiceMock;
+    /**
+     * @var MockObject
+     */
+    private $loggerMock;
+    /**
+     * @var MockObject
+     */
+    private $messageManagerMock;
+    /**
+     * @var MockObject
+     */
+    private $redirectFactoryMock;
+    /**
+     * @var MockObject
+     */
+    private $redirectMock;
+    /**
+     * @var MassDelete
+     */
+    private $controller;
 
     protected function setUp(): void
     {
@@ -42,7 +69,9 @@ class MassDeleteTest extends TestCase
         $this->redirectMock = $this->createMock(Redirect::class);
 
         $this->contextMock->expects($this->once())->method('getMessageManager')->willReturn($this->messageManagerMock);
-        $this->contextMock->expects($this->once())->method('getResultRedirectFactory')->willReturn($this->redirectFactoryMock);
+        $this->contextMock->expects($this->once())
+            ->method('getResultRedirectFactory')
+            ->willReturn($this->redirectFactoryMock);
 
         $this->redirectFactoryMock->expects($this->once())
             ->method('create')

@@ -14,10 +14,25 @@ use PHPUnit\Framework\TestCase;
 
 class DownloadEpodTest extends TestCase
 {
-    private RequestInterface|Stub $requestStub;
-    private ShipmentDataRepositoryInterface|Stub $repositoryStub;
-    private UrlInterface|Stub $urlBuilderStub;
-    private DownloadEpod $button;
+    /**
+     * @var Stub
+     */
+    private $requestStub;
+
+    /**
+     * @var Stub
+     */
+    private $repositoryStub;
+
+    /**
+     * @var Stub
+     */
+    private $urlBuilderStub;
+
+    /**
+     * @var DownloadEpod
+     */
+    private $button;
 
     protected function setUp(): void
     {

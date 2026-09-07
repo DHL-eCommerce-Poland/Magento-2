@@ -16,17 +16,17 @@ class AddDhlPrepareButtonPluginTest extends TestCase
     /**
      * @var UrlInterface
      */
-    private UrlInterface $urlBuilder;
+    private $urlBuilder;
 
     /**
      * @var OrderRepositoryInterface
      */
-    private OrderRepositoryInterface $orderRepository;
+    private $orderRepository;
 
     /**
      * @var AddDhlPrepareButtonPlugin
      */
-    private AddDhlPrepareButtonPlugin $plugin;
+    private $plugin;
 
     protected function setUp(): void
     {

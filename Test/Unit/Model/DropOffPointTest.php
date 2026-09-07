@@ -14,7 +14,7 @@ class DropOffPointTest extends TestCase
     /**
      * @var DropOffPoint
      */
-    private DropOffPoint $model;
+    private $model;
 
     protected function setUp(): void
     {

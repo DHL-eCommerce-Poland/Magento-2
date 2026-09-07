@@ -26,16 +26,43 @@ use Psr\Log\LoggerInterface;
 #[AllowMockObjectsWithoutExpectations]
 class MagentoShipmentSyncServiceTest extends TestCase
 {
-    private OrderRepositoryInterface|MockObject $orderRepositoryMock;
-    private ShipmentFactory|MockObject $shipmentFactoryMock;
-    private TrackFactory|MockObject $trackFactoryMock;
-    private ShipmentRepositoryInterface|MockObject $shipmentRepositoryMock;
-    private ShipmentTrackRepositoryInterface|MockObject $trackRepositoryMock;
-    private EmailSender|MockObject $emailSenderMock;
-    private TransactionFactory|MockObject $transactionFactoryMock;
-    private LoggerInterface|MockObject $loggerMock;
+    /**
+     * @var MockObject
+     */
+    private $orderRepositoryMock;
+    /**
+     * @var MockObject
+     */
+    private $shipmentFactoryMock;
+    /**
+     * @var MockObject
+     */
+    private $trackFactoryMock;
+    /**
+     * @var MockObject
+     */
+    private $shipmentRepositoryMock;
+    /**
+     * @var MockObject
+     */
+    private $trackRepositoryMock;
+    /**
+     * @var MockObject
+     */
+    private $emailSenderMock;
+    /**
+     * @var MockObject
+     */
+    private $transactionFactoryMock;
+    /**
+     * @var MockObject
+     */
+    private $loggerMock;
 
-    private MagentoShipmentSyncService $service;
+    /**
+     * @var MagentoShipmentSyncService
+     */
+    private $service;
 
     protected function setUp(): void
     {

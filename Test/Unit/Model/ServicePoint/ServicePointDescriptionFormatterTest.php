@@ -13,7 +13,7 @@ class ServicePointDescriptionFormatterTest extends TestCase
     /**
      * @var ServicePointDescriptionFormatter
      */
-    private ServicePointDescriptionFormatter $formatter;
+    private $formatter;
 
     protected function setUp(): void
     {

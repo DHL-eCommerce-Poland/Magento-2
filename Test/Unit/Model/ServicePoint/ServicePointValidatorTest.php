@@ -98,7 +98,9 @@ class ServicePointValidatorTest extends TestCase
         );
 
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('German Customer Number (Postnummer) is required for delivery to a German Packstation.');
+        $this->expectExceptionMessage(
+            'German Customer Number (Postnummer) is required for delivery to a German Packstation.'
+        );
 
         $validator->validate(Carrier::CODE, 'connect', $point);
     }
@@ -121,7 +123,9 @@ class ServicePointValidatorTest extends TestCase
         );
 
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('Invalid German Customer Number (Postnummer). It must contain between 6 and 10 digits.');
+        $this->expectExceptionMessage(
+            'Invalid German Customer Number (Postnummer). It must contain between 6 and 10 digits.'
+        );
 
         $validator->validate(Carrier::CODE, 'connect', $point);
     }

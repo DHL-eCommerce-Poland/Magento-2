@@ -15,7 +15,10 @@ use PHPUnit\Framework\TestCase;
 
 class ShipmentReturnDataMapperTest extends TestCase
 {
-    private ShipmentReturnDataMapper $mapper;
+    /**
+     * @var ShipmentReturnDataMapper
+     */
+    private $mapper;
 
     protected function setUp(): void
     {

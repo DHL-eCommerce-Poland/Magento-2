@@ -19,12 +19,30 @@ use Psr\Log\LoggerInterface;
 #[AllowMockObjectsWithoutExpectations]
 class RedirectNativeViewPluginTest extends TestCase
 {
-    private RequestInterface&MockObject $request;
-    private HttpResponse&MockObject $response;
-    private UrlInterface&MockObject $urlBuilder;
-    private ShipmentDataRepositoryInterface&MockObject $shipmentDataRepository;
-    private LoggerInterface&MockObject $logger;
-    private RedirectNativeViewPlugin $plugin;
+    /**
+     * @var MockObject
+     */
+    private $request;
+    /**
+     * @var MockObject
+     */
+    private $response;
+    /**
+     * @var MockObject
+     */
+    private $urlBuilder;
+    /**
+     * @var MockObject
+     */
+    private $shipmentDataRepository;
+    /**
+     * @var MockObject
+     */
+    private $logger;
+    /**
+     * @var RedirectNativeViewPlugin
+     */
+    private $plugin;
 
     protected function setUp(): void
     {

@@ -15,7 +15,7 @@ class DeliveryServiceTest extends TestCase
     /**
      * @var DeliveryService
      */
-    private DeliveryService $model;
+    private $model;
 
     protected function setUp(): void
     {

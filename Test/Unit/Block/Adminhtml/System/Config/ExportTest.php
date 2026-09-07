@@ -19,17 +19,17 @@ class ExportTest extends TestCase
     /**
      * @var LayoutInterface|MockObject
      */
-    private LayoutInterface|MockObject $layoutMock;
+    private $layoutMock;
 
     /**
      * @var UrlInterface|MockObject
      */
-    private UrlInterface|MockObject $urlBuilderMock;
+    private $urlBuilderMock;
 
     /**
      * @var Export
      */
-    private Export $exportBlock;
+    private $exportBlock;
 
     protected function setUp(): void
     {

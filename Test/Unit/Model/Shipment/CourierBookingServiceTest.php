@@ -22,11 +22,26 @@ use PHPUnit\Framework\TestCase;
 #[AllowMockObjectsWithoutExpectations]
 class CourierBookingServiceTest extends TestCase
 {
-    private ClientInterface|Stub $clientStub;
-    private CredentialsProvider|Stub $credentialsProviderStub;
-    private ShipmentDataRepositoryInterface|Stub $shipmentDataRepositoryStub;
-    private TimezoneInterface|MockObject $timezoneMock;
-    private CourierBookingService $service;
+    /**
+     * @var Stub
+     */
+    private $clientStub;
+    /**
+     * @var Stub
+     */
+    private $credentialsProviderStub;
+    /**
+     * @var Stub
+     */
+    private $shipmentDataRepositoryStub;
+    /**
+     * @var MockObject
+     */
+    private $timezoneMock;
+    /**
+     * @var CourierBookingService
+     */
+    private $service;
 
     protected function setUp(): void
     {
@@ -66,7 +81,9 @@ class CourierBookingServiceTest extends TestCase
             ->willReturn($entityStub);
 
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('None of the selected shipments have valid DHL Shipment IDs for courier booking.');
+        $this->expectExceptionMessage(
+            'None of the selected shipments have valid DHL Shipment IDs for courier booking.'
+        );
 
         $this->service->bookCourier([10], '2026-08-28', '10:00', '14:00');
     }

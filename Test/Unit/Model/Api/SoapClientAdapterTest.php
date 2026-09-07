@@ -19,23 +19,26 @@ class SoapClientAdapterTest extends TestCase
     /**
      * @var LoggerInterface|MockObject
      */
-    private LoggerInterface|MockObject $loggerStub;
+    private $loggerStub;
 
     /**
      * @var SoapClientAdapter
      */
-    private SoapClientAdapter $adapter;
+    private $adapter;
 
     /**
      * @var ScopeConfigInterface|MockObject
      */
-    private ScopeConfigInterface|MockObject $scopeConfigStub;
+    private $scopeConfigStub;
 
     /**
      * @var TimezoneInterface|MockObject
      */
-    private TimezoneInterface|MockObject $timezoneMock;
-    private \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer $dateSanitizer;
+    private $timezoneMock;
+    /**
+     * @var \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer
+     */
+    private $dateSanitizer;
 
     /**
      * Set up test dependencies.
@@ -80,22 +83,32 @@ class SoapClientAdapterTest extends TestCase
 
     public function testSanitizeXmlTruncatesLabelData(): void
     {
-        $rawXml = '<soap:Envelope><item><shipmentId>12345</shipmentId><labelData>JVBERi0xLjUKJeLjz9MKNiAwIG9iago8PC9Db2xvclNwYWNlL0RldmljZUdyYXk=</labelData></item></soap:Envelope>';
+        $rawXml = '<soap:Envelope><item><shipmentId>12345</shipmentId>' .
+            '<labelData>JVBERi0xLjUKJeLjz9MKNiAwIG9iago8PC9Db2xvclNwYWNlL0RldmljZUdyYXk=</labelData>' .
+            '</item></soap:Envelope>';
 
         $sanitized = $this->adapter->sanitizeXml($rawXml);
 
-        $this->assertStringNotContainsString('JVBERi0xLjUKJeLjz9MKNiAwIG9iago8PC9Db2xvclNwYWNlL0RldmljZUdyYXk=', $sanitized);
+        $this->assertStringNotContainsString(
+            'JVBERi0xLjUKJeLjz9MKNiAwIG9iago8PC9Db2xvclNwYWNlL0RldmljZUdyYXk=',
+            $sanitized
+        );
         $this->assertStringContainsString('<labelData>***BINARY DATA TRUNCATED***</labelData>', $sanitized);
         $this->assertStringContainsString('<shipmentId>12345</shipmentId>', $sanitized);
     }
 
     public function testSanitizeXmlTruncatesScanData(): void
     {
-        $rawXml = '<soap:Envelope><getShipmentScanResult><scanData>iVBORw0KGgoAAAANSUhEUgAAAXgAAAF4CAYAAABeneKmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQU</scanData><scanMimeType>image/png</scanMimeType></getShipmentScanResult></soap:Envelope>';
+        $rawXml = '<soap:Envelope><getShipmentScanResult>' .
+            '<scanData>iVBORw0KGgoAAAANSUhEUgAAAXgAAAF4CAYAAABeneKmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQU' .
+            '</scanData><scanMimeType>image/png</scanMimeType></getShipmentScanResult></soap:Envelope>';
 
         $sanitized = $this->adapter->sanitizeXml($rawXml);
 
-        $this->assertStringNotContainsString('iVBORw0KGgoAAAANSUhEUgAAAXgAAAF4CAYAAABeneKmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQU', $sanitized);
+        $this->assertStringNotContainsString(
+            'iVBORw0KGgoAAAANSUhEUgAAAXgAAAF4CAYAAABeneKmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQU',
+            $sanitized
+        );
         $this->assertStringContainsString('<scanData>***BINARY DATA TRUNCATED***</scanData>', $sanitized);
         $this->assertStringContainsString('<scanMimeType>image/png</scanMimeType>', $sanitized);
     }

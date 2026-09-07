@@ -17,14 +17,38 @@ use Psr\Log\LoggerInterface;
 
 class DeleteTest extends TestCase
 {
-    private Context|MockObject $contextMock;
-    private RequestInterface|MockObject $requestMock;
-    private ManagerInterface|MockObject $messageManagerMock;
-    private RedirectFactory|MockObject $redirectFactoryMock;
-    private Redirect|MockObject $redirectMock;
-    private ShipmentDeletionService|MockObject $deletionServiceMock;
-    private LoggerInterface|MockObject $loggerMock;
-    private Delete $controller;
+    /**
+     * @var MockObject
+     */
+    private $contextMock;
+    /**
+     * @var MockObject
+     */
+    private $requestMock;
+    /**
+     * @var MockObject
+     */
+    private $messageManagerMock;
+    /**
+     * @var MockObject
+     */
+    private $redirectFactoryMock;
+    /**
+     * @var MockObject
+     */
+    private $redirectMock;
+    /**
+     * @var MockObject
+     */
+    private $deletionServiceMock;
+    /**
+     * @var MockObject
+     */
+    private $loggerMock;
+    /**
+     * @var Delete
+     */
+    private $controller;
 
     protected function setUp(): void
     {
@@ -38,7 +62,9 @@ class DeleteTest extends TestCase
 
         $this->contextMock->expects($this->once())->method('getRequest')->willReturn($this->requestMock);
         $this->contextMock->expects($this->once())->method('getMessageManager')->willReturn($this->messageManagerMock);
-        $this->contextMock->expects($this->once())->method('getResultRedirectFactory')->willReturn($this->redirectFactoryMock);
+        $this->contextMock->expects($this->once())
+            ->method('getResultRedirectFactory')
+            ->willReturn($this->redirectFactoryMock);
 
         $this->redirectFactoryMock->expects($this->once())
             ->method('create')

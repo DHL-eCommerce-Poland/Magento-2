@@ -17,13 +17,34 @@ use PHPUnit\Framework\TestCase;
 
 class UpdateStatusTest extends TestCase
 {
-    private Context|Stub $contextStub;
-    private RequestInterface|Stub $requestStub;
-    private RedirectFactory|Stub $redirectFactoryStub;
-    private Redirect|Stub $redirectStub;
-    private ManagerInterface|Stub $messageManagerStub;
-    private ShipmentTrackingService|Stub $trackingServiceStub;
-    private UpdateStatus $controller;
+    /**
+     * @var Stub
+     */
+    private $contextStub;
+    /**
+     * @var Stub
+     */
+    private $requestStub;
+    /**
+     * @var Stub
+     */
+    private $redirectFactoryStub;
+    /**
+     * @var Stub
+     */
+    private $redirectStub;
+    /**
+     * @var Stub
+     */
+    private $messageManagerStub;
+    /**
+     * @var Stub
+     */
+    private $trackingServiceStub;
+    /**
+     * @var UpdateStatus
+     */
+    private $controller;
 
     protected function setUp(): void
     {
@@ -79,7 +100,12 @@ class UpdateStatusTest extends TestCase
             shipmentId: '1234567890',
             receivedBy: null,
             events: [
-                ['status' => 'DOR', 'description' => 'Doręczono', 'terminal' => 'Warszawa', 'timestamp' => '2026-08-28 14:00:00'],
+                [
+                    'status' => 'DOR',
+                    'description' => 'Doręczono',
+                    'terminal' => 'Warszawa',
+                    'timestamp' => '2026-08-28 14:00:00',
+                ],
             ]
         );
 

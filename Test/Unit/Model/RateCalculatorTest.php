@@ -14,12 +14,12 @@ class RateCalculatorTest extends TestCase
     /**
      * @var TableRateResolver|MockObject
      */
-    private TableRateResolver|MockObject $tableRateResolverMock;
+    private $tableRateResolverMock;
 
     /**
      * @var RateCalculator
      */
-    private RateCalculator $rateCalculator;
+    private $rateCalculator;
 
     protected function setUp(): void
     {

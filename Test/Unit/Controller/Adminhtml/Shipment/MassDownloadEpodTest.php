@@ -22,17 +22,50 @@ use PHPUnit\Framework\TestCase;
 
 class MassDownloadEpodTest extends TestCase
 {
-    private Context|Stub $contextStub;
-    private RequestInterface|Stub $requestStub;
-    private RedirectFactory|Stub $redirectFactoryStub;
-    private Redirect|Stub $redirectStub;
-    private Filter|Stub $filterStub;
-    private CollectionFactory|Stub $collectionFactoryStub;
-    private Collection|Stub $collectionStub;
-    private DocumentDownloadService|Stub $serviceStub;
-    private FileFactory|Stub $fileFactoryStub;
-    private ManagerInterface|Stub $messageManagerStub;
-    private MassDownloadEpod $controller;
+    /**
+     * @var Stub
+     */
+    private $contextStub;
+    /**
+     * @var Stub
+     */
+    private $requestStub;
+    /**
+     * @var Stub
+     */
+    private $redirectFactoryStub;
+    /**
+     * @var Stub
+     */
+    private $redirectStub;
+    /**
+     * @var Stub
+     */
+    private $filterStub;
+    /**
+     * @var Stub
+     */
+    private $collectionFactoryStub;
+    /**
+     * @var Stub
+     */
+    private $collectionStub;
+    /**
+     * @var Stub
+     */
+    private $serviceStub;
+    /**
+     * @var Stub
+     */
+    private $fileFactoryStub;
+    /**
+     * @var Stub
+     */
+    private $messageManagerStub;
+    /**
+     * @var MassDownloadEpod
+     */
+    private $controller;
 
     protected function setUp(): void
     {

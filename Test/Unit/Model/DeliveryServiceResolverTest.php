@@ -15,12 +15,12 @@ class DeliveryServiceResolverTest extends TestCase
     /**
      * @var DeliveryServiceRepositoryInterface|MockObject
      */
-    private DeliveryServiceRepositoryInterface|MockObject $repositoryMock;
+    private $repositoryMock;
 
     /**
      * @var DeliveryServiceResolver
      */
-    private DeliveryServiceResolver $resolver;
+    private $resolver;
 
     protected function setUp(): void
     {

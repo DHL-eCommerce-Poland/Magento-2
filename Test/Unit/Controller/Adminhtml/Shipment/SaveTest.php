@@ -24,47 +24,47 @@ class SaveTest extends TestCase
     /**
      * @var Context|MockObject
      */
-    private Context|MockObject $contextStub;
+    private $contextStub;
 
     /**
      * @var RequestInterface|MockObject
      */
-    private RequestInterface|MockObject $requestStub;
+    private $requestStub;
 
     /**
      * @var ShipmentDataService|MockObject
      */
-    private ShipmentDataService|MockObject $shipmentDataServiceMock;
+    private $shipmentDataServiceMock;
 
     /**
      * @var ShipmentCreationService|MockObject
      */
-    private ShipmentCreationService|MockObject $shipmentCreationServiceMock;
+    private $shipmentCreationServiceMock;
 
     /**
      * @var ScopeConfigInterface|MockObject
      */
-    private ScopeConfigInterface|MockObject $scopeConfigMock;
+    private $scopeConfigMock;
 
     /**
      * @var JsonFactory|MockObject
      */
-    private JsonFactory|MockObject $jsonFactoryStub;
+    private $jsonFactoryStub;
 
     /**
      * @var Json|MockObject
      */
-    private Json|MockObject $jsonResultMock;
+    private $jsonResultMock;
 
     /**
      * @var LoggerInterface|MockObject
      */
-    private LoggerInterface|MockObject $loggerStub;
+    private $loggerStub;
 
     /**
      * @var Save
      */
-    private Save $controller;
+    private $controller;
 
     protected function setUp(): void
     {

@@ -23,14 +23,38 @@ use Psr\Log\LoggerInterface;
 
 class DocumentDownloadServiceTest extends TestCase
 {
-    private ShipmentDataRepositoryInterface|Stub $repositoryStub;
-    private ClientInterface|Stub $clientStub;
-    private CredentialsProvider|Stub $credentialsProviderStub;
-    private ScopeConfigInterface|Stub $scopeConfigStub;
-    private Filesystem|Stub $filesystemStub;
-    private LabelGenerator|Stub $labelGeneratorStub;
-    private LoggerInterface|Stub $loggerStub;
-    private DocumentDownloadService $service;
+    /**
+     * @var Stub
+     */
+    private $repositoryStub;
+    /**
+     * @var Stub
+     */
+    private $clientStub;
+    /**
+     * @var Stub
+     */
+    private $credentialsProviderStub;
+    /**
+     * @var Stub
+     */
+    private $scopeConfigStub;
+    /**
+     * @var Stub
+     */
+    private $filesystemStub;
+    /**
+     * @var Stub
+     */
+    private $labelGeneratorStub;
+    /**
+     * @var Stub
+     */
+    private $loggerStub;
+    /**
+     * @var DocumentDownloadService
+     */
+    private $service;
 
     protected function setUp(): void
     {

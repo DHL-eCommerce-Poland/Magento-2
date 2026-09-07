@@ -15,7 +15,7 @@ class TemplateVariableResolverTest extends TestCase
     /**
      * @var TemplateVariableResolver
      */
-    private TemplateVariableResolver $resolver;
+    private $resolver;
 
     protected function setUp(): void
     {

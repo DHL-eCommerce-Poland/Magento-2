@@ -20,14 +20,38 @@ use PHPUnit\Framework\TestCase;
 
 class MassUpdateStatusTest extends TestCase
 {
-    private Context|Stub $contextStub;
-    private Filter|MockObject $filterMock;
-    private CollectionFactory|MockObject $collectionFactoryMock;
-    private ShipmentTrackingService|MockObject $trackingServiceMock;
-    private RedirectFactory|Stub $redirectFactoryStub;
-    private Redirect|MockObject $redirectMock;
-    private ManagerInterface|MockObject $messageManagerMock;
-    private MassUpdateStatus $controller;
+    /**
+     * @var Stub
+     */
+    private $contextStub;
+    /**
+     * @var MockObject
+     */
+    private $filterMock;
+    /**
+     * @var MockObject
+     */
+    private $collectionFactoryMock;
+    /**
+     * @var MockObject
+     */
+    private $trackingServiceMock;
+    /**
+     * @var Stub
+     */
+    private $redirectFactoryStub;
+    /**
+     * @var MockObject
+     */
+    private $redirectMock;
+    /**
+     * @var MockObject
+     */
+    private $messageManagerMock;
+    /**
+     * @var MassUpdateStatus
+     */
+    private $controller;
 
     protected function setUp(): void
     {

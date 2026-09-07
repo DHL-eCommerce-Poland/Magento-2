@@ -17,10 +17,22 @@ use RuntimeException;
 
 class RecreateShipmentTest extends TestCase
 {
-    private Context|Stub $contextStub;
-    private RequestInterface|MockObject $requestMock;
-    private ShipmentDataRepositoryInterface|Stub $shipmentRepositoryStub;
-    private RecreateShipment $button;
+    /**
+     * @var Stub
+     */
+    private $contextStub;
+    /**
+     * @var MockObject
+     */
+    private $requestMock;
+    /**
+     * @var Stub
+     */
+    private $shipmentRepositoryStub;
+    /**
+     * @var RecreateShipment
+     */
+    private $button;
 
     protected function setUp(): void
     {

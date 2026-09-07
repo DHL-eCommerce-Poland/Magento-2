@@ -21,10 +21,22 @@ use PHPUnit\Framework\TestCase;
 #[AllowMockObjectsWithoutExpectations]
 class CourierPickupTimeResolverTest extends TestCase
 {
-    private ClientInterface|MockObject $clientMock;
-    private CredentialsProvider|Stub $credentialsProviderStub;
-    private TimezoneInterface|MockObject $timezoneMock;
-    private CourierPickupTimeResolver $resolver;
+    /**
+     * @var MockObject
+     */
+    private $clientMock;
+    /**
+     * @var Stub
+     */
+    private $credentialsProviderStub;
+    /**
+     * @var MockObject
+     */
+    private $timezoneMock;
+    /**
+     * @var CourierPickupTimeResolver
+     */
+    private $resolver;
 
     protected function setUp(): void
     {
@@ -143,12 +155,21 @@ class CourierPickupTimeResolverTest extends TestCase
             ->method('getPostalCodeServices')
             ->willReturnOnConsecutiveCalls($result1, $result2);
 
-        $result = $this->resolver->resolveAvailableHoursForPostalCodes(['00-001', '35-234'], $today, 'sandbox', '09:00');
+        $result = $this->resolver->resolveAvailableHoursForPostalCodes(
+            ['00-001',
+            '35-234'],
+            $today,
+            'sandbox',
+            '09:00'
+        );
 
         $this->assertTrue($result['is_today_possible']);
         $this->assertEquals('12:00', $result['dr_pickup_from']);
         $this->assertEquals('16:00', $result['dr_pickup_to']);
-        $this->assertEquals([['from' => '12:00', 'to' => '16:00', 'label' => '12:00 - 16:00']], $result['available_hours']);
+        $this->assertEquals(
+            [['from' => '12:00', 'to' => '16:00', 'label' => '12:00 - 16:00']],
+            $result['available_hours']
+        );
     }
 
     public function testResolveAvailableHoursNormalizesLocaleDateStringToIsoFormat(): void

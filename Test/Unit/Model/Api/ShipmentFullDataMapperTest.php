@@ -18,7 +18,7 @@ class ShipmentFullDataMapperTest extends TestCase
     /**
      * @var ShipmentFullDataMapper
      */
-    private ShipmentFullDataMapper $mapper;
+    private $mapper;
 
     protected function setUp(): void
     {

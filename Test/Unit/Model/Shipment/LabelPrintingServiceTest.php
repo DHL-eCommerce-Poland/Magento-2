@@ -18,11 +18,26 @@ use PHPUnit\Framework\TestCase;
 
 class LabelPrintingServiceTest extends TestCase
 {
-    private ShipmentDataRepositoryInterface|Stub $repositoryStub;
-    private ClientInterface|Stub $clientStub;
-    private CredentialsProvider|Stub $credentialsProviderStub;
-    private ScopeConfigInterface|Stub $scopeConfigStub;
-    private LabelPrintingService $service;
+    /**
+     * @var Stub
+     */
+    private $repositoryStub;
+    /**
+     * @var Stub
+     */
+    private $clientStub;
+    /**
+     * @var Stub
+     */
+    private $credentialsProviderStub;
+    /**
+     * @var Stub
+     */
+    private $scopeConfigStub;
+    /**
+     * @var LabelPrintingService
+     */
+    private $service;
 
     protected function setUp(): void
     {

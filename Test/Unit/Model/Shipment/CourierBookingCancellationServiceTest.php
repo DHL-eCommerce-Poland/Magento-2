@@ -20,11 +20,26 @@ use PHPUnit\Framework\TestCase;
 
 class CourierBookingCancellationServiceTest extends TestCase
 {
-    private ClientInterface|Stub $clientStub;
-    private CredentialsProvider|Stub $credentialsProviderStub;
-    private ShipmentDataRepositoryInterface|Stub $shipmentDataRepositoryStub;
-    private ShipmentDataCollectionFactory|Stub $collectionFactoryStub;
-    private CourierBookingCancellationService $service;
+    /**
+     * @var Stub
+     */
+    private $clientStub;
+    /**
+     * @var Stub
+     */
+    private $credentialsProviderStub;
+    /**
+     * @var Stub
+     */
+    private $shipmentDataRepositoryStub;
+    /**
+     * @var Stub
+     */
+    private $collectionFactoryStub;
+    /**
+     * @var CourierBookingCancellationService
+     */
+    private $service;
 
     protected function setUp(): void
     {
@@ -61,7 +76,9 @@ class CourierBookingCancellationServiceTest extends TestCase
             ->willReturn($entityStub);
 
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('None of the selected shipments have an active courier booking/dispatch number to cancel.');
+        $this->expectExceptionMessage(
+            'None of the selected shipments have an active courier booking/dispatch number to cancel.'
+        );
 
         $this->service->cancelCourierBooking([10]);
     }

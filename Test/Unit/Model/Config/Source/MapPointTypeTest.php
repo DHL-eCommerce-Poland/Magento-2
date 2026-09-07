@@ -12,7 +12,7 @@ class MapPointTypeTest extends TestCase
     /**
      * @var MapPointType
      */
-    private MapPointType $sourceModel;
+    private $sourceModel;
 
     /**
      * @return void

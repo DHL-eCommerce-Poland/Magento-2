@@ -14,7 +14,7 @@ class OrderWeightAggregatorTest extends TestCase
     /**
      * @var OrderWeightAggregator
      */
-    private OrderWeightAggregator $aggregator;
+    private $aggregator;
 
     protected function setUp(): void
     {

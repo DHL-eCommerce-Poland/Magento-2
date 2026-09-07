@@ -15,10 +15,25 @@ use PHPUnit\Framework\TestCase;
 #[AllowMockObjectsWithoutExpectations]
 class PackageNumbersTest extends TestCase
 {
-    private ContextInterface&MockObject $contextMock;
-    private UiComponentFactory&MockObject $uiComponentFactoryMock;
-    private SerializerInterface&MockObject $serializerMock;
-    private PackageNumbers $packageNumbersColumn;
+    /**
+     * @var ContextInterface|MockObject
+     */
+    private $contextMock;
+
+    /**
+     * @var UiComponentFactory|MockObject
+     */
+    private $uiComponentFactoryMock;
+
+    /**
+     * @var SerializerInterface|MockObject
+     */
+    private $serializerMock;
+
+    /**
+     * @var PackageNumbers
+     */
+    private $packageNumbersColumn;
 
     protected function setUp(): void
     {

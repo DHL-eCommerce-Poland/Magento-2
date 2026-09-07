@@ -21,12 +21,30 @@ use Psr\Log\LoggerInterface;
 #[AllowMockObjectsWithoutExpectations]
 class ShipmentDeletionServiceTest extends TestCase
 {
-    private ShipmentDataRepositoryInterface|MockObject $repositoryMock;
-    private ClientInterface|MockObject $clientMock;
-    private CredentialsProvider|MockObject $credentialsProviderMock;
-    private ScopeConfigInterface|MockObject $scopeConfigMock;
-    private LoggerInterface|MockObject $loggerMock;
-    private ShipmentDeletionService $deletionService;
+    /**
+     * @var MockObject
+     */
+    private $repositoryMock;
+    /**
+     * @var MockObject
+     */
+    private $clientMock;
+    /**
+     * @var MockObject
+     */
+    private $credentialsProviderMock;
+    /**
+     * @var MockObject
+     */
+    private $scopeConfigMock;
+    /**
+     * @var MockObject
+     */
+    private $loggerMock;
+    /**
+     * @var ShipmentDeletionService
+     */
+    private $deletionService;
 
     protected function setUp(): void
     {

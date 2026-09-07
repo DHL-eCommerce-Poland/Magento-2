@@ -19,11 +19,26 @@ use PHPUnit\Framework\TestCase;
 
 class ShipmentTrackingServiceTest extends TestCase
 {
-    private ShipmentDataRepositoryInterface|MockObject $shipmentDataRepositoryMock;
-    private ClientInterface|Stub $clientStub;
-    private CredentialsProvider|Stub $credentialsProviderStub;
-    private ScopeConfigInterface|Stub $scopeConfigMock;
-    private ShipmentTrackingService $service;
+    /**
+     * @var MockObject
+     */
+    private $shipmentDataRepositoryMock;
+    /**
+     * @var Stub
+     */
+    private $clientStub;
+    /**
+     * @var Stub
+     */
+    private $credentialsProviderStub;
+    /**
+     * @var Stub
+     */
+    private $scopeConfigMock;
+    /**
+     * @var ShipmentTrackingService
+     */
+    private $service;
 
     protected function setUp(): void
     {

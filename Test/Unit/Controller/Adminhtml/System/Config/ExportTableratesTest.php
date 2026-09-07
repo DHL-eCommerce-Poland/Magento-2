@@ -20,12 +20,12 @@ class ExportTableratesTest extends TestCase
     /**
      * @var FileFactory|MockObject
      */
-    private FileFactory|MockObject $fileFactoryMock;
+    private $fileFactoryMock;
 
     /**
      * @var ExportTablerates
      */
-    private ExportTablerates $controller;
+    private $controller;
 
     protected function setUp(): void
     {

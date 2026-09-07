@@ -21,15 +21,42 @@ use Psr\Log\LoggerInterface;
 
 class ReturnShipmentCreationServiceTest extends TestCase
 {
-    private ShipmentDataService|MockObject $shipmentDataServiceMock;
-    private ShipmentDataValidator|MockObject $validatorMock;
-    private ShipmentReturnDataMapper|MockObject $returnMapperMock;
-    private CredentialsProvider|MockObject $credentialsProviderMock;
-    private ClientInterface|MockObject $clientMock;
-    private LockManagerInterface|MockObject $lockManagerMock;
-    private LoggerInterface|MockObject $loggerStub;
-    private SerializerInterface|MockObject $serializerMock;
-    private ReturnShipmentCreationService $service;
+    /**
+     * @var MockObject
+     */
+    private $shipmentDataServiceMock;
+    /**
+     * @var MockObject
+     */
+    private $validatorMock;
+    /**
+     * @var MockObject
+     */
+    private $returnMapperMock;
+    /**
+     * @var MockObject
+     */
+    private $credentialsProviderMock;
+    /**
+     * @var MockObject
+     */
+    private $clientMock;
+    /**
+     * @var MockObject
+     */
+    private $lockManagerMock;
+    /**
+     * @var MockObject
+     */
+    private $loggerStub;
+    /**
+     * @var MockObject
+     */
+    private $serializerMock;
+    /**
+     * @var ReturnShipmentCreationService
+     */
+    private $service;
 
     protected function setUp(): void
     {

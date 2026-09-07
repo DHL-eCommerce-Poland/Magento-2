@@ -15,12 +15,12 @@ class DropOffPointResolverTest extends TestCase
     /**
      * @var DropOffPointRepositoryInterface|MockObject
      */
-    private DropOffPointRepositoryInterface|MockObject $repositoryMock;
+    private $repositoryMock;
 
     /**
      * @var DropOffPointResolver
      */
-    private DropOffPointResolver $resolver;
+    private $resolver;
 
     protected function setUp(): void
     {

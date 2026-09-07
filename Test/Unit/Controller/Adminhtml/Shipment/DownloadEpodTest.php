@@ -19,14 +19,38 @@ use PHPUnit\Framework\TestCase;
 
 class DownloadEpodTest extends TestCase
 {
-    private Context|Stub $contextStub;
-    private RequestInterface|Stub $requestStub;
-    private RedirectFactory|Stub $redirectFactoryStub;
-    private Redirect|Stub $redirectStub;
-    private ManagerInterface|Stub $messageManagerStub;
-    private DocumentDownloadService|Stub $serviceStub;
-    private FileFactory|Stub $fileFactoryStub;
-    private DownloadEpod $controller;
+    /**
+     * @var Stub
+     */
+    private $contextStub;
+    /**
+     * @var Stub
+     */
+    private $requestStub;
+    /**
+     * @var Stub
+     */
+    private $redirectFactoryStub;
+    /**
+     * @var Stub
+     */
+    private $redirectStub;
+    /**
+     * @var Stub
+     */
+    private $messageManagerStub;
+    /**
+     * @var Stub
+     */
+    private $serviceStub;
+    /**
+     * @var Stub
+     */
+    private $fileFactoryStub;
+    /**
+     * @var DownloadEpod
+     */
+    private $controller;
 
     protected function setUp(): void
     {

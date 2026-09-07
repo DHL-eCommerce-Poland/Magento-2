@@ -12,7 +12,7 @@ class DeliveryModeTest extends TestCase
     /**
      * @var DeliveryMode
      */
-    private DeliveryMode $sourceModel;
+    private $sourceModel;
 
     /**
      * @return void

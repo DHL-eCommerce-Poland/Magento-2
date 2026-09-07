@@ -13,7 +13,7 @@ class StreetAddressParserTest extends TestCase
     /**
      * @var StreetAddressParser
      */
-    private StreetAddressParser $parser;
+    private $parser;
 
     protected function setUp(): void
     {

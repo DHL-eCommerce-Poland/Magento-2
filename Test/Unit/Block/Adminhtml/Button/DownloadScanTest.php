@@ -14,10 +14,22 @@ use PHPUnit\Framework\TestCase;
 
 class DownloadScanTest extends TestCase
 {
-    private RequestInterface|Stub $requestStub;
-    private ShipmentDataRepositoryInterface|Stub $repositoryStub;
-    private UrlInterface|Stub $urlBuilderStub;
-    private DownloadScan $button;
+    /**
+     * @var Stub
+     */
+    private $requestStub;
+    /**
+     * @var Stub
+     */
+    private $repositoryStub;
+    /**
+     * @var Stub
+     */
+    private $urlBuilderStub;
+    /**
+     * @var DownloadScan
+     */
+    private $button;
 
     protected function setUp(): void
     {

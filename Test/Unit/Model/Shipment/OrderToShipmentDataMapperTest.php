@@ -23,7 +23,7 @@ class OrderToShipmentDataMapperTest extends TestCase
     /**
      * @var OrderToShipmentDataMapper
      */
-    private OrderToShipmentDataMapper $mapper;
+    private $mapper;
 
     protected function setUp(): void
     {

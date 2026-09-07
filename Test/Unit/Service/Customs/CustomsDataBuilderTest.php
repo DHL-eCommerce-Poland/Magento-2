@@ -103,7 +103,9 @@ class CustomsDataBuilderTest extends TestCase
         );
 
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('No Customs Clearance configuration found for international shipment. Please configure default Customs.');
+        $this->expectExceptionMessage(
+            'No Customs Clearance configuration found for international shipment. Please configure default Customs.'
+        );
 
         $builder->buildCustomsData(null);
     }
@@ -129,7 +131,10 @@ class CustomsDataBuilderTest extends TestCase
         );
 
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('A VAT Invoice PDF file is required for individual customs clearance (I). Please upload invoice in Customs Template.');
+        $this->expectExceptionMessage(
+            'A VAT Invoice PDF file is required for individual customs clearance (I). ' .
+            'Please upload invoice in Customs Template.'
+        );
 
         $builder->buildCustomsData(null);
     }

@@ -15,7 +15,10 @@ use PHPUnit\Framework\TestCase;
 
 class ReturnShipmentDataBuilderTest extends TestCase
 {
-    private ReturnShipmentDataBuilder $builder;
+    /**
+     * @var ReturnShipmentDataBuilder
+     */
+    private $builder;
 
     protected function setUp(): void
     {

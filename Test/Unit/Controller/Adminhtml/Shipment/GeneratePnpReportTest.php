@@ -21,15 +21,42 @@ use PHPUnit\Framework\TestCase;
 
 class GeneratePnpReportTest extends TestCase
 {
-    private Context|Stub $contextStub;
-    private RequestInterface|Stub $requestStub;
-    private RedirectFactory|Stub $redirectFactoryStub;
-    private Redirect|Stub $redirectStub;
-    private ManagerInterface|Stub $messageManagerStub;
-    private PnpReportService|MockObject $serviceMock;
-    private FileFactory|Stub $fileFactoryStub;
-    private TimezoneInterface|Stub $timezoneStub;
-    private GeneratePnpReport $controller;
+    /**
+     * @var Stub
+     */
+    private $contextStub;
+    /**
+     * @var Stub
+     */
+    private $requestStub;
+    /**
+     * @var Stub
+     */
+    private $redirectFactoryStub;
+    /**
+     * @var Stub
+     */
+    private $redirectStub;
+    /**
+     * @var Stub
+     */
+    private $messageManagerStub;
+    /**
+     * @var MockObject
+     */
+    private $serviceMock;
+    /**
+     * @var Stub
+     */
+    private $fileFactoryStub;
+    /**
+     * @var Stub
+     */
+    private $timezoneStub;
+    /**
+     * @var GeneratePnpReport
+     */
+    private $controller;
 
     protected function setUp(): void
     {

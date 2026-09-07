@@ -23,17 +23,50 @@ use Psr\Log\LoggerInterface;
 
 class CreateReturnShipmentTest extends TestCase
 {
-    private Context|MockObject $contextMock;
-    private RequestInterface|MockObject $requestMock;
-    private ManagerInterface|MockObject $messageManagerMock;
-    private RedirectFactory|MockObject $redirectFactoryMock;
-    private Redirect|MockObject $redirectMock;
-    private ShipmentDataService|MockObject $shipmentDataServiceMock;
-    private ReturnShipmentDataBuilder|MockObject $returnBuilderMock;
-    private ReturnShipmentCreationService|MockObject $returnCreationServiceMock;
-    private ScopeConfigInterface|MockObject $scopeConfigMock;
-    private LoggerInterface|MockObject $loggerMock;
-    private CreateReturnShipment $controller;
+    /**
+     * @var MockObject
+     */
+    private $contextMock;
+    /**
+     * @var MockObject
+     */
+    private $requestMock;
+    /**
+     * @var MockObject
+     */
+    private $messageManagerMock;
+    /**
+     * @var MockObject
+     */
+    private $redirectFactoryMock;
+    /**
+     * @var MockObject
+     */
+    private $redirectMock;
+    /**
+     * @var MockObject
+     */
+    private $shipmentDataServiceMock;
+    /**
+     * @var MockObject
+     */
+    private $returnBuilderMock;
+    /**
+     * @var MockObject
+     */
+    private $returnCreationServiceMock;
+    /**
+     * @var MockObject
+     */
+    private $scopeConfigMock;
+    /**
+     * @var MockObject
+     */
+    private $loggerMock;
+    /**
+     * @var CreateReturnShipment
+     */
+    private $controller;
 
     protected function setUp(): void
     {
@@ -50,7 +83,9 @@ class CreateReturnShipmentTest extends TestCase
 
         $this->contextMock->expects($this->once())->method('getRequest')->willReturn($this->requestMock);
         $this->contextMock->expects($this->once())->method('getMessageManager')->willReturn($this->messageManagerMock);
-        $this->contextMock->expects($this->once())->method('getResultRedirectFactory')->willReturn($this->redirectFactoryMock);
+        $this->contextMock->expects($this->once())
+            ->method('getResultRedirectFactory')
+            ->willReturn($this->redirectFactoryMock);
 
         $this->redirectFactoryMock->expects($this->once())->method('create')->willReturn($this->redirectMock);
         $this->redirectMock->expects($this->once())->method('setPath')->with('*/*/index')->willReturnSelf();

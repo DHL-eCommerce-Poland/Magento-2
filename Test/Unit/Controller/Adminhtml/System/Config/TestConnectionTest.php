@@ -21,32 +21,32 @@ class TestConnectionTest extends TestCase
     /**
      * @var Context|MockObject
      */
-    private Context|MockObject $contextStub;
+    private $contextStub;
 
     /**
      * @var HttpRequest|MockObject
      */
-    private HttpRequest|MockObject $requestStub;
+    private $requestStub;
 
     /**
      * @var JsonFactory|MockObject
      */
-    private JsonFactory|MockObject $resultJsonFactoryMock;
+    private $resultJsonFactoryMock;
 
     /**
      * @var CredentialsProvider|MockObject
      */
-    private CredentialsProvider|MockObject $credentialsProviderMock;
+    private $credentialsProviderMock;
 
     /**
      * @var ClientInterface|MockObject
      */
-    private ClientInterface|MockObject $clientMock;
+    private $clientMock;
 
     /**
      * @var TestConnection
      */
-    private TestConnection $controller;
+    private $controller;
 
     protected function setUp(): void
     {

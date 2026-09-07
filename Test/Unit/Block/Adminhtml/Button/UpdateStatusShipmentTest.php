@@ -17,11 +17,26 @@ use PHPUnit\Framework\TestCase;
 
 class UpdateStatusShipmentTest extends TestCase
 {
-    private Context|Stub $contextStub;
-    private RequestInterface|MockObject $requestMock;
-    private UrlInterface|Stub $urlBuilderStub;
-    private ShipmentDataRepositoryInterface|Stub $shipmentRepositoryStub;
-    private UpdateStatusShipment $button;
+    /**
+     * @var Stub
+     */
+    private $contextStub;
+    /**
+     * @var MockObject
+     */
+    private $requestMock;
+    /**
+     * @var Stub
+     */
+    private $urlBuilderStub;
+    /**
+     * @var Stub
+     */
+    private $shipmentRepositoryStub;
+    /**
+     * @var UpdateStatusShipment
+     */
+    private $button;
 
     protected function setUp(): void
     {

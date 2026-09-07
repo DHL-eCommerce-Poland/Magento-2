@@ -21,14 +21,38 @@ use PHPUnit\Framework\TestCase;
 
 class MassCancelCourierBookingTest extends TestCase
 {
-    private Context|Stub $contextStub;
-    private Filter|MockObject $filterMock;
-    private CollectionFactory|MockObject $collectionFactoryMock;
-    private CourierBookingCancellationService|MockObject $cancellationServiceMock;
-    private RedirectFactory|Stub $redirectFactoryStub;
-    private Redirect|MockObject $redirectMock;
-    private ManagerInterface|MockObject $messageManagerMock;
-    private MassCancelCourierBooking $controller;
+    /**
+     * @var Stub
+     */
+    private $contextStub;
+    /**
+     * @var MockObject
+     */
+    private $filterMock;
+    /**
+     * @var MockObject
+     */
+    private $collectionFactoryMock;
+    /**
+     * @var MockObject
+     */
+    private $cancellationServiceMock;
+    /**
+     * @var Stub
+     */
+    private $redirectFactoryStub;
+    /**
+     * @var MockObject
+     */
+    private $redirectMock;
+    /**
+     * @var MockObject
+     */
+    private $messageManagerMock;
+    /**
+     * @var MassCancelCourierBooking
+     */
+    private $controller;
 
     protected function setUp(): void
     {

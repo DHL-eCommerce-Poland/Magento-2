@@ -22,7 +22,7 @@ class TablerateTest extends TestCase
     /**
      * @var Tablerate
      */
-    private Tablerate $backendModel;
+    private $backendModel;
 
     protected function setUp(): void
     {

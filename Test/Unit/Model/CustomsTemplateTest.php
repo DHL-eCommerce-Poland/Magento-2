@@ -17,7 +17,7 @@ class CustomsTemplateTest extends TestCase
     /**
      * @var CustomsTemplate
      */
-    private CustomsTemplate $model;
+    private $model;
 
     protected function setUp(): void
     {
