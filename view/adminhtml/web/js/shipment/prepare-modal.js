@@ -5,7 +5,8 @@ define([
     'Magento_Ui/js/modal/modal',
     'Magento_Ui/js/modal/alert',
     'mage/translate',
-    'mage/validation'
+    'mage/validation',
+    'mage/loader'
 ], function ($, ko, Component, modal, alert) {
     'use strict';
 
@@ -586,6 +587,9 @@ define([
 
         openModal: function (orderId, prepareUrl) {
             var self = this;
+            if (typeof $('body').loader === 'function') {
+                $('body').loader();
+            }
             $('body').trigger('processStart');
 
             $.getJSON(prepareUrl)
@@ -641,7 +645,11 @@ define([
                                     var selfModal = this;
                                     var $btn = $(e.target).closest('button');
                                     var $form = $('#ideo-dhl-prepare-modal-form');
-                                    
+
+                                    if ($form.length && typeof $form.valid === 'function' && !$form.valid()) {
+                                        return false;
+                                    }
+
                                     var draftJs = ko.toJS(self.shipmentData());
                                     var pFrom = draftJs.sender ? draftJs.sender.pickupHourFrom : null;
                                     var pTo = draftJs.sender ? draftJs.sender.pickupHourTo : null;
@@ -662,11 +670,13 @@ define([
                                         return false;
                                     }
 
-                                    // Double-click protection & native loader
+                                    // Double-click protection & native full-page loader
                                     $btn.prop('disabled', true);
+                                    if (typeof $('body').loader === 'function') {
+                                        $('body').loader();
+                                    }
                                     $('body').trigger('processStart');
 
-                                    var draftJs = ko.toJS(self.draft());
                                     var senderPresetId = (draftJs.sender && draftJs.sender.selectedDropOffPointId) ? draftJs.sender.selectedDropOffPointId : null;
                                     var shipmentPresetId = (draftJs.shipmentSettings && draftJs.shipmentSettings.selectedDeliveryServiceId) ? draftJs.shipmentSettings.selectedDeliveryServiceId : null;
 
@@ -680,10 +690,14 @@ define([
                                             selfModal.closeModal();
                                             var successMsg = saveRes.message || ($.mage.__('DHL shipment %1 has been created successfully.').replace('%1', saveRes.shipmentId || ''));
                                             showAdminMessage('success', successMsg);
+                                            // Keep full-page loader active until page reload finishes
+                                            $('body').trigger('processStart');
                                             setTimeout(function () {
                                                 window.location.reload();
-                                            }, 800);
+                                            }, 300);
                                         } else {
+                                            $('body').trigger('processStop');
+                                            $btn.prop('disabled', false);
                                             var errorMsg = (saveRes.message || $.mage.__('Error creating DHL shipment.'))
                                                 .replace(/\n/g, '<br/>');
                                             alert({
@@ -691,9 +705,13 @@ define([
                                                 content: errorMsg
                                             });
                                         }
-                                    }).always(function () {
+                                    }).fail(function () {
                                         $('body').trigger('processStop');
                                         $btn.prop('disabled', false);
+                                        alert({
+                                            title: $.mage.__('Error'),
+                                            content: $.mage.__('An error occurred while communicating with the server.')
+                                        });
                                     });
                                 }
                             }]

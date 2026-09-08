@@ -12,6 +12,9 @@ use Magento\Shipping\Model\Carrier\AbstractCarrier;
 use Magento\Shipping\Model\Carrier\CarrierInterface;
 use Magento\Shipping\Model\Rate\Result;
 use Magento\Shipping\Model\Rate\ResultFactory;
+use Magento\Shipping\Model\Tracking\Result\Status;
+use Magento\Shipping\Model\Tracking\Result\StatusFactory as TrackStatusFactory;
+use Magento\Shipping\Model\Tracking\ResultFactory as TrackResultFactory;
 use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 
@@ -27,6 +30,11 @@ class Carrier extends AbstractCarrier implements CarrierInterface
     protected $_code = self::CODE;
 
     /**
+     * @var bool
+     */
+    protected $_isTrackingAvailable = true;
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param RateErrorFactory $rateErrorFactory
      * @param LoggerInterface $logger
@@ -34,6 +42,9 @@ class Carrier extends AbstractCarrier implements CarrierInterface
      * @param RateMethodFactory $rateMethodFactory
      * @param MethodCatalog $methodCatalog
      * @param RateCalculator $rateCalculator
+     * @param TrackResultFactory $trackResultFactory
+     * @param TrackStatusFactory $trackStatusFactory
+     * @param TrackingUrlResolver $trackingUrlResolver
      * @param array $data
      */
     public function __construct(
@@ -44,6 +55,9 @@ class Carrier extends AbstractCarrier implements CarrierInterface
         private readonly RateMethodFactory $rateMethodFactory,
         private readonly MethodCatalog $methodCatalog,
         private readonly RateCalculator $rateCalculator,
+        private readonly TrackResultFactory $trackResultFactory,
+        private readonly TrackStatusFactory $trackStatusFactory,
+        private readonly TrackingUrlResolver $trackingUrlResolver,
         array $data = []
     ) {
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
@@ -168,5 +182,39 @@ class Carrier extends AbstractCarrier implements CarrierInterface
         }
 
         return $methods;
+    }
+
+    /**
+     * Check if carrier has shipping tracking option available.
+     *
+     * @return bool
+     */
+    public function isTrackingAvailable(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get shipping tracking information.
+     *
+     * @param string $tracking
+     *
+     * @return Status|Result|bool
+     */
+    public function getTrackingInfo(string $tracking): Status|Result|bool
+    {
+        $trackingNumber = trim((string)$tracking);
+        if ($trackingNumber === '') {
+            return false;
+        }
+
+        $status = $this->trackStatusFactory->create();
+        $status->setCarrier(self::CODE);
+        $carrierTitle = $this->getConfigData('title') ?: 'DHL Parcel';
+        $status->setCarrierTitle((string)$carrierTitle);
+        $status->setTracking($trackingNumber);
+        $status->setUrl($this->trackingUrlResolver->getUrl($trackingNumber));
+
+        return $status;
     }
 }

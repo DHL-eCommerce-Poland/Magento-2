@@ -4,7 +4,8 @@ define([
     'uiComponent',
     'Magento_Ui/js/modal/modal',
     'Magento_Ui/js/modal/alert',
-    'mage/translate'
+    'mage/translate',
+    'mage/loader'
 ], function ($, ko, Component, modal, alert, $t) {
     'use strict';
 

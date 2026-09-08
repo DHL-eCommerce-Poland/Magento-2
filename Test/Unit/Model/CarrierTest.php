@@ -8,6 +8,7 @@ use Ideo\Dhl\Model\Carrier;
 use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\RateCalculator;
 use Ideo\Dhl\Model\TableRateResolver;
+use Ideo\Dhl\Model\TrackingUrlResolver;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\DataObject;
 use Magento\Quote\Model\Quote\Address\RateRequest;
@@ -15,6 +16,9 @@ use Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
 use Magento\Shipping\Model\Rate\Result;
 use Magento\Shipping\Model\Rate\ResultFactory;
+use Magento\Shipping\Model\Tracking\ResultFactory as TrackResultFactory;
+use Magento\Shipping\Model\Tracking\Result\Status;
+use Magento\Shipping\Model\Tracking\Result\StatusFactory as TrackStatusFactory;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -189,6 +193,44 @@ class CarrierTest extends TestCase
     }
 
     /**
+     * Verify isTrackingAvailable returns true.
+     */
+    public function testIsTrackingAvailableReturnsTrue(): void
+    {
+        $carrier = $this->createCarrier(['active' => '1']);
+        self::assertTrue($carrier->isTrackingAvailable());
+    }
+
+    /**
+     * Verify getTrackingInfo returns false for empty tracking number.
+     */
+    public function testGetTrackingInfoReturnsFalseForEmptyTrackingNumber(): void
+    {
+        $carrier = $this->createCarrier(['active' => '1']);
+        self::assertFalse($carrier->getTrackingInfo('   '));
+    }
+
+    /**
+     * Verify getTrackingInfo returns Status object with correct tracking URL and carrier title.
+     */
+    public function testGetTrackingInfoReturnsStatusObjectWithUrlAndTitle(): void
+    {
+        $config = [
+            'active' => '1',
+            'title' => 'DHL Express Carrier',
+        ];
+        $carrier = $this->createCarrier($config);
+
+        $status = $carrier->getTrackingInfo('1234567890');
+
+        self::assertInstanceOf(Status::class, $status);
+        self::assertSame(Carrier::CODE, $status->getCarrier());
+        self::assertSame('DHL Express Carrier', $status->getCarrierTitle());
+        self::assertSame('1234567890', $status->getTracking());
+        self::assertSame('https://mojdhl.pl/sprawdz?paczki=1234567890', $status->getUrl());
+    }
+
+    /**
      * Create a carrier with isolated configuration and rate factories.
      *
      * @param array $config
@@ -229,6 +271,13 @@ class CarrierTest extends TestCase
         $errorFactory = $this->createStub(ErrorFactory::class);
         $errorFactory->method('create')->willReturnCallback(static fn (): DataObject => new DataObject());
 
+        $trackResult = $this->createStub(\Magento\Shipping\Model\Tracking\Result::class);
+        $trackResultFactory = $this->createStub(TrackResultFactory::class);
+        $trackResultFactory->method('create')->willReturn($trackResult);
+
+        $trackStatusFactory = $this->createStub(TrackStatusFactory::class);
+        $trackStatusFactory->method('create')->willReturnCallback(static fn (): Status => new Status());
+
         $tableRateResolver = $this->createStub(TableRateResolver::class);
         $rateCalculator = new RateCalculator($tableRateResolver);
 
@@ -239,7 +288,10 @@ class CarrierTest extends TestCase
             $resultFactory,
             $methodFactory,
             new MethodCatalog(),
-            $rateCalculator
+            $rateCalculator,
+            $trackResultFactory,
+            $trackStatusFactory,
+            new TrackingUrlResolver()
         );
     }
 }
