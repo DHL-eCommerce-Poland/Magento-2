@@ -9,6 +9,7 @@ use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CreateShipmentsResult;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
+use Ideo\Dhl\Model\ServicePoint\NearestPointResolver;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Lock\LockManagerInterface;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -31,6 +32,7 @@ class ShipmentCreationService
      * @param ReturnShipmentDataBuilder $returnBuilder
      * @param ReturnShipmentCreationService $returnCreationService
      * @param MagentoShipmentSyncService $magentoShipmentSyncService
+     * @param NearestPointResolver $nearestPointResolver
      */
     public function __construct(
         private readonly ShipmentDataService $shipmentDataService,
@@ -43,7 +45,8 @@ class ShipmentCreationService
         private readonly SerializerInterface $serializer,
         private readonly ReturnShipmentDataBuilder $returnBuilder,
         private readonly ReturnShipmentCreationService $returnCreationService,
-        private readonly MagentoShipmentSyncService $magentoShipmentSyncService
+        private readonly MagentoShipmentSyncService $magentoShipmentSyncService,
+        private readonly NearestPointResolver $nearestPointResolver
     ) {
     }
 
@@ -66,6 +69,8 @@ class ShipmentCreationService
         ?string $presetSenderId = null,
         ?string $presetShipmentId = null
     ): CreateShipmentsResult {
+        $shipmentData = $this->ensureServicePointResolved($shipmentData, $environment);
+
         $orderId = $shipmentData->getOrderId();
         $hash = hash('sha256', $this->serializer->serialize($shipmentData->toArray()));
         $lockName = 'dhl_shipment_create_' . ($orderId ?? $hash);
@@ -182,6 +187,8 @@ class ShipmentCreationService
         DhlShipmentData $shipmentData,
         string $environment = 'sandbox'
     ): CreateShipmentsResult {
+        $shipmentData = $this->ensureServicePointResolved($shipmentData, $environment);
+
         $lockName = 'dhl_shipment_recreate_' . $entityId;
 
         if (!$this->lockManager->lock($lockName, self::LOCK_TTL)) {
@@ -256,5 +263,54 @@ class ShipmentCreationService
                 $this->logger->warning(sprintf('[ShipmentCreation] Failed to release lock: %s', $lockName));
             }
         }
+    }
+
+    /**
+     * Resolve nearest service point if service is SP / EKS and recipient popId is empty.
+     *
+     * @param DhlShipmentData $shipmentData
+     * @param string $environment
+     *
+     * @return DhlShipmentData
+     * @throws LocalizedException
+     */
+    private function ensureServicePointResolved(DhlShipmentData $shipmentData, string $environment): DhlShipmentData
+    {
+        $serviceType = strtoupper(trim((string)$shipmentData->getShipmentSettings()->getServiceType()));
+        $popId = $shipmentData->getRecipient()->getPopId();
+
+        if (in_array($serviceType, ['SP', 'PS', 'EKS'], true) && (empty($popId) || trim((string)$popId) === '')) {
+            if ($this->nearestPointResolver !== null) {
+                try {
+                    $updatedRecipient = $this->nearestPointResolver->resolveForRecipient(
+                        $shipmentData->getRecipient(),
+                        $environment
+                    );
+                    $shipmentDataArr = $shipmentData->toArray();
+                    $shipmentDataArr['recipient'] = $updatedRecipient->toArray();
+
+                    return DhlShipmentData::fromArray($shipmentDataArr);
+                } catch (LocalizedException $e) {
+                    $this->logger->warning(sprintf(
+                        '[ShipmentCreation] Could not auto-resolve nearest point for order #%s: %s',
+                        (string) $shipmentData->getOrderId(),
+                        $e->getMessage()
+                    ));
+                    throw $e;
+                } catch (Throwable $e) {
+                    $this->logger->error(sprintf(
+                        '[ShipmentCreation] Error resolving nearest point for order #%s: %s',
+                        (string) $shipmentData->getOrderId(),
+                        $e->getMessage()
+                    ));
+                    throw new LocalizedException(__(
+                        'Could not resolve nearest DHL Service Point: %1',
+                        $e->getMessage()
+                    ));
+                }
+            }
+        }
+
+        return $shipmentData;
     }
 }

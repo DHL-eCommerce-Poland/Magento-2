@@ -269,6 +269,57 @@ class TestSoapClient extends SoapClient
     }
 
     /**
+     * Dummy getNearestServicepoints method for SoapClient mocking.
+     *
+     * @param mixed $args
+     * @return mixed
+     * @throws SoapFault
+     */
+    public function getNearestServicepoints(mixed $args): mixed
+    {
+        if ($this->shouldThrowFault) {
+            throw new SoapFault('POINTS_ERR', 'Error fetching nearest service points');
+        }
+
+        return (object) [
+            'getNearestServicepointsResult' => (object) [
+                'points' => (object) [
+                    'item' => [
+                        (object) [
+                            'sap' => 'POP-WAW-100',
+                            'name' => 'Sklep Żabka 100',
+                            'type' => 'POP',
+                            'description' => 'Opis punktu 100',
+                            'longitude' => '21.01',
+                            'latitude' => '52.23',
+                            'address' => (object) [
+                                'street' => 'Marszałkowska',
+                                'houseNumber' => '10',
+                                'postcode' => '00-001',
+                                'city' => 'Warszawa',
+                            ],
+                        ],
+                        (object) [
+                            'sap' => 'POP-WAW-101',
+                            'name' => 'Sklep Żabka 101',
+                            'type' => 'POP',
+                            'description' => 'Opis punktu 101',
+                            'longitude' => '21.02',
+                            'latitude' => '52.24',
+                            'address' => (object) [
+                                'street' => 'Aleje Jerozolimskie',
+                                'houseNumber' => '20',
+                                'postcode' => '00-002',
+                                'city' => 'Warszawa',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * Dummy __getLastRequest method.
      *
      * @return string

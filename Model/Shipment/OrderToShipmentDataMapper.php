@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Ideo\Dhl\Model\ServicePoint\NearestPointResolver;
 use Ideo\Dhl\Model\Shipment\Data\PackageData;
 use Ideo\Dhl\Model\Shipment\Data\RecipientData;
 use Ideo\Dhl\Model\Shipment\Data\SenderData;
@@ -28,6 +29,7 @@ class OrderToShipmentDataMapper
      * @param TemplateVariableResolver $variableResolver
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
+     * @param NearestPointResolver $nearestPointResolver
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -36,6 +38,7 @@ class OrderToShipmentDataMapper
         private readonly TemplateVariableResolver $variableResolver,
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
+        private readonly NearestPointResolver $nearestPointResolver,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -357,6 +360,17 @@ class OrderToShipmentDataMapper
             : null;
 
         $serviceType = (string)($defaultShipmentDefaults['serviceType'] ?? '');
+
+        if (in_array(strtoupper(trim((string)$serviceType)), ['SP', 'PS', 'EKS'], true)
+            && (empty($popId) || trim((string)$popId) === '')
+            && $this->nearestPointResolver !== null
+        ) {
+            try {
+                $recipientData = $this->nearestPointResolver->resolveForRecipient($recipientData);
+            } catch (Throwable $e) {
+                $this->logger?->warning('Could not resolve nearest point during OrderToShipmentDataMapper::map: ' . $e->getMessage());
+            }
+        }
 
         $shipmentSettings = new ShipmentSettingsData(
             serviceType: $serviceType,
