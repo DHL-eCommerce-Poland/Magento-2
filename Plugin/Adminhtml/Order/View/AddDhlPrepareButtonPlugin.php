@@ -58,10 +58,13 @@ class AddDhlPrepareButtonPlugin
                 return;
             }
 
-            // Hide button if order is canceled or closed
+            // Hide button if order is canceled, closed or complete
             $state = $order->getState();
 
-            if ($state === Order::STATE_CLOSED || $state === Order::STATE_CANCELED) {
+            if ($state === Order::STATE_CLOSED
+                || $state === Order::STATE_CANCELED
+                || $state === Order::STATE_COMPLETE
+            ) {
                 return;
             }
 

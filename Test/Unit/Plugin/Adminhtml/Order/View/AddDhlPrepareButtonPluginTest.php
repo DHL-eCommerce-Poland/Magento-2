@@ -87,4 +87,19 @@ class AddDhlPrepareButtonPluginTest extends TestCase
 
         $this->plugin->beforeSetLayout($block);
     }
+
+    public function testBeforeSetLayoutSkipsCompleteOrder(): void
+    {
+        $order = $this->createStub(Order::class);
+        $order->method('getShippingMethod')->willReturn('dhlparcel_standard');
+        $order->method('getState')->willReturn(Order::STATE_COMPLETE);
+
+        $this->orderRepository->method('get')->willReturn($order);
+
+        $block = $this->createMock(OrderViewBlock::class);
+        $block->method('getOrderId')->willReturn(13);
+        $block->expects($this->never())->method('addButton');
+
+        $this->plugin->beforeSetLayout($block);
+    }
 }
