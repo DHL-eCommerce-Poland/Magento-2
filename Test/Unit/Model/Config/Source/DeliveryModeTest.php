@@ -31,8 +31,8 @@ class DeliveryModeTest extends TestCase
     {
         $options = $this->sourceModel->toOptionArray();
 
-        $this->assertCount(2, $options);
+        $this->assertCount(1, $options);
         $this->assertEquals(DeliveryMode::MODE_MAP, $options[0]['value']);
-        $this->assertEquals(DeliveryMode::MODE_NEAREST, $options[1]['value']);
+        $this->assertEquals('nearest', DeliveryMode::MODE_NEAREST);
     }
 }

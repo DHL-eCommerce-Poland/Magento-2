@@ -23,10 +23,6 @@ class DeliveryMode implements OptionSourceInterface
                 'value' => self::MODE_MAP,
                 'label' => __('Point selection from map and delivery'),
             ],
-            [
-                'value' => self::MODE_NEAREST,
-                'label' => __('Delivery to nearest point based on recipient address'),
-            ],
         ];
     }
 }
