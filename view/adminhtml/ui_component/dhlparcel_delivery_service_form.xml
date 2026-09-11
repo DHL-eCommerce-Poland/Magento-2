@@ -602,6 +602,10 @@
                                     <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.weight</target>
                                     <callback>hide</callback>
                                 </action>
+                                <action name="4">
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.has_euro_return</target>
+                                    <callback>hide</callback>
+                                </action>
                             </actions>
                         </rule>
                         <rule name="1">
@@ -623,6 +627,10 @@
                                     <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.weight</target>
                                     <callback>show</callback>
                                 </action>
+                                <action name="4">
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.has_euro_return</target>
+                                    <callback>hide</callback>
+                                </action>
                             </actions>
                         </rule>
                         <rule name="2">
@@ -642,6 +650,10 @@
                                 </action>
                                 <action name="3">
                                     <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.weight</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="4">
+                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.has_euro_return</target>
                                     <callback>show</callback>
                                 </action>
                             </actions>

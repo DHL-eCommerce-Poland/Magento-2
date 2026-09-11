@@ -168,6 +168,10 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
             $this->setData(self::METHOD_CODE, implode(',', array_filter($methodCode)));
         }
 
+        if ($this->getPackageType() !== 'PALLET') {
+            $this->setHasEuroReturn(false);
+        }
+
         return $this;
     }
 

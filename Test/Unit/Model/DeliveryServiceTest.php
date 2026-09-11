@@ -121,4 +121,22 @@ class DeliveryServiceTest extends TestCase
 
         $this->assertSame('dhl_courier,dhl_express', $this->model->getData('method_code'));
     }
+
+    public function testBeforeSaveResetsHasEuroReturnForNonPalletPackageType(): void
+    {
+        $this->model->setPackageType('PACKAGE');
+        $this->model->setHasEuroReturn(true);
+        $this->model->beforeSave();
+
+        $this->assertFalse($this->model->getHasEuroReturn());
+    }
+
+    public function testBeforeSavePreservesHasEuroReturnForPalletPackageType(): void
+    {
+        $this->model->setPackageType('PALLET');
+        $this->model->setHasEuroReturn(true);
+        $this->model->beforeSave();
+
+        $this->assertTrue($this->model->getHasEuroReturn());
+    }
 }
