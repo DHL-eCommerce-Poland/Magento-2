@@ -463,4 +463,17 @@ class SoapClientAdapterTest extends TestCase
         $this->assertEquals('PNP_ERR', $result->getErrorCode());
         $this->assertStringContainsString('Error fetching PNP report', (string) $result->getErrorMessage());
     }
+
+    /**
+     * Test API origin constant is Ideo_M2 and XML_PATH_API_ORIGIN config constant is removed.
+     *
+     * @return void
+     */
+    public function testApiOriginConstantIsIdeoM2(): void
+    {
+        $reflection = new \ReflectionClass(SoapClientAdapter::class);
+        $this->assertTrue($reflection->hasConstant('API_ORIGIN'));
+        $this->assertEquals('Ideo_M2', $reflection->getConstant('API_ORIGIN'));
+        $this->assertFalse($reflection->hasConstant('XML_PATH_API_ORIGIN'));
+    }
 }

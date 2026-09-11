@@ -406,7 +406,6 @@ Enabled for Checkout,Włączone w procesie zakupowym
 Sandbox,Sandbox (Środowisko testowe)
 API Login,Login API
 API Password,Hasło API
-API Provider Origin Header (DHLApiOrgin),Nagłówek źródła dostawcy API (DHLApiOrgin)
 API Login Sandbox,Login API Sandbox
 API Password Sandbox,Hasło API Sandbox
 Import Table Rates CSV,Importuj CSV stawek tabelarycznych

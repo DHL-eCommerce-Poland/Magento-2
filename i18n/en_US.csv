@@ -405,7 +405,6 @@ Error,Error
 Sandbox,Sandbox
 "API Login","API Login"
 "API Password","API Password"
-"API Provider Origin Header (DHLApiOrgin)","API Provider Origin Header (DHLApiOrgin)"
 "API Login Sandbox","API Login Sandbox"
 "API Password Sandbox","API Password Sandbox"
 "Import Table Rates CSV","Import Table Rates CSV"

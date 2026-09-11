@@ -18,7 +18,7 @@ class SoapClientAdapter implements ClientInterface
     private const WSDL_URL_PRODUCTION = 'https://dhl24.com.pl/webapi2';
     private const WSDL_URL_SANDBOX = 'https://sandbox.dhl24.com.pl/webapi2';
     private const CONNECTION_TIMEOUT = 10;
-    private const XML_PATH_API_ORIGIN = 'carriers/dhlparcel/api_origin';
+    private const API_ORIGIN = 'Ideo_M2';
 
     /**
      * @param LoggerInterface $logger
@@ -1145,19 +1145,11 @@ class SoapClientAdapter implements ClientInterface
 
         $cacheWsdl = $isWritable ? WSDL_CACHE_BOTH : WSDL_CACHE_NONE;
 
-        $apiOrigin = 'Ideo_Magento';
-        if ($this->scopeConfig !== null) {
-            $configuredOrigin = (string) $this->scopeConfig->getValue(self::XML_PATH_API_ORIGIN);
-            if (trim($configuredOrigin) !== '') {
-                $apiOrigin = trim($configuredOrigin);
-            }
-        }
-
         try {
             // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
             $context = stream_context_create([
                 'http' => [
-                    'header' => 'DHLApiOrgin: ' . $apiOrigin,
+                    'header' => 'DHLApiOrgin: ' . self::API_ORIGIN,
                     'user_agent' => 'PHP-SOAP/' . PHP_VERSION . ' (Magento 2 Ideo_Dhl)',
                 ],
                 'ssl' => [
