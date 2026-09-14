@@ -58,8 +58,10 @@ class ConfigProvider implements ConfigProviderInterface
             'economy' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_economy_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
             'dhlparcel_connect' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_connect_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
             'connect' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_connect_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
-            'dhlparcel_international' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_international_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
-            'international' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_international_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
+            'dhlparcel_connect_parcel_shop' => 'pop',
+            'connect_parcel_shop' => 'pop',
+            'dhlparcel_connect_packstation' => 'box',
+            'connect_packstation' => 'box',
         ];
 
         return [
@@ -78,7 +80,8 @@ class ConfigProvider implements ConfigProviderInterface
                     'pointMethods' => [
                         'dhlparcel_economy',
                         'dhlparcel_connect',
-                        'dhlparcel_international',
+                        'dhlparcel_connect_parcel_shop',
+                        'dhlparcel_connect_packstation',
                     ],
                 ],
             ],

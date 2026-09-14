@@ -178,7 +178,7 @@ define([
             }
 
             return carrierCode === 'dhlparcel'
-                && ['economy', 'connect', 'international', 'connect_plus'].indexOf(methodCode) !== -1;
+                && ['economy', 'connect', 'connect_parcel_shop', 'connect_packstation', 'connect_plus'].indexOf(methodCode) !== -1;
         },
 
         /**
@@ -283,7 +283,8 @@ define([
                     pointMethods: [
                         'dhlparcel_economy',
                         'dhlparcel_connect',
-                        'dhlparcel_international',
+                        'dhlparcel_connect_parcel_shop',
+                        'dhlparcel_connect_packstation',
                         'dhlparcel_connect_plus'
                     ]
                 };

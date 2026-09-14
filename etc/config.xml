@@ -67,68 +67,29 @@
                 <method_parcel_12_specificerrmsg>This shipping method is currently unavailable.</method_parcel_12_specificerrmsg>
                 <method_parcel_12_showmethod>0</method_parcel_12_showmethod>
 
-                <method_return_polska_active>0</method_return_polska_active>
-                <method_return_polska_title>DHL Parcel</method_return_polska_title>
-                <method_return_polska_method_name>DHL Parcel Return Polska</method_return_polska_method_name>
-                <method_return_polska_pricing_type>fixed</method_return_polska_pricing_type>
-                <method_return_polska_price>17.00</method_return_polska_price>
-                <method_return_polska_sallowspecific>1</method_return_polska_sallowspecific>
-                <method_return_polska_specificcountry>PL</method_return_polska_specificcountry>
-                <method_return_polska_sort_order>50</method_return_polska_sort_order>
-                <method_return_polska_free_shipping_enable>0</method_return_polska_free_shipping_enable>
-                <method_return_polska_free_shipping_subtotal>0.00</method_return_polska_free_shipping_subtotal>
-                <method_return_polska_specificerrmsg>This shipping method is currently unavailable.</method_return_polska_specificerrmsg>
-                <method_return_polska_showmethod>0</method_return_polska_showmethod>
-
                 <method_economy_active>0</method_economy_active>
                 <method_economy_title>DHL Parcel</method_economy_title>
                 <method_economy_method_name>DHL Parcel Economy</method_economy_method_name>
                 <method_economy_pricing_type>fixed</method_economy_pricing_type>
-                <method_economy_price>14.50</method_economy_price>
-                <method_economy_point_map_type>all</method_economy_point_map_type>
+                <method_economy_price>14.00</method_economy_price>
                 <method_economy_point_delivery_mode>map</method_economy_point_delivery_mode>
+                <method_economy_point_map_type>all</method_economy_point_map_type>
                 <method_economy_sallowspecific>1</method_economy_sallowspecific>
                 <method_economy_specificcountry>PL</method_economy_specificcountry>
-                <method_economy_sort_order>60</method_economy_sort_order>
+                <method_economy_sort_order>50</method_economy_sort_order>
                 <method_economy_free_shipping_enable>0</method_economy_free_shipping_enable>
                 <method_economy_free_shipping_subtotal>0.00</method_economy_free_shipping_subtotal>
                 <method_economy_specificerrmsg>This shipping method is currently unavailable.</method_economy_specificerrmsg>
                 <method_economy_showmethod>0</method_economy_showmethod>
 
-                <method_max_paczka_active>0</method_max_paczka_active>
-                <method_max_paczka_title>DHL Parcel</method_max_paczka_title>
-                <method_max_paczka_method_name>DHL Parcel Max Paczka</method_max_paczka_method_name>
-                <method_max_paczka_pricing_type>fixed</method_max_paczka_pricing_type>
-                <method_max_paczka_price>95.00</method_max_paczka_price>
-                <method_max_paczka_sallowspecific>1</method_max_paczka_sallowspecific>
-                <method_max_paczka_specificcountry>PL</method_max_paczka_specificcountry>
-                <method_max_paczka_sort_order>70</method_max_paczka_sort_order>
-                <method_max_paczka_free_shipping_enable>0</method_max_paczka_free_shipping_enable>
-                <method_max_paczka_free_shipping_subtotal>0.00</method_max_paczka_free_shipping_subtotal>
-                <method_max_paczka_specificerrmsg>This shipping method is currently unavailable.</method_max_paczka_specificerrmsg>
-                <method_max_paczka_showmethod>0</method_max_paczka_showmethod>
-
-                <method_max_polpaleta_active>0</method_max_polpaleta_active>
-                <method_max_polpaleta_title>DHL Parcel</method_max_polpaleta_title>
-                <method_max_polpaleta_method_name>DHL Parcel Max Półpaleta</method_max_polpaleta_method_name>
-                <method_max_polpaleta_pricing_type>fixed</method_max_polpaleta_pricing_type>
-                <method_max_polpaleta_price>101.00</method_max_polpaleta_price>
-                <method_max_polpaleta_sallowspecific>1</method_max_polpaleta_sallowspecific>
-                <method_max_polpaleta_specificcountry>PL</method_max_polpaleta_specificcountry>
-                <method_max_polpaleta_sort_order>80</method_max_polpaleta_sort_order>
-                <method_max_polpaleta_free_shipping_enable>0</method_max_polpaleta_free_shipping_enable>
-                <method_max_polpaleta_free_shipping_subtotal>0.00</method_max_polpaleta_free_shipping_subtotal>
-                <method_max_polpaleta_specificerrmsg>This shipping method is currently unavailable.</method_max_polpaleta_specificerrmsg>
-                <method_max_polpaleta_showmethod>0</method_max_polpaleta_showmethod>
-
                 <method_max_paleta_active>0</method_max_paleta_active>
                 <method_max_paleta_title>DHL Parcel</method_max_paleta_title>
                 <method_max_paleta_method_name>DHL Parcel Max Paleta</method_max_paleta_method_name>
                 <method_max_paleta_pricing_type>fixed</method_max_paleta_pricing_type>
-                <method_max_paleta_price>130.00</method_max_paleta_price>
+                <method_max_paleta_price>250.00</method_max_paleta_price>
                 <method_max_paleta_sallowspecific>1</method_max_paleta_sallowspecific>
                 <method_max_paleta_specificcountry>PL</method_max_paleta_specificcountry>
-                <method_max_paleta_sort_order>90</method_max_paleta_sort_order>
+                <method_max_paleta_sort_order>60</method_max_paleta_sort_order>
                 <method_max_paleta_free_shipping_enable>0</method_max_paleta_free_shipping_enable>
                 <method_max_paleta_free_shipping_subtotal>0.00</method_max_paleta_free_shipping_subtotal>
                 <method_max_paleta_specificerrmsg>This shipping method is currently unavailable.</method_max_paleta_specificerrmsg>
@@ -147,24 +108,39 @@
                 <method_connect_specificerrmsg>This shipping method is currently unavailable.</method_connect_specificerrmsg>
                 <method_connect_showmethod>0</method_connect_showmethod>
 
-                <method_international_active>0</method_international_active>
-                <method_international_title>DHL Parcel</method_international_title>
-                <method_international_method_name>DHL Parcel International</method_international_method_name>
-                <method_international_pricing_type>fixed</method_international_pricing_type>
-                <method_international_price>126.00</method_international_price>
-                <method_international_sallowspecific>0</method_international_sallowspecific>
-                <method_international_specificcountry></method_international_specificcountry>
-                <method_international_sort_order>110</method_international_sort_order>
-                <method_international_free_shipping_enable>0</method_international_free_shipping_enable>
-                <method_international_free_shipping_subtotal>0.00</method_international_free_shipping_subtotal>
-                <method_international_specificerrmsg>This shipping method is currently unavailable.</method_international_specificerrmsg>
-                <method_international_showmethod>0</method_international_showmethod>
+                <method_connect_parcel_shop_active>0</method_connect_parcel_shop_active>
+                <method_connect_parcel_shop_title>DHL Parcel</method_connect_parcel_shop_title>
+                <method_connect_parcel_shop_method_name>DHL Parcel Connect Parcel Shop</method_connect_parcel_shop_method_name>
+                <method_connect_parcel_shop_pricing_type>fixed</method_connect_parcel_shop_pricing_type>
+                <method_connect_parcel_shop_price>126.00</method_connect_parcel_shop_price>
+                <method_connect_parcel_shop_point_map_type>pop</method_connect_parcel_shop_point_map_type>
+                <method_connect_parcel_shop_sallowspecific>0</method_connect_parcel_shop_sallowspecific>
+                <method_connect_parcel_shop_specificcountry></method_connect_parcel_shop_specificcountry>
+                <method_connect_parcel_shop_sort_order>110</method_connect_parcel_shop_sort_order>
+                <method_connect_parcel_shop_free_shipping_enable>0</method_connect_parcel_shop_free_shipping_enable>
+                <method_connect_parcel_shop_free_shipping_subtotal>0.00</method_connect_parcel_shop_free_shipping_subtotal>
+                <method_connect_parcel_shop_specificerrmsg>This shipping method is currently unavailable.</method_connect_parcel_shop_specificerrmsg>
+                <method_connect_parcel_shop_showmethod>0</method_connect_parcel_shop_showmethod>
+
+                <method_connect_packstation_active>0</method_connect_packstation_active>
+                <method_connect_packstation_title>DHL Parcel</method_connect_packstation_title>
+                <method_connect_packstation_method_name>DHL Parcel Connect Packstation</method_connect_packstation_method_name>
+                <method_connect_packstation_pricing_type>fixed</method_connect_packstation_pricing_type>
+                <method_connect_packstation_price>126.00</method_connect_packstation_price>
+                <method_connect_packstation_point_map_type>box</method_connect_packstation_point_map_type>
+                <method_connect_packstation_sallowspecific>0</method_connect_packstation_sallowspecific>
+                <method_connect_packstation_specificcountry></method_connect_packstation_specificcountry>
+                <method_connect_packstation_sort_order>115</method_connect_packstation_sort_order>
+                <method_connect_packstation_free_shipping_enable>0</method_connect_packstation_free_shipping_enable>
+                <method_connect_packstation_free_shipping_subtotal>0.00</method_connect_packstation_free_shipping_subtotal>
+                <method_connect_packstation_specificerrmsg>This shipping method is currently unavailable.</method_connect_packstation_specificerrmsg>
+                <method_connect_packstation_showmethod>0</method_connect_packstation_showmethod>
 
                 <method_connect_plus_active>0</method_connect_plus_active>
                 <method_connect_plus_title>DHL Parcel</method_connect_plus_title>
                 <method_connect_plus_method_name>DHL Parcel Connect Plus</method_connect_plus_method_name>
                 <method_connect_plus_pricing_type>fixed</method_connect_plus_pricing_type>
-                <method_connect_plus_price>80.00</method_connect_plus_price>
+                <method_connect_plus_price>70.00</method_connect_plus_price>
                 <method_connect_plus_sallowspecific>0</method_connect_plus_sallowspecific>
                 <method_connect_plus_specificcountry></method_connect_plus_specificcountry>
                 <method_connect_plus_sort_order>120</method_connect_plus_sort_order>
@@ -172,32 +148,6 @@
                 <method_connect_plus_free_shipping_subtotal>0.00</method_connect_plus_free_shipping_subtotal>
                 <method_connect_plus_specificerrmsg>This shipping method is currently unavailable.</method_connect_plus_specificerrmsg>
                 <method_connect_plus_showmethod>0</method_connect_plus_showmethod>
-
-                <method_return_connect_active>0</method_return_connect_active>
-                <method_return_connect_title>DHL Parcel</method_return_connect_title>
-                <method_return_connect_method_name>DHL Parcel Return Connect</method_return_connect_method_name>
-                <method_return_connect_pricing_type>fixed</method_return_connect_pricing_type>
-                <method_return_connect_price>70.00</method_return_connect_price>
-                <method_return_connect_sallowspecific>0</method_return_connect_sallowspecific>
-                <method_return_connect_specificcountry></method_return_connect_specificcountry>
-                <method_return_connect_sort_order>130</method_return_connect_sort_order>
-                <method_return_connect_free_shipping_enable>0</method_return_connect_free_shipping_enable>
-                <method_return_connect_free_shipping_subtotal>0.00</method_return_connect_free_shipping_subtotal>
-                <method_return_connect_specificerrmsg>This shipping method is currently unavailable.</method_return_connect_specificerrmsg>
-                <method_return_connect_showmethod>0</method_return_connect_showmethod>
-
-                <method_connect_polpaleta_active>0</method_connect_polpaleta_active>
-                <method_connect_polpaleta_title>DHL Parcel</method_connect_polpaleta_title>
-                <method_connect_polpaleta_method_name>DHL Parcel Connect Pallet - Półpaleta</method_connect_polpaleta_method_name>
-                <method_connect_polpaleta_pricing_type>fixed</method_connect_polpaleta_pricing_type>
-                <method_connect_polpaleta_price>460.00</method_connect_polpaleta_price>
-                <method_connect_polpaleta_sallowspecific>0</method_connect_polpaleta_sallowspecific>
-                <method_connect_polpaleta_specificcountry></method_connect_polpaleta_specificcountry>
-                <method_connect_polpaleta_sort_order>140</method_connect_polpaleta_sort_order>
-                <method_connect_polpaleta_free_shipping_enable>0</method_connect_polpaleta_free_shipping_enable>
-                <method_connect_polpaleta_free_shipping_subtotal>0.00</method_connect_polpaleta_free_shipping_subtotal>
-                <method_connect_polpaleta_specificerrmsg>This shipping method is currently unavailable.</method_connect_polpaleta_specificerrmsg>
-                <method_connect_polpaleta_showmethod>0</method_connect_polpaleta_showmethod>
 
                 <method_connect_pallet_active>0</method_connect_pallet_active>
                 <method_connect_pallet_title>DHL Parcel</method_connect_pallet_title>

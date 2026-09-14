@@ -19,7 +19,7 @@ class SystemXmlTest extends TestCase
 
         $groups = $xml->xpath('/config/system/section[@id="carriers"]/group[@id="dhlparcel"]/group');
         self::assertIsArray($groups);
-        self::assertCount(16, $groups);
+        self::assertCount(12, $groups);
 
         // General group assertion
         $generalGroups = $xml->xpath(
@@ -67,16 +67,12 @@ class SystemXmlTest extends TestCase
             'premium' => 'premium',
             'parcel_9' => 'parcel_9',
             'parcel_12' => 'parcel_12',
-            'return_polska' => 'return_polska',
             'economy' => 'economy',
-            'max_paczka' => 'max_paczka',
-            'max_polpaleta' => 'max_polpaleta',
             'max_paleta' => 'max_paleta',
             'connect' => 'connect',
-            'international' => 'international',
+            'connect_parcel_shop' => 'connect_parcel_shop',
+            'connect_packstation' => 'connect_packstation',
             'connect_plus' => 'connect_plus',
-            'return_connect' => 'return_connect',
-            'connect_polpaleta' => 'connect_polpaleta',
             'connect_pallet' => 'connect_pallet',
         ];
 
@@ -115,5 +111,17 @@ class SystemXmlTest extends TestCase
         self::assertCount(1, $economyGroup);
         self::assertCount(1, $economyGroup[0]->xpath('./field[@id="point_delivery_mode"]'));
         self::assertCount(1, $economyGroup[0]->xpath('./field[@id="point_map_type"]'));
+
+        $connectParcelShopGroup = $xml->xpath(
+            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]/group[@id="connect_parcel_shop"]'
+        );
+        self::assertCount(1, $connectParcelShopGroup);
+        self::assertCount(0, $connectParcelShopGroup[0]->xpath('./field[@id="point_map_type"]'));
+
+        $connectPackstationGroup = $xml->xpath(
+            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]/group[@id="connect_packstation"]'
+        );
+        self::assertCount(1, $connectPackstationGroup);
+        self::assertCount(0, $connectPackstationGroup[0]->xpath('./field[@id="point_map_type"]'));
     }
 }

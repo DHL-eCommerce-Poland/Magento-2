@@ -18,10 +18,12 @@ class ServicePointValidator
     private const POINT_METHODS = [
         'dhlparcel_economy',
         'dhlparcel_connect',
-        'dhlparcel_international',
+        'dhlparcel_connect_parcel_shop',
+        'dhlparcel_connect_packstation',
         'economy',
         'connect',
-        'international',
+        'connect_parcel_shop',
+        'connect_packstation',
     ];
 
     /**

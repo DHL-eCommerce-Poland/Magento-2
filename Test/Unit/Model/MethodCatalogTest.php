@@ -16,7 +16,7 @@ class MethodCatalogTest extends TestCase
     {
         $methods = (new MethodCatalog())->getMethods();
 
-        self::assertCount(15, $methods);
+        self::assertCount(11, $methods);
         self::assertArrayNotHasKey('group', $methods[0]);
         self::assertSame(
             [
@@ -24,16 +24,12 @@ class MethodCatalogTest extends TestCase
                 'premium',
                 'parcel_9',
                 'parcel_12',
-                'return_polska',
                 'economy',
-                'max_paczka',
-                'max_polpaleta',
                 'max_paleta',
                 'connect',
-                'international',
+                'connect_parcel_shop',
+                'connect_packstation',
                 'connect_plus',
-                'return_connect',
-                'connect_polpaleta',
                 'connect_pallet',
             ],
             array_column($methods, 'code')

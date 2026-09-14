@@ -24,8 +24,6 @@ class ConfigProviderTest extends TestCase
                 static fn (string $path) => match ($path) {
                     'carriers/dhlparcel/method_economy_point_map_type' => 'pop',
                     'carriers/dhlparcel/method_economy_point_delivery_mode' => 'map',
-                    'carriers/dhlparcel/method_connect_point_map_type' => 'all',
-                    'carriers/dhlparcel/method_international_point_map_type' => 'box',
                     default => null,
                 }
             );
@@ -67,6 +65,10 @@ class ConfigProviderTest extends TestCase
         $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['default']);
         $this->assertContainsEquals('dhlparcel_economy', $dhlConfig['pointMethods']);
         $this->assertContainsEquals('dhlparcel_connect', $dhlConfig['pointMethods']);
+        $this->assertEquals('pop', $dhlConfig['pointMapTypes']['connect_parcel_shop']);
+        $this->assertEquals('pop', $dhlConfig['pointMapTypes']['dhlparcel_connect_parcel_shop']);
+        $this->assertEquals('box', $dhlConfig['pointMapTypes']['connect_packstation']);
+        $this->assertEquals('box', $dhlConfig['pointMapTypes']['dhlparcel_connect_packstation']);
     }
 
     public function testGetConfigReturnsQuoteSelectedPointWhenPresent(): void
