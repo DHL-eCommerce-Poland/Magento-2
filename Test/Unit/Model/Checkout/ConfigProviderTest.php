@@ -64,7 +64,9 @@ class ConfigProviderTest extends TestCase
         $this->assertEquals('https://example.com/logo_dhl_box_pop.png', $dhlConfig['logos']['dhlparcel_economy']);
         $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['default']);
         $this->assertContainsEquals('dhlparcel_economy', $dhlConfig['pointMethods']);
-        $this->assertContainsEquals('dhlparcel_connect', $dhlConfig['pointMethods']);
+        $this->assertNotContains('dhlparcel_connect', $dhlConfig['pointMethods']);
+        $this->assertContainsEquals('dhlparcel_connect_parcel_shop', $dhlConfig['pointMethods']);
+        $this->assertContainsEquals('dhlparcel_connect_packstation', $dhlConfig['pointMethods']);
         $this->assertEquals('pop', $dhlConfig['pointMapTypes']['connect_parcel_shop']);
         $this->assertEquals('pop', $dhlConfig['pointMapTypes']['dhlparcel_connect_parcel_shop']);
         $this->assertEquals('box', $dhlConfig['pointMapTypes']['connect_packstation']);

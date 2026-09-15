@@ -125,8 +125,13 @@ class Carrier extends AbstractCarrier implements CarrierInterface
                 flatPrice: $flatPrice,
                 isFreeShippingEnabled: $isFreeShippingEnabled,
                 freeShippingSubtotal: $freeShippingSubtotal,
-                isFreeShipping: $request->getFreeShipping() === true
+                isFreeShipping: $request->getFreeShipping() === true,
+                destCountryId: $destCountryId
             );
+
+            if ($price === null) {
+                continue;
+            }
 
             $rate = $this->rateMethodFactory->create();
             $rate->setCarrier(self::CODE);

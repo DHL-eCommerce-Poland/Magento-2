@@ -6,11 +6,12 @@ namespace Ideo\Dhl\Controller\Adminhtml\System\Config;
 
 use Exception;
 use Ideo\Dhl\Model\MethodCatalog;
+use Ideo\Dhl\Model\TableRateResolver;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class ExportTablerates extends Action
 {
@@ -19,14 +20,16 @@ class ExportTablerates extends Action
     /**
      * @param Context $context
      * @param FileFactory $fileFactory
-     * @param ResourceConnection $resourceConnection
      * @param MethodCatalog $methodCatalog
+     * @param TableRateResolver $tableRateResolver
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Context $context,
         private readonly FileFactory $fileFactory,
-        private readonly ResourceConnection $resourceConnection,
-        private readonly MethodCatalog $methodCatalog
+        private readonly MethodCatalog $methodCatalog,
+        private readonly TableRateResolver $tableRateResolver,
+        private readonly StoreManagerInterface $storeManager
     ) {
         parent::__construct($context);
     }
@@ -40,29 +43,24 @@ class ExportTablerates extends Action
     public function execute(): ResponseInterface
     {
         $fileName = 'dhl_tablerates.csv';
-        $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('dhlparcel_tablerate');
 
-        $select = $connection->select()
-            ->from($tableName, [
-                'website_id',
-                'method_code',
-                'condition_type',
-                'condition_from',
-                'condition_to',
-                'price',
-            ]);
+        $websiteParam = $this->getRequest()?->getParam('website');
+        $websiteId = 0;
+        if ($websiteParam !== null && $websiteParam !== '') {
+            try {
+                $websiteId = (int)$this->storeManager->getWebsite($websiteParam)->getId();
+            } catch (Exception) {
+                $websiteId = is_numeric($websiteParam) ? (int)$websiteParam : 0;
+            }
+        }
 
-        $rows = $connection->fetchAll($select);
+        $rows = $this->tableRateResolver->getRatesForExport($websiteId);
 
         $methodOrder = array_flip(array_column($this->methodCatalog->getMethods(), 'code'));
 
         usort($rows, static function (array $a, array $b) use ($methodOrder): int {
-            if ((int)$a['website_id'] !== (int)$b['website_id']) {
-                return (int)$a['website_id'] <=> (int)$b['website_id'];
-            }
-            $orderA = $methodOrder[$a['method_code']] ?? 999;
-            $orderB = $methodOrder[$b['method_code']] ?? 999;
+            $orderA = $methodOrder[$a['method_code']] ?? PHP_INT_MAX;
+            $orderB = $methodOrder[$b['method_code']] ?? PHP_INT_MAX;
             if ($orderA !== $orderB) {
                 return $orderA <=> $orderB;
             }
@@ -72,11 +70,10 @@ class ExportTablerates extends Action
             return (float)$a['condition_from'] <=> (float)$b['condition_from'];
         });
 
-        $content = "Website,Method Code,Condition Type,Value From,Value To,Price\n";
+        $content = "Method Code,Condition Type,Value From,Value To,Price\n";
         foreach ($rows as $row) {
             $content .= sprintf(
-                "%d,%s,%s,%.4f,%.4f,%.4f\n",
-                (int)$row['website_id'],
+                "%s,%s,%.4f,%.4f,%.4f\n",
                 $row['method_code'],
                 $row['condition_type'],
                 (float)$row['condition_from'],

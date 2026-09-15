@@ -120,6 +120,11 @@ Invalid CSV header structure.,Nieprawidłowa struktura nagłówka pliku CSV.
 Invalid data format on line %1.,Nieprawidłowy format danych w linii %1.
 "Unsupported condition type ""%1"" on line %2.","Nieobsługiwany typ warunku ""%1"" w linii %2."
 Failed to save table rates: %1,Nie udało się zapisać stawek tabelarycznych: %1
+Failed to save country rates: %1,Nie udało się zapisać międzynarodowych stawek tabelarycznych: %1
+Invalid CSV header structure. Expected columns: Method Code, Country, Price.,Nieprawidłowa struktura nagłówka pliku CSV. Oczekiwane kolumny: Method Code, Country, Price.
+"Invalid country code ""%1"" on line %2. Please use 2-letter ISO country codes.","Nieprawidłowy kod kraju ""%1"" w linii %2. Prosimy użyć 2-literowych kodów ISO kraju."
+"Unsupported method code ""%1"" on line %2.","Nieobsługiwany kod metody ""%1"" w linii %2."
+"Invalid price value ""%1"" on line %2.","Nieprawidłowa wartość ceny ""%1"" w linii %2."
 Based on Cart,Na podstawie koszyka
 Private Address,Adres prywatny
 Company Address,Adres firmowy
@@ -145,6 +150,7 @@ ALL - All package types,ALL - Wszystkie typy paczek
 2EUROPE - Export shipments,2EUROPE - Przesyłki eksportowe
 PR - Premium shipments,PR - Przesyłki premium
 Fixed Price,Stała cena
+Table Rates: By Country,Stawki tabelaryczne: Wg kraju
 Table Rates: By Weight,Stawki tabelaryczne: Wg wagi
 Table Rates: By Subtotal,Stawki tabelaryczne: Wg wartości zamówienia
 Drop-Off Point or Courier,Nadanie w punkcie lub kurierem
@@ -410,6 +416,8 @@ API Login Sandbox,Login API Sandbox
 API Password Sandbox,Hasło API Sandbox
 Import Table Rates CSV,Importuj CSV stawek tabelarycznych
 Export Table Rates CSV,Eksportuj CSV stawek tabelarycznych
+Import International Country Rates CSV,Importuj CSV międzynarodowych stawek tabelarycznych
+Export International Country Rates CSV,Eksportuj CSV międzynarodowych stawek tabelarycznych
 Debug Mode,Tryb debugowania
 DHL Parcel Polska,DHL Parcel Polska
 Enabled,Włączone
@@ -536,3 +544,6 @@ Updated At,Zaktualizowano
 Customs Clearance,Odprawa celna
 Configuration,Konfiguracja
 Help,Pomoc
+"This list is automatically synchronized from the CSV country rates import.","Lista jest automatycznie synchronizowana na podstawie importu stawek krajów z pliku CSV."
+"Upload CSV with columns: Method Code, Condition Type (weight or subtotal), Value From (kg or order amount), Value To (kg or order amount), Price","Wgraj plik CSV z kolumnami: Method Code, Condition Type (weight lub subtotal), Value From (waga w kg lub kwota zamówienia), Value To (waga w kg lub kwota zamówienia), Price (cena dostawy)"
+"Upload CSV with columns: Method Code, Country, Price. For every method in the file, missing countries will be disabled automatically.","Wgraj plik CSV z kolumnami: Method Code, Country, Price. Dla każdej metody w pliku brakujące kraje zostaną automatycznie wyłączone."

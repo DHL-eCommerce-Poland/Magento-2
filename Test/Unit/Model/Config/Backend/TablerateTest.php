@@ -59,7 +59,7 @@ class TablerateTest extends TestCase
 
     public function testParseCsvRowsThrowsExceptionWhenHeaderIsInvalid(): void
     {
-        $csvContent = "Invalid,Header,Row\n1,parcel_polska,weight,0,5,15.0";
+        $csvContent = "Invalid,Header,Row\nparcel_polska,weight,0,5,15.0";
 
         $this->expectException(LocalizedException::class);
         $this->expectExceptionMessage('Invalid CSV header structure.');
@@ -67,7 +67,38 @@ class TablerateTest extends TestCase
         $this->backendModel->parseCsvContent($csvContent);
     }
 
-    public function testParseCsvRowsParsesValidRowsCorrectly(): void
+    public function testParseCsvRowsParsesWithoutWebsiteColumnInDefaultScope(): void
+    {
+        $csvContent = "Method Code,Condition Type,Value From,Value To,Price\n" .
+            "parcel_polska,weight,0.0,5.0,15.00\n" .
+            "premium,subtotal,0.0,100.0,10.00";
+
+        $rows = $this->backendModel->parseCsvContent($csvContent);
+
+        $this->assertCount(2, $rows);
+        $this->assertEquals([
+            'website_id' => 0,
+            'method_code' => 'parcel_polska',
+            'condition_type' => 'weight',
+            'condition_from' => 0.0,
+            'condition_to' => 5.0,
+            'price' => 15.00,
+        ], $rows[0]);
+        $this->assertEquals(0, $rows[1]['website_id']);
+    }
+
+    public function testParseCsvRowsParsesWithExplicitWebsiteId(): void
+    {
+        $csvContent = "Method Code,Condition Type,Value From,Value To,Price\n" .
+            "parcel_polska,weight,0.0,5.0,15.00";
+
+        $rows = $this->backendModel->parseCsvContent($csvContent, 2);
+
+        $this->assertCount(1, $rows);
+        $this->assertSame(2, $rows[0]['website_id']);
+    }
+
+    public function testParseCsvRowsParsesWithWebsiteColumnForBackwardCompatibility(): void
     {
         $csvContent = "Website,Method Code,Condition Type,Value From,Value To,Price\n" .
             "1,parcel_polska,weight,0.0,5.0,15.00\n" .
@@ -84,5 +115,21 @@ class TablerateTest extends TestCase
             'condition_to' => 5.0,
             'price' => 15.00,
         ], $rows[0]);
+    }
+
+    public function testResolveCurrentWebsiteIdReturnsScopeIdWhenWebsiteScope(): void
+    {
+        $this->backendModel->setScope(\Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES);
+        $this->backendModel->setScopeId('3');
+
+        $this->assertSame(3, $this->backendModel->resolveCurrentWebsiteId());
+    }
+
+    public function testResolveCurrentWebsiteIdReturnsZeroForDefaultScope(): void
+    {
+        $this->backendModel->setScope('default');
+        $this->backendModel->setScopeId('0');
+
+        $this->assertSame(0, $this->backendModel->resolveCurrentWebsiteId());
     }
 }

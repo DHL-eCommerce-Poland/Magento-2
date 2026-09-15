@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Model;
 
 use Ideo\Dhl\Model\Carrier;
+use Ideo\Dhl\Model\CountryRateResolver;
 use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\RateCalculator;
 use Ideo\Dhl\Model\TableRateResolver;
@@ -231,13 +232,77 @@ class CarrierTest extends TestCase
     }
 
     /**
+     * Verify method is excluded when rate calculator returns null for country rate.
+     */
+    public function testMethodIsExcludedWhenRateCalculatorReturnsNullForCountry(): void
+    {
+        $config = [
+            'active' => '1',
+            'method_connect_active' => '1',
+            'method_connect_title' => 'DHL Parcel Connect',
+            'method_connect_pricing_type' => 'country',
+        ];
+
+        $countryRateResolverMock = $this->createMock(CountryRateResolver::class);
+        $countryRateResolverMock->expects($this->once())
+            ->method('resolveRate')
+            ->with(0, 'connect', 'ES')
+            ->willReturn(null);
+
+        $rates = [];
+        $carrier = $this->createCarrier($config, $rates, $countryRateResolverMock);
+
+        $request = new RateRequest();
+        $request->setDestCountryId('ES');
+
+        $carrier->collectRates($request);
+
+        self::assertCount(0, $rates);
+    }
+
+    /**
+     * Verify method is included with country rate price when rate calculator returns price.
+     */
+    public function testMethodIsIncludedWithCountryRatePriceWhenRateCalculatorReturnsPrice(): void
+    {
+        $config = [
+            'active' => '1',
+            'method_connect_active' => '1',
+            'method_connect_title' => 'DHL Parcel Connect',
+            'method_connect_pricing_type' => 'country',
+        ];
+
+        $countryRateResolverMock = $this->createMock(CountryRateResolver::class);
+        $countryRateResolverMock->expects($this->once())
+            ->method('resolveRate')
+            ->with(0, 'connect', 'DE')
+            ->willReturn(43.00);
+
+        $rates = [];
+        $carrier = $this->createCarrier($config, $rates, $countryRateResolverMock);
+
+        $request = new RateRequest();
+        $request->setDestCountryId('DE');
+
+        $carrier->collectRates($request);
+
+        self::assertCount(1, $rates);
+        self::assertSame('connect', $rates[0]['method']);
+        self::assertSame(43.0, $rates[0]['price']);
+    }
+
+    /**
      * Create a carrier with isolated configuration and rate factories.
      *
      * @param array $config
      * @param array $rates
+     * @param CountryRateResolver|null $countryRateResolver
      */
-    private function createCarrier(array $config, array &$rates = []): Carrier
-    {
+    private function createCarrier(
+        array $config,
+        array &$rates = [],
+        ?CountryRateResolver $countryRateResolver = null
+    ): Carrier {
         $scopeConfig = $this->createStub(ScopeConfigInterface::class);
         $scopeConfig->method('getValue')->willReturnCallback(
             static function (string $path) use ($config) {
@@ -279,7 +344,8 @@ class CarrierTest extends TestCase
         $trackStatusFactory->method('create')->willReturnCallback(static fn (): Status => new Status());
 
         $tableRateResolver = $this->createStub(TableRateResolver::class);
-        $rateCalculator = new RateCalculator($tableRateResolver);
+        $countryRateResolver = $countryRateResolver ?? $this->createStub(CountryRateResolver::class);
+        $rateCalculator = new RateCalculator($tableRateResolver, $countryRateResolver);
 
         return new Carrier(
             $scopeConfig,

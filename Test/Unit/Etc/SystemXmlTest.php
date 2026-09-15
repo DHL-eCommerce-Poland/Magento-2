@@ -83,7 +83,7 @@ class SystemXmlTest extends TestCase
             self::assertCount(1, $methodGroups);
             self::assertFalse(isset($methodGroups[0]['expanded']));
 
-            foreach ([
+            $expectedFields = [
                 'active',
                 'title',
                 'pricing_type',
@@ -94,8 +94,9 @@ class SystemXmlTest extends TestCase
                 'specificcountry',
                 'showmethod',
                 'specificerrmsg',
-                'sort_order'
-            ] as $field) {
+                'sort_order',
+            ];
+            foreach ($expectedFields as $field) {
                 $fields = $methodGroups[0]->xpath('./field[@id="' . $field . '"]');
                 self::assertCount(1, $fields);
                 self::assertSame(
@@ -111,6 +112,12 @@ class SystemXmlTest extends TestCase
         self::assertCount(1, $economyGroup);
         self::assertCount(1, $economyGroup[0]->xpath('./field[@id="point_delivery_mode"]'));
         self::assertCount(1, $economyGroup[0]->xpath('./field[@id="point_map_type"]'));
+
+        $connectGroup = $xml->xpath(
+            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]/group[@id="connect"]'
+        );
+        self::assertCount(1, $connectGroup);
+        self::assertCount(0, $connectGroup[0]->xpath('./field[@id="point_map_type"]'));
 
         $connectParcelShopGroup = $xml->xpath(
             '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]/group[@id="connect_parcel_shop"]'

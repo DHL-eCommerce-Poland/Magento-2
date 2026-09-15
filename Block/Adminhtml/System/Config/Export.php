@@ -19,9 +19,17 @@ class Export extends Field
      * @return string
      * @throws LocalizedException
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     protected function _getElementHtml(AbstractElement $element): string
     {
-        $url = $this->getUrl('dhlparcel/system_config/exportTablerates');
+        $params = [];
+        $website = $this->getRequest()?->getParam('website');
+        if ($website !== null) {
+            $params['website'] = $website;
+        }
+        $url = empty($params)
+            ? $this->getUrl('dhlparcel/system_config/exportTablerates')
+            : $this->getUrl('dhlparcel/system_config/exportTablerates', $params);
 
         $button = $this->getLayout()->createBlock(Button::class)->setData([
             'id' => 'export_dhl_tablerates_button',

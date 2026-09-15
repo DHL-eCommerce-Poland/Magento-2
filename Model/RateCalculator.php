@@ -7,14 +7,17 @@ namespace Ideo\Dhl\Model;
 class RateCalculator
 {
     public const PRICING_TYPE_FIXED = 'fixed';
+    public const PRICING_TYPE_COUNTRY = 'country';
     public const PRICING_TYPE_WEIGHT = 'weight';
     public const PRICING_TYPE_SUBTOTAL = 'subtotal';
 
     /**
      * @param TableRateResolver $tableRateResolver
+     * @param CountryRateResolver $countryRateResolver
      */
     public function __construct(
-        private readonly TableRateResolver $tableRateResolver
+        private readonly TableRateResolver $tableRateResolver,
+        private readonly CountryRateResolver $countryRateResolver
     ) {
     }
 
@@ -30,8 +33,9 @@ class RateCalculator
      * @param bool $isFreeShippingEnabled
      * @param float $freeShippingSubtotal
      * @param bool $isFreeShipping
+     * @param string|null $destCountryId
      *
-     * @return float
+     * @return float|null Null when shipping method is unavailable for the destination.
      */
     public function calculate(
         int $websiteId,
@@ -42,10 +46,19 @@ class RateCalculator
         float $flatPrice,
         bool $isFreeShippingEnabled,
         float $freeShippingSubtotal,
-        bool $isFreeShipping
-    ): float {
+        bool $isFreeShipping,
+        ?string $destCountryId = null
+    ): ?float {
         if ($isFreeShipping || ($isFreeShippingEnabled && $packageValue >= $freeShippingSubtotal)) {
             return 0.00;
+        }
+
+        if ($pricingType === self::PRICING_TYPE_COUNTRY) {
+            if (empty($destCountryId)) {
+                return null;
+            }
+
+            return $this->countryRateResolver->resolveRate($websiteId, $methodCode, $destCountryId);
         }
 
         if ($pricingType === self::PRICING_TYPE_WEIGHT) {

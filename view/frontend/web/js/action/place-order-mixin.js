@@ -15,7 +15,7 @@ define([
             if (shippingMethod && (shippingMethod.carrier_code === 'dhlparcel' || shippingMethod.carrierCode === 'dhlparcel')) {
                 var methodCode = shippingMethod.method_code || shippingMethod.methodCode || '';
                 var fullMethodCode = (shippingMethod.carrier_code || shippingMethod.carrierCode || '') + '_' + methodCode;
-                var pointMethods = ['dhlparcel_economy', 'dhlparcel_connect', 'dhlparcel_connect_parcel_shop', 'dhlparcel_connect_packstation', 'economy', 'connect', 'connect_parcel_shop', 'connect_packstation'];
+                var pointMethods = ['dhlparcel_economy', 'dhlparcel_connect_parcel_shop', 'dhlparcel_connect_packstation', 'economy', 'connect_parcel_shop', 'connect_packstation'];
 
                 var isPointMethod = pointMethods.indexOf(fullMethodCode) !== -1 || pointMethods.indexOf(methodCode) !== -1;
 

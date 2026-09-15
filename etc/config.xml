@@ -98,7 +98,7 @@
                 <method_connect_active>0</method_connect_active>
                 <method_connect_title>DHL Parcel</method_connect_title>
                 <method_connect_method_name>DHL Parcel Connect</method_connect_method_name>
-                <method_connect_pricing_type>fixed</method_connect_pricing_type>
+                <method_connect_pricing_type>country</method_connect_pricing_type>
                 <method_connect_price>70.00</method_connect_price>
                 <method_connect_sallowspecific>0</method_connect_sallowspecific>
                 <method_connect_specificcountry></method_connect_specificcountry>
@@ -111,7 +111,7 @@
                 <method_connect_parcel_shop_active>0</method_connect_parcel_shop_active>
                 <method_connect_parcel_shop_title>DHL Parcel</method_connect_parcel_shop_title>
                 <method_connect_parcel_shop_method_name>DHL Parcel Connect Parcel Shop</method_connect_parcel_shop_method_name>
-                <method_connect_parcel_shop_pricing_type>fixed</method_connect_parcel_shop_pricing_type>
+                <method_connect_parcel_shop_pricing_type>country</method_connect_parcel_shop_pricing_type>
                 <method_connect_parcel_shop_price>126.00</method_connect_parcel_shop_price>
                 <method_connect_parcel_shop_point_map_type>pop</method_connect_parcel_shop_point_map_type>
                 <method_connect_parcel_shop_sallowspecific>0</method_connect_parcel_shop_sallowspecific>
@@ -125,7 +125,7 @@
                 <method_connect_packstation_active>0</method_connect_packstation_active>
                 <method_connect_packstation_title>DHL Parcel</method_connect_packstation_title>
                 <method_connect_packstation_method_name>DHL Parcel Connect Packstation</method_connect_packstation_method_name>
-                <method_connect_packstation_pricing_type>fixed</method_connect_packstation_pricing_type>
+                <method_connect_packstation_pricing_type>country</method_connect_packstation_pricing_type>
                 <method_connect_packstation_price>126.00</method_connect_packstation_price>
                 <method_connect_packstation_point_map_type>box</method_connect_packstation_point_map_type>
                 <method_connect_packstation_sallowspecific>0</method_connect_packstation_sallowspecific>
@@ -139,7 +139,7 @@
                 <method_connect_plus_active>0</method_connect_plus_active>
                 <method_connect_plus_title>DHL Parcel</method_connect_plus_title>
                 <method_connect_plus_method_name>DHL Parcel Connect Plus</method_connect_plus_method_name>
-                <method_connect_plus_pricing_type>fixed</method_connect_plus_pricing_type>
+                <method_connect_plus_pricing_type>country</method_connect_plus_pricing_type>
                 <method_connect_plus_price>70.00</method_connect_plus_price>
                 <method_connect_plus_sallowspecific>0</method_connect_plus_sallowspecific>
                 <method_connect_plus_specificcountry></method_connect_plus_specificcountry>
@@ -152,7 +152,7 @@
                 <method_connect_pallet_active>0</method_connect_pallet_active>
                 <method_connect_pallet_title>DHL Parcel</method_connect_pallet_title>
                 <method_connect_pallet_method_name>DHL Parcel Connect Pallet - Paleta</method_connect_pallet_method_name>
-                <method_connect_pallet_pricing_type>fixed</method_connect_pallet_pricing_type>
+                <method_connect_pallet_pricing_type>country</method_connect_pallet_pricing_type>
                 <method_connect_pallet_price>614.00</method_connect_pallet_price>
                 <method_connect_pallet_sallowspecific>0</method_connect_pallet_sallowspecific>
                 <method_connect_pallet_specificcountry></method_connect_pallet_specificcountry>

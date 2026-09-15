@@ -53,4 +53,46 @@ class TableRateResolver
 
         return (float)$result;
     }
+
+    /**
+     * Retrieve table rates rows for export by website ID.
+     *
+     * @param int $websiteId
+     * @param bool $fallbackToDefault
+     *
+     * @return array
+     */
+    public function getRatesForExport(int $websiteId, bool $fallbackToDefault = true): array
+    {
+        $connection = $this->resourceConnection->getConnection();
+        $tableName = $this->resourceConnection->getTableName('dhlparcel_tablerate');
+
+        $select = $connection->select()
+            ->from($tableName, [
+                'website_id',
+                'method_code',
+                'condition_type',
+                'condition_from',
+                'condition_to',
+                'price',
+            ])
+            ->where('website_id = ?', $websiteId);
+
+        $rows = $connection->fetchAll($select);
+        if (empty($rows) && $websiteId !== 0 && $fallbackToDefault) {
+            $defaultSelect = $connection->select()
+                ->from($tableName, [
+                    'website_id',
+                    'method_code',
+                    'condition_type',
+                    'condition_from',
+                    'condition_to',
+                    'price',
+                ])
+                ->where('website_id = 0');
+            $rows = $connection->fetchAll($defaultSelect);
+        }
+
+        return $rows;
+    }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Model;
 
+use Ideo\Dhl\Model\CountryRateResolver;
 use Ideo\Dhl\Model\RateCalculator;
 use Ideo\Dhl\Model\TableRateResolver;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -17,6 +18,11 @@ class RateCalculatorTest extends TestCase
     private $tableRateResolverMock;
 
     /**
+     * @var CountryRateResolver|MockObject
+     */
+    private $countryRateResolverMock;
+
+    /**
      * @var RateCalculator
      */
     private $rateCalculator;
@@ -24,12 +30,17 @@ class RateCalculatorTest extends TestCase
     protected function setUp(): void
     {
         $this->tableRateResolverMock = $this->createMock(TableRateResolver::class);
-        $this->rateCalculator = new RateCalculator($this->tableRateResolverMock);
+        $this->countryRateResolverMock = $this->createMock(CountryRateResolver::class);
+        $this->rateCalculator = new RateCalculator(
+            $this->tableRateResolverMock,
+            $this->countryRateResolverMock
+        );
     }
 
     public function testCalculateReturnsZeroWhenFreeShippingRequested(): void
     {
         $this->tableRateResolverMock->expects($this->never())->method('resolveRate');
+        $this->countryRateResolverMock->expects($this->never())->method('resolveRate');
 
         $price = $this->rateCalculator->calculate(
             websiteId: 1,
@@ -49,6 +60,7 @@ class RateCalculatorTest extends TestCase
     public function testCalculateReturnsZeroWhenFreeShippingThresholdMet(): void
     {
         $this->tableRateResolverMock->expects($this->never())->method('resolveRate');
+        $this->countryRateResolverMock->expects($this->never())->method('resolveRate');
 
         $price = $this->rateCalculator->calculate(
             websiteId: 1,
@@ -68,6 +80,7 @@ class RateCalculatorTest extends TestCase
     public function testCalculateReturnsFlatPriceWhenPricingTypeIsFixed(): void
     {
         $this->tableRateResolverMock->expects($this->never())->method('resolveRate');
+        $this->countryRateResolverMock->expects($this->never())->method('resolveRate');
 
         $price = $this->rateCalculator->calculate(
             websiteId: 1,
@@ -86,6 +99,7 @@ class RateCalculatorTest extends TestCase
 
     public function testCalculateReturnsTableRatePriceWhenWeightIsInRange(): void
     {
+        $this->countryRateResolverMock->expects($this->never())->method('resolveRate');
         $this->tableRateResolverMock
             ->expects($this->once())
             ->method('resolveRate')
@@ -109,6 +123,7 @@ class RateCalculatorTest extends TestCase
 
     public function testCalculateReturnsZeroWhenWeightIsOutOfBounds(): void
     {
+        $this->countryRateResolverMock->expects($this->never())->method('resolveRate');
         $this->tableRateResolverMock
             ->expects($this->once())
             ->method('resolveRate')
@@ -132,6 +147,7 @@ class RateCalculatorTest extends TestCase
 
     public function testCalculateReturnsTableRatePriceWhenSubtotalIsInRange(): void
     {
+        $this->countryRateResolverMock->expects($this->never())->method('resolveRate');
         $this->tableRateResolverMock
             ->expects($this->once())
             ->method('resolveRate')
@@ -151,5 +167,76 @@ class RateCalculatorTest extends TestCase
         );
 
         $this->assertEquals(12.00, $price);
+    }
+
+    public function testCalculateReturnsCountryRatePriceWhenCountryFound(): void
+    {
+        $this->tableRateResolverMock->expects($this->never())->method('resolveRate');
+        $this->countryRateResolverMock
+            ->expects($this->once())
+            ->method('resolveRate')
+            ->with(1, 'connect', 'DE')
+            ->willReturn(43.00);
+
+        $price = $this->rateCalculator->calculate(
+            websiteId: 1,
+            methodCode: 'connect',
+            pricingType: RateCalculator::PRICING_TYPE_COUNTRY,
+            packageWeight: 2.0,
+            packageValue: 50.0,
+            flatPrice: 70.0,
+            isFreeShippingEnabled: false,
+            freeShippingSubtotal: 0.0,
+            isFreeShipping: false,
+            destCountryId: 'DE'
+        );
+
+        $this->assertSame(43.00, $price);
+    }
+
+    public function testCalculateReturnsNullWhenCountryNotFound(): void
+    {
+        $this->tableRateResolverMock->expects($this->never())->method('resolveRate');
+        $this->countryRateResolverMock
+            ->expects($this->once())
+            ->method('resolveRate')
+            ->with(1, 'connect', 'ES')
+            ->willReturn(null);
+
+        $price = $this->rateCalculator->calculate(
+            websiteId: 1,
+            methodCode: 'connect',
+            pricingType: RateCalculator::PRICING_TYPE_COUNTRY,
+            packageWeight: 2.0,
+            packageValue: 50.0,
+            flatPrice: 70.0,
+            isFreeShippingEnabled: false,
+            freeShippingSubtotal: 0.0,
+            isFreeShipping: false,
+            destCountryId: 'ES'
+        );
+
+        $this->assertNull($price);
+    }
+
+    public function testCalculateReturnsNullWhenCountryRateAndDestCountryIdEmpty(): void
+    {
+        $this->tableRateResolverMock->expects($this->never())->method('resolveRate');
+        $this->countryRateResolverMock->expects($this->never())->method('resolveRate');
+
+        $price = $this->rateCalculator->calculate(
+            websiteId: 1,
+            methodCode: 'connect',
+            pricingType: RateCalculator::PRICING_TYPE_COUNTRY,
+            packageWeight: 2.0,
+            packageValue: 50.0,
+            flatPrice: 70.0,
+            isFreeShippingEnabled: false,
+            freeShippingSubtotal: 0.0,
+            isFreeShipping: false,
+            destCountryId: null
+        );
+
+        $this->assertNull($price);
     }
 }

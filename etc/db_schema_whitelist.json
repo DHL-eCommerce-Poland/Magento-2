@@ -124,5 +124,54 @@
         "constraint": {
             "PRIMARY": true
         }
+    },
+    "dhlparcel_country_rate": {
+        "column": {
+            "entity_id": true,
+            "website_id": true,
+            "method_code": true,
+            "country_id": true,
+            "price": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "DHLPARCEL_COUNTRY_RATE_WEBSITE_ID_METHOD_CODE_COUNTRY_ID": true
+        }
+    },
+    "dhlparcel_customs_template": {
+        "column": {
+            "entity_id": true,
+            "template_name": true,
+            "customs_type": true,
+            "category_of_item": true,
+            "currency": true,
+            "default_tariff_code": true,
+            "invoice_date": true,
+            "invoice_file": true,
+            "shipper_eori": true,
+            "shipper_nip": true,
+            "shipper_vat_no": true,
+            "country_of_origin": true,
+            "costs_of_shipment": true,
+            "gross_weight": true,
+            "receiver_eori": true,
+            "receiver_vat_no": true,
+            "contact_first_name": true,
+            "contact_last_name": true,
+            "additional_info": true,
+            "not_exceed_value": true,
+            "not_prohibited_goods": true,
+            "not_restricted_goods": true,
+            "customs_items": true,
+            "is_default": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "DHLPARCEL_CUSTOMS_TEMPLATE_IS_DEFAULT": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
     }
 }

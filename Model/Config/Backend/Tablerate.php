@@ -16,6 +16,7 @@ use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Magento\MediaStorage\Model\File\UploaderFactory;
+use Magento\Store\Model\ScopeInterface;
 
 class Tablerate extends File
 {
@@ -63,48 +64,67 @@ class Tablerate extends File
      * Parse CSV file content into tabular rate rows array.
      *
      * @param string $content Raw CSV text content.
+     * @param int|null $defaultWebsiteId Optional website ID override.
      *
      * @return array Array of parsed rate rows.
      * @throws LocalizedException If CSV header or content is invalid.
      */
-    public function parseCsvContent(string $content): array
+    public function parseCsvContent(string $content, ?int $defaultWebsiteId = null): array
     {
-        $lines = preg_split('/\r\n|\r|\n/', trim($content));
-        if (empty($lines)) {
+        $cleanContent = preg_replace('/^\xEF\xBB\xBF/', '', trim($content));
+        $lines = preg_split('/\r\n|\r|\n/', (string)$cleanContent);
+        if (empty($lines) || trim((string)$lines[0]) === '') {
             throw new LocalizedException(__('CSV file is empty.'));
         }
 
-        $header = str_getcsv(array_shift($lines), ',', '"', '\\');
+        $headerLine = array_shift($lines);
+        $delimiter = (substr_count((string)$headerLine, ';') > substr_count((string)$headerLine, ',')) ? ';' : ',';
+
+        $header = str_getcsv((string)$headerLine, $delimiter, '"', '\\');
         $normalizedHeader = array_map(static fn ($col) => strtolower(trim((string)$col)), $header);
 
-        $expectedColumns = ['website', 'method code', 'condition type', 'value from', 'value to', 'price'];
+        $expectedColumns = ['method code', 'condition type', 'value from', 'value to', 'price'];
         foreach ($expectedColumns as $col) {
             if (!in_array($col, $normalizedHeader, true)) {
-                throw new LocalizedException(__('Invalid CSV header structure.'));
+                throw new LocalizedException(
+                    __(
+                        'Invalid CSV header structure. ' .
+                        'Expected columns: Method Code, Condition Type, Value From, Value To, Price.'
+                    )
+                );
             }
         }
 
         $colMap = array_flip($normalizedHeader);
+        $hasWebsite = in_array('website', $normalizedHeader, true);
+        $currentScopeWebsiteId = $defaultWebsiteId ?? $this->resolveCurrentWebsiteId();
         $rows = [];
 
         foreach ($lines as $index => $line) {
-            if (trim($line) === '') {
+            if (trim((string)$line) === '') {
                 continue;
             }
 
-            $data = str_getcsv($line, ',', '"', '\\');
+            $data = str_getcsv((string)$line, $delimiter, '"', '\\');
             if (count($data) < count($expectedColumns)) {
                 throw new LocalizedException(
                     __('Invalid data format on line %1.', $index + 2)
                 );
             }
 
-            $websiteId = (int)trim($data[$colMap['website']]);
-            $methodCode = trim($data[$colMap['method code']]);
-            $conditionType = strtolower(trim($data[$colMap['condition type']]));
-            $from = (float)trim($data[$colMap['value from']]);
-            $to = (float)trim($data[$colMap['value to']]);
-            $price = (float)trim($data[$colMap['price']]);
+            if ($currentScopeWebsiteId > 0) {
+                $websiteId = $currentScopeWebsiteId;
+            } elseif ($hasWebsite && isset($data[$colMap['website']])) {
+                $websiteId = (int)trim((string)$data[$colMap['website']]);
+            } else {
+                $websiteId = 0;
+            }
+
+            $methodCode = trim((string)$data[$colMap['method code']]);
+            $conditionType = strtolower(trim((string)$data[$colMap['condition type']]));
+            $from = (float)trim((string)$data[$colMap['value from']]);
+            $to = (float)trim((string)$data[$colMap['value to']]);
+            $price = (float)trim((string)$data[$colMap['price']]);
 
             if (!in_array($conditionType, ['weight', 'subtotal'], true)) {
                 throw new LocalizedException(
@@ -145,20 +165,18 @@ class Tablerate extends File
 
             if ($this->_mediaDirectory->isExist($relativeFilePath)) {
                 $content = $this->_mediaDirectory->readFile($relativeFilePath);
-                $rows = $this->parseCsvContent($content);
-                $this->saveTableRates($rows);
+                $websiteId = $this->resolveCurrentWebsiteId();
+                $rows = $this->parseCsvContent($content, $websiteId);
+                $this->saveTableRates($rows, $websiteId);
 
                 $dateStr = date('Y-m-d_H-i-s');
-                $filename = $pathInfo['filename'] ?? 'dhl_tablerates';
-                $extension = $pathInfo['extension'] ?? 'csv';
-                $timestampedFileName = sprintf(
-                    '%s_%s.%s',
-                    $filename,
-                    $dateStr,
-                    $extension
-                );
-
+                $timestampedFileName = sprintf('dhl_tablerates_%s.csv', $dateStr);
                 $timestampedRelativePath = 'import/dhl/' . $timestampedFileName;
+
+                if ($this->_mediaDirectory->isExist($timestampedRelativePath)) {
+                    $this->_mediaDirectory->deleteFile($timestampedRelativePath);
+                }
+
                 if ($this->_mediaDirectory->renameFile($relativeFilePath, $timestampedRelativePath)) {
                     $this->setValue($timestampedFileName);
                 }
@@ -169,21 +187,61 @@ class Tablerate extends File
     }
 
     /**
+     * Clean config cache after save.
+     *
+     * @return $this
+     */
+    public function afterSave()
+    {
+        parent::afterSave();
+        $this->cacheTypeList->cleanType('config');
+        return $this;
+    }
+
+    /**
+     * Resolve website ID based on active configuration scope.
+     *
+     * @return int
+     */
+    public function resolveCurrentWebsiteId(): int
+    {
+        $scope = $this->getScope();
+        $scopeId = (int)$this->getScopeId();
+
+        if ($scope === ScopeInterface::SCOPE_WEBSITES) {
+            return $scopeId;
+        }
+
+        return 0;
+    }
+
+    /**
      * Bulk save parsed table rates into database table.
      *
      * @param array $rows
+     * @param int|null $websiteId
      *
      * @return void
      * @throws LocalizedException
      */
-    public function saveTableRates(array $rows): void
+    public function saveTableRates(array $rows, ?int $websiteId = null): void
     {
         $connection = $this->resourceConnection->getConnection();
         $tableName = $this->resourceConnection->getTableName('dhlparcel_tablerate');
 
+        $affectedWebsiteIds = $websiteId !== null
+            ? [$websiteId]
+            : array_values(array_unique(array_map(static fn ($r) => (int)$r['website_id'], $rows)));
+
+        if (empty($affectedWebsiteIds)) {
+            $affectedWebsiteIds = [0];
+        }
+
         $connection->beginTransaction();
         try {
-            $connection->delete($tableName);
+            $connection->delete($tableName, [
+                'website_id IN (?)' => $affectedWebsiteIds,
+            ]);
             if (!empty($rows)) {
                 $connection->insertMultiple($tableName, $rows);
             }
@@ -199,6 +257,7 @@ class Tablerate extends File
      *
      * @return string[]
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     protected function _getAllowedExtensions(): array
     {
         return ['csv'];
@@ -209,6 +268,7 @@ class Tablerate extends File
      *
      * @return string
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     protected function _getUploadDir(): string
     {
         return $this->_mediaDirectory->getAbsolutePath('import/dhl');
