@@ -3,6 +3,7 @@ Back,Back
 "Order Courier","Order Courier"
 "Cancel Courier Booking","Cancel Courier Booking"
 "Are you sure you want to cancel courier booking for this shipment?","Are you sure you want to cancel courier booking for this shipment?"
+"Are you sure you want to cancel courier booking for the selected shipments?","Are you sure you want to cancel courier booking for the selected shipments?"
 "Create Return Shipment","Create Return Shipment"
 "Are you sure you want to create a return shipment for this parcel?","Are you sure you want to create a return shipment for this parcel?"
 Delete,Delete
@@ -119,6 +120,11 @@ Shipments,Shipments
 "Invalid data format on line %1.","Invalid data format on line %1."
 "Unsupported condition type ""%1"" on line %2.","Unsupported condition type ""%1"" on line %2."
 "Failed to save table rates: %1","Failed to save table rates: %1"
+"Failed to save country rates: %1","Failed to save country rates: %1"
+"Invalid CSV header structure. Expected columns: Method Code","Invalid CSV header structure. Expected columns: Method Code"
+"Invalid country code ""%1"" on line %2. Please use 2-letter ISO country codes.","Invalid country code ""%1"" on line %2. Please use 2-letter ISO country codes."
+"Unsupported method code ""%1"" on line %2.","Unsupported method code ""%1"" on line %2."
+"Invalid price value ""%1"" on line %2.","Invalid price value ""%1"" on line %2."
 "Based on Cart","Based on Cart"
 "Private Address","Private Address"
 "Company Address","Company Address"
@@ -144,6 +150,7 @@ Pallet,Pallet
 "2EUROPE - Export shipments","2EUROPE - Export shipments"
 "PR - Premium shipments","PR - Premium shipments"
 "Fixed Price","Fixed Price"
+"Table Rates: By Country","Table Rates: By Country"
 "Table Rates: By Weight","Table Rates: By Weight"
 "Table Rates: By Subtotal","Table Rates: By Subtotal"
 "Drop-Off Point or Courier","Drop-Off Point or Courier"
@@ -377,10 +384,10 @@ Terminal,Terminal
 "DHL Service Point Pickup","DHL Service Point Pickup"
 "Delivery will automatically be made to the nearest service point based on the entered recipient address.","Delivery will automatically be made to the nearest service point based on the entered recipient address."
 "Select a DHL pickup point from the map:","Select a DHL pickup point from the map:"
-"Select point from map","Select point from map"
+"Select pickup point","Select pickup point"
 "Selected pickup point:","Selected pickup point:"
 "German Customer Number (Postnummer):","German Customer Number (Postnummer):"
-"Change point","Change point"
+"Change pickup point","Change pickup point"
 "Please select shipments for courier booking.","Please select shipments for courier booking."
 "Select Date","Select Date"
 "Order Courier for DHL Shipments","Order Courier for DHL Shipments"
@@ -409,6 +416,8 @@ Sandbox,Sandbox
 "API Password Sandbox","API Password Sandbox"
 "Import Table Rates CSV","Import Table Rates CSV"
 "Export Table Rates CSV","Export Table Rates CSV"
+"Import International Country Rates CSV","Import International Country Rates CSV"
+"Export International Country Rates CSV","Export International Country Rates CSV"
 "Debug Mode","Debug Mode"
 "DHL Parcel Polska","DHL Parcel Polska"
 Enabled,Enabled
@@ -535,3 +544,6 @@ Packages,Packages
 Customs Clearance,Customs Clearance
 Configuration,Configuration
 Help,Help
+"This list is automatically synchronized from the CSV country rates import.","This list is automatically synchronized from the CSV country rates import."
+"Upload CSV with columns: Method Code, Condition Type (weight or subtotal), Value From (kg or order amount), Value To (kg or order amount), Price","Upload CSV with columns: Method Code, Condition Type (weight or subtotal), Value From (kg or order amount), Value To (kg or order amount), Price"
+"Upload CSV with columns: Method Code, Country, Price. For every method in the file, missing countries will be disabled automatically.","Upload CSV with columns: Method Code, Country, Price. For every method in the file, missing countries will be disabled automatically."

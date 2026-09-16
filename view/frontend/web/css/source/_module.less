@@ -22,48 +22,62 @@
 }
 
 & when (@media-common = true) {
-    .dhl-method-logo {
-        height: 22px;
-        width: auto;
-        max-width: 80px;
-        vertical-align: middle;
-        margin-left: 8px;
-        display: inline-block;
+    .dhl-method-logo-wrapper {
+        margin: 0 0 6px 0;
+        padding: 0;
+        display: block;
+        clear: both;
+
+        .dhl-method-logo {
+            height: auto;
+            max-height: 28px;
+            width: auto;
+            max-width: none;
+            margin: 0;
+            padding: 0;
+            vertical-align: middle;
+            display: block;
+            border: 0;
+        }
     }
 
-    .dhl-logo-base() {
-        content: '';
-        display: inline-block;
-        vertical-align: middle;
-        margin-left: 8px;
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center left;
-        height: 24px;
-        width: 70px;
-    }
+    .dhl-carrier-wrapper {
+        margin-top: 6px;
+        clear: both;
 
-    .table-checkout-shipping-method {
-        label[for^="s_method_dhlparcel_"]:not(:has(.dhl-method-logo)) {
-            &::after {
-                .dhl-logo-base();
-                background-image: url('../images/logo_dhl.png');
+        .dhl-select-point-btn {
+            font-size: 12px;
+            line-height: 1.4;
+            padding: 5px 12px;
+            margin-top: 8px;
+            background-color: #FFCC00;
+            border: 1px solid #D2072A;
+            color: #D2072A;
+            font-weight: bold;
+            box-shadow: none;
+
+            &:hover, &:focus, &:active {
+                background-color: #e6b800;
+                border-color: #D2072A;
+                color: #D2072A;
+            }
+
+            span {
+                color: #D2072A;
             }
         }
 
-        label[for="s_method_dhlparcel_economy"]:not(:has(.dhl-method-logo)) {
-            &::after {
-                background-image: url('../images/logo_dhl_box_pop.png');
-            }
+        .dhl-point-selected-inline {
+            background: #fff;
+            padding: 8px 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            margin-top: 6px;
+            font-size: 13px;
         }
 
-        tr:has(input[value^="dhlparcel_"]) .col-carrier:not(:has(.dhl-method-logo))::after {
-            .dhl-logo-base();
-            background-image: url('../images/logo_dhl.png');
-        }
-
-        tr:has(input[value="dhlparcel_economy"]) .col-carrier:not(:has(.dhl-method-logo))::after {
-            background-image: url('../images/logo_dhl_box_pop.png');
+        .dhl-point-prompt-inline {
+            margin-top: 6px;
         }
     }
 }

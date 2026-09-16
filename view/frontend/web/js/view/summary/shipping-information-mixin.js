@@ -100,7 +100,7 @@ define([
                     }
                     var formattedAddress = addressParts.join(', ');
 
-                    var label = $t('Pickup Point') + ': ' + name + ' (' + sapId + ')';
+                    var label = $t('Pickup Point') + ': ' + name;
                     if (formattedAddress) {
                         label += ', ' + formattedAddress;
                     }
