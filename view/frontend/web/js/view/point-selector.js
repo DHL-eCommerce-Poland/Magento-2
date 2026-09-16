@@ -2,442 +2,54 @@ define([
     'uiComponent',
     'jquery',
     'Magento_Checkout/js/model/quote',
-    'Magento_Checkout/js/model/shipping-service',
-    'Magento_Checkout/js/checkout-data',
+    'Ideo_Dhl/js/model/point-state',
     'Magento_Ui/js/modal/modal',
     'mage/translate'
-], function (Component, $, quote, shippingService, checkoutData, modal, $t) {
+], function (Component, $, quote, pointState, modal, $t) {
     'use strict';
 
     return Component.extend({
         defaults: {
             template: 'Ideo_Dhl/point-selector',
-            selectedPoint: null,
-            isModalOpen: false,
-            isPointSelected: false
+            isModalOpen: false
         },
 
         /**
-         * Initialize observables and shipping method listeners.
+         * Initialize component observables and message listeners.
          */
         initObservable: function () {
             this._super();
-            this.observe(['selectedPoint', 'isModalOpen', 'isPointSelected']);
+            this.observe(['isModalOpen']);
 
-            var self = this;
-
-            /**
-             * Update point selector visibility from the current checkout selection.
-             */
-            var updatePointSelectionState = function () {
-                var method = self.getSelectedShippingMethod();
-                self.isPointSelected(self.isDhlPointMethod(method));
-                self.renderInlinePointSelectors();
-            };
-
-            var applyClickedShippingMethod = function (element) {
-                var method = self.methodFromCode($(element).val() || '');
-                if (!method) {
-                    return;
-                }
-
-                self._dhlClickedShippingMethod = method;
-                updatePointSelectionState();
-
-                clearTimeout(self._dhlClickedShippingMethodTimeout);
-                self._dhlClickedShippingMethodTimeout = setTimeout(function () {
-                    self._dhlClickedShippingMethod = null;
-                    updatePointSelectionState();
-                }, 250);
-            };
-
-            var updateTimeout;
-            var schedulePointSelectionStateUpdate = function () {
-                clearTimeout(updateTimeout);
-                updateTimeout = setTimeout(updatePointSelectionState, 75);
-                self._dhlPointSelectorUpdateTimeout = updateTimeout;
-            };
-
-            updatePointSelectionState();
-
-            var clearSelectedPoint = function () {
-                self.selectedPoint(null);
-                try {
-                    window.sessionStorage.removeItem('dhl_selected_service_point');
-                } catch (e) {
-                    console.warn('DHL Point Selector: Error clearing selected point:', e);
-                }
-
-                var address = quote.shippingAddress();
-                if (address && address.extension_attributes) {
-                    delete address.extension_attributes['dhl_service_point_id'];
-                    delete address.extension_attributes['dhl_service_point_name'];
-                    delete address.extension_attributes['dhl_service_point_street'];
-                    delete address.extension_attributes['dhl_service_point_postcode'];
-                    delete address.extension_attributes['dhl_service_point_city'];
-                    delete address.extension_attributes['dhl_is_packstation'];
-                    delete address.extension_attributes['dhl_is_postfiliale'];
-                    delete address.extension_attributes['dhl_postnummer'];
-                }
-            };
-
-            var lastMethodCode = null;
-            quote.shippingMethod.subscribe(function (newMethod) {
-                var currentCode = newMethod ? ((newMethod.carrier_code || newMethod.carrierCode || '') + '_' + (newMethod.method_code || newMethod.methodCode || '')) : '';
-                if (lastMethodCode !== null && lastMethodCode !== currentCode) {
-                    clearSelectedPoint();
-                }
-                lastMethodCode = currentCode;
-                updatePointSelectionState();
-            });
-
-            self.selectedPoint.subscribe(function () {
-                self.scheduleInlinePointSelectorsRender();
-            });
-
-            shippingService.getShippingRates().subscribe(function () {
-                schedulePointSelectionStateUpdate();
-                self.scheduleInlinePointSelectorsRender();
-            });
-
-            shippingService.isLoading.subscribe(function (isLoading) {
-                if (!isLoading) {
-                    self.scheduleInlinePointSelectorsRender();
-                }
-            });
-
-            $(document).ready(function () {
-                self.scheduleInlinePointSelectorsRender();
-            });
-
-            $(document).on('click.ideoDhlPointSelector', '.table-checkout-shipping-method tr.row', function () {
-                var radio = $(this).find('input[type="radio"]').first();
-                if (radio.length) {
-                    applyClickedShippingMethod(radio[0]);
-                }
-            });
-
-            $(document).on('click.ideoDhlPointSelectorBtn', '.dhl-select-point-btn', function (e) {
-                e.preventDefault();
-
-                var $btn = $(this);
-                var $row = $btn.closest('tr');
-                if ($row.length) {
-                    var $radio = $row.find('input[type="radio"]').first();
-                    if ($radio.length && !$radio.is(':checked')) {
-                        $radio.prop('checked', true).trigger('click').trigger('change');
-                    }
-                }
-
-                self.openMapModal();
-            });
-
-            $(document).on('change.ideoDhlPostnummer input.ideoDhlPostnummer', '.dhl-postnummer-input', function (e) {
-                self.updatePostnummer({}, e);
-            });
-
-            self.scheduleInlinePointSelectorsRender();
+            this.initListeners();
 
             return this;
         },
 
         /**
-         * Schedule rendering of inline point selectors with retries for asynchronous Knockout DOM updates.
-         *
-         * @param {number} [retryCount=0] Current retry iteration.
+         * Initialize component instance.
          */
-        scheduleInlinePointSelectorsRender: function () {
-            var self = this;
-            if (this._dhlRenderTimer) {
-                clearTimeout(this._dhlRenderTimer);
-            }
-            self.renderInlinePointSelectors();
-            this._dhlRenderTimer = setTimeout(function () {
-                self.renderInlinePointSelectors();
-            }, 150);
+        initialize: function () {
+            this._super();
+            return this;
         },
 
         /**
-         * Dynamically render point selector button and details directly inside shipping method row cell.
-         */
-        renderInlinePointSelectors: function () {
-            var self = this;
-            var config = this.getDhlConfig();
-            var pointMethods = (config && config.pointMethods && config.pointMethods.length)
-                ? config.pointMethods
-                : [
-                    'dhlparcel_economy',
-                    'dhlparcel_connect_parcel_shop',
-                    'dhlparcel_connect_packstation'
-                ];
-
-            var currentMethod = this.getSelectedShippingMethod();
-            var currentFullCode = currentMethod
-                ? ((currentMethod.carrier_code || currentMethod.carrierCode || '') + '_' + (currentMethod.method_code || currentMethod.methodCode || ''))
-                : '';
-
-            pointMethods.forEach(function (fullCode) {
-                var parts = self.methodFromCode(fullCode);
-                var carrierCode = parts ? parts.carrier_code : 'dhlparcel';
-                var methodCode = parts ? parts.method_code : fullCode;
-
-                var labelId = '#label_method_' + methodCode + '_' + carrierCode;
-                var $cell = $(labelId);
-
-                if (!$cell.length) {
-                    var $input = $('input[value="' + fullCode + '"], input[value="' + methodCode + '"]');
-                    if ($input.length) {
-                        var $row = $input.closest('tr');
-                        if ($row.length) {
-                            $cell = $row.find('[id^="label_method_"]').first();
-                            if (!$cell.length) {
-                                $cell = $row.find('.col-method').last();
-                            }
-                        }
-                    }
-                }
-
-                if (!$cell.length) {
-                    return;
-                }
-
-                var wrapperSelector = '[data-dhl-wrapper="' + fullCode + '"]';
-                var $wrapper = $cell.find(wrapperSelector);
-
-                if (!$wrapper.length) {
-                    $cell.append('<div class="dhl-carrier-wrapper" data-dhl-wrapper="' + fullCode + '" style="margin-top: 6px;"></div>');
-                    $wrapper = $cell.find(wrapperSelector);
-                }
-
-                var isSelected = (currentFullCode === fullCode || currentFullCode === methodCode);
-
-                if (isSelected && self.isNearestDeliveryMode()) {
-                    var nearestHtml = '<div class="dhl-point-nearest-info" style="color: #333; font-size: 12px; margin-top: 4px;">' +
-                            '<strong>' + $t('DHL Service Point Pickup') + '</strong><br/>' +
-                            '<span>' + $t('Delivery will automatically be made to the nearest service point based on the entered recipient address.') + '</span>' +
-                        '</div>';
-                    if ($wrapper.html() !== nearestHtml) {
-                        $wrapper.html(nearestHtml);
-                    }
-                    return;
-                }
-
-                var point = self.selectedPoint();
-                if (point && point.sap && (isSelected || !currentFullCode)) {
-                    var html = '<div class="dhl-point-selected-inline" style="background: #fff; padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 4px; margin-top: 6px; font-size: 13px;">';
-                    html += '<p style="margin-bottom: 4px; font-weight: bold; color: #333;">' + $t('Selected pickup point:') + '</p>';
-                    html += '<div style="line-height: 1.4;">';
-                    html += '<strong>' + $('<div>').text(point.name || '').html() + '</strong><br/>';
-                    html += $('<div>').text((point.street || '') + ' ' + (point.streetNo || point.houseNo || '')).html() + '<br/>';
-                    html += $('<div>').text((point.zip || '') + ' ' + (point.city || '')).html();
-                    html += '</div>';
-
-                    if (self.isDePackstationSelected()) {
-                        html += '<div class="dhl-postnummer-field field required" style="margin-top: 8px;">';
-                        html += '<label for="dhl_postnummer_inline" style="font-weight: bold; font-size: 12px; color: #333;">' + $t('German Customer Number (Postnummer):') + ' <span style="color: #e02b27;">*</span></label>';
-                        html += '<input type="text" id="dhl_postnummer_inline" name="dhl_postnummer" class="input-text required-entry dhl-postnummer-input" value="' + $('<div>').text(point.postnummer || '').html() + '" placeholder="12345678" style="margin-top: 4px; max-width: 220px; display: block;" />';
-                        html += '<div id="dhl_postnummer_inline_error" class="dhl-postnummer-error mage-error" style="display: none; color: #e02b27; font-size: 12px; margin-top: 4px;"></div>';
-                        html += '</div>';
-                    } else if (self.isDePointSelected()) {
-                        html += '<div class="dhl-postnummer-field field" style="margin-top: 8px;">';
-                        html += '<label for="dhl_postnummer_inline_opt" style="font-weight: bold; font-size: 12px; color: #333;">' + $t('German Customer Number (Postnummer):') + '</label>';
-                        html += '<input type="text" id="dhl_postnummer_inline_opt" name="dhl_postnummer" class="input-text dhl-postnummer-input" value="' + $('<div>').text(point.postnummer || '').html() + '" placeholder="12345678" style="margin-top: 4px; max-width: 220px; display: block;" />';
-                        html += '<div id="dhl_postnummer_inline_opt_error" class="dhl-postnummer-error mage-error" style="display: none; color: #e02b27; font-size: 12px; margin-top: 4px;"></div>';
-                        html += '</div>';
-                    }
-
-                    html += '<button type="button" class="action secondary small dhl-select-point-btn"><span>' + $t('Change pickup point') + '</span></button>';
-                    html += '</div>';
-
-                    if ($wrapper.find('.dhl-point-selected-inline').length === 0 || $wrapper.html() !== html) {
-                        $wrapper.html(html);
-                    }
-                } else {
-                    var promptHtml = '<div class="dhl-point-prompt-inline" style="margin-top: 6px;">';
-                    promptHtml += '<button type="button" class="action primary small dhl-select-point-btn"><span>' + $t('Select pickup point') + '</span></button>';
-                    promptHtml += '<div class="dhl-point-error mage-error" style="display: none; color: #e02b27; font-size: 12px; margin-top: 4px;"></div>';
-                    promptHtml += '</div>';
-
-                    if ($wrapper.find('.dhl-point-prompt-inline').length === 0 || $wrapper.html() !== promptHtml) {
-                        $wrapper.html(promptHtml);
-                    }
-                }
-            });
-        },
-
-        /**
-         * Resolve the currently selected shipping method using Magento's checkout state.
-         *
-         * The DOM is used only when Magento has rendered a radio selection before its
-         * observable state is available.
-         *
-         * @return {Object|null} Selected shipping method data.
-         */
-        getSelectedShippingMethod: function () {
-            if (this._dhlClickedShippingMethod) {
-                return this._dhlClickedShippingMethod;
-            }
-
-            var savedRate = checkoutData.getSelectedShippingRate();
-            if (savedRate) {
-                var rates = shippingService.getShippingRates()();
-                var matchingRate = rates.filter(function (rate) {
-                    return rate.carrier_code + '_' + rate.method_code === savedRate;
-                })[0];
-
-                // The saved rate is the same source used by Magento's radio binding.
-                // Prefer it when rates are loaded so an older quote method cannot win.
-                if (matchingRate) {
-                    return matchingRate;
-                }
-
-                // Keep the persisted choice available while rates are still loading.
-                if (!rates.length) {
-                    return this.methodFromCode(savedRate);
-                }
-            }
-
-            if (window.checkoutConfig && window.checkoutConfig.selectedShippingMethod) {
-                return window.checkoutConfig.selectedShippingMethod;
-            }
-
-            var method = quote.shippingMethod();
-            if (method && (method.carrier_code || method.carrierCode)
-                && (method.method_code || method.methodCode)
-            ) {
-                return method;
-            }
-
-            var checkedRadio = $('.table-checkout-shipping-method input[type="radio"]:checked, input[name="shipping_method"]:checked');
-            if (checkedRadio.length) {
-                return this.methodFromCode(checkedRadio.val() || '');
-            }
-
-            return null;
-        },
-
-        /**
-         * Check whether a shipping method requires the DHL point selector.
-         *
-         * @param {Object|null} method Shipping method data.
-         *
-         * @return {Boolean} Whether the point selector is required.
-         */
-        isDhlPointMethod: function (method) {
-            if (!method) {
-                return false;
-            }
-
-            var carrierCode = method.carrier_code || method.carrierCode || '';
-            var methodCode = method.method_code || method.methodCode || '';
-            var fullCode = carrierCode + '_' + methodCode;
-            var config = this.getDhlConfig();
-
-            if (config.pointMethods && config.pointMethods.length) {
-                return config.pointMethods.indexOf(fullCode) !== -1
-                    || config.pointMethods.indexOf(methodCode) !== -1;
-            }
-
-            return carrierCode === 'dhlparcel'
-                && ['economy', 'connect_parcel_shop', 'connect_packstation'].indexOf(methodCode) !== -1;
-        },
-
-        /**
-         * Convert Magento's carrier_method code into method data.
-         *
-         * @param {string} code Combined carrier and method code.
-         *
-         * @return {Object|null} Shipping method data or null for an invalid code.
-         */
-        methodFromCode: function (code) {
-            var separatorPosition = code.indexOf('_');
-            if (separatorPosition === -1) {
-                return null;
-            }
-
-            return {
-                carrier_code: code.substring(0, separatorPosition),
-                method_code: code.substring(separatorPosition + 1)
-            };
-        },
-
-        /**
-         * Release listeners and the DOM observer when the UI component is destroyed.
-         *
-         * @return {Object} Destroyed component instance.
-         */
-        destroy: function () {
-            $(document).off('.ideoDhlPointSelector');
-
-            clearTimeout(this._dhlPointSelectorUpdateTimeout);
-            clearTimeout(this._dhlClickedShippingMethodTimeout);
-
-            return this._super();
-        },
-
-        /**
-         * Retrieve current quote ID if available.
+         * Retrieve current quote ID.
          *
          * @return {string|number|null} Current quote entity ID or masked quote ID.
          */
         getQuoteId: function () {
-            return quote.getQuoteId() || (window.checkoutConfig && window.checkoutConfig.quoteData && window.checkoutConfig.quoteData.entity_id) || null;
-        },
-
-        /**
-         * Restore selected point from sessionStorage if present and matching current quote.
-         */
-        restoreSavedPoint: function () {
-            try {
-                var savedData = window.sessionStorage.getItem('dhl_selected_service_point');
-                if (savedData) {
-                    var savedPoint = JSON.parse(savedData);
-                    if (savedPoint && typeof savedPoint === 'object' && savedPoint.sap) {
-                        var currentQuoteId = this.getQuoteId();
-                        if (savedPoint.quoteId && currentQuoteId && String(savedPoint.quoteId) !== String(currentQuoteId)) {
-                            window.sessionStorage.removeItem('dhl_selected_service_point');
-                            this.selectedPoint(null);
-                            return;
-                        }
-                        this.selectedPoint(savedPoint);
-                    }
-                }
-            } catch (e) {
-                console.warn('DHL Point Selector: Error restoring point from storage:', e);
-            }
-        },
-
-        /**
-         * Initialize component
-         */
-        initialize: function () {
-            this._super();
-            this.initListeners();
-
-            var config = this.getDhlConfig();
-            if (config && config.selectedPoint && config.selectedPoint.sap) {
-                var currentQuoteId = this.getQuoteId();
-                config.selectedPoint.quoteId = currentQuoteId;
-                this.selectedPoint(config.selectedPoint);
-                try {
-                    window.sessionStorage.setItem('dhl_selected_service_point', JSON.stringify(config.selectedPoint));
-                } catch (e) {
-                    console.warn('DHL Point Selector: Error saving initial point to storage:', e);
-                }
-            } else {
-                this.restoreSavedPoint();
-            }
-
-            this.scheduleInlinePointSelectorsRender();
-
-            return this;
+            return pointState.getQuoteId();
         },
 
         /**
          * Retrieve DHL configuration from checkoutConfig
+         *
+         * @return {Object} DHL configuration object.
          */
         getDhlConfig: function () {
-            return window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel
+            return (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel)
                 ? window.checkoutConfig.shipping.dhlparcel
                 : {
                     mapUrl: 'https://parcelshop.dhl.pl/mapa',
@@ -452,112 +64,24 @@ define([
         },
 
         /**
-         * Return method code of selected shipping method
+         * Return method code of currently selected shipping method.
+         *
+         * @return {string} Carrier and method code string.
          */
         currentMethodCode: function () {
-            var method = this.getSelectedShippingMethod();
+            var method = quote.shippingMethod();
             if (!method) {
                 return '';
             }
-
             var carrierCode = method.carrier_code || method.carrierCode || '';
             var methodCode = method.method_code || method.methodCode || '';
             return carrierCode + '_' + methodCode;
         },
 
         /**
-         * Check if current method is domestic SP with nearest delivery mode configured
-         */
-        /**
-         * Check if current method is domestic SP with nearest delivery mode configured
-         */
-        isNearestDeliveryMode: function () {
-            var methodCode = this.currentMethodCode();
-            var config = this.getDhlConfig();
-            return (methodCode === 'dhlparcel_economy' || methodCode === 'economy') && config.deliveryMode === 'nearest';
-        },
-
-        /**
-         * Check if selected point is a German Packstation (Locker) requiring Postnummer input
-         */
-        isDePackstationSelected: function () {
-            var point = this.selectedPoint();
-            if (!point) {
-                return false;
-            }
-
-            var country = (point.country || '').toUpperCase();
-            if (!country) {
-                var address = quote.shippingAddress();
-                if (address && (address.countryId || address.country_id)) {
-                    country = (address.countryId || address.country_id).toUpperCase();
-                }
-            }
-
-            if (country !== 'DE') {
-                return false;
-            }
-
-            var nameStr = (point.name || point.sap || '').toLowerCase();
-            var typeStr = (point.type || point.ptype || '').toLowerCase();
-
-            return !!(
-                point.isPackstation ||
-                point.packstation ||
-                typeStr === 'packstation' ||
-                typeStr === 'lmecobox' ||
-                typeStr === 'box' ||
-                (point.ptype || '').toLowerCase() === 'packstation' ||
-                nameStr.indexOf('packstation') !== -1 ||
-                nameStr.indexOf('box') !== -1 ||
-                /^\d+$/.test((point.name || '').trim())
-            );
-        },
-
-        /**
-         * Check if selected point is a German Postfiliale / ParcelShop (Point) with optional Postnummer input
-         */
-        isDePointSelected: function () {
-            var point = this.selectedPoint();
-            if (!point) {
-                return false;
-            }
-
-            var country = (point.country || '').toUpperCase();
-            if (!country) {
-                var address = quote.shippingAddress();
-                if (address && (address.countryId || address.country_id)) {
-                    country = (address.countryId || address.country_id).toUpperCase();
-                }
-            }
-
-            return country === 'DE' && !this.isDePackstationSelected();
-        },
-
-        /**
-         * Update postnummer value on selected point and session storage
-         */
-        updatePostnummer: function (data, event) {
-            var val = event && event.target ? event.target.value : '';
-            var point = this.selectedPoint();
-            if (point) {
-                point.postnummer = val;
-                this.selectedPoint(point);
-                try {
-                    window.sessionStorage.setItem('dhl_selected_service_point', JSON.stringify(point));
-                } catch (e) {
-                    console.warn('DHL Point Selector: Error saving postnummer:', e);
-                }
-            }
-
-            if (val.trim()) {
-                $('#dhl_postnummer_input, #dhl_postnummer_input_opt').css('border-color', '#cccccc');
-                $('#dhl_postnummer_input_error, #dhl_postnummer_input_opt_error').hide().text('');
-            }
-        },
-
-        /**
-         * Build iframe URL for DHL map modal with live recipient country resolution
+         * Build iframe URL for DHL map modal with recipient country resolution.
+         *
+         * @return {string} Map iframe URL.
          */
         getMapIframeUrl: function () {
             var config = this.getDhlConfig();
@@ -601,7 +125,7 @@ define([
         },
 
         /**
-         * Open DHL map popup modal reliably ensuring widget initialization
+         * Open DHL map popup modal.
          */
         openMapModal: function () {
             var self = this;
@@ -633,7 +157,7 @@ define([
         },
 
         /**
-         * Close DHL map popup modal
+         * Close DHL map popup modal.
          */
         closeMapModal: function () {
             var modalContainer = $('#dhl-map-modal');
@@ -644,11 +168,12 @@ define([
         },
 
         /**
-         * Attach postMessage event listener to capture point selection
+         * Attach postMessage event listener to capture map point selection.
          */
         initListeners: function () {
             var self = this;
-            var listenMessage = function (event) {
+
+            this._messageListener = function (event) {
                 if (!event || !event.data) {
                     return;
                 }
@@ -660,6 +185,7 @@ define([
                         return;
                     }
                 }
+
                 if (pointData && typeof pointData === 'object' && pointData.sap) {
                     var address = quote.shippingAddress();
                     var recipientCountry = pointData.country || (address ? (address.countryId || address.country_id) : 'PL') || 'PL';
@@ -697,22 +223,33 @@ define([
                         postnummer: pointData.postnummer || ''
                     };
 
-                    self.selectedPoint(formattedPoint);
-                    try {
-                        window.sessionStorage.setItem('dhl_selected_service_point', JSON.stringify(formattedPoint));
-                    } catch (e) {
-                        console.warn('DHL Point Selector: Error saving selected point to storage:', e);
-                    }
-
+                    pointState.setSelectedPoint(formattedPoint);
                     self.closeMapModal();
                 }
             };
 
             if (window.addEventListener) {
-                window.addEventListener('message', listenMessage, false);
+                window.addEventListener('message', this._messageListener, false);
             } else if (window.attachEvent) {
-                window.attachEvent('onmessage', listenMessage);
+                window.attachEvent('onmessage', this._messageListener);
             }
+        },
+
+        /**
+         * Clean up listeners when component is destroyed.
+         *
+         * @return {Object} Component instance.
+         */
+        destroy: function () {
+            if (this._messageListener) {
+                if (window.removeEventListener) {
+                    window.removeEventListener('message', this._messageListener, false);
+                } else if (window.detachEvent) {
+                    window.detachEvent('onmessage', this._messageListener);
+                }
+            }
+
+            return this._super();
         }
     });
 });

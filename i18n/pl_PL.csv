@@ -384,10 +384,10 @@ No tracking events recorded yet for this shipment.,Brak zarejestrowanych zdarze�
 DHL Service Point Pickup,Odbiór w punkcie DHL ServicePoint
 Delivery will automatically be made to the nearest service point based on the entered recipient address.,Dostawa zostanie automatycznie zrealizowana do najbliższego punktu odbioru na podstawie wpisanego adresu odbiorcy.
 Select a DHL pickup point from the map:,Wybierz punkt odbioru DHL z mapy:
-Select pickup point,Wybierz punkt odbioru
-Selected pickup point:,Wybrany punkt odbioru:
+Select DHL pickup point,Wybierz punkt odbioru DHL
+Selected DHL pickup point:,Wybrany punkt odbioru DHL:
 German Customer Number (Postnummer):,Niemiecki numer klienta (Postnummer):
-Change pickup point,Zmień punkt odbioru
+Change DHL pickup point,Zmień punkt odbioru DHL
 Please select shipments for courier booking.,Prosimy wybrać przesyłki do zamówienia kuriera.
 Select Date,Wybierz datę
 Order Courier for DHL Shipments,Zamów kuriera dla przesyłek DHL

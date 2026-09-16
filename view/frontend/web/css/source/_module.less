@@ -45,6 +45,12 @@
         margin-top: 6px;
         clear: both;
 
+        .dhl-point-nearest-info {
+            color: #333;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
         .dhl-select-point-btn {
             font-size: 12px;
             line-height: 1.4;
@@ -68,12 +74,49 @@
         }
 
         .dhl-point-selected-inline {
-            background: #fff;
+            background: #FFCC00;
             padding: 8px 10px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid #D2072A;
             border-radius: 4px;
             margin-top: 6px;
-            font-size: 13px;
+            color: #D2072A;
+            font-size: 12px;
+
+            p {
+                margin-bottom: 4px;
+                font-weight: bold;
+                color: #D2072A;
+            }
+
+            > div {
+                line-height: 1.4;
+            }
+        }
+
+        .dhl-postnummer-field {
+            margin-top: 8px;
+
+            label {
+                font-weight: bold;
+                font-size: 12px;
+                color: #D2072A;
+
+                span.required-mark {
+                    color: #e02b27;
+                }
+            }
+
+            .dhl-postnummer-input {
+                margin-top: 4px;
+                display: block;
+            }
+        }
+
+        .dhl-postnummer-error,
+        .dhl-point-error {
+            color: #e02b27;
+            font-size: 12px;
+            margin-top: 4px;
         }
 
         .dhl-point-prompt-inline {

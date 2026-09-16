@@ -39,7 +39,7 @@ class ConfigProviderTest extends TestCase
             ->willReturn(null);
 
         $assetRepository = $this->createMock(AssetRepository::class);
-        $assetRepository->expects(self::exactly(2))
+        $assetRepository->expects(self::exactly(4))
             ->method('getUrl')
             ->willReturnCallback(
                 static fn (string $fileId) => match ($fileId) {
@@ -62,6 +62,8 @@ class ConfigProviderTest extends TestCase
         $this->assertTrue($dhlConfig['debug']);
         $this->assertNull($dhlConfig['selectedPoint']);
         $this->assertEquals('https://example.com/logo_dhl_box_pop.png', $dhlConfig['logos']['dhlparcel_economy']);
+        $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['dhlparcel_connect_parcel_shop']);
+        $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['dhlparcel_connect_packstation']);
         $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['default']);
         $this->assertContainsEquals('dhlparcel_economy', $dhlConfig['pointMethods']);
         $this->assertNotContains('dhlparcel_connect', $dhlConfig['pointMethods']);

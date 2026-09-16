@@ -73,6 +73,8 @@ class ConfigProvider implements ConfigProviderInterface
                     'selectedPoint' => $this->getQuoteSelectedPoint(),
                     'logos' => [
                         'dhlparcel_economy' => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box_pop.png'),
+                        'dhlparcel_connect_parcel_shop' => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
+                        'dhlparcel_connect_packstation' => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
                         'default' => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
                     ],
                     'pointMethods' => [

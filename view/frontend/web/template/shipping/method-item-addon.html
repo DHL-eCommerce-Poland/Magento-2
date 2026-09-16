@@ -1,0 +1,62 @@
+<div class="dhl-carrier-wrapper">
+    <!-- ko if: isDhlPointMethod() -->
+        <!-- ko if: isNearestDeliveryMode() -->
+        <div class="dhl-point-nearest-info">
+            <strong data-bind="i18n: 'DHL Service Point Pickup'"></strong><br/>
+            <span data-bind="i18n: 'Delivery will automatically be made to the nearest service point based on the entered recipient address.'"></span>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko ifnot: isNearestDeliveryMode() -->
+            <!-- ko if: isPointSelected() -->
+            <div class="dhl-point-selected-inline">
+                <p data-bind="i18n: 'Selected DHL pickup point:'"></p>
+                <div>
+                    <strong data-bind="text: selectedPointName()"></strong><br/>
+                    <span data-bind="text: selectedPointStreet()"></span><br/>
+                    <span data-bind="text: selectedPointCityZip()"></span>
+                </div>
+
+                <!-- ko if: isDePackstationSelected() -->
+                <div class="dhl-postnummer-field field required" data-bind="click: stopPropagation">
+                    <label for="dhl_postnummer_inline">
+                        <span data-bind="i18n: 'German Customer Number (Postnummer):'"></span> <span class="required-mark">*</span>
+                    </label>
+                    <input type="text" id="dhl_postnummer_inline" name="dhl_postnummer" class="input-text required-entry dhl-postnummer-input"
+                           data-bind="value: postnummerInput, valueUpdate: 'afterkeydown'" placeholder="12345678" />
+                    <!-- ko if: postnummerErrorMessage() -->
+                    <div class="dhl-postnummer-error mage-error" data-bind="text: postnummerErrorMessage()"></div>
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+
+                <!-- ko if: isDePointSelected() -->
+                <div class="dhl-postnummer-field field" data-bind="click: stopPropagation">
+                    <label for="dhl_postnummer_inline_opt" data-bind="i18n: 'German Customer Number (Postnummer):'"></label>
+                    <input type="text" id="dhl_postnummer_inline_opt" name="dhl_postnummer" class="input-text dhl-postnummer-input"
+                           data-bind="value: postnummerInput, valueUpdate: 'afterkeydown'" placeholder="12345678" />
+                    <!-- ko if: postnummerErrorMessage() -->
+                    <div class="dhl-postnummer-error mage-error" data-bind="text: postnummerErrorMessage()"></div>
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+
+                <button type="button" class="action secondary small dhl-select-point-btn" data-bind="click: openMapModal">
+                    <span data-bind="i18n: 'Change DHL pickup point'"></span>
+                </button>
+            </div>
+            <!-- /ko -->
+
+            <!-- ko ifnot: isPointSelected() -->
+            <div class="dhl-point-prompt-inline">
+                <button type="button" class="action primary small dhl-select-point-btn" data-bind="click: openMapModal">
+                    <span data-bind="i18n: 'Select DHL pickup point'"></span>
+                </button>
+                <!-- ko if: pointErrorMessage() -->
+                <div class="dhl-point-error mage-error" data-bind="text: pointErrorMessage()"></div>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+        <!-- /ko -->
+    <!-- /ko -->
+</div>

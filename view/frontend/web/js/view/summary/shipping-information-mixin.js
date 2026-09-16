@@ -1,14 +1,16 @@
 define([
     'Magento_Checkout/js/model/quote',
-    'uiRegistry',
+    'Ideo_Dhl/js/model/point-state',
     'mage/translate'
-], function (quote, registry, $t) {
+], function (quote, pointState, $t) {
     'use strict';
 
     return function (ShippingInformationComponent) {
         return ShippingInformationComponent.extend({
             /**
              * Append selected DHL service point details to shipping method title in checkout summary
+             *
+             * @return {string} Formatted shipping method title.
              */
             getShippingMethodTitle: function () {
                 var title = this._super();
@@ -29,30 +31,8 @@ define([
                     return title;
                 }
 
-                var pointData = null;
+                var pointData = pointState.selectedPoint();
 
-                // 1. Try sessionStorage first
-                try {
-                    var savedData = window.sessionStorage.getItem('dhl_selected_service_point');
-                    if (savedData) {
-                        pointData = JSON.parse(savedData);
-                    }
-                } catch (e) {
-                    console.warn('DHL Shipping Information Summary: Error reading storage:', e);
-                }
-
-                // 2. Try active Knockout observable from point-selector component
-                if (!pointData) {
-                    var pointSelector = registry.get('checkout.steps.shipping-step.shippingAddress.shippingAdditional.dhl-point-selector')
-                        || registry.get('checkout.steps.shipping-step.shippingAddress.dhl-point-selector')
-                        || registry.get('dhl-point-selector');
-
-                    if (pointSelector && typeof pointSelector.selectedPoint === 'function') {
-                        pointData = pointSelector.selectedPoint();
-                    }
-                }
-
-                // 3. Try quote shipping address extension attributes
                 if (!pointData) {
                     var address = quote.shippingAddress();
                     if (address) {
@@ -72,7 +52,6 @@ define([
                     }
                 }
 
-                // 4. Try checkoutConfig initial selectedPoint
                 if (!pointData && window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) {
                     var cfg = window.checkoutConfig.shipping.dhlparcel;
                     if (cfg.selectedPoint && cfg.selectedPoint.sap) {
