@@ -72,6 +72,12 @@ class ShipmentCreationService
         $shipmentData = $this->ensureServicePointResolved($shipmentData, $environment);
 
         $orderId = $shipmentData->getOrderId();
+        if ($orderId !== null && $this->shipmentDataService->hasShipmentForOrder($orderId)) {
+            throw new LocalizedException(
+                __('A DHL shipment has already been created for order #%1.', $orderId)
+            );
+        }
+
         $hash = hash('sha256', $this->serializer->serialize($shipmentData->toArray()));
         $lockName = 'dhl_shipment_create_' . ($orderId ?? $hash);
 

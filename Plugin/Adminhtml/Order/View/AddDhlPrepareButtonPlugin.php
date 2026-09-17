@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Plugin\Adminhtml\Order\View;
 
 use Exception;
+use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Magento\Backend\Model\UrlInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Block\Adminhtml\Order\View as OrderViewBlock;
@@ -19,11 +20,13 @@ class AddDhlPrepareButtonPlugin
     /**
      * @param UrlInterface $urlBuilder
      * @param OrderRepositoryInterface $orderRepository
+     * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param LoggerInterface|null $logger
      */
     public function __construct(
         private readonly UrlInterface $urlBuilder,
         private readonly OrderRepositoryInterface $orderRepository,
+        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -43,6 +46,11 @@ class AddDhlPrepareButtonPlugin
         }
 
         try {
+            // Hide button if DHL shipment was already created for this order
+            if ($this->shipmentDataRepository->getByOrderId((int)$orderId) !== null) {
+                return;
+            }
+
             /** @var Order $order */
             $order = $this->orderRepository->get((int)$orderId);
 

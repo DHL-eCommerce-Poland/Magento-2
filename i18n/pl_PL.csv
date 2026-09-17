@@ -547,3 +547,5 @@ Help,Pomoc
 "This list is automatically synchronized from the CSV country rates import.","Lista jest automatycznie synchronizowana na podstawie importu stawek krajów z pliku CSV."
 "Upload CSV with columns: Method Code, Condition Type (weight or subtotal), Value From (kg or order amount), Value To (kg or order amount), Price","Wgraj plik CSV z kolumnami: Method Code, Condition Type (weight lub subtotal), Value From (waga w kg lub kwota zamówienia), Value To (waga w kg lub kwota zamówienia), Price (cena dostawy)"
 "Upload CSV with columns: Method Code, Country, Price. For every method in the file, missing countries will be disabled automatically.","Wgraj plik CSV z kolumnami: Method Code, Country, Price. Dla każdej metody w pliku brakujące kraje zostaną automatycznie wyłączone."
+"A DHL shipment has already been created for order #%1.","Przesyłka DHL dla zamówienia #%1 została już utworzona."
+

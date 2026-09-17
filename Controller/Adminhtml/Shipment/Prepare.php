@@ -57,6 +57,13 @@ class Prepare extends Action
             ]);
         }
 
+        if ($this->shipmentDataService->hasShipmentForOrder($orderId)) {
+            return $resultJson->setData([
+                'success' => false,
+                'message' => __('A DHL shipment has already been created for order #%1.', $orderId)->render(),
+            ]);
+        }
+
         try {
             $order = $this->orderRepository->get($orderId);
             $presetSenderId = $this->getRequest()->getParam('preset_sender_id')

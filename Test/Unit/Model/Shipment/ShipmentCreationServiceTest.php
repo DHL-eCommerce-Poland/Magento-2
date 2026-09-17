@@ -368,4 +368,25 @@ class ShipmentCreationServiceTest extends TestCase
         $result = $serviceWithResolver->createShipment($shipmentData, 'sandbox');
         $this->assertTrue($result->isSuccess());
     }
+
+    /**
+     * Test createShipment throws LocalizedException when a shipment has already been created for the order.
+     *
+     * @return void
+     */
+    public function testCreateShipmentThrowsExceptionWhenShipmentAlreadyExists(): void
+    {
+        $shipmentData = $this->createStub(DhlShipmentData::class);
+        $shipmentData->method('getOrderId')->willReturn(100);
+
+        $this->shipmentDataServiceMock->expects($this->once())
+            ->method('hasShipmentForOrder')
+            ->with(100)
+            ->willReturn(true);
+
+        $this->expectException(\Magento\Framework\Exception\LocalizedException::class);
+        $this->expectExceptionMessage('A DHL shipment has already been created for order #100.');
+
+        $this->service->createShipment($shipmentData, 'sandbox');
+    }
 }

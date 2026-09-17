@@ -338,4 +338,16 @@ class ShipmentDataService
     {
         return $this->shipmentDataRepository->getListByOrderId($orderId);
     }
+
+    /**
+     * Check if a DHL shipment entity already exists for given order ID.
+     *
+     * @param int $orderId
+     *
+     * @return bool
+     */
+    public function hasShipmentForOrder(int $orderId): bool
+    {
+        return $this->shipmentDataRepository->getByOrderId($orderId) !== null;
+    }
 }

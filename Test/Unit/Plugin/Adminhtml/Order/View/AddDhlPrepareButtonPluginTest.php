@@ -9,8 +9,10 @@ use Magento\Backend\Model\UrlInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Block\Adminhtml\Order\View as OrderViewBlock;
 use Magento\Sales\Model\Order;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class AddDhlPrepareButtonPluginTest extends TestCase
 {
     /**
@@ -24,6 +26,11 @@ class AddDhlPrepareButtonPluginTest extends TestCase
     private $orderRepository;
 
     /**
+     * @var \Ideo\Dhl\Api\ShipmentDataRepositoryInterface
+     */
+    private $shipmentDataRepository;
+
+    /**
      * @var AddDhlPrepareButtonPlugin
      */
     private $plugin;
@@ -32,7 +39,12 @@ class AddDhlPrepareButtonPluginTest extends TestCase
     {
         $this->urlBuilder = $this->createStub(UrlInterface::class);
         $this->orderRepository = $this->createStub(OrderRepositoryInterface::class);
-        $this->plugin = new AddDhlPrepareButtonPlugin($this->urlBuilder, $this->orderRepository);
+        $this->shipmentDataRepository = $this->createStub(\Ideo\Dhl\Api\ShipmentDataRepositoryInterface::class);
+        $this->plugin = new AddDhlPrepareButtonPlugin(
+            $this->urlBuilder,
+            $this->orderRepository,
+            $this->shipmentDataRepository
+        );
     }
 
     public function testBeforeSetLayoutAddsButtonForDhlShippingMethod(): void
@@ -44,6 +56,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
         $order->method('hasShipments')->willReturn(false);
 
         $this->orderRepository->method('get')->willReturn($order);
+        $this->shipmentDataRepository->method('getByOrderId')->willReturn(null);
 
         $block = $this->createMock(OrderViewBlock::class);
         $block->method('getOrderId')->willReturn(10);
@@ -51,10 +64,27 @@ class AddDhlPrepareButtonPluginTest extends TestCase
             ->method('addButton')
             ->with(
                 'dhlparcel_prepare_shipment',
-                $this->callback(fn ($arg) => is_array($arg) && isset($arg['label'])),
+                self::callback(fn ($arg) => is_array($arg) && isset($arg['label'])),
                 0,
                 95
             );
+
+        $this->plugin->beforeSetLayout($block);
+    }
+
+    public function testBeforeSetLayoutSkipsWhenShipmentAlreadyExists(): void
+    {
+        $order = $this->createStub(Order::class);
+        $order->method('getShippingMethod')->willReturn('dhlparcel_standard');
+        $order->method('getState')->willReturn(Order::STATE_PROCESSING);
+
+        $this->orderRepository->method('get')->willReturn($order);
+        $existingEntity = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $this->shipmentDataRepository->method('getByOrderId')->willReturn($existingEntity);
+
+        $block = $this->createMock(OrderViewBlock::class);
+        $block->method('getOrderId')->willReturn(14);
+        $block->expects($this->never())->method('addButton');
 
         $this->plugin->beforeSetLayout($block);
     }

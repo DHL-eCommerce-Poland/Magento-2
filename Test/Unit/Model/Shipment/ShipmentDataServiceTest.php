@@ -13,6 +13,7 @@ use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use Ideo\Dhl\Model\Shipment\ShipmentDataService;
 use Ideo\Dhl\Model\Shipment\ShipmentDataValidator;
 use Ideo\Dhl\Model\ShipmentDataFactory;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use PHPUnit\Framework\TestCase;
@@ -43,7 +44,7 @@ class ShipmentDataServiceTest extends TestCase
             ->method('map')
             ->willReturn($expectedData);
 
-        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
+        $serializer = new Json();
 
         $service = new ShipmentDataService(
             $orderRepository,
@@ -85,7 +86,7 @@ class ShipmentDataServiceTest extends TestCase
         $entity->expects($this->once())->method('setStatus')->with('Nowa');
         $shipmentDataRepository->expects($this->once())->method('save')->willReturn($entity);
 
-        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
+        $serializer = new Json();
 
         $service = new ShipmentDataService(
             $orderRepository,
@@ -124,7 +125,7 @@ class ShipmentDataServiceTest extends TestCase
             ->with(105)
             ->willReturn([$entity1, $entity2]);
 
-        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
+        $serializer = new Json();
 
         $service = new ShipmentDataService(
             $orderRepository,
@@ -156,7 +157,7 @@ class ShipmentDataServiceTest extends TestCase
         $deliveryServiceRepository = $this->createStub(DeliveryServiceRepositoryInterface::class);
         $shipmentDataRepository = $this->createMock(ShipmentDataRepositoryInterface::class);
         $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
-        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
+        $serializer = new Json();
 
         $entity = $this->createStub(ShipmentDataInterface::class);
         $entity->method('getShipmentData')->willReturn('{"orderId":105}');
@@ -178,5 +179,76 @@ class ShipmentDataServiceTest extends TestCase
 
         $result = $service->loadShipmentData(5);
         $this->assertEquals(105, $result->getOrderId());
+    }
+
+    /**
+     * Test hasShipmentForOrder returns true when repository returns an existing shipment entity.
+     *
+     * @return void
+     */
+    public function testHasShipmentForOrderReturnsTrueWhenEntityExists(): void
+    {
+        $orderRepository = $this->createStub(OrderRepositoryInterface::class);
+        $mapper = $this->createStub(OrderToShipmentDataMapper::class);
+        $validator = $this->createStub(ShipmentDataValidator::class);
+        $dropOffPointRepository = $this->createStub(DropOffPointRepositoryInterface::class);
+        $deliveryServiceRepository = $this->createStub(DeliveryServiceRepositoryInterface::class);
+        $shipmentDataRepository = $this->createMock(ShipmentDataRepositoryInterface::class);
+        $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
+        $serializer = new Json();
+
+        $entity = $this->createStub(ShipmentDataInterface::class);
+        $shipmentDataRepository->expects($this->once())
+            ->method('getByOrderId')
+            ->with(101)
+            ->willReturn($entity);
+
+        $service = new ShipmentDataService(
+            $orderRepository,
+            $mapper,
+            $validator,
+            $dropOffPointRepository,
+            $deliveryServiceRepository,
+            $shipmentDataRepository,
+            $shipmentDataFactory,
+            $serializer
+        );
+
+        $this->assertTrue($service->hasShipmentForOrder(101));
+    }
+
+    /**
+     * Test hasShipmentForOrder returns false when repository returns null.
+     *
+     * @return void
+     */
+    public function testHasShipmentForOrderReturnsFalseWhenNoEntity(): void
+    {
+        $orderRepository = $this->createStub(OrderRepositoryInterface::class);
+        $mapper = $this->createStub(OrderToShipmentDataMapper::class);
+        $validator = $this->createStub(ShipmentDataValidator::class);
+        $dropOffPointRepository = $this->createStub(DropOffPointRepositoryInterface::class);
+        $deliveryServiceRepository = $this->createStub(DeliveryServiceRepositoryInterface::class);
+        $shipmentDataRepository = $this->createMock(ShipmentDataRepositoryInterface::class);
+        $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
+        $serializer = new Json();
+
+        $shipmentDataRepository->expects($this->once())
+            ->method('getByOrderId')
+            ->with(102)
+            ->willReturn(null);
+
+        $service = new ShipmentDataService(
+            $orderRepository,
+            $mapper,
+            $validator,
+            $dropOffPointRepository,
+            $deliveryServiceRepository,
+            $shipmentDataRepository,
+            $shipmentDataFactory,
+            $serializer
+        );
+
+        $this->assertFalse($service->hasShipmentForOrder(102));
     }
 }

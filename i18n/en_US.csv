@@ -547,3 +547,5 @@ Help,Help
 "This list is automatically synchronized from the CSV country rates import.","This list is automatically synchronized from the CSV country rates import."
 "Upload CSV with columns: Method Code, Condition Type (weight or subtotal), Value From (kg or order amount), Value To (kg or order amount), Price","Upload CSV with columns: Method Code, Condition Type (weight or subtotal), Value From (kg or order amount), Value To (kg or order amount), Price"
 "Upload CSV with columns: Method Code, Country, Price. For every method in the file, missing countries will be disabled automatically.","Upload CSV with columns: Method Code, Country, Price. For every method in the file, missing countries will be disabled automatically."
+"A DHL shipment has already been created for order #%1.","A DHL shipment has already been created for order #%1."
+
