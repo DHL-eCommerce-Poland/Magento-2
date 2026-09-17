@@ -91,11 +91,10 @@ class ShipmentFullDataMapper
             ? $this->sanitizeString($recipient->getPopId())
             : null;
 
-        $isPop = !empty($recipient->getPopId()) || $recipient->isPackstation() || $recipient->isPostfiliale();
-        $isBusiness = $recipient->getType() === AddressType::TYPE_BUSINESS;
-        $receiverAddressType = $isPop
-            ? AddressType::TYPE_CONSUMER
-            : ($isBusiness ? AddressType::TYPE_BUSINESS : AddressType::TYPE_CONSUMER);
+        $rawType = strtoupper(trim($recipient->getType()));
+        $receiverAddressType = in_array($rawType, [AddressType::TYPE_BUSINESS, AddressType::TYPE_CONSUMER], true)
+            ? $rawType
+            : (trim($recipient->getName()) !== '' ? AddressType::TYPE_BUSINESS : AddressType::TYPE_CONSUMER);
 
         $recipientName = $recipient->getName() !== ''
             ? $recipient->getName()

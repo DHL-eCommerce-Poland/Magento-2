@@ -111,4 +111,20 @@ class RecipientDataTest extends TestCase
         $exported = $recipient->toArray();
         $this->assertEquals($data, $exported);
     }
+
+    /**
+     * Test fromArray with addressType key fallback and lower-case input.
+     *
+     * @return void
+     */
+    public function testFromArrayWithAddressTypeFallback(): void
+    {
+        $data = [
+            'addressType' => 'b',
+            'name' => 'Firma Testowa',
+        ];
+
+        $recipient = RecipientData::fromArray($data);
+        $this->assertEquals('B', $recipient->getType());
+    }
 }

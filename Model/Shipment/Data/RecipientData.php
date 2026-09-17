@@ -267,9 +267,15 @@ class RecipientData
     // phpcs:ignore Magento2.Functions.StaticFunction.StaticFunction
     public static function fromArray(array $data): self
     {
+        $name = (string)($data['name'] ?? '');
+        $rawType = strtoupper(trim((string)($data['type'] ?? $data['addressType'] ?? '')));
+        $type = !empty($rawType)
+            ? $rawType
+            : (trim($name) !== '' ? 'B' : 'C');
+
         return new self(
-            (string)($data['name'] ?? ''),
-            (string)($data['type'] ?? 'C'),
+            $name,
+            $type,
             (string)($data['firstName'] ?? ''),
             (string)($data['lastName'] ?? ''),
             (string)($data['contactPerson'] ?? ''),

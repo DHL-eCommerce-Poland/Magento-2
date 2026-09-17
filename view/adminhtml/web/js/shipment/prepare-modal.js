@@ -152,9 +152,12 @@ define([
         var pickupHourFromObs = ko.observable(pFrom);
         var pickupHourToObs = ko.observable(pTo);
 
+        var initialRecName = r.name || '';
+        var initialRecType = r.type || (initialRecName.trim() !== '' ? 'B' : 'C');
+
         var recipientObj = {
-            type: ko.observable(r.type || 'C'),
-            name: ko.observable(r.name || ''),
+            type: ko.observable(initialRecType),
+            name: ko.observable(initialRecName),
             firstName: ko.observable(r.firstName || ''),
             lastName: ko.observable(r.lastName || ''),
             contactPerson: ko.observable(r.contactPerson || ''),
@@ -170,6 +173,12 @@ define([
             phone: ko.observable(r.phone || ''),
             email: ko.observable(r.email || '')
         };
+
+        recipientObj.name.subscribe(function (newName) {
+            if (newName && newName.trim() !== '' && recipientObj.type() !== 'B') {
+                recipientObj.type('B');
+            }
+        });
 
         var packagesRaw = st.packages || [];
         var packagesObsArr = ko.observableArray([]);
@@ -346,6 +355,7 @@ define([
             this.labelTypeOptions = ko.observableArray([]);
             this.packageTypeOptions = ko.observableArray([]);
             this.addressTypeOptions = ko.observableArray([]);
+            this.shipmentAddressTypeOptions = ko.observableArray([]);
             this.contentSourceOptions = ko.observableArray([]);
             this.returnQrCodeTypeOptions = ko.observableArray([]);
             this.returnBookCourierOptions = ko.observableArray([]);
@@ -565,10 +575,6 @@ define([
                             self.draft().recipient.type('B');
                         } else if (addressType === 'C') {
                             self.draft().recipient.type('C');
-                        } else {
-                            var companyName = self.draft().recipient.name();
-                            var hasCompany = !!(companyName && String(companyName).trim());
-                            self.draft().recipient.type(hasCompany ? 'B' : 'C');
                         }
                     }
 
@@ -608,6 +614,7 @@ define([
                         self.labelTypeOptions(response.labelTypeOptions || []);
                         self.packageTypeOptions(response.packageTypeOptions || []);
                         self.addressTypeOptions(response.addressTypeOptions || []);
+                        self.shipmentAddressTypeOptions(response.shipmentAddressTypeOptions || []);
                         self.contentSourceOptions(response.contentSourceOptions || []);
                         self.returnQrCodeTypeOptions(response.returnQrCodeTypeOptions || []);
                         self.returnBookCourierOptions(response.returnBookCourierOptions || []);

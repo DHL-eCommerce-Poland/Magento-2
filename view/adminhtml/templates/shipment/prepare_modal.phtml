@@ -98,12 +98,7 @@ $dateFormat = $viewModel->getDateFormat();
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Address Type')) ?></span></label>
                             <div class="admin__field-control">
-                                <label class="admin__field-label" style="margin-right: 15px;">
-                                    <input type="radio" value="C" data-bind="checked: type" /> <?= $escaper->escapeHtml(__('Consumer / Private (C)')) ?>
-                                </label>
-                                <label class="admin__field-label">
-                                    <input type="radio" value="B" data-bind="checked: type" /> <?= $escaper->escapeHtml(__('Company / Business (B)')) ?>
-                                </label>
+                                <select class="admin__control-select" data-bind="options: $parent.shipmentAddressTypeOptions, optionsText: 'label', optionsValue: 'value', value: type" required></select>
                             </div>
                         </div>
                         <div class="admin__field">

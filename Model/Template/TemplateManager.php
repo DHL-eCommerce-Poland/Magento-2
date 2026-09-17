@@ -14,6 +14,7 @@ use Ideo\Dhl\Model\Config\Source\PackageType as PackageTypeSource;
 use Ideo\Dhl\Model\Config\Source\ReturnBookCourier as ReturnBookCourierSource;
 use Ideo\Dhl\Model\Config\Source\ReturnQrCodeType as ReturnQrCodeTypeSource;
 use Ideo\Dhl\Model\Config\Source\ServiceCode as ServiceCodeSource;
+use Ideo\Dhl\Model\Config\Source\ShipmentAddressType as ShipmentAddressTypeSource;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory as DeliveryServiceCollectionFactory;
 use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory as DropOffPointCollectionFactory;
 use Ideo\Dhl\Model\Shipment\Data\SenderData;
@@ -39,14 +40,15 @@ class TemplateManager
      * @param LabelTypeSource $labelTypeSource
      * @param PackageTypeSource $packageTypeSource
      * @param AddressTypeSource $addressTypeSource
+     * @param ShipmentAddressTypeSource $shipmentAddressTypeSource
      * @param ContentSource $contentSource
+     * @param ReturnQrCodeTypeSource $returnQrCodeTypeSource
+     * @param ReturnBookCourierSource $returnBookCourierSource
      * @param OrderRepositoryInterface $orderRepository
      * @param OrderToShipmentDataMapper $mapper
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
      * @param LoggerInterface|null $logger
-     * @param ReturnQrCodeTypeSource|null $returnQrCodeTypeSource
-     * @param ReturnBookCourierSource|null $returnBookCourierSource
      */
     public function __construct(
         private readonly DropOffPointCollectionFactory $dropOffPointCollectionFactory,
@@ -58,14 +60,15 @@ class TemplateManager
         private readonly LabelTypeSource $labelTypeSource,
         private readonly PackageTypeSource $packageTypeSource,
         private readonly AddressTypeSource $addressTypeSource,
+        private readonly ShipmentAddressTypeSource $shipmentAddressTypeSource,
         private readonly ContentSource $contentSource,
+        private readonly ReturnQrCodeTypeSource $returnQrCodeTypeSource,
+        private readonly ReturnBookCourierSource $returnBookCourierSource,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly OrderToShipmentDataMapper $mapper,
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
-        private readonly ?LoggerInterface $logger = null,
-        private readonly ?ReturnQrCodeTypeSource $returnQrCodeTypeSource = null,
-        private readonly ?ReturnBookCourierSource $returnBookCourierSource = null
+        private readonly ?LoggerInterface $logger = null
     ) {
     }
 
@@ -179,6 +182,16 @@ class TemplateManager
     }
 
     /**
+     * Get Shipment Recipient Address Type options (Consumer vs Business).
+     *
+     * @return array
+     */
+    public function getShipmentAddressTypeOptions(): array
+    {
+        return $this->shipmentAddressTypeSource->toOptionArray();
+    }
+
+    /**
      * Get Content Source options from source model.
      *
      * @return array
@@ -196,8 +209,7 @@ class TemplateManager
      */
     public function getReturnQrCodeTypeOptions(): array
     {
-        $source = $this->returnQrCodeTypeSource ?? new ReturnQrCodeTypeSource();
-        $options = $source->toOptionArray();
+        $options = $this->returnQrCodeTypeSource->toOptionArray();
         return array_values(array_filter($options, fn ($opt) => isset($opt['value']) && $opt['value'] !== ''));
     }
 
@@ -208,8 +220,7 @@ class TemplateManager
      */
     public function getReturnBookCourierOptions(): array
     {
-        $source = $this->returnBookCourierSource ?? new ReturnBookCourierSource();
-        $options = $source->toOptionArray();
+        $options = $this->returnBookCourierSource->toOptionArray();
         return array_values(array_filter($options, fn ($opt) => isset($opt['value']) && $opt['value'] !== ''));
     }
 
