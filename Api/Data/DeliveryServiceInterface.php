@@ -8,7 +8,6 @@ interface DeliveryServiceInterface
 {
     public const ENTITY_ID = 'entity_id';
     public const TEMPLATE_NAME = 'template_name';
-    public const SERVICE_CODE = 'service_code';
     public const METHOD_CODE = 'method_code';
     public const PACKAGE_TYPE = 'package_type';
     public const WEIGHT = 'weight';
@@ -62,22 +61,6 @@ interface DeliveryServiceInterface
      * @return $this
      */
     public function setTemplateName(string $templateName): static;
-
-    /**
-     * Get DHL service code.
-     *
-     * @return string
-     */
-    public function getServiceCode(): string;
-
-    /**
-     * Set DHL service code.
-     *
-     * @param string $serviceCode
-     *
-     * @return $this
-     */
-    public function setServiceCode(string $serviceCode): static;
 
     /**
      * Get shipping method code.

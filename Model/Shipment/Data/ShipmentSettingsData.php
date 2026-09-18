@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-// phpcs:disable Generic.Files.LineLength.TooLong
-
 namespace Ideo\Dhl\Model\Shipment\Data;
+
+use Ideo\Dhl\Model\MethodCatalog;
 
 class ShipmentSettingsData
 {
@@ -40,7 +40,7 @@ class ShipmentSettingsData
      * @param PackageData[] $packages
      */
     public function __construct(
-        private string $serviceType = 'AH',
+        private string $serviceType = '',
         private string $pickupType = 'COURIER',
         private string $content = '',
         private string $mpk = '',
@@ -401,6 +401,7 @@ class ShipmentSettingsData
      *
      * @return self
      */
+    // phpcs:disable Generic.Files.LineLength.TooLong
     // phpcs:ignore Magento2.Functions.StaticFunction.StaticFunction
     public static function fromArray(array $data): self
     {
@@ -416,7 +417,7 @@ class ShipmentSettingsData
         }
 
         return new self(
-            serviceType: (string)($data['serviceType'] ?? 'AH'),
+            serviceType: (string)($data['serviceType'] ?? ''),
             pickupType: (string)($data['pickupType'] ?? 'COURIER'),
             content: (string)($data['content'] ?? ''),
             mpk: (string)($data['mpk'] ?? ''),

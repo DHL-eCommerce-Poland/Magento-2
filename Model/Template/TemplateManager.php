@@ -15,6 +15,7 @@ use Ideo\Dhl\Model\Config\Source\ReturnBookCourier as ReturnBookCourierSource;
 use Ideo\Dhl\Model\Config\Source\ReturnQrCodeType as ReturnQrCodeTypeSource;
 use Ideo\Dhl\Model\Config\Source\ServiceCode as ServiceCodeSource;
 use Ideo\Dhl\Model\Config\Source\ShipmentAddressType as ShipmentAddressTypeSource;
+use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory as DeliveryServiceCollectionFactory;
 use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory as DropOffPointCollectionFactory;
 use Ideo\Dhl\Model\Shipment\Data\SenderData;
@@ -48,6 +49,7 @@ class TemplateManager
      * @param OrderToShipmentDataMapper $mapper
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
+     * @param MethodCatalog $methodCatalog
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -68,6 +70,7 @@ class TemplateManager
         private readonly OrderToShipmentDataMapper $mapper,
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
+        private readonly MethodCatalog $methodCatalog,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -278,7 +281,7 @@ class TemplateManager
         $options = [];
 
         foreach ($collection as $item) {
-            $label = $item->getTemplateName() ?: sprintf('%s (%s)', $item->getServiceCode(), $item->getPackageType());
+            $label = $item->getTemplateName() ?: sprintf('%s (%s)', $item->getMethodCode() ?: 'Template', $item->getPackageType());
             $options[] = [
                 'value' => (int)$item->getEntityId(),
                 'label' => $label,
@@ -361,9 +364,11 @@ class TemplateManager
             $service = $this->deliveryServiceRepository->getById($templateId);
             $rawContent = (string)($service->getContent() ?? 'ORDER_NUMBER');
 
+            $shippingMethod = null;
             if ($orderId) {
                 $order = $this->orderRepository->get($orderId);
                 $contentVal = $this->mapper->resolveContentValue($rawContent, $order);
+                $shippingMethod = (string)($order->getShippingMethod() ?? '');
             } else {
                 $contentVal = match ($rawContent) {
                     'ORDER_NUMBER', 'ORDER_ID', 'INVOICE_NUMBER', 'STATIC_VALUE' => '',
@@ -372,7 +377,7 @@ class TemplateManager
             }
 
             return new ShipmentSettingsData(
-                serviceType: (string)($service->getServiceCode() ?: 'AH'),
+                serviceType: $this->methodCatalog->getServiceCodeForMethod($shippingMethod),
                 pickupType: 'COURIER',
                 content: $contentVal,
                 mpk: (string)($service->getMpk() ?? ''),

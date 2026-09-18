@@ -9,6 +9,7 @@ use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CreateShipmentsResult;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
+use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\ServicePoint\NearestPointResolver;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Lock\LockManagerInterface;
@@ -285,7 +286,7 @@ class ShipmentCreationService
         $serviceType = strtoupper(trim((string)$shipmentData->getShipmentSettings()->getServiceType()));
         $popId = $shipmentData->getRecipient()->getPopId();
 
-        if (in_array($serviceType, ['SP', 'PS', 'EKS'], true) && (empty($popId) || trim((string)$popId) === '')) {
+        if (in_array($serviceType, [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EKS], true) && (empty($popId) || trim((string)$popId) === '')) {
             if ($this->nearestPointResolver !== null) {
                 try {
                     $updatedRecipient = $this->nearestPointResolver->resolveForRecipient(

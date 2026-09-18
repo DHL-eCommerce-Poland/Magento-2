@@ -197,20 +197,20 @@ $dateFormat = $viewModel->getDateFormat();
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Package Contents Description')) ?></span></label>
                             <div class="admin__field-control">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Package Contents Description')) ?>" maxlength="<?= DhlShipmentRestrictions::MAX_LENGTH_CONTENT ?>" data-bind="value: content" required />
+                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Package Contents Description')) ?>" maxlength="<?= (int) DhlShipmentRestrictions::MAX_LENGTH_CONTENT ?>" data-bind="value: content" required />
                             </div>
                         </div>
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Additional Comments')) ?></span></label>
                             <div class="admin__field-control">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Additional Comments')) ?>" maxlength="<?= DhlShipmentRestrictions::MAX_LENGTH_COMMENT ?>" data-bind="value: comment" />
+                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Additional Comments')) ?>" maxlength="<?= (int) DhlShipmentRestrictions::MAX_LENGTH_COMMENT ?>" data-bind="value: comment" />
                             </div>
                         </div>
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipment Reference Number & MPK')) ?></span></label>
                             <div class="admin__field-control">
                                 <div style="display: flex; gap: 8px;">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipment Reference Number')) ?>" maxlength="<?= DhlShipmentRestrictions::MAX_LENGTH_REFERENCE ?>" data-bind="value: reference" style="flex: 1;" />
+                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipment Reference Number')) ?>" maxlength="<?= (int) DhlShipmentRestrictions::MAX_LENGTH_REFERENCE ?>" data-bind="value: reference" style="flex: 1;" />
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('MPK')) ?>" data-bind="value: mpk" style="flex: 1;" />
                                 </div>
                             </div>

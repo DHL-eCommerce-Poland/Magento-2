@@ -68,7 +68,6 @@
         "column": {
             "entity_id": true,
             "template_name": true,
-            "service_code": true,
             "method_code": true,
             "package_type": true,
             "weight": true,

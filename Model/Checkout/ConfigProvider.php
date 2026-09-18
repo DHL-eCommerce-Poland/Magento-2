@@ -6,6 +6,9 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Checkout;
 
+use Ideo\Dhl\Model\Carrier;
+use Ideo\Dhl\Model\Config\Source\MapPointType;
+use Ideo\Dhl\Model\MethodCatalog;
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -41,7 +44,7 @@ class ConfigProvider implements ConfigProviderInterface
         $mapType = (string)$this->scopeConfig->getValue(
             self::XML_PATH_MAP_TYPE,
             ScopeInterface::SCOPE_STORE
-        ) ?: 'all';
+        ) ?: MapPointType::TYPE_ALL;
 
         $deliveryMode = (string)$this->scopeConfig->getValue(
             self::XML_PATH_DELIVERY_MODE,
@@ -53,13 +56,22 @@ class ConfigProvider implements ConfigProviderInterface
             ScopeInterface::SCOPE_STORE
         );
 
+        $economyCode = MethodCatalog::METHOD_ECONOMY;
+        $economyPrefixed = Carrier::CODE_PREFIX . $economyCode;
+
+        $connectShopCode = MethodCatalog::METHOD_CONNECT_PARCEL_SHOP;
+        $connectShopPrefixed = Carrier::CODE_PREFIX . $connectShopCode;
+
+        $connectPackstationCode = MethodCatalog::METHOD_CONNECT_PACKSTATION;
+        $connectPackstationPrefixed = Carrier::CODE_PREFIX . $connectPackstationCode;
+
         $pointMapTypes = [
-            'dhlparcel_economy' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_economy_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
-            'economy' => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_economy_point_map_type', ScopeInterface::SCOPE_STORE) ?: 'all',
-            'dhlparcel_connect_parcel_shop' => 'pop',
-            'connect_parcel_shop' => 'pop',
-            'dhlparcel_connect_packstation' => 'box',
-            'connect_packstation' => 'box',
+            $economyPrefixed => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_economy_point_map_type', ScopeInterface::SCOPE_STORE) ?: MapPointType::TYPE_ALL,
+            $economyCode => (string)$this->scopeConfig->getValue('carriers/dhlparcel/method_economy_point_map_type', ScopeInterface::SCOPE_STORE) ?: MapPointType::TYPE_ALL,
+            $connectShopPrefixed => MapPointType::TYPE_POP,
+            $connectShopCode => MapPointType::TYPE_POP,
+            $connectPackstationPrefixed => MapPointType::TYPE_BOX,
+            $connectPackstationCode => MapPointType::TYPE_BOX,
         ];
 
         return [
@@ -72,15 +84,15 @@ class ConfigProvider implements ConfigProviderInterface
                     'debug' => $debug,
                     'selectedPoint' => $this->getQuoteSelectedPoint(),
                     'logos' => [
-                        'dhlparcel_economy' => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box_pop.png'),
-                        'dhlparcel_connect_parcel_shop' => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
-                        'dhlparcel_connect_packstation' => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
+                        $economyPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box_pop.png'),
+                        $connectShopPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
+                        $connectPackstationPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
                         'default' => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
                     ],
                     'pointMethods' => [
-                        'dhlparcel_economy',
-                        'dhlparcel_connect_parcel_shop',
-                        'dhlparcel_connect_packstation',
+                        $economyPrefixed,
+                        $connectShopPrefixed,
+                        $connectPackstationPrefixed,
                     ],
                 ],
             ],

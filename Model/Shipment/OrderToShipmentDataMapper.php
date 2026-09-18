@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\ServicePoint\NearestPointResolver;
 use Ideo\Dhl\Model\Shipment\Data\PackageData;
 use Ideo\Dhl\Model\Shipment\Data\RecipientData;
@@ -30,6 +31,7 @@ class OrderToShipmentDataMapper
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
      * @param NearestPointResolver $nearestPointResolver
+     * @param MethodCatalog $methodCatalog
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -39,6 +41,7 @@ class OrderToShipmentDataMapper
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
         private readonly NearestPointResolver $nearestPointResolver,
+        private readonly MethodCatalog $methodCatalog,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -359,9 +362,10 @@ class OrderToShipmentDataMapper
             ? (string)$defaultSenderDefaults['pickup_time_to']
             : null;
 
-        $serviceType = (string)($defaultShipmentDefaults['serviceType'] ?? '');
+        $shippingMethod = (string)($order->getShippingMethod() ?? '');
+        $serviceType = $this->methodCatalog->getServiceCodeForMethod($shippingMethod);
 
-        if (in_array(strtoupper(trim((string)$serviceType)), ['SP', 'PS', 'EKS'], true)
+        if (in_array(strtoupper(trim((string)$serviceType)), [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EKS], true)
             && (empty($popId) || trim((string)$popId) === '')
             && $this->nearestPointResolver !== null
         ) {

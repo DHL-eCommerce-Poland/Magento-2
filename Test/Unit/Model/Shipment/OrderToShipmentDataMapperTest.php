@@ -50,7 +50,8 @@ class OrderToShipmentDataMapperTest extends TestCase
             $variableResolver,
             $serializer,
             $timezoneMock,
-            $this->nearestPointResolverMock
+            $this->nearestPointResolverMock,
+            new \Ideo\Dhl\Model\MethodCatalog()
         );
     }
 
@@ -135,6 +136,33 @@ class OrderToShipmentDataMapperTest extends TestCase
         $this->assertSame('Adam Nowak', $shipmentData->getRecipient()->getContactPerson());
         $this->assertTrue($shipmentData->getSpecialServices()->isCod());
         $this->assertSame(299.99, $shipmentData->getSpecialServices()->getCodAmount());
+    }
+
+    /**
+     * Test mapping shipping method to DHL API service type.
+     *
+     * @return void
+     */
+    public function testMapOrderShippingMethodToServiceType(): void
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getStreet')->willReturn(['Main St 1']);
+        $address->method('getCity')->willReturn('Warszawa');
+        $address->method('getPostcode')->willReturn('00-001');
+
+        $payment = $this->createStub(Payment::class);
+        $payment->method('getMethod')->willReturn('checkmo');
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getEntityId')->willReturn(103);
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getPayment')->willReturn($payment);
+        $order->method('getShippingMethod')->willReturn('dhlparcel_premium');
+
+        $shipmentData = $this->mapper->map($order);
+
+        $this->assertSame('PR', $shipmentData->getShipmentSettings()->getServiceType());
     }
 
     /**

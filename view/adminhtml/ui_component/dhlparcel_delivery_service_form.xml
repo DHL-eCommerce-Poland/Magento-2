@@ -60,24 +60,6 @@
                 <dataScope>template_name</dataScope>
             </settings>
         </field>
-        <field name="service_code" formElement="select">
-            <settings>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
-                </validation>
-                <dataType>text</dataType>
-                <label translate="true">Service</label>
-                <dataScope>service_code</dataScope>
-            </settings>
-            <formElements>
-                <select>
-                    <settings>
-                        <caption translate="true">Select Service...</caption>
-                        <options class="Ideo\Dhl\Model\Config\Source\ServiceCode"/>
-                    </settings>
-                </select>
-            </formElements>
-        </field>
         <field name="drop_off_point_id" formElement="select">
             <settings>
                 <validation>

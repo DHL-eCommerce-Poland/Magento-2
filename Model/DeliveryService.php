@@ -104,28 +104,6 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     }
 
     /**
-     * Get DHL service code.
-     *
-     * @return string
-     */
-    public function getServiceCode(): string
-    {
-        return (string)$this->getData(self::SERVICE_CODE);
-    }
-
-    /**
-     * Set DHL service code.
-     *
-     * @param string $serviceCode
-     *
-     * @return $this
-     */
-    public function setServiceCode(string $serviceCode): static
-    {
-        return $this->setData(self::SERVICE_CODE, $serviceCode);
-    }
-
-    /**
      * Get shipping method code.
      *
      * @return string|null

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Ideo\Dhl\Model\MethodCatalog;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
@@ -98,7 +99,7 @@ class ShipmentDataValidator
         }
 
         // ServicePoint / POP point requirement
-        if (in_array(strtoupper(trim((string)$serviceType)), ['SP', 'PS'], true) && empty($popId)) {
+        if (in_array(strtoupper(trim((string)$serviceType)), [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS], true) && empty($popId)) {
             $errors[] = __('Service Point ID is required for ServicePoint shipments.')->render();
         }
 

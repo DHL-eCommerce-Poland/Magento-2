@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\ServicePoint;
 
 use Ideo\Dhl\Model\Carrier;
+use Ideo\Dhl\Model\MethodCatalog;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\ScopeInterface;
@@ -16,14 +17,10 @@ class ServicePointValidator
     private const XML_PATH_DELIVERY_MODE = 'carriers/dhlparcel/method_economy_point_delivery_mode';
 
     private const POINT_METHODS = [
-        'dhlparcel_economy',
-        'dhlparcel_connect',
-        'dhlparcel_connect_parcel_shop',
-        'dhlparcel_connect_packstation',
-        'economy',
-        'connect',
-        'connect_parcel_shop',
-        'connect_packstation',
+        MethodCatalog::METHOD_ECONOMY,
+        MethodCatalog::METHOD_CONNECT,
+        MethodCatalog::METHOD_CONNECT_PARCEL_SHOP,
+        MethodCatalog::METHOD_CONNECT_PACKSTATION,
     ];
 
     /**
@@ -92,17 +89,17 @@ class ServicePointValidator
             return false;
         }
 
-        $fullMethodCode = $carrierCode . '_' . $methodCode;
+        $cleanMethodCode = strtolower(trim($methodCode));
+        if (str_starts_with($cleanMethodCode, Carrier::CODE_PREFIX)) {
+            $cleanMethodCode = substr($cleanMethodCode, strlen(Carrier::CODE_PREFIX));
+        }
 
-        $isPointMethod = in_array($fullMethodCode, self::POINT_METHODS, true)
-            || in_array($methodCode, self::POINT_METHODS, true);
-
-        if (!$isPointMethod) {
+        if (!in_array($cleanMethodCode, self::POINT_METHODS, true)) {
             return false;
         }
 
         // Domestic SP (economy) in 'nearest' delivery mode does NOT require map point selection
-        if ($methodCode === 'economy') {
+        if ($cleanMethodCode === MethodCatalog::METHOD_ECONOMY) {
             $deliveryMode = (string) $this->scopeConfig->getValue(
                 self::XML_PATH_DELIVERY_MODE,
                 ScopeInterface::SCOPE_STORE

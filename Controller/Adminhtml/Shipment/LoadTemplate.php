@@ -7,6 +7,7 @@ namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
 use Exception;
 use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
+use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use Ideo\Dhl\Model\Template\TemplateManager;
 use Ideo\Dhl\Model\Template\TemplateVariableResolver;
@@ -33,6 +34,7 @@ class LoadTemplate extends Action
      * @param TemplateManager $templateManager
      * @param JsonFactory $jsonFactory
      * @param TemplateVariableResolver $variableResolver
+     * @param MethodCatalog $methodCatalog
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -44,6 +46,7 @@ class LoadTemplate extends Action
         private readonly TemplateManager $templateManager,
         private readonly JsonFactory $jsonFactory,
         private readonly TemplateVariableResolver $variableResolver,
+        private readonly MethodCatalog $methodCatalog,
         private readonly ?LoggerInterface $logger = null
     ) {
         parent::__construct($context);
@@ -106,9 +109,11 @@ class LoadTemplate extends Action
                 $resolvedReference = (string)($serviceData['reference'] ?? '');
                 $resolvedMpk = (string)($serviceData['mpk'] ?? '');
 
+                $shippingMethod = null;
                 if ($orderId) {
                     try {
                         $order = $this->orderRepository->get($orderId);
+                        $shippingMethod = (string)($order->getShippingMethod() ?? '');
                         $resolvedContent = $this->mapper->resolveContentValue($resolvedContent, $order);
                         $resolvedComment = $resolvedComment !== ''
                             ? $this->variableResolver->resolve($resolvedComment, $order)
@@ -130,7 +135,7 @@ class LoadTemplate extends Action
                 return $resultJson->setData([
                     'success' => true,
                     'data' => [
-                        'serviceType' => $serviceData['service_code'] ?? 'AH',
+                        'serviceType' => $this->methodCatalog->getServiceCodeForMethod($shippingMethod),
                         'packageType' => $serviceData['package_type'] ?? 'PACKAGE',
                         'weight' => (float)($serviceData['weight'] ?? 1.0),
                         'width' => isset($serviceData['width']) ? (float)$serviceData['width'] : null,

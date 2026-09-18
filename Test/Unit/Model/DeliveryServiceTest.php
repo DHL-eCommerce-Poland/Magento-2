@@ -41,9 +41,6 @@ class DeliveryServiceTest extends TestCase
         $this->model->setTemplateName('Standard Shipping');
         $this->assertSame('Standard Shipping', $this->model->getTemplateName());
 
-        $this->model->setServiceCode('AH');
-        $this->assertSame('AH', $this->model->getServiceCode());
-
         $this->model->setMethodCode('dhl_courier');
         $this->assertSame('dhl_courier', $this->model->getMethodCode());
 
