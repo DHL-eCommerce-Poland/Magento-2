@@ -125,6 +125,7 @@ class OrderToShipmentDataMapperTest extends TestCase
         $order->method('getEntityId')->willReturn(102);
         $order->method('getIncrementId')->willReturn('100000102');
         $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska_cod');
         $order->method('getPayment')->willReturn($payment);
         $order->method('getItems')->willReturn([]);
         $order->method('getGrandTotal')->willReturn(299.99);
@@ -163,6 +164,36 @@ class OrderToShipmentDataMapperTest extends TestCase
         $shipmentData = $this->mapper->map($order);
 
         $this->assertSame('PR', $shipmentData->getShipmentSettings()->getServiceType());
+    }
+
+    /**
+     * Test mapping order with a COD shipping method triggers COD special service.
+     *
+     * @return void
+     */
+    public function testMapOrderWithCodShippingMethodTriggersCodSpecialService(): void
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getStreet')->willReturn(['Main St 1']);
+        $address->method('getCity')->willReturn('Warszawa');
+        $address->method('getPostcode')->willReturn('00-001');
+
+        $payment = $this->createStub(Payment::class);
+        $payment->method('getMethod')->willReturn('checkmo');
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getEntityId')->willReturn(104);
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getPayment')->willReturn($payment);
+        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska_cod');
+        $order->method('getGrandTotal')->willReturn(450.50);
+
+        $shipmentData = $this->mapper->map($order);
+
+        $this->assertSame('AH', $shipmentData->getShipmentSettings()->getServiceType());
+        $this->assertTrue($shipmentData->getSpecialServices()->isCod());
+        $this->assertSame(450.50, $shipmentData->getSpecialServices()->getCodAmount());
     }
 
     /**

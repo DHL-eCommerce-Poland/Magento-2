@@ -4,10 +4,11 @@ define([
     'Magento_Checkout/js/model/quote',
     'Magento_Checkout/js/model/shipping-service',
     'Ideo_Dhl/js/model/point-state',
+    'Ideo_Dhl/js/model/method-codes',
     'uiRegistry',
     'mage/translate',
     'require'
-], function ($, ko, quote, shippingService, pointState, registry, $t, require) {
+], function ($, ko, quote, shippingService, pointState, methodCodes, registry, $t, require) {
     'use strict';
 
     return function (Shipping) {
@@ -81,7 +82,7 @@ define([
              */
             bindDhlMethodAddons: function () {
                 var self = this;
-                var $dhlInputs = $('input[value^="dhlparcel_"]');
+                var $dhlInputs = $('input[value^="' + methodCodes.CARRIER_CODE + '_"]');
 
                 if (!$dhlInputs.length) {
                     return false;
@@ -105,7 +106,7 @@ define([
 
                     var fullCode = $input.val();
                     var separatorPos = fullCode.indexOf('_');
-                    var carrierCode = separatorPos !== -1 ? fullCode.substring(0, separatorPos) : 'dhlparcel';
+                    var carrierCode = separatorPos !== -1 ? fullCode.substring(0, separatorPos) : methodCodes.CARRIER_CODE;
                     var methodCode = separatorPos !== -1 ? fullCode.substring(separatorPos + 1) : fullCode;
                     var methodObj = { carrier_code: carrierCode, method_code: methodCode };
 

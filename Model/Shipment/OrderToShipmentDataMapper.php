@@ -181,14 +181,17 @@ class OrderToShipmentDataMapper
 
         if (empty($popId)) {
             $shippingMethod = (string)($order->getShippingMethod() ?? '');
-            if (str_contains(strtolower($shippingMethod), 'pop')
+            if (
+                str_contains(strtolower($shippingMethod), 'pop')
                 || str_contains(strtolower($shippingMethod), 'servicepoint')
             ) {
-                if (preg_match(
-                    '/(?:POP|Point)\s*:?\s*([A-Z0-9\-]+)/i',
-                    (string)($order->getShippingDescription() ?? ''),
-                    $matches
-                )) {
+                if (
+                    preg_match(
+                        '/(?:POP|Point)\s*:?\s*([A-Z0-9\-]+)/i',
+                        (string)($order->getShippingDescription() ?? ''),
+                        $matches
+                    )
+                ) {
                     $popId = $matches[1];
                     $popName = (string)$order->getShippingDescription();
                 }
@@ -251,12 +254,8 @@ class OrderToShipmentDataMapper
         // 5. Special services & COD detection
         $isCod = false;
         $codAmount = null;
-        $paymentCode = strtolower((string)($order->getPayment()?->getMethod() ?? ''));
-        $paymentTitle = strtolower((string)($order->getPayment()?->getAdditionalInformation('method_title') ?? ''));
-        if (str_contains($paymentCode, 'cod')
-            || str_contains($paymentCode, 'cashondelivery')
-            || str_contains($paymentTitle, 'pobrani')
-        ) {
+        $shippingMethod = (string)($order->getShippingMethod() ?? '');
+        if ($this->methodCatalog->isCodMethod($shippingMethod)) {
             $isCod = true;
             $codAmount = (float)$order->getGrandTotal();
         }
@@ -266,7 +265,7 @@ class OrderToShipmentDataMapper
             try {
                 $decoded = $this->serializer->unserialize($presetSS);
                 $presetSS = is_array($decoded) ? $decoded : [];
-            } catch (InvalidArgumentException $e) {
+            } catch (InvalidArgumentException) {
                 $presetSS = [];
             }
         }
@@ -365,7 +364,8 @@ class OrderToShipmentDataMapper
         $shippingMethod = (string)($order->getShippingMethod() ?? '');
         $serviceType = $this->methodCatalog->getServiceCodeForMethod($shippingMethod);
 
-        if (in_array(strtoupper(trim((string)$serviceType)), [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EKS], true)
+        if (
+            in_array(strtoupper(trim((string)$serviceType)), [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EKS], true)
             && (empty($popId) || trim((string)$popId) === '')
             && $this->nearestPointResolver !== null
         ) {

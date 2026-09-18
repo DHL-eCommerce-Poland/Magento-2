@@ -39,7 +39,7 @@ class ConfigProviderTest extends TestCase
             ->willReturn(null);
 
         $assetRepository = $this->createMock(AssetRepository::class);
-        $assetRepository->expects(self::exactly(4))
+        $assetRepository->expects(self::exactly(7))
             ->method('getUrl')
             ->willReturnCallback(
                 static fn (string $fileId) => match ($fileId) {
@@ -62,15 +62,15 @@ class ConfigProviderTest extends TestCase
         $this->assertTrue($dhlConfig['debug']);
         $this->assertNull($dhlConfig['selectedPoint']);
         $this->assertEquals('https://example.com/logo_dhl_box_pop.png', $dhlConfig['logos']['dhlparcel_economy']);
-        $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['dhlparcel_connect_parcel_shop']);
+        $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['dhlparcel_connect_parcelshop']);
         $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['dhlparcel_connect_packstation']);
         $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['default']);
         $this->assertContainsEquals('dhlparcel_economy', $dhlConfig['pointMethods']);
         $this->assertNotContains('dhlparcel_connect', $dhlConfig['pointMethods']);
-        $this->assertContainsEquals('dhlparcel_connect_parcel_shop', $dhlConfig['pointMethods']);
+        $this->assertContainsEquals('dhlparcel_connect_parcelshop', $dhlConfig['pointMethods']);
         $this->assertContainsEquals('dhlparcel_connect_packstation', $dhlConfig['pointMethods']);
-        $this->assertEquals('pop', $dhlConfig['pointMapTypes']['connect_parcel_shop']);
-        $this->assertEquals('pop', $dhlConfig['pointMapTypes']['dhlparcel_connect_parcel_shop']);
+        $this->assertEquals('pop', $dhlConfig['pointMapTypes']['connect_parcelshop']);
+        $this->assertEquals('pop', $dhlConfig['pointMapTypes']['dhlparcel_connect_parcelshop']);
         $this->assertEquals('box', $dhlConfig['pointMapTypes']['connect_packstation']);
         $this->assertEquals('box', $dhlConfig['pointMapTypes']['dhlparcel_connect_packstation']);
     }

@@ -1,8 +1,9 @@
 define([
     'ko',
     'Magento_Checkout/js/model/quote',
+    'Ideo_Dhl/js/model/method-codes',
     'mage/translate'
-], function (ko, quote, $t) {
+], function (ko, quote, methodCodes, $t) {
     'use strict';
 
     var STORAGE_KEY = 'dhl_selected_service_point';
@@ -177,6 +178,7 @@ define([
          * Check if a given shipping method requires DHL point selection.
          *
          * @param {Object|null} method Shipping method object.
+         *
          * @return {Boolean} True if method requires point selection.
          */
         isDhlPointMethod: function (method) {
@@ -188,19 +190,24 @@ define([
             var fullCode = carrierCode + '_' + methodCode;
             var config = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) || {};
             var pointMethods = config.pointMethods || [
-                'dhlparcel_economy',
-                'dhlparcel_connect_parcel_shop',
-                'dhlparcel_connect_packstation'
+                methodCodes.FULL_ECONOMY,
+                methodCodes.FULL_CONNECT_PARCELSHOP,
+                methodCodes.FULL_CONNECT_PACKSTATION
             ];
 
             return pointMethods.indexOf(fullCode) !== -1 || pointMethods.indexOf(methodCode) !== -1 ||
-                (carrierCode === 'dhlparcel' && ['economy', 'connect_parcel_shop', 'connect_packstation'].indexOf(methodCode) !== -1);
+                (carrierCode === methodCodes.CARRIER_CODE && [
+                    methodCodes.METHOD_ECONOMY,
+                    methodCodes.METHOD_CONNECT_PARCELSHOP,
+                    methodCodes.METHOD_CONNECT_PACKSTATION
+                ].indexOf(methodCode) !== -1);
         },
 
         /**
          * Check if method is configured for automatic nearest service point delivery.
          *
          * @param {Object|null} method Shipping method object.
+         *
          * @return {Boolean} True if nearest mode active.
          */
         isNearestDeliveryMode: function (method) {
@@ -209,7 +216,7 @@ define([
             }
             var methodCode = method.method_code || method.methodCode || '';
             var config = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) || {};
-            return (methodCode === 'economy' || methodCode === 'dhlparcel_economy') && config.deliveryMode === 'nearest';
+            return (methodCode === methodCodes.METHOD_ECONOMY || methodCode === methodCodes.FULL_ECONOMY) && config.deliveryMode === 'nearest';
         },
 
         /**
@@ -271,6 +278,7 @@ define([
          * Validate point selection for shipping method.
          *
          * @param {Object|null} method Shipping method object.
+         *
          * @return {Boolean} True if selection is valid.
          */
         validatePointSelection: function (method) {

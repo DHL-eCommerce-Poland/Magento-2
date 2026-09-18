@@ -19,7 +19,7 @@ class SystemXmlTest extends TestCase
 
         $groups = $xml->xpath('/config/system/section[@id="carriers"]/group[@id="dhlparcel"]/group');
         self::assertIsArray($groups);
-        self::assertCount(12, $groups);
+        self::assertCount(23, $groups);
 
         // General group assertion
         $generalGroups = $xml->xpath(
@@ -64,16 +64,27 @@ class SystemXmlTest extends TestCase
         // Method groups assertions
         $methodCodes = [
             'parcel_polska' => 'parcel_polska',
+            'parcel_polska_cod' => 'parcel_polska_cod',
             'premium' => 'premium',
+            'premium_cod' => 'premium_cod',
             'parcel_9' => 'parcel_9',
+            'parcel_9_cod' => 'parcel_9_cod',
             'parcel_12' => 'parcel_12',
+            'parcel_12_cod' => 'parcel_12_cod',
             'economy' => 'economy',
+            'economy_cod' => 'economy_cod',
             'max_paleta' => 'max_paleta',
+            'max_paleta_cod' => 'max_paleta_cod',
             'connect' => 'connect',
-            'connect_parcel_shop' => 'connect_parcel_shop',
+            'connect_cod' => 'connect_cod',
+            'connect_parcelshop' => 'connect_parcelshop',
+            'connect_parcelshop_cod' => 'connect_parcelshop_cod',
             'connect_packstation' => 'connect_packstation',
+            'connect_packstation_cod' => 'connect_packstation_cod',
             'connect_plus' => 'connect_plus',
+            'connect_plus_cod' => 'connect_plus_cod',
             'connect_pallet' => 'connect_pallet',
+            'connect_pallet_cod' => 'connect_pallet_cod',
         ];
 
         foreach ($methodCodes as $groupId => $methodCode) {
@@ -120,7 +131,7 @@ class SystemXmlTest extends TestCase
         self::assertCount(0, $connectGroup[0]->xpath('./field[@id="point_map_type"]'));
 
         $connectParcelShopGroup = $xml->xpath(
-            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]/group[@id="connect_parcel_shop"]'
+            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]/group[@id="connect_parcelshop"]'
         );
         self::assertCount(1, $connectParcelShopGroup);
         self::assertCount(0, $connectParcelShopGroup[0]->xpath('./field[@id="point_map_type"]'));

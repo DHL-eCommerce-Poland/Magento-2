@@ -18,9 +18,13 @@ class ServicePointValidator
 
     private const POINT_METHODS = [
         MethodCatalog::METHOD_ECONOMY,
+        MethodCatalog::METHOD_ECONOMY_COD,
         MethodCatalog::METHOD_CONNECT,
-        MethodCatalog::METHOD_CONNECT_PARCEL_SHOP,
+        MethodCatalog::METHOD_CONNECT_COD,
+        MethodCatalog::METHOD_CONNECT_PARCELSHOP,
+        MethodCatalog::METHOD_CONNECT_PARCELSHOP_COD,
         MethodCatalog::METHOD_CONNECT_PACKSTATION,
+        MethodCatalog::METHOD_CONNECT_PACKSTATION_COD,
     ];
 
     /**
@@ -99,11 +103,18 @@ class ServicePointValidator
         }
 
         // Domestic SP (economy) in 'nearest' delivery mode does NOT require map point selection
-        if ($cleanMethodCode === MethodCatalog::METHOD_ECONOMY) {
+        if ($cleanMethodCode === MethodCatalog::METHOD_ECONOMY || $cleanMethodCode === MethodCatalog::METHOD_ECONOMY_COD) {
+            $path = $cleanMethodCode === MethodCatalog::METHOD_ECONOMY_COD
+                ? 'carriers/dhlparcel/method_economy_cod_point_delivery_mode'
+                : self::XML_PATH_DELIVERY_MODE;
+
             $deliveryMode = (string) $this->scopeConfig->getValue(
+                $path,
+                ScopeInterface::SCOPE_STORE
+            ) ?: ((string) $this->scopeConfig->getValue(
                 self::XML_PATH_DELIVERY_MODE,
                 ScopeInterface::SCOPE_STORE
-            ) ?: 'map';
+            ) ?: 'map');
 
             if ($deliveryMode === 'nearest') {
                 return false;

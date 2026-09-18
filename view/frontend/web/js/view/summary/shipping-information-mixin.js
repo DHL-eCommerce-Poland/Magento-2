@@ -1,8 +1,9 @@
 define([
     'Magento_Checkout/js/model/quote',
     'Ideo_Dhl/js/model/point-state',
+    'Ideo_Dhl/js/model/method-codes',
     'mage/translate'
-], function (quote, pointState, $t) {
+], function (quote, pointState, methodCodes, $t) {
     'use strict';
 
     return function (ShippingInformationComponent) {
@@ -23,8 +24,8 @@ define([
                 var methodCode = method.method_code || method.methodCode || '';
                 var carrierTitle = method.carrier_title || method.carrierTitle || '';
 
-                var isDhl = carrierCode === 'dhlparcel'
-                    || methodCode.indexOf('dhlparcel') === 0
+                var isDhl = carrierCode === methodCodes.CARRIER_CODE
+                    || methodCode.indexOf(methodCodes.CARRIER_CODE) === 0
                     || carrierTitle.indexOf('DHL') !== -1;
 
                 if (!isDhl) {

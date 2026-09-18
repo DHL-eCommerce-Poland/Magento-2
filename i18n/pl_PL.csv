@@ -440,7 +440,7 @@ Point Delivery Mode,Tryb dostawy do punktu
 Map Point Type Filter,Filtr typu punktów na mapie
 DHL Parcel Max Paleta,DHL Parcel Max Paleta
 DHL Parcel Connect,DHL Parcel Connect
-DHL Parcel Connect Parcel Shop,DHL Parcel Connect Parcel Shop
+DHL Parcel Connect Parcelshop,DHL Parcel Connect Parcelshop
 DHL Parcel Connect Packstation,DHL Parcel Connect Packstation
 DHL Parcel Connect Plus,DHL Parcel Connect Plus
 DHL Parcel Connect Pallet - Paleta,DHL Parcel Connect Pallet - Paleta
@@ -548,4 +548,16 @@ Help,Pomoc
 "Upload CSV with columns: Method Code, Condition Type (weight or subtotal), Value From (kg or order amount), Value To (kg or order amount), Price","Wgraj plik CSV z kolumnami: Method Code, Condition Type (weight lub subtotal), Value From (waga w kg lub kwota zamówienia), Value To (waga w kg lub kwota zamówienia), Price (cena dostawy)"
 "Upload CSV with columns: Method Code, Country, Price. For every method in the file, missing countries will be disabled automatically.","Wgraj plik CSV z kolumnami: Method Code, Country, Price. Dla każdej metody w pliku brakujące kraje zostaną automatycznie wyłączone."
 "A DHL shipment has already been created for order #%1.","Przesyłka DHL dla zamówienia #%1 została już utworzona."
+"DHL Parcel Polska - Cash on Delivery","DHL Parcel Polska - płatność przy odbiorze"
+"DHL Parcel Premium - Cash on Delivery","DHL Parcel Premium - płatność przy odbiorze"
+"DHL Parcel 9 - Cash on Delivery","DHL Parcel 9 - płatność przy odbiorze"
+"DHL Parcel 12 - Cash on Delivery","DHL Parcel 12 - płatność przy odbiorze"
+"DHL Parcel Economy - Cash on Delivery","DHL Parcel Economy - płatność przy odbiorze"
+"DHL Parcel Max Paleta - Cash on Delivery","DHL Parcel Max Paleta - płatność przy odbiorze"
+"DHL Parcel Connect - Cash on Delivery","DHL Parcel Connect - płatność przy odbiorze"
+"DHL Parcel Connect Parcelshop - Cash on Delivery","DHL Parcel Connect Parcelshop - płatność przy odbiorze"
+"DHL Parcel Connect Packstation - Cash on Delivery","DHL Parcel Connect Packstation - płatność przy odbiorze"
+"DHL Parcel Connect Plus - Cash on Delivery","DHL Parcel Connect Plus - płatność przy odbiorze"
+"DHL Parcel Connect Pallet - Paleta - Cash on Delivery","DHL Parcel Connect Pallet - Paleta - płatność przy odbiorze"
+
 

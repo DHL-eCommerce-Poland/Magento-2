@@ -77,7 +77,7 @@ class CarrierTest extends TestCase
 
         $carrier->collectRates($this->createStub(RateRequest::class));
 
-        self::assertCount(11, $rates);
+        self::assertCount(22, $rates);
     }
 
     /**

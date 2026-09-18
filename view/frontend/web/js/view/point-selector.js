@@ -3,9 +3,10 @@ define([
     'jquery',
     'Magento_Checkout/js/model/quote',
     'Ideo_Dhl/js/model/point-state',
+    'Ideo_Dhl/js/model/method-codes',
     'Magento_Ui/js/modal/modal',
     'mage/translate'
-], function (Component, $, quote, pointState, modal, $t) {
+], function (Component, $, quote, pointState, methodCodes, modal, $t) {
     'use strict';
 
     return Component.extend({
@@ -52,13 +53,13 @@ define([
             return (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel)
                 ? window.checkoutConfig.shipping.dhlparcel
                 : {
-                    mapUrl: 'https://parcelshop.dhl.pl/mapa',
+                    mapUrl: methodCodes.DEFAULT_MAP_URL,
                     pointMapType: 'all',
                     deliveryMode: 'map',
                     pointMethods: [
-                        'dhlparcel_economy',
-                        'dhlparcel_connect_parcel_shop',
-                        'dhlparcel_connect_packstation'
+                        methodCodes.FULL_ECONOMY,
+                        methodCodes.FULL_CONNECT_PARCELSHOP,
+                        methodCodes.FULL_CONNECT_PACKSTATION
                     ]
                 };
         },
@@ -85,7 +86,7 @@ define([
          */
         getMapIframeUrl: function () {
             var config = this.getDhlConfig();
-            var baseUrl = config.mapUrl || 'https://parcelshop.dhl.pl/mapa';
+            var baseUrl = config.mapUrl || methodCodes.DEFAULT_MAP_URL;
             var country = 'PL';
 
             var address = quote.shippingAddress();
