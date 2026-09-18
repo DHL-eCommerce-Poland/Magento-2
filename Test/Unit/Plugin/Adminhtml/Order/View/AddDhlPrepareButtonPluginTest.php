@@ -89,16 +89,26 @@ class AddDhlPrepareButtonPluginTest extends TestCase
         $this->plugin->beforeSetLayout($block);
     }
 
-    public function testBeforeSetLayoutSkipsNonDhlShippingMethod(): void
+    public function testBeforeSetLayoutAddsButtonForNonDhlShippingMethod(): void
     {
         $order = $this->createStub(Order::class);
         $order->method('getShippingMethod')->willReturn('flatrate_flatrate');
+        $order->method('getState')->willReturn(Order::STATE_PROCESSING);
+        $order->method('getStatus')->willReturn('processing');
 
         $this->orderRepository->method('get')->willReturn($order);
+        $this->shipmentDataRepository->method('getByOrderId')->willReturn(null);
 
         $block = $this->createMock(OrderViewBlock::class);
         $block->method('getOrderId')->willReturn(11);
-        $block->expects($this->never())->method('addButton');
+        $block->expects($this->once())
+            ->method('addButton')
+            ->with(
+                'dhlparcel_prepare_shipment',
+                self::callback(fn ($arg) => is_array($arg) && isset($arg['label'])),
+                0,
+                95
+            );
 
         $this->plugin->beforeSetLayout($block);
     }

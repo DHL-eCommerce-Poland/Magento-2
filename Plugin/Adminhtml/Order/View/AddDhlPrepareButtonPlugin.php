@@ -13,7 +13,7 @@ use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
 
 /**
- * Plugin adding "DHL Shipment" button to admin order view page for DHL Parcel orders.
+ * Plugin adding "DHL Shipment" button to admin order view page.
  */
 class AddDhlPrepareButtonPlugin
 {
@@ -56,13 +56,6 @@ class AddDhlPrepareButtonPlugin
 
             // Hide button for virtual/downloadable orders
             if ($order->getIsVirtual()) {
-                return;
-            }
-
-            $shippingMethod = strtolower((string)($order->getShippingMethod() ?? ''));
-
-            $isDhlMethod = str_starts_with($shippingMethod, 'dhlparcel') || str_starts_with($shippingMethod, 'dhl');
-            if (empty($shippingMethod) || !$isDhlMethod) {
                 return;
             }
 
