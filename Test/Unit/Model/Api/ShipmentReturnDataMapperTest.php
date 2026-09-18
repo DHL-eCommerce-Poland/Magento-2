@@ -102,13 +102,10 @@ class ShipmentReturnDataMapperTest extends TestCase
         $this->assertEquals(150.0, $mapped['shipmentInfo']['specialServices']['item'][0]['serviceValue']);
     }
 
-    public function testSanitizeAndTruncateString(): void
+    public function testSanitizeString(): void
     {
         $dirty = "Test\x00\x07String  ";
         $sanitized = $this->mapper->sanitizeString($dirty);
         $this->assertEquals('TestString', $sanitized);
-
-        $truncated = $this->mapper->truncateString('Bardzo długa zawartość paczki zwrotnej', 10);
-        $this->assertEquals('Bardzo dłu', $truncated);
     }
 }

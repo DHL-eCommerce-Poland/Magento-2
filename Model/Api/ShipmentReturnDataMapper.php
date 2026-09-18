@@ -6,7 +6,6 @@ namespace Ideo\Dhl\Model\Api;
 
 use Ideo\Dhl\Model\Config\Source\ReturnBookCourier;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Ideo\Dhl\Model\Shipment\DhlShipmentRestrictions;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class ShipmentReturnDataMapper
@@ -122,10 +121,7 @@ class ShipmentReturnDataMapper
 
         $result = [
             'shipmentInfo' => $shipmentInfo,
-            'content' => $this->truncateString(
-                $this->sanitizeString($settings->getContent() ?: __('Zwrot zamówienia')),
-                DhlShipmentRestrictions::MAX_LENGTH_CONTENT
-            ),
+            'content' => $this->sanitizeString($settings->getContent() ?: __('Order Return')),
             'ship' => [
                 'shipper' => [
                     'address' => [
@@ -166,17 +162,11 @@ class ShipmentReturnDataMapper
         ];
 
         if ($settings->getComment() !== '') {
-            $result['comment'] = $this->truncateString(
-                $this->sanitizeString($settings->getComment()),
-                DhlShipmentRestrictions::MAX_LENGTH_COMMENT
-            );
+            $result['comment'] = $this->sanitizeString($settings->getComment());
         }
 
         if ($settings->getReference() !== '') {
-            $result['reference'] = $this->truncateString(
-                $this->sanitizeString($settings->getReference()),
-                DhlShipmentRestrictions::MAX_LENGTH_REFERENCE
-            );
+            $result['reference'] = $this->sanitizeString($settings->getReference());
         }
 
         if (!empty($primaryWaybillNumber)) {
@@ -212,22 +202,5 @@ class ShipmentReturnDataMapper
     public function sanitizePostalCode(string $postalCode): string
     {
         return (string) preg_replace('/[^0-9]/', '', $postalCode);
-    }
-
-    /**
-     * Safely truncate UTF-8 string to maximum character length.
-     *
-     * @param string $string
-     * @param int $maxLength
-     *
-     * @return string
-     */
-    public function truncateString(string $string, int $maxLength): string
-    {
-        if (mb_strlen($string) <= $maxLength) {
-            return $string;
-        }
-
-        return mb_substr($string, 0, $maxLength);
     }
 }

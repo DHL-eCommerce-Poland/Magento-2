@@ -226,43 +226,7 @@ define([
             packages: packagesObsArr
         };
 
-        shipmentSettingsObj.isSinglePieceOnly = ko.computed(function () {
-            var sType = (shipmentSettingsObj.serviceType() || '').toUpperCase().trim();
-            var popIdVal = (recipientObj.popId() || '').trim();
-            if (popIdVal !== '') return true;
-            return sType === 'SP' || sType === 'PS' || sType === 'LM';
-        });
-
-        shipmentSettingsObj.isNonStandardForbidden = ko.computed(function () {
-            var sType = (shipmentSettingsObj.serviceType() || '').toUpperCase().trim();
-            var popIdVal = (recipientObj.popId() || '').trim();
-            if (popIdVal !== '') return true;
-            return sType === 'SP' || sType === 'PS' || sType === 'LM';
-        });
-
-        var checkAndEnforceRestrictions = function () {
-            if (shipmentSettingsObj.isSinglePieceOnly()) {
-                if (shipmentSettingsObj.packages().length > 1) {
-                    shipmentSettingsObj.packages.splice(1, shipmentSettingsObj.packages().length - 1);
-                }
-                if (shipmentSettingsObj.packages().length > 0) {
-                    shipmentSettingsObj.packages()[0].quantity(1);
-                }
-            }
-            if (shipmentSettingsObj.isNonStandardForbidden()) {
-                if (shipmentSettingsObj.packages().length > 0) {
-                    $.each(shipmentSettingsObj.packages(), function (i, pkg) {
-                        pkg.isNonStandard(false);
-                    });
-                }
-            }
-        };
-
-        shipmentSettingsObj.serviceType.subscribe(checkAndEnforceRestrictions);
-        recipientObj.popId.subscribe(checkAndEnforceRestrictions);
-
         shipmentSettingsObj.addPackageRow = function () {
-            if (shipmentSettingsObj.isSinglePieceOnly()) return;
             shipmentSettingsObj.packages.push(createPackageObservable({
                 packageType: 'PACKAGE',
                 quantity: 1,
@@ -506,7 +470,7 @@ define([
                     if (shipmentSettings && self.draft().shipmentSettings) {
                         var currentSettings = self.draft().shipmentSettings;
                         $.each(shipmentSettings, function (key, val) {
-                            if (key === 'selectedDeliveryServiceId' || key === 'packages' || key === 'isSinglePieceOnly' || key === 'isNonStandardForbidden') return;
+                            if (key === 'selectedDeliveryServiceId' || key === 'packages') return;
                             if (typeof currentSettings[key] === 'function') {
                                 if (typeof val === 'string') {
                                     val = val.trim();

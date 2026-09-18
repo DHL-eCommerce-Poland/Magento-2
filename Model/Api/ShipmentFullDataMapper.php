@@ -6,7 +6,6 @@ namespace Ideo\Dhl\Model\Api;
 
 use Ideo\Dhl\Model\Config\Source\AddressType;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Ideo\Dhl\Model\Shipment\DhlShipmentRestrictions;
 
 class ShipmentFullDataMapper
 {
@@ -156,18 +155,9 @@ class ShipmentFullDataMapper
             'shipmentDate' => $settings->getShipmentDate(),
             'skipRestrictionCheck' => false,
             'servicePointAccountNumber' => $servicePointAccountNumber,
-            'content' => $this->truncateString(
-                $this->sanitizeString($settings->getContent()),
-                DhlShipmentRestrictions::MAX_LENGTH_CONTENT
-            ),
-            'comment' => $this->truncateString(
-                $this->sanitizeString($settings->getComment()),
-                DhlShipmentRestrictions::MAX_LENGTH_COMMENT
-            ),
-            'reference' => $this->truncateString(
-                $this->sanitizeString($settings->getReference()),
-                DhlShipmentRestrictions::MAX_LENGTH_REFERENCE
-            ),
+            'content' => $this->sanitizeString($settings->getContent()),
+            'comment' => $this->sanitizeString($settings->getComment()),
+            'reference' => $this->sanitizeString($settings->getReference()),
         ];
 
         if ($settings->getPickupHourFrom() !== null && $settings->getPickupHourFrom() !== '') {
@@ -206,22 +196,5 @@ class ShipmentFullDataMapper
     public function sanitizePostalCode(string $postalCode): string
     {
         return (string) preg_replace('/[^0-9]/', '', $postalCode);
-    }
-
-    /**
-     * Safely truncate UTF-8 string to maximum character length.
-     *
-     * @param string $string
-     * @param int $maxLength
-     *
-     * @return string
-     */
-    public function truncateString(string $string, int $maxLength): string
-    {
-        if (mb_strlen($string) <= $maxLength) {
-            return $string;
-        }
-
-        return mb_substr($string, 0, $maxLength);
     }
 }

@@ -142,13 +142,11 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertTrue($mapped['service']['collectOnDelivery']);
         $this->assertEquals(150.0, $mapped['service']['collectOnDeliveryValue']);
 
-        // Check control character sanitization & length limits
+        // Check control character sanitization
         $this->assertFalse($mapped['skipRestrictionCheck']);
         $this->assertNull($mapped['servicePointAccountNumber']);
         $this->assertStringNotContainsString("\x07", $mapped['content']);
         $this->assertStringNotContainsString("\x00", $mapped['comment']);
-        $this->assertLessThanOrEqual(30, mb_strlen($mapped['content']));
-        $this->assertLessThanOrEqual(100, mb_strlen($mapped['comment']));
     }
 
     /**

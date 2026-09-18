@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\DeliveryService;
 
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory;
-use Ideo\Dhl\Model\Shipment\DhlShipmentRestrictions;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 
@@ -80,22 +79,16 @@ class DataProvider extends AbstractDataProvider
     {
         $meta = parent::getMeta();
 
-        $maxComment = DhlShipmentRestrictions::MAX_LENGTH_COMMENT;
         $commentConfig = &$meta['general']['children']['comment']['arguments']['data']['config'];
-        $commentConfig['validation']['max_text_length'] = $maxComment;
         $commentConfig['notice'] = __(
             'Available tags: {order_increment_id}, {product_names}, {sku_list}, '
-            . '{qty_total}, {customer_name}, {payment_method} (max %1 chars)',
-            $maxComment
+            . '{qty_total}, {customer_name}, {payment_method}'
         );
 
-        $maxRef = DhlShipmentRestrictions::MAX_LENGTH_REFERENCE;
         $refConfig = &$meta['general']['children']['reference']['arguments']['data']['config'];
-        $refConfig['validation']['max_text_length'] = $maxRef;
         $refConfig['notice'] = __(
             'Available tags: {order_increment_id}, {product_names}, {sku_list}, '
-            . '{qty_total}, {customer_name}, {payment_method} (max %1 chars)',
-            $maxRef
+            . '{qty_total}, {customer_name}, {payment_method}'
         );
 
         return $meta;

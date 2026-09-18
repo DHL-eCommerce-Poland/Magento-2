@@ -78,26 +78,6 @@ class ShipmentDataValidator
             $errors[] = __('Package Contents Description is required.')->render();
         }
 
-        // Text field length restrictions
-        if (mb_strlen($settings->getContent()) > DhlShipmentRestrictions::MAX_LENGTH_CONTENT) {
-            $errors[] = __(
-                'Package Contents Description cannot exceed %1 characters.',
-                DhlShipmentRestrictions::MAX_LENGTH_CONTENT
-            )->render();
-        }
-        if (mb_strlen($settings->getComment()) > DhlShipmentRestrictions::MAX_LENGTH_COMMENT) {
-            $errors[] = __(
-                'Additional Comments cannot exceed %1 characters.',
-                DhlShipmentRestrictions::MAX_LENGTH_COMMENT
-            )->render();
-        }
-        if (mb_strlen($settings->getReference()) > DhlShipmentRestrictions::MAX_LENGTH_REFERENCE) {
-            $errors[] = __(
-                'Shipment Reference Number cannot exceed %1 characters.',
-                DhlShipmentRestrictions::MAX_LENGTH_REFERENCE
-            )->render();
-        }
-
         // ServicePoint / POP point requirement
         if (in_array(strtoupper(trim((string)$serviceType)), [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS], true) && empty($popId)) {
             $errors[] = __('Service Point ID is required for ServicePoint shipments.')->render();
@@ -107,33 +87,10 @@ class ShipmentDataValidator
         if (empty($packages)) {
             $errors[] = __('At least one package is required.')->render();
         } else {
-            // Check single-piece restriction for ServicePoint / POP / Return products
-            $isSinglePieceOnly = DhlShipmentRestrictions::isSinglePieceOnly($serviceType, $popId);
-            $totalPackageQuantity = 0;
-            foreach ($packages as $pkg) {
-                $totalPackageQuantity += $pkg->getQuantity();
-            }
-
-            if ($isSinglePieceOnly && (count($packages) > 1 || $totalPackageQuantity > 1)) {
-                $errors[] = __(
-                    'Only single-piece (1 package) shipments are allowed for '
-                    . 'ServicePoint, Return, or POP point deliveries.'
-                )->render();
-            }
-
-            // Check non-standard package restriction
-            $isNonStandardForbidden = DhlShipmentRestrictions::isNonStandardForbidden($serviceType, $popId);
-
             foreach ($packages as $index => $pkg) {
                 $rowNum = $index + 1;
                 if ($pkg->getWeight() <= 0) {
                     $errors[] = __('Package #%1 weight must be greater than zero.', $rowNum)->render();
-                }
-
-                if ($isNonStandardForbidden && $pkg->isNonStandard()) {
-                    $errors[] = __(
-                        'Non-standard (NST) packages are not allowed for ServicePoint, Return, or POP point deliveries.'
-                    )->render();
                 }
 
                 if ($pkg->getPackageType() !== 'ENVELOPE') {
