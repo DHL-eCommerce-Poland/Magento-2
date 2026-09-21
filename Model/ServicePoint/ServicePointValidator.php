@@ -62,7 +62,18 @@ class ServicePointValidator
         $country = strtoupper((string) $servicePoint->getCountry());
         $postnummer = trim((string) $servicePoint->getPostnummer());
 
-        if ($country === 'DE' && $servicePoint->isPackstation()) {
+        $cleanMethodCode = strtolower(trim((string) $methodCode));
+        if (str_starts_with($cleanMethodCode, Carrier::CODE_PREFIX)) {
+            $cleanMethodCode = substr($cleanMethodCode, strlen(Carrier::CODE_PREFIX));
+        }
+
+        $isPackstationMethod = in_array(
+            $cleanMethodCode,
+            [MethodCatalog::METHOD_CONNECT_PACKSTATION, MethodCatalog::METHOD_CONNECT_PACKSTATION_COD],
+            true
+        );
+
+        if ($country === 'DE' && ($servicePoint->isPackstation() || $isPackstationMethod)) {
             if ($postnummer === '') {
                 throw new LocalizedException(__('German Customer Number (Postnummer) is required for delivery to a German Packstation.'));
             }

@@ -1,9 +1,10 @@
 define([
+    'jquery',
     'ko',
     'Magento_Checkout/js/model/quote',
     'Ideo_Dhl/js/model/method-codes',
     'mage/translate'
-], function (ko, quote, methodCodes, $t) {
+], function ($, ko, quote, methodCodes, $t) {
     'use strict';
 
     var STORAGE_KEY = 'dhl_selected_service_point';
@@ -175,6 +176,29 @@ define([
         getQuoteId: getQuoteId,
 
         /**
+         * Resolve destination country code for current quote/point.
+         *
+         * @return {string} Uppercase 2-letter country code.
+         */
+        getDestinationCountry: function () {
+            var address = quote.shippingAddress();
+            if (address && (address.countryId || address.country_id)) {
+                return String(address.countryId || address.country_id).toUpperCase();
+            }
+            if (typeof $ !== 'undefined') {
+                var formCountry = $('select[name="country_id"]').val();
+                if (formCountry) {
+                    return String(formCountry).toUpperCase();
+                }
+            }
+            var point = selectedPoint();
+            if (point && point.country) {
+                return String(point.country).toUpperCase();
+            }
+            return 'PL';
+        },
+
+        /**
          * Check if a given shipping method requires DHL point selection.
          *
          * @param {Object|null} method Shipping method object.
@@ -191,15 +215,21 @@ define([
             var config = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) || {};
             var pointMethods = config.pointMethods || [
                 methodCodes.FULL_ECONOMY,
+                methodCodes.FULL_ECONOMY_COD,
                 methodCodes.FULL_CONNECT_PARCELSHOP,
-                methodCodes.FULL_CONNECT_PACKSTATION
+                methodCodes.FULL_CONNECT_PARCELSHOP_COD,
+                methodCodes.FULL_CONNECT_PACKSTATION,
+                methodCodes.FULL_CONNECT_PACKSTATION_COD
             ];
 
             return pointMethods.indexOf(fullCode) !== -1 || pointMethods.indexOf(methodCode) !== -1 ||
                 (carrierCode === methodCodes.CARRIER_CODE && [
                     methodCodes.METHOD_ECONOMY,
+                    methodCodes.METHOD_ECONOMY_COD,
                     methodCodes.METHOD_CONNECT_PARCELSHOP,
-                    methodCodes.METHOD_CONNECT_PACKSTATION
+                    methodCodes.METHOD_CONNECT_PARCELSHOP_COD,
+                    methodCodes.METHOD_CONNECT_PACKSTATION,
+                    methodCodes.METHOD_CONNECT_PACKSTATION_COD
                 ].indexOf(methodCode) !== -1);
         },
 
@@ -229,29 +259,23 @@ define([
             if (!point) {
                 return false;
             }
-            var country = (point.country || '').toUpperCase();
-            if (!country) {
-                var address = quote.shippingAddress();
-                if (address && (address.countryId || address.country_id)) {
-                    country = (address.countryId || address.country_id).toUpperCase();
-                }
-            }
+            var country = this.getDestinationCountry();
             if (country !== 'DE') {
                 return false;
             }
 
-            var nameStr = (point.name || point.sap || '').toLowerCase();
-            var typeStr = (point.type || point.ptype || '').toLowerCase();
-            return !!(
-                point.isPackstation ||
-                point.packstation ||
-                typeStr === 'packstation' ||
-                typeStr === 'lmecobox' ||
-                typeStr === 'box' ||
-                nameStr.indexOf('packstation') !== -1 ||
-                nameStr.indexOf('box') !== -1 ||
-                /^\d+$/.test((point.name || '').trim())
-            );
+            var curMethod = quote.shippingMethod();
+            var mCode = curMethod ? (curMethod.method_code || curMethod.methodCode || '') : '';
+            var fullMCode = curMethod ? ((curMethod.carrier_code || curMethod.carrierCode || '') + '_' + mCode) : '';
+            if (mCode === methodCodes.METHOD_CONNECT_PACKSTATION ||
+                mCode === methodCodes.METHOD_CONNECT_PACKSTATION_COD ||
+                fullMCode === methodCodes.FULL_CONNECT_PACKSTATION ||
+                fullMCode === methodCodes.FULL_CONNECT_PACKSTATION_COD
+            ) {
+                return true;
+            }
+
+            return !!(point.isPackstation || point.packstation);
         },
 
         /**
@@ -264,13 +288,7 @@ define([
             if (!point) {
                 return false;
             }
-            var country = (point.country || '').toUpperCase();
-            if (!country) {
-                var address = quote.shippingAddress();
-                if (address && (address.countryId || address.country_id)) {
-                    country = (address.countryId || address.country_id).toUpperCase();
-                }
-            }
+            var country = this.getDestinationCountry();
             return country === 'DE' && !this.isDePackstationSelected();
         },
 
@@ -299,7 +317,7 @@ define([
                 return false;
             }
 
-            var country = (point.country || '').toUpperCase();
+            var country = this.getDestinationCountry();
             var postnummer = (point.postnummer || '').trim();
 
             if (country === 'DE' && this.isDePackstationSelected() && !postnummer) {

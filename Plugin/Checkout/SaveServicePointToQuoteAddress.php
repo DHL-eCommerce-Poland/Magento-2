@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Plugin\Checkout;
 
+use Ideo\Dhl\Model\Carrier;
+use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\ServicePoint\ServicePointValidator;
 use Ideo\Dhl\Model\ServicePoint\ServicePointValueObject;
 use Magento\Checkout\Api\Data\ShippingInformationInterface;
@@ -49,6 +51,30 @@ class SaveServicePointToQuoteAddress
 
         $extAttributes = $shippingAddress->getExtensionAttributes();
         $servicePoint = $this->extractPointFromExtensionAttributes($extAttributes, $shippingAddress);
+
+        $cleanMethodCode = strtolower(trim($methodCode));
+        if (str_starts_with($cleanMethodCode, Carrier::CODE_PREFIX)) {
+            $cleanMethodCode = substr($cleanMethodCode, strlen(Carrier::CODE_PREFIX));
+        }
+        $isPackstationMethod = in_array(
+            $cleanMethodCode,
+            [MethodCatalog::METHOD_CONNECT_PACKSTATION, MethodCatalog::METHOD_CONNECT_PACKSTATION_COD],
+            true
+        );
+
+        if ($servicePoint !== null && $isPackstationMethod && !$servicePoint->isPackstation()) {
+            $servicePoint = new ServicePointValueObject(
+                $servicePoint->getId(),
+                $servicePoint->getName(),
+                $servicePoint->getStreet(),
+                $servicePoint->getPostcode(),
+                $servicePoint->getCity(),
+                true,
+                false,
+                $servicePoint->getPostnummer(),
+                $servicePoint->getCountry()
+            );
+        }
 
         // Validate selection requirement
         $this->validator->validate($carrierCode, $methodCode, $servicePoint);
@@ -117,12 +143,14 @@ class SaveServicePointToQuoteAddress
             return null;
         }
 
-        $hasCountryMethod = $shippingAddress
-            && is_object($shippingAddress)
-            && method_exists($shippingAddress, 'getCountryId');
-        $country = $hasCountryMethod
-            ? (string) $shippingAddress->getCountryId()
-            : '';
+        $country = '';
+        if ($shippingAddress && is_object($shippingAddress)) {
+            if (method_exists($shippingAddress, 'getCountryId') && $shippingAddress->getCountryId()) {
+                $country = (string) $shippingAddress->getCountryId();
+            } elseif (method_exists($shippingAddress, 'getData')) {
+                $country = (string) ($shippingAddress->getData('country_id') ?? '');
+            }
+        }
 
         return new ServicePointValueObject(
             $id,

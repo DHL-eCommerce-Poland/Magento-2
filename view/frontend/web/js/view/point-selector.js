@@ -189,20 +189,27 @@ define([
 
                 if (pointData && typeof pointData === 'object' && pointData.sap) {
                     var address = quote.shippingAddress();
-                    var recipientCountry = pointData.country || (address ? (address.countryId || address.country_id) : 'PL') || 'PL';
-                    var nameStr = (pointData.name || pointData.sap || '').toLowerCase();
+                    var formCountry = $('select[name="country_id"]').val();
+                    var recipientCountry = pointData.country ||
+                        (address ? (address.countryId || address.country_id) : '') ||
+                        formCountry ||
+                        'PL';
+                    var countryUpper = recipientCountry.toUpperCase();
                     var typeStr = (pointData.type || pointData.ptype || '').toLowerCase();
 
-                    var isPackstation = !!(
+                    var curMethod = quote.shippingMethod();
+                    var mCode = curMethod ? (curMethod.method_code || curMethod.methodCode || '') : '';
+                    var fullMCode = curMethod ? ((curMethod.carrier_code || curMethod.carrierCode || '') + '_' + mCode) : '';
+                    var isPackstationMethod = mCode === methodCodes.METHOD_CONNECT_PACKSTATION ||
+                        mCode === methodCodes.METHOD_CONNECT_PACKSTATION_COD ||
+                        fullMCode === methodCodes.FULL_CONNECT_PACKSTATION ||
+                        fullMCode === methodCodes.FULL_CONNECT_PACKSTATION_COD;
+
+                    var isPackstation = isPackstationMethod || !!(
                         pointData.isPackstation ||
                         pointData.packstation ||
                         typeStr === 'packstation' ||
-                        typeStr === 'lmecobox' ||
-                        typeStr === 'box' ||
-                        (pointData.ptype || '').toLowerCase() === 'packstation' ||
-                        nameStr.indexOf('packstation') !== -1 ||
-                        nameStr.indexOf('box') !== -1 ||
-                        (/^\d+$/.test((pointData.name || '').trim()) && recipientCountry.toUpperCase() === 'DE')
+                        (pointData.ptype || '').toLowerCase() === 'packstation'
                     );
 
                     var isPostfiliale = !isPackstation;

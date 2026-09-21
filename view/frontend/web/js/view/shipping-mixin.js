@@ -211,7 +211,14 @@ define([
                                 pointState.setPostnummer(value);
                             }
                         }),
-                        postnummerErrorMessage: pointState.postnummerErrorMessage,
+                        postnummerErrorMessage: ko.computed(function () {
+                            var curMethod = quote.shippingMethod();
+                            var curCode = curMethod ? ((curMethod.carrier_code || curMethod.carrierCode || '') + '_' + (curMethod.method_code || curMethod.methodCode || '')) : '';
+                            if (curCode === fullCode || curCode === methodCode) {
+                                return pointState.postnummerErrorMessage();
+                            }
+                            return '';
+                        }),
                         pointErrorMessage: ko.computed(function () {
                             var curMethod = quote.shippingMethod();
                             var curCode = curMethod ? ((curMethod.carrier_code || curMethod.carrierCode || '') + '_' + (curMethod.method_code || curMethod.methodCode || '')) : '';
@@ -265,6 +272,16 @@ define([
                     if (!pointState.validatePointSelection(method)) {
                         var msg = pointState.pointErrorMessage() || pointState.postnummerErrorMessage() || $t('Please select a DHL pickup point on the map.');
                         this.errorValidationMessage(msg);
+                        var $input = $('#dhl_postnummer_inline:visible, #dhl_postnummer_inline_opt:visible');
+                        if (pointState.postnummerErrorMessage() && $input.length) {
+                            $input.first().focus();
+                            $('html, body').stop().animate({ scrollTop: $input.first().offset().top - 120 }, 300);
+                        } else {
+                            var $targetWrapper = $('[data-dhl-method]');
+                            if ($targetWrapper.length) {
+                                $('html, body').stop().animate({ scrollTop: $targetWrapper.first().offset().top - 120 }, 300);
+                            }
+                        }
                         return false;
                     }
                 }

@@ -166,6 +166,10 @@ class ConfigProvider implements ConfigProviderInterface
             $street = (string) $shippingAddress->getData('dhl_service_point_street');
             $postcode = (string) $shippingAddress->getData('dhl_service_point_postcode');
             $city = (string) $shippingAddress->getData('dhl_service_point_city');
+            $country = (string) ($shippingAddress->getCountryId() ?: $shippingAddress->getData('country_id'));
+            $isPackstation = (bool) $shippingAddress->getData('dhl_is_packstation');
+            $isPostfiliale = (bool) $shippingAddress->getData('dhl_is_postfiliale');
+            $postnummer = (string) $shippingAddress->getData('dhl_postnummer');
 
             return [
                 'sap' => $sap,
@@ -175,6 +179,10 @@ class ConfigProvider implements ConfigProviderInterface
                 'houseNo' => '',
                 'zip' => $postcode,
                 'city' => $city,
+                'country' => $country,
+                'isPackstation' => $isPackstation,
+                'isPostfiliale' => $isPostfiliale,
+                'postnummer' => $postnummer,
             ];
         } catch (Throwable) {
             return null;

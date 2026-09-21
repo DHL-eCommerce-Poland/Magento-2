@@ -41,9 +41,17 @@
         }
     }
 
+    .dhl-method-addon-container {
+        box-sizing: border-box;
+        display: block;
+        max-width: 360px;
+    }
+
     .dhl-carrier-wrapper {
-        margin-top: 6px;
+        box-sizing: border-box;
         clear: both;
+        margin-top: 6px;
+        max-width: 360px;
 
         .dhl-point-nearest-info {
             color: #333;
@@ -52,15 +60,15 @@
         }
 
         .dhl-select-point-btn {
-            font-size: 12px;
-            line-height: 1.4;
-            padding: 5px 12px;
-            margin-top: 8px;
             background-color: #FFCC00;
             border: 1px solid #D2072A;
-            color: #D2072A;
-            font-weight: bold;
             box-shadow: none;
+            color: #D2072A;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-top: 8px;
+            padding: 5px 12px;
 
             &:hover, &:focus, &:active {
                 background-color: #e6b800;
@@ -75,31 +83,43 @@
 
         .dhl-point-selected-inline {
             background: #FFCC00;
-            padding: 8px 10px;
             border: 1px solid #D2072A;
             border-radius: 4px;
-            margin-top: 6px;
+            box-sizing: border-box;
             color: #D2072A;
             font-size: 12px;
+            margin-top: 6px;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            padding: 8px 10px;
+            white-space: normal;
+            word-wrap: break-word;
 
             p {
-                margin-bottom: 4px;
-                font-weight: bold;
                 color: #D2072A;
+                font-weight: bold;
+                margin-bottom: 4px;
             }
 
             > div {
                 line-height: 1.4;
+                overflow-wrap: break-word;
+                word-wrap: break-word;
             }
         }
 
         .dhl-postnummer-field {
+            box-sizing: border-box;
             margin-top: 8px;
+            max-width: 100%;
 
             label {
-                font-weight: bold;
-                font-size: 12px;
                 color: #D2072A;
+                display: block;
+                font-size: 12px;
+                font-weight: bold;
+                line-height: 1.35;
+                white-space: normal;
 
                 span.required-mark {
                     color: #e02b27;
@@ -107,20 +127,32 @@
             }
 
             .dhl-postnummer-input {
-                margin-top: 4px;
+                box-sizing: border-box;
                 display: block;
+                margin-top: 4px;
+                max-width: 220px;
+                width: 100%;
             }
         }
 
         .dhl-postnummer-error,
         .dhl-point-error {
+            box-sizing: border-box;
             color: #e02b27;
+            display: block;
             font-size: 12px;
+            line-height: 1.35;
             margin-top: 4px;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            white-space: normal;
+            word-wrap: break-word;
         }
 
         .dhl-point-prompt-inline {
+            box-sizing: border-box;
             margin-top: 6px;
+            max-width: 100%;
         }
     }
 }

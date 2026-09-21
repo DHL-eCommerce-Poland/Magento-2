@@ -17,11 +17,17 @@ define([
                     if (errorMsg) {
                         globalMessageList.addErrorMessage({ message: errorMsg });
                     }
-                    var $targetWrapper = $('[data-dhl-method]');
-                    if ($targetWrapper.length) {
-                        $('html, body').stop().animate({ scrollTop: $targetWrapper.first().offset().top - 120 }, 300);
+                    var $input = $('#dhl_postnummer_inline:visible, #dhl_postnummer_inline_opt:visible');
+                    if (pointState.postnummerErrorMessage() && $input.length) {
+                        $input.first().focus();
+                        $('html, body').stop().animate({ scrollTop: $input.first().offset().top - 120 }, 300);
                     } else {
-                        $('html, body').stop().animate({ scrollTop: 0 }, 300);
+                        var $targetWrapper = $('[data-dhl-method]');
+                        if ($targetWrapper.length) {
+                            $('html, body').stop().animate({ scrollTop: $targetWrapper.first().offset().top - 120 }, 300);
+                        } else {
+                            $('html, body').stop().animate({ scrollTop: 0 }, 300);
+                        }
                     }
                     return $.Deferred().reject();
                 }

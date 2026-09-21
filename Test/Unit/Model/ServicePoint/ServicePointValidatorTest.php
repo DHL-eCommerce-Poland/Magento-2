@@ -150,4 +150,29 @@ class ServicePointValidatorTest extends TestCase
         $this->expectNotToPerformAssertions();
         $validator->validate(Carrier::CODE, 'connect', $point);
     }
+
+    public function testValidationThrowsExceptionForConnectPackstationMethodWithoutPostnummer(): void
+    {
+        $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+
+        $validator = new ServicePointValidator($scopeConfigStub);
+        $point = new ServicePointValueObject(
+            'DE123',
+            'Point Name',
+            'Keetstr.',
+            '49393',
+            'Lohne',
+            false,
+            false,
+            null,
+            'DE'
+        );
+
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage(
+            'German Customer Number (Postnummer) is required for delivery to a German Packstation.'
+        );
+
+        $validator->validate(Carrier::CODE, 'connect_packstation', $point);
+    }
 }
