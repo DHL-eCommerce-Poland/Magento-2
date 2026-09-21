@@ -20,6 +20,7 @@ class CourierBookingService
      * @param CredentialsProvider $credentialsProvider
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param TimezoneInterface $timezone
+     * @param ShipmentDateSanitizer $dateSanitizer
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -27,6 +28,7 @@ class CourierBookingService
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly TimezoneInterface $timezone,
+        private readonly ShipmentDateSanitizer $dateSanitizer,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -57,15 +59,7 @@ class CourierBookingService
         }
 
         try {
-            $pickupDt = $this->timezone->date($pickupDate);
-            $formattedPickupDate = $pickupDt->format('Y-m-d');
-            if ((int) $pickupDt->format('N') >= 6) {
-                throw new LocalizedException(
-                    __('Courier pickup is not available for weekends. Please select a business day in the calendar.')
-                );
-            }
-        } catch (LocalizedException $le) {
-            throw $le;
+            $formattedPickupDate = $this->dateSanitizer->sanitize($pickupDate, null, false);
         } catch (Throwable $e) {
             $formattedPickupDate = $this->timezone->scopeDate()->format('Y-m-d');
             $this->logger?->warning(sprintf(

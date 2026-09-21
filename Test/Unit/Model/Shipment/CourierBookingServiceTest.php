@@ -12,6 +12,7 @@ use Ideo\Dhl\Model\Api\CourierBookingResult;
 use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Shipment\CourierBookingService;
+use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -49,6 +50,10 @@ class CourierBookingServiceTest extends TestCase
         $this->credentialsProviderStub = $this->createStub(CredentialsProvider::class);
         $this->shipmentDataRepositoryStub = $this->createStub(ShipmentDataRepositoryInterface::class);
         $this->timezoneMock = $this->createMock(TimezoneInterface::class);
+        $this->timezoneMock->method('scopeDate')
+            ->willReturnCallback(function ($scope = null, $date = null) {
+                return new DateTime($date ? (string)$date : 'today');
+            });
 
         $this->timezoneMock->method('date')
             ->willReturnCallback(fn ($d) => new DateTime($d));
@@ -56,11 +61,14 @@ class CourierBookingServiceTest extends TestCase
         $this->credentialsProviderStub->method('getCredentials')
             ->willReturn(new Credentials('user', 'pass', true));
 
+        $dateSanitizer = new ShipmentDateSanitizer($this->timezoneMock);
+
         $this->service = new CourierBookingService(
             $this->clientStub,
             $this->credentialsProviderStub,
             $this->shipmentDataRepositoryStub,
-            $this->timezoneMock
+            $this->timezoneMock,
+            $dateSanitizer
         );
     }
 
@@ -114,5 +122,40 @@ class CourierBookingServiceTest extends TestCase
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('ORDER_999', $result->getCourierOrderId());
+    }
+
+    public function testBookCourierAllowsFutureDateAndCallsApiClient(): void
+    {
+        $entityMock = $this->createMock(ShipmentDataInterface::class);
+        $entityMock->method('getShipmentId')->willReturn('1234567890');
+        $this->shipmentDataRepositoryStub->method('getById')
+            ->willReturn($entityMock);
+
+        $bookingResult = new CourierBookingResult(true, 'ORDER_FUTURE', null, null, 'OK');
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->expects($this->once())
+            ->method('bookCourier')
+            ->with(
+                $this->anything(),
+                ['1234567890'],
+                '2026-09-26',
+                '10:00',
+                '14:00',
+                $this->anything()
+            )
+            ->willReturn($bookingResult);
+
+        $service = new CourierBookingService(
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->shipmentDataRepositoryStub,
+            $this->timezoneMock,
+            new ShipmentDateSanitizer($this->timezoneMock)
+        );
+
+        $result = $service->bookCourier([10], '2026-09-26', '10:00', '14:00');
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals('ORDER_FUTURE', $result->getCourierOrderId());
     }
 }

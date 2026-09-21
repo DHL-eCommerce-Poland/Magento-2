@@ -12,6 +12,7 @@ use Magento\Framework\View\Element\Template;
 
 $viewModel = $block->getViewModel();
 $dateFormat = $viewModel->getDateFormat();
+$todayDate = $viewModel->getFormattedDate();
 
 $hoursUrl = $block->getUrl('dhlparcel/shipment/getPickupHours');
 $bookUrl = $block->getUrl('dhlparcel/shipment/bookCourier');
@@ -45,7 +46,13 @@ $bookUrl = $block->getUrl('dhlparcel/shipment/bookCourier');
             <div class="admin__field required">
                 <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Pickup Date')) ?></span></label>
                 <div class="admin__field-control">
-                    <input type="text" id="dhlparcel_pickup_date" class="admin__control-text" data-bind="dhlDatepicker: pickupDate, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', minDate: new Date() }" style="width: 200px; box-sizing: border-box;" required />
+                    <input type="text"
+                           id="dhlparcel_pickup_date"
+                           class="admin__control-text"
+                           value="<?= $escaper->escapeHtmlAttr($todayDate) ?>"
+                           data-bind="dhlDatepicker: pickupDate, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', minDate: 0 }"
+                           style="width: 200px; box-sizing: border-box;"
+                           required />
                 </div>
             </div>
 

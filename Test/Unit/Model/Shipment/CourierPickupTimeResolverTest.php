@@ -45,7 +45,9 @@ class CourierPickupTimeResolverTest extends TestCase
         $this->timezoneMock = $this->createMock(TimezoneInterface::class);
 
         $this->timezoneMock->method('scopeDate')
-            ->willReturn(new DateTime('today'));
+            ->willReturnCallback(function ($scope = null, $date = null) {
+                return new DateTime($date ? (string)$date : 'today');
+            });
 
         $this->timezoneMock->method('date')
             ->willReturnCallback(fn ($d) => new DateTime((string)$d));
@@ -186,5 +188,40 @@ class CourierPickupTimeResolverTest extends TestCase
 
         $this->assertTrue($result['is_date_available']);
         $this->assertEquals('10:00', $result['dr_pickup_from']);
+    }
+
+    public function testResolveAvailableHoursReturnsWarningWhenApiReturnsNoPickupHoursForDate(): void
+    {
+        $apiResult = new PostalCodeServicesResult(true, null, null, null, null, false);
+
+        $this->clientMock->expects($this->once())
+            ->method('getPostalCodeServices')
+            ->with($this->anything(), '00-001', '2026-09-26')
+            ->willReturn($apiResult);
+
+        $result = $this->resolver->resolveAvailableHours('00-001', '2026-09-26', 'sandbox', '10:00');
+
+        $this->assertFalse($result['is_today_possible']);
+        $this->assertFalse($result['is_date_available']);
+        $this->assertEmpty($result['available_hours']);
+        $this->assertStringContainsString('Courier pickup is not available for the selected date', $result['message']);
+    }
+
+    public function testResolveAvailableHoursSuccessForFutureBusinessDay(): void
+    {
+        // 2026-09-22 is Tuesday
+        $apiResult = new PostalCodeServicesResult(true, '10:00', '16:00', null, null, false);
+
+        $this->clientMock->expects($this->once())
+            ->method('getPostalCodeServices')
+            ->with($this->anything(), '00-001', '2026-09-22')
+            ->willReturn($apiResult);
+
+        $result = $this->resolver->resolveAvailableHours('00-001', '2026-09-22', 'sandbox', '10:00');
+
+        $this->assertTrue($result['is_date_available']);
+        $this->assertEquals('10:00', $result['dr_pickup_from']);
+        $this->assertEquals('16:00', $result['dr_pickup_to']);
+        $this->assertCount(1, $result['available_hours']);
     }
 }

@@ -33,15 +33,7 @@ define([
 
                     $el.on('change.dhldatepicker', function () {
                         if (ko.isObservable(value)) {
-                            var dateObj = $el.datepicker('getDate');
-                            if (dateObj instanceof Date && !isNaN(dateObj.getTime())) {
-                                var yyyy = dateObj.getFullYear();
-                                var mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-                                var dd = String(dateObj.getDate()).padStart(2, '0');
-                                value(yyyy + '-' + mm + '-' + dd);
-                            } else {
-                                value($el.val());
-                            }
+                            value($el.val());
                         }
                     });
 
@@ -61,6 +53,7 @@ define([
             }
         };
     }
+    ko.bindingHandlers.dhlBookCourierDatepicker = ko.bindingHandlers.dhlDatepicker;
 
     return Component.extend({
         defaults: {
@@ -81,7 +74,7 @@ define([
                     warningMessage: ''
                 });
 
-            this.pickupDate = ko.observable(new Date().toISOString().slice(0, 10));
+            this.pickupDate = ko.observable($('#dhlparcel_pickup_date').val() || '');
             this.value = this.pickupDate;
             this.isUpdatingDate = false;
             this.hoursCache = {};
@@ -138,8 +131,8 @@ define([
             self.additionalInfo('');
 
             var $dateInput = $('#dhlparcel_pickup_date');
-            if ($dateInput.length && $dateInput.data('datepicker')) {
-                $dateInput.datepicker('option', 'minDate', new Date());
+            if ($dateInput.length && ($dateInput.data('datepicker') || $dateInput.hasClass('_has-datepicker'))) {
+                $dateInput.datepicker('option', 'minDate', 0);
                 $dateInput.datepicker('setDate', new Date());
                 $dateInput.next('.ui-datepicker-trigger').addClass('v-middle').empty();
                 if ($dateInput.val()) {
@@ -175,6 +168,10 @@ define([
         },
 
         onDateChange: function () {
+            var $dateInput = $('#dhlparcel_pickup_date');
+            if ($dateInput.length) {
+                this.pickupDate($dateInput.val());
+            }
             this.loadPickupHours();
         },
 
@@ -182,7 +179,7 @@ define([
             var self = this;
             var ids = self.selectedShipmentIds();
             var firstId = (ids && ids.length) ? ids[0] : null;
-            var date = self.pickupDate();
+            var date = self.pickupDate() || $('#dhlparcel_pickup_date').val();
 
             if (!ids || !ids.length) {
                 return;
@@ -303,7 +300,7 @@ define([
                 type: 'POST',
                 data: {
                     shipment_ids: ids,
-                    pickup_date: self.pickupDate(),
+                    pickup_date: self.pickupDate() || $('#dhlparcel_pickup_date').val(),
                     pickup_time_from: timeFrom,
                     pickup_time_to: timeTo,
                     additional_info: self.additionalInfo(),

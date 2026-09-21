@@ -54,18 +54,6 @@ class CourierPickupTimeResolver
 
         $currentTime = $currentTime ?: $this->timezone->scopeDate()->format('H:i');
 
-        $requestedDt = $this->timezone->date($formattedDate);
-        if ((int) $requestedDt->format('N') >= 6) {
-            return [
-                'is_today_possible' => false,
-                'is_date_available' => false,
-                'message' => (string) __('Courier pickup is not available for the selected date. Please select another date in the calendar.'),
-                'available_hours' => [],
-                'dr_pickup_from' => null,
-                'dr_pickup_to' => null,
-            ];
-        }
-
         $credentials = $this->credentialsProvider->getCredentials($environment);
         $result = $this->client->getPostalCodeServices($credentials, $postalCode, $formattedDate);
 
