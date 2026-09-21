@@ -86,20 +86,13 @@
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="template_name" length="255" nullable="false" comment="Template Name"/>
         <column xsi:type="varchar" name="method_code" length="64" nullable="true" comment="Magento Shipping Method Code"/>
-        <column xsi:type="varchar" name="package_type" length="32" nullable="false" default="PACKAGE" comment="Package Type"/>
-        <column xsi:type="decimal" name="weight" precision="12" scale="4" nullable="false" default="0.0000" comment="Weight in KG"/>
-        <column xsi:type="decimal" name="length" precision="12" scale="4" nullable="false" default="0.0000" comment="Length in CM"/>
-        <column xsi:type="decimal" name="width" precision="12" scale="4" nullable="false" default="0.0000" comment="Width in CM"/>
-        <column xsi:type="decimal" name="height" precision="12" scale="4" nullable="false" default="0.0000" comment="Height in CM"/>
-        <column xsi:type="smallint" name="is_non_standard" unsigned="true" nullable="false" default="0" comment="Is Non Standard Package"/>
-        <column xsi:type="smallint" name="has_euro_return" unsigned="true" nullable="false" default="0" comment="Has Euro Return"/>
         <column xsi:type="text" name="content" nullable="true" comment="Package Contents Description"/>
         <column xsi:type="text" name="comment" nullable="true" comment="Special Comments"/>
         <column xsi:type="varchar" name="reference" length="255" nullable="true" comment="Reference Number"/>
         <column xsi:type="varchar" name="mpk" length="64" nullable="true" comment="MPK Cost Center Code"/>
         <column xsi:type="text" name="additional_services" nullable="true" comment="Additional Services JSON"/>
+        <column xsi:type="text" name="packages" nullable="true" comment="Packages JSON Array"/>
         <column xsi:type="varchar" name="label_type" length="32" nullable="false" default="BLP" comment="Shipment Label Format"/>
-        <column xsi:type="int" name="drop_off_point_id" unsigned="true" nullable="true" comment="Default Drop-Off Point ID"/>
         <column xsi:type="varchar" name="address_type" length="16" nullable="true" default="N" comment="Address Type (C/B/N)"/>
         <column xsi:type="smallint" name="auto_create_return_shipment" unsigned="true" nullable="false" default="0" comment="Auto Create Return Shipment"/>
         <column xsi:type="varchar" name="return_label_type" length="32" nullable="true" comment="Return Label Type"/>

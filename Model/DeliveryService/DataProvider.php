@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\DeliveryService;
 
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory;
+use InvalidArgumentException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 
@@ -57,10 +58,20 @@ class DataProvider extends AbstractDataProvider
                     if (is_array($decoded)) {
                         $data['additional_services'] = $decoded;
                     }
-                } catch (\InvalidArgumentException $e) {
+                } catch (InvalidArgumentException $e) {
                     unset($e);
                 }
             }
+            $packages = $item->getPackages();
+            if (is_array($packages)) {
+                foreach ($packages as $k => &$pkg) {
+                    if (is_array($pkg)) {
+                        $pkg['record_id'] = (string)$k;
+                    }
+                }
+                unset($pkg);
+            }
+            $data['packages'] = $packages;
             if (isset($data['method_code']) && is_string($data['method_code']) && $data['method_code'] !== '') {
                 $data['method_code'] = explode(',', $data['method_code']);
             }

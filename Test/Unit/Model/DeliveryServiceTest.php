@@ -44,27 +44,6 @@ class DeliveryServiceTest extends TestCase
         $this->model->setMethodCode('dhl_courier');
         $this->assertSame('dhl_courier', $this->model->getMethodCode());
 
-        $this->model->setPackageType('PACKAGE');
-        $this->assertSame('PACKAGE', $this->model->getPackageType());
-
-        $this->model->setWeight(2.5);
-        $this->assertSame(2.5, $this->model->getWeight());
-
-        $this->model->setLength(30.0);
-        $this->assertSame(30.0, $this->model->getLength());
-
-        $this->model->setWidth(20.0);
-        $this->assertSame(20.0, $this->model->getWidth());
-
-        $this->model->setHeight(15.0);
-        $this->assertSame(15.0, $this->model->getHeight());
-
-        $this->model->setIsNonStandard(true);
-        $this->assertTrue($this->model->getIsNonStandard());
-
-        $this->model->setHasEuroReturn(false);
-        $this->assertFalse($this->model->getHasEuroReturn());
-
         $this->model->setContent('Books');
         $this->assertSame('Books', $this->model->getContent());
 
@@ -83,8 +62,11 @@ class DeliveryServiceTest extends TestCase
         $this->model->setLabelType('BLP');
         $this->assertSame('BLP', $this->model->getLabelType());
 
-        $this->model->setDropOffPointId(10);
-        $this->assertSame(10, $this->model->getDropOffPointId());
+        $packagesArr = [
+            ['package_type' => 'PACKAGE', 'weight' => 2.5, 'width' => 20, 'length' => 30, 'height' => 15]
+        ];
+        $this->model->setPackages($packagesArr);
+        $this->assertSame($packagesArr, $this->model->getPackages());
 
         $this->model->setAddressType('B');
         $this->assertSame('B', $this->model->getAddressType());
@@ -119,21 +101,24 @@ class DeliveryServiceTest extends TestCase
         $this->assertSame('dhl_courier,dhl_express', $this->model->getData('method_code'));
     }
 
-    public function testBeforeSaveResetsHasEuroReturnForNonPalletPackageType(): void
+    public function testBeforeSaveSerializesPackagesArray(): void
     {
-        $this->model->setPackageType('PACKAGE');
-        $this->model->setHasEuroReturn(true);
+        $this->model->setData('packages', [
+            ['package_type' => 'PACKAGE', 'quantity' => 1, 'weight' => 5]
+        ]);
         $this->model->beforeSave();
 
-        $this->assertFalse($this->model->getHasEuroReturn());
+        $this->assertSame(
+            '[{"package_type":"PACKAGE","quantity":1,"weight":5}]',
+            $this->model->getData('packages')
+        );
     }
 
-    public function testBeforeSavePreservesHasEuroReturnForPalletPackageType(): void
+    public function testBeforeSaveSetsPackagesToNullWhenEmpty(): void
     {
-        $this->model->setPackageType('PALLET');
-        $this->model->setHasEuroReturn(true);
+        $this->model->setData('packages', []);
         $this->model->beforeSave();
 
-        $this->assertTrue($this->model->getHasEuroReturn());
+        $this->assertNull($this->model->getData('packages'));
     }
 }

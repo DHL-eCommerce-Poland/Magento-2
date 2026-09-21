@@ -9,20 +9,13 @@ interface DeliveryServiceInterface
     public const ENTITY_ID = 'entity_id';
     public const TEMPLATE_NAME = 'template_name';
     public const METHOD_CODE = 'method_code';
-    public const PACKAGE_TYPE = 'package_type';
-    public const WEIGHT = 'weight';
-    public const LENGTH = 'length';
-    public const WIDTH = 'width';
-    public const HEIGHT = 'height';
-    public const IS_NON_STANDARD = 'is_non_standard';
-    public const HAS_EURO_RETURN = 'has_euro_return';
     public const CONTENT = 'content';
     public const COMMENT = 'comment';
     public const REFERENCE = 'reference';
     public const MPK = 'mpk';
     public const ADDITIONAL_SERVICES = 'additional_services';
     public const LABEL_TYPE = 'label_type';
-    public const DROP_OFF_POINT_ID = 'drop_off_point_id';
+    public const PACKAGES = 'packages';
     public const ADDRESS_TYPE = 'address_type';
     public const AUTO_CREATE_RETURN_SHIPMENT = 'auto_create_return_shipment';
     public const RETURN_LABEL_TYPE = 'return_label_type';
@@ -77,118 +70,6 @@ interface DeliveryServiceInterface
      * @return $this
      */
     public function setMethodCode(?string $methodCode): static;
-
-    /**
-     * Get package type.
-     *
-     * @return string
-     */
-    public function getPackageType(): string;
-
-    /**
-     * Set package type.
-     *
-     * @param string $packageType
-     *
-     * @return $this
-     */
-    public function setPackageType(string $packageType): static;
-
-    /**
-     * Get weight in KG.
-     *
-     * @return float
-     */
-    public function getWeight(): float;
-
-    /**
-     * Set weight in KG.
-     *
-     * @param float $weight
-     *
-     * @return $this
-     */
-    public function setWeight(float $weight): static;
-
-    /**
-     * Get length in CM.
-     *
-     * @return float
-     */
-    public function getLength(): float;
-
-    /**
-     * Set length in CM.
-     *
-     * @param float $length
-     *
-     * @return $this
-     */
-    public function setLength(float $length): static;
-
-    /**
-     * Get width in CM.
-     *
-     * @return float
-     */
-    public function getWidth(): float;
-
-    /**
-     * Set width in CM.
-     *
-     * @param float $width
-     *
-     * @return $this
-     */
-    public function setWidth(float $width): static;
-
-    /**
-     * Get height in CM.
-     *
-     * @return float
-     */
-    public function getHeight(): float;
-
-    /**
-     * Set height in CM.
-     *
-     * @param float $height
-     *
-     * @return $this
-     */
-    public function setHeight(float $height): static;
-
-    /**
-     * Get is non standard package flag.
-     *
-     * @return bool
-     */
-    public function getIsNonStandard(): bool;
-
-    /**
-     * Set is non standard package flag.
-     *
-     * @param bool $isNonStandard
-     *
-     * @return $this
-     */
-    public function setIsNonStandard(bool $isNonStandard): static;
-
-    /**
-     * Get has euro return flag.
-     *
-     * @return bool
-     */
-    public function getHasEuroReturn(): bool;
-
-    /**
-     * Set has euro return flag.
-     *
-     * @param bool $hasEuroReturn
-     *
-     * @return $this
-     */
-    public function setHasEuroReturn(bool $hasEuroReturn): static;
 
     /**
      * Get package contents description.
@@ -287,20 +168,20 @@ interface DeliveryServiceInterface
     public function setLabelType(string $labelType): static;
 
     /**
-     * Get default drop off point ID.
+     * Get packages array.
      *
-     * @return int|null
+     * @return array|null
      */
-    public function getDropOffPointId(): ?int;
+    public function getPackages(): ?array;
 
     /**
-     * Set default drop off point ID.
+     * Set packages array.
      *
-     * @param int|null $dropOffPointId
+     * @param array|null $packages
      *
      * @return $this
      */
-    public function setDropOffPointId(?int $dropOffPointId): static;
+    public function setPackages(?array $packages): static;
 
     /**
      * Get address type.

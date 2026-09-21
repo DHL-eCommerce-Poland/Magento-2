@@ -60,24 +60,6 @@
                 <dataScope>template_name</dataScope>
             </settings>
         </field>
-        <field name="drop_off_point_id" formElement="select">
-            <settings>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
-                </validation>
-                <dataType>text</dataType>
-                <label translate="true">Default Drop-Off Point</label>
-                <notice translate="true">Default Drop-Off Point is loaded from the DHL Drop-Off Points grid.</notice>
-                <dataScope>drop_off_point_id</dataScope>
-            </settings>
-            <formElements>
-                <select>
-                    <settings>
-                        <options class="Ideo\Dhl\Model\Config\Source\DropOffPoint"/>
-                    </settings>
-                </select>
-            </formElements>
-        </field>
         <field name="address_type" formElement="select">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -557,178 +539,290 @@
             <collapsible>true</collapsible>
             <opened>true</opened>
         </settings>
-        <field name="package_type" formElement="select">
-            <settings>
-                <dataScope>package_type</dataScope>
-                <dataType>text</dataType>
-                <label translate="true">Shipment Type</label>
-                <notice translate="true">Dimensions are not required for envelope shipments</notice>
-                <switcherConfig>
-                    <rules>
-                        <rule name="0">
-                            <value>ENVELOPE</value>
-                            <actions>
-                                <action name="0">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.width</target>
-                                    <callback>hide</callback>
-                                </action>
-                                <action name="1">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.length</target>
-                                    <callback>hide</callback>
-                                </action>
-                                <action name="2">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.height</target>
-                                    <callback>hide</callback>
-                                </action>
-                                <action name="3">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.weight</target>
-                                    <callback>hide</callback>
-                                </action>
-                                <action name="4">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.has_euro_return</target>
-                                    <callback>hide</callback>
-                                </action>
-                            </actions>
-                        </rule>
-                        <rule name="1">
-                            <value>PACKAGE</value>
-                            <actions>
-                                <action name="0">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.width</target>
-                                    <callback>show</callback>
-                                </action>
-                                <action name="1">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.length</target>
-                                    <callback>show</callback>
-                                </action>
-                                <action name="2">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.height</target>
-                                    <callback>show</callback>
-                                </action>
-                                <action name="3">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.weight</target>
-                                    <callback>show</callback>
-                                </action>
-                                <action name="4">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.has_euro_return</target>
-                                    <callback>hide</callback>
-                                </action>
-                            </actions>
-                        </rule>
-                        <rule name="2">
-                            <value>PALLET</value>
-                            <actions>
-                                <action name="0">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.width</target>
-                                    <callback>show</callback>
-                                </action>
-                                <action name="1">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.length</target>
-                                    <callback>show</callback>
-                                </action>
-                                <action name="2">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.height</target>
-                                    <callback>show</callback>
-                                </action>
-                                <action name="3">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.weight</target>
-                                    <callback>show</callback>
-                                </action>
-                                <action name="4">
-                                    <target>dhlparcel_delivery_service_form.dhlparcel_delivery_service_form.dimensions.has_euro_return</target>
-                                    <callback>show</callback>
-                                </action>
-                            </actions>
-                        </rule>
-                    </rules>
-                    <enabled>true</enabled>
-                </switcherConfig>
-            </settings>
-            <formElements>
-                <select>
-                    <settings>
-                        <options class="Ideo\Dhl\Model\Config\Source\PackageType"/>
-                    </settings>
-                </select>
-            </formElements>
-        </field>
-        <field name="width" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Width (cm)</label>
-                <dataScope>width</dataScope>
-            </settings>
-        </field>
-        <field name="length" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Length (cm)</label>
-                <dataScope>length</dataScope>
-            </settings>
-        </field>
-        <field name="height" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Height (cm)</label>
-                <dataScope>height</dataScope>
-            </settings>
-        </field>
-        <field name="weight" formElement="input">
-            <settings>
-                <validation>
-                    <rule name="validate-number" xsi:type="boolean">true</rule>
-                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
-                </validation>
-                <dataType>text</dataType>
-                <label translate="true">Weight (kg)</label>
-                <dataScope>weight</dataScope>
-            </settings>
-        </field>
-        <field name="is_non_standard" formElement="checkbox">
+        <dynamicRows name="packages">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="default" xsi:type="number">0</item>
+                    <item name="deleteButtonLabel" xsi:type="string" translate="true">Delete</item>
+                    <item name="dndConfig" xsi:type="array">
+                        <item name="enabled" xsi:type="boolean">false</item>
+                    </item>
                 </item>
             </argument>
             <settings>
-                <dataType>boolean</dataType>
-                <label translate="true">NST - Non-Standard Package</label>
-                <dataScope>is_non_standard</dataScope>
+                <addButtonLabel translate="true">Add Package</addButtonLabel>
+                <label translate="true">Packages</label>
+                <componentType>dynamicRows</componentType>
+                <dndConfig>
+                    <param name="enabled" xsi:type="boolean">false</param>
+                </dndConfig>
             </settings>
-            <formElements>
-                <checkbox>
+            <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="isTemplate" xsi:type="boolean">true</item>
+                        <item name="is_collection" xsi:type="boolean">true</item>
+                        <item name="componentType" xsi:type="string">container</item>
+                    </item>
+                </argument>
+                <field name="package_type" formElement="select">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                        </item>
+                    </argument>
                     <settings>
-                        <valueMap>
-                            <map name="false" xsi:type="number">0</map>
-                            <map name="true" xsi:type="number">1</map>
-                        </valueMap>
-                        <prefer>toggle</prefer>
+                        <dataType>text</dataType>
+                        <label translate="true">Package Type</label>
+                        <dataScope>package_type</dataScope>
+                        <switcherConfig>
+                            <rules>
+                                <rule name="0">
+                                    <value>PACKAGE</value>
+                                    <actions>
+                                        <action name="0">
+                                            <target>${ $.parentName }.width</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="1">
+                                            <target>${ $.parentName }.length</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="2">
+                                            <target>${ $.parentName }.height</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="3">
+                                            <target>${ $.parentName }.has_euro_return</target>
+                                            <callback>disable</callback>
+                                        </action>
+                                        <action name="4">
+                                            <target>${ $.parentName }.has_euro_return</target>
+                                            <callback>value</callback>
+                                            <params>
+                                                <param name="0" xsi:type="number">0</param>
+                                            </params>
+                                        </action>
+                                    </actions>
+                                </rule>
+                                <rule name="1">
+                                    <value>ENVELOPE</value>
+                                    <actions>
+                                        <action name="0">
+                                            <target>${ $.parentName }.width</target>
+                                            <callback>disable</callback>
+                                        </action>
+                                        <action name="1">
+                                            <target>${ $.parentName }.width</target>
+                                            <callback>value</callback>
+                                            <params>
+                                                <param name="0" xsi:type="string"></param>
+                                            </params>
+                                        </action>
+                                        <action name="2">
+                                            <target>${ $.parentName }.length</target>
+                                            <callback>disable</callback>
+                                        </action>
+                                        <action name="3">
+                                            <target>${ $.parentName }.length</target>
+                                            <callback>value</callback>
+                                            <params>
+                                                <param name="0" xsi:type="string"></param>
+                                            </params>
+                                        </action>
+                                        <action name="4">
+                                            <target>${ $.parentName }.height</target>
+                                            <callback>disable</callback>
+                                        </action>
+                                        <action name="5">
+                                            <target>${ $.parentName }.height</target>
+                                            <callback>value</callback>
+                                            <params>
+                                                <param name="0" xsi:type="string"></param>
+                                            </params>
+                                        </action>
+                                        <action name="6">
+                                            <target>${ $.parentName }.has_euro_return</target>
+                                            <callback>disable</callback>
+                                        </action>
+                                        <action name="7">
+                                            <target>${ $.parentName }.has_euro_return</target>
+                                            <callback>value</callback>
+                                            <params>
+                                                <param name="0" xsi:type="number">0</param>
+                                            </params>
+                                        </action>
+                                    </actions>
+                                </rule>
+                                <rule name="2">
+                                    <value>PALLET</value>
+                                    <actions>
+                                        <action name="0">
+                                            <target>${ $.parentName }.width</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="1">
+                                            <target>${ $.parentName }.length</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="2">
+                                            <target>${ $.parentName }.height</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="3">
+                                            <target>${ $.parentName }.has_euro_return</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                    </actions>
+                                </rule>
+                            </rules>
+                            <enabled>true</enabled>
+                        </switcherConfig>
                     </settings>
-                </checkbox>
-            </formElements>
-        </field>
-        <field name="has_euro_return" formElement="checkbox">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="default" xsi:type="number">0</item>
-                </item>
-            </argument>
-            <settings>
-                <dataType>boolean</dataType>
-                <label translate="true">EURO RETURN - Pallet Return</label>
-                <dataScope>has_euro_return</dataScope>
-            </settings>
-            <formElements>
-                <checkbox>
+                    <formElements>
+                        <select>
+                            <settings>
+                                <options class="Ideo\Dhl\Model\Config\Source\PackageType"/>
+                            </settings>
+                        </select>
+                    </formElements>
+                </field>
+                <field name="quantity" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="cols" xsi:type="number">3</item>
+                            <item name="size" xsi:type="number">3</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
+                        </item>
+                    </argument>
                     <settings>
-                        <valueMap>
-                            <map name="false" xsi:type="number">0</map>
-                            <map name="true" xsi:type="number">1</map>
-                        </valueMap>
-                        <prefer>toggle</prefer>
+                        <dataType>text</dataType>
+                        <label translate="true">Qty</label>
+                        <dataScope>quantity</dataScope>
                     </settings>
-                </checkbox>
-            </formElements>
-        </field>
+                </field>
+                <field name="weight" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="cols" xsi:type="number">5</item>
+                            <item name="size" xsi:type="number">5</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Weight (kg)</label>
+                        <dataScope>weight</dataScope>
+                    </settings>
+                </field>
+                <field name="width" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="cols" xsi:type="number">5</item>
+                            <item name="size" xsi:type="number">5</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Width (cm)</label>
+                        <dataScope>width</dataScope>
+                    </settings>
+                </field>
+                <field name="length" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="cols" xsi:type="number">5</item>
+                            <item name="size" xsi:type="number">5</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Length (cm)</label>
+                        <dataScope>length</dataScope>
+                    </settings>
+                </field>
+                <field name="height" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="cols" xsi:type="number">5</item>
+                            <item name="size" xsi:type="number">5</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Height (cm)</label>
+                        <dataScope>height</dataScope>
+                    </settings>
+                </field>
+                <field name="is_non_standard" formElement="checkbox">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="default" xsi:type="number">0</item>
+                            <item name="fit" xsi:type="boolean">true</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>boolean</dataType>
+                        <label translate="true">NST</label>
+                        <dataScope>is_non_standard</dataScope>
+                    </settings>
+                    <formElements>
+                        <checkbox>
+                            <settings>
+                                <valueMap>
+                                    <map name="false" xsi:type="number">0</map>
+                                    <map name="true" xsi:type="number">1</map>
+                                </valueMap>
+                            </settings>
+                        </checkbox>
+                    </formElements>
+                </field>
+                <field name="has_euro_return" formElement="checkbox">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="default" xsi:type="number">0</item>
+                            <item name="fit" xsi:type="boolean">true</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>boolean</dataType>
+                        <label translate="true">Euro Return</label>
+                        <dataScope>has_euro_return</dataScope>
+                    </settings>
+                    <formElements>
+                        <checkbox>
+                            <settings>
+                                <valueMap>
+                                    <map name="false" xsi:type="number">0</map>
+                                    <map name="true" xsi:type="number">1</map>
+                                </valueMap>
+                            </settings>
+                        </checkbox>
+                    </formElements>
+                </field>
+                <actionDelete name="actionDelete">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">false</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <additionalClasses>
+                            <class name="data-grid-actions-cell">true</class>
+                        </additionalClasses>
+                        <dataType>text</dataType>
+                        <label translate="true">Actions</label>
+                        <componentType>actionDelete</componentType>
+                    </settings>
+                </actionDelete>
+            </container>
+        </dynamicRows>
     </fieldset>
 </form>

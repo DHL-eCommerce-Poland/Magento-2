@@ -7,6 +7,7 @@ namespace Ideo\Dhl\Model;
 use Ideo\Dhl\Api\Data\DeliveryServiceInterface;
 use Ideo\Dhl\Model\Config\Source\LabelType;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService as DeliveryServiceResource;
+use InvalidArgumentException;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
@@ -146,165 +147,102 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
             $this->setData(self::METHOD_CODE, implode(',', array_filter($methodCode)));
         }
 
-        if ($this->getPackageType() !== 'PALLET') {
-            $this->setHasEuroReturn(false);
+        $packagesRaw = $this->getData(self::PACKAGES);
+        $packagesClean = $this->parsePackagesData($packagesRaw);
+        $this->setData(
+            self::PACKAGES,
+            !empty($packagesClean) ? $this->serializer->serialize($packagesClean) : null
+        );
+
+        $addServices = $this->getData(self::ADDITIONAL_SERVICES);
+        if (is_array($addServices)) {
+            $this->setData(self::ADDITIONAL_SERVICES, $this->serializer->serialize($addServices));
         }
 
         return $this;
     }
 
     /**
-     * Get package type.
+     * Helper to safely decode and normalize packages array.
      *
-     * @return string
+     * @param mixed $val
+     *
+     * @return array
      */
-    public function getPackageType(): string
+    private function parsePackagesData(mixed $val): array
     {
-        return (string)($this->getData(self::PACKAGE_TYPE) ?: 'PACKAGE');
+        if (empty($val)) {
+            return [];
+        }
+
+        if (is_string($val)) {
+            try {
+                $decoded = $this->serializer->unserialize($val);
+                if (is_string($decoded) && $decoded !== '') {
+                    $decoded = $this->serializer->unserialize($decoded);
+                }
+                $val = is_array($decoded) ? $decoded : [];
+            } catch (InvalidArgumentException) {
+                return [];
+            }
+        }
+
+        if (!is_array($val)) {
+            return [];
+        }
+
+        $flattened = [];
+        $stack = [$val];
+        while (!empty($stack)) {
+            $current = array_shift($stack);
+            if (!is_array($current)) {
+                continue;
+            }
+            $hasPkgField = isset($current['package_type'])
+                || isset($current['packageType'])
+                || isset($current['weight'])
+                || isset($current['quantity']);
+            if ($hasPkgField) {
+                if (empty($current['is_deleted']) && empty($current['delete'])) {
+                    unset($current['initialize'], $current['record_id'], $current['is_deleted'], $current['delete']);
+                    $flattened[] = $current;
+                }
+            } else {
+                foreach ($current as $item) {
+                    if (is_array($item)) {
+                        $stack[] = $item;
+                    }
+                }
+            }
+        }
+
+        return array_values($flattened);
     }
 
     /**
-     * Set package type.
+     * Get packages array.
      *
-     * @param string $packageType
+     * @return array|null
+     */
+    public function getPackages(): ?array
+    {
+        return $this->parsePackagesData($this->getData(self::PACKAGES));
+    }
+
+    /**
+     * Set packages array.
+     *
+     * @param array|null $packages
      *
      * @return $this
      */
-    public function setPackageType(string $packageType): static
+    public function setPackages(?array $packages): static
     {
-        return $this->setData(self::PACKAGE_TYPE, $packageType);
-    }
-
-    /**
-     * Get weight in KG.
-     *
-     * @return float
-     */
-    public function getWeight(): float
-    {
-        return (float)$this->getData(self::WEIGHT);
-    }
-
-    /**
-     * Set weight in KG.
-     *
-     * @param float $weight
-     *
-     * @return $this
-     */
-    public function setWeight(float $weight): static
-    {
-        return $this->setData(self::WEIGHT, $weight);
-    }
-
-    /**
-     * Get length in CM.
-     *
-     * @return float
-     */
-    public function getLength(): float
-    {
-        return (float)$this->getData(self::LENGTH);
-    }
-
-    /**
-     * Set length in CM.
-     *
-     * @param float $length
-     *
-     * @return $this
-     */
-    public function setLength(float $length): static
-    {
-        return $this->setData(self::LENGTH, $length);
-    }
-
-    /**
-     * Get width in CM.
-     *
-     * @return float
-     */
-    public function getWidth(): float
-    {
-        return (float)$this->getData(self::WIDTH);
-    }
-
-    /**
-     * Set width in CM.
-     *
-     * @param float $width
-     *
-     * @return $this
-     */
-    public function setWidth(float $width): static
-    {
-        return $this->setData(self::WIDTH, $width);
-    }
-
-    /**
-     * Get height in CM.
-     *
-     * @return float
-     */
-    public function getHeight(): float
-    {
-        return (float)$this->getData(self::HEIGHT);
-    }
-
-    /**
-     * Set height in CM.
-     *
-     * @param float $height
-     *
-     * @return $this
-     */
-    public function setHeight(float $height): static
-    {
-        return $this->setData(self::HEIGHT, $height);
-    }
-
-    /**
-     * Get is non standard package flag.
-     *
-     * @return bool
-     */
-    public function getIsNonStandard(): bool
-    {
-        return (bool)$this->getData(self::IS_NON_STANDARD);
-    }
-
-    /**
-     * Set is non standard package flag.
-     *
-     * @param bool $isNonStandard
-     *
-     * @return $this
-     */
-    public function setIsNonStandard(bool $isNonStandard): static
-    {
-        return $this->setData(self::IS_NON_STANDARD, $isNonStandard ? 1 : 0);
-    }
-
-    /**
-     * Get has euro return flag.
-     *
-     * @return bool
-     */
-    public function getHasEuroReturn(): bool
-    {
-        return (bool)$this->getData(self::HAS_EURO_RETURN);
-    }
-
-    /**
-     * Set has euro return flag.
-     *
-     * @param bool $hasEuroReturn
-     *
-     * @return $this
-     */
-    public function setHasEuroReturn(bool $hasEuroReturn): static
-    {
-        return $this->setData(self::HAS_EURO_RETURN, $hasEuroReturn ? 1 : 0);
+        $clean = $packages !== null ? $this->parsePackagesData($packages) : [];
+        return $this->setData(
+            self::PACKAGES,
+            !empty($clean) ? $this->serializer->serialize($clean) : null
+        );
     }
 
     /**
@@ -414,7 +352,7 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
             try {
                 $decoded = $this->serializer->unserialize($val);
                 return is_array($decoded) ? $decoded : null;
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 return null;
             }
         }
@@ -456,29 +394,6 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     public function setLabelType(string $labelType): static
     {
         return $this->setData(self::LABEL_TYPE, $labelType);
-    }
-
-    /**
-     * Get default drop off point ID.
-     *
-     * @return int|null
-     */
-    public function getDropOffPointId(): ?int
-    {
-        $val = $this->getData(self::DROP_OFF_POINT_ID);
-        return ($val !== null && $val !== '') ? (int)$val : null;
-    }
-
-    /**
-     * Set default drop off point ID.
-     *
-     * @param int|null $dropOffPointId
-     *
-     * @return $this
-     */
-    public function setDropOffPointId(?int $dropOffPointId): static
-    {
-        return $this->setData(self::DROP_OFF_POINT_ID, $dropOffPointId);
     }
 
     /**

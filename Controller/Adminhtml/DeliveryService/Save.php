@@ -57,6 +57,11 @@ class Save extends Action implements HttpPostActionInterface
                     $data['method_code'] = implode(',', array_filter($data['method_code']));
                 }
 
+                if (!isset($data['packages'])) {
+                    $data['packages'] = null;
+                }
+                unset($data['dimensions']);
+
                 /** @var DeliveryService $model */
                 $model->setData($data);
                 $this->deliveryServiceRepository->save($model);
