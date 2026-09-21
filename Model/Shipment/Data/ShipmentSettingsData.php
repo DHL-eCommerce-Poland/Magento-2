@@ -411,6 +411,9 @@ class ShipmentSettingsData
         if (is_array($packagesRaw) && !empty($packagesRaw)) {
             foreach ($packagesRaw as $pkgItem) {
                 if (is_array($pkgItem)) {
+                    if (!empty($pkgItem['is_deleted']) || !empty($pkgItem['delete'])) {
+                        continue;
+                    }
                     $packages[] = PackageData::fromArray($pkgItem);
                 }
             }

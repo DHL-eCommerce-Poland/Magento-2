@@ -78,4 +78,33 @@ class PackageDataTest extends TestCase
 
         $this->assertFalse($package->hasEuroReturn());
     }
+
+    /**
+     * Test fromArray with snake_case keys as stored in database JSON.
+     *
+     * @return void
+     */
+    public function testFromArrayWithSnakeCaseKeys(): void
+    {
+        $data = [
+            'package_type' => 'PALLET',
+            'quantity' => '2',
+            'weight' => '25.5',
+            'width' => '60',
+            'length' => '80',
+            'height' => '90',
+            'is_non_standard' => '1',
+            'has_euro_return' => '1',
+        ];
+
+        $package = PackageData::fromArray($data);
+        $this->assertEquals('PALLET', $package->getPackageType());
+        $this->assertEquals(2, $package->getQuantity());
+        $this->assertEquals(25.5, $package->getWeight());
+        $this->assertEquals(60.0, $package->getWidth());
+        $this->assertEquals(80.0, $package->getLength());
+        $this->assertEquals(90.0, $package->getHeight());
+        $this->assertTrue($package->isNonStandard());
+        $this->assertTrue($package->hasEuroReturn());
+    }
 }

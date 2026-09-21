@@ -28,7 +28,7 @@ $dateFormat = $viewModel->getDateFormat();
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Drop-Off Point Template')) ?></span></label>
                             <div class="admin__field-control">
-                                <select class="admin__control-select" data-bind="options: $parent.senderTemplates, optionsText: 'label', optionsValue: 'value', value: selectedDropOffPointId, optionsCaption: '<?= $escaper->escapeHtmlAttr(__('Select Template...')) ?>', event: { change: function() { $parent.onSenderTemplateChange() } }"></select>
+                                <select class="admin__control-select" data-bind="options: $parent.senderTemplates, optionsText: 'label', optionsValue: 'value', value: selectedDropOffPointId, optionsCaption: '<?= $escaper->escapeHtmlAttr(__('Select Template...')) ?>', event: { change: function(d, e) { $parent.onSenderTemplateChange(null, e); } }"></select>
                             </div>
                         </div>
                         <div class="admin__field required">
@@ -177,7 +177,7 @@ $dateFormat = $viewModel->getDateFormat();
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Delivery Service Template')) ?></span></label>
                             <div class="admin__field-control">
-                                <select class="admin__control-select" data-bind="options: $parent.shipmentTemplates, optionsText: 'label', optionsValue: 'value', value: selectedDeliveryServiceId, optionsCaption: '<?= $escaper->escapeHtmlAttr(__('Select Template...')) ?>', event: { change: function() { $parent.onShipmentTemplateChange() } }"></select>
+                                <select class="admin__control-select" data-bind="options: $parent.shipmentTemplates, optionsText: 'label', optionsValue: 'value', value: selectedDeliveryServiceId, optionsCaption: '<?= $escaper->escapeHtmlAttr(__('Select Template...')) ?>', event: { change: function(d, e) { $parent.onShipmentTemplateChange(null, e); } }"></select>
                             </div>
                         </div>
                         <div class="admin__field required">
@@ -217,9 +217,12 @@ $dateFormat = $viewModel->getDateFormat();
                         <div class="admin__field">
                             <label class="admin__field-label"></label>
                             <div class="admin__field-control" style="margin-top: 8px;">
-                                <label class="admin__field-label">
-                                    <input type="checkbox" data-bind="checked: autoCreateReturnShipment" /> <?= $escaper->escapeHtml(__('Generate return label automatically when creating shipment')) ?>
-                                </label>
+                                <div class="admin__field admin__field-option">
+                                    <input type="checkbox" class="admin__control-checkbox" id="auto_create_return_shipment" data-bind="checked: autoCreateReturnShipment" />
+                                    <label class="admin__field-label" for="auto_create_return_shipment">
+                                        <span><?= $escaper->escapeHtml(__('Generate return label automatically when creating shipment')) ?></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <!-- ko if: autoCreateReturnShipment -->
@@ -259,46 +262,76 @@ $dateFormat = $viewModel->getDateFormat();
                         <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Additional Services')) ?></span></legend>
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Services')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; flex-direction: column; gap: 6px; padding-top: 6px;">
-                                <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: insurance" /> <?= $escaper->escapeHtml(__('Insurance')) ?>
-                                </label>
-                                <div style="margin-left: 24px; margin-top: 4px; margin-bottom: 8px; max-width: 250px;" data-bind="visible: insurance">
+                            <div class="admin__field-control" style="display: flex; flex-direction: column; gap: 8px; padding-top: 6px;">
+                                <div class="admin__field admin__field-option">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_insurance" data-bind="checked: insurance" />
+                                    <label class="admin__field-label" for="service_insurance">
+                                        <span><?= $escaper->escapeHtml(__('Insurance')) ?></span>
+                                    </label>
+                                </div>
+                                <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: insurance">
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Insurance Value')) ?>" data-bind="value: insuranceValue, attr: {required: insurance() ? 'required' : null}" data-validate="{'required-entry': true, 'validate-number': true, 'greater-than-zero': true}" />
                                 </div>
-                                <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: cod" /> <?= $escaper->escapeHtml(__('Cash On Delivery')) ?>
-                                </label>
-                                <div style="margin-left: 24px; margin-top: 4px; margin-bottom: 8px; max-width: 250px;" data-bind="visible: cod">
+                                <div class="admin__field admin__field-option">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_cod" data-bind="checked: cod" />
+                                    <label class="admin__field-label" for="service_cod">
+                                        <span><?= $escaper->escapeHtml(__('Cash On Delivery')) ?></span>
+                                    </label>
+                                </div>
+                                <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: cod">
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('COD Amount')) ?>" data-bind="value: codAmount, attr: {required: cod() ? 'required' : null}" data-validate="{'required-entry': true, 'validate-number': true, 'greater-than-zero': true}" />
                                 </div>
-                                <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: eveningDelivery" /> <?= $escaper->escapeHtml(__('Evening Delivery (18-22)')) ?>
-                                </label>
-                                <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: saturdayDelivery" /> <?= $escaper->escapeHtml(__('Saturday Delivery')) ?>
-                                </label>
-                                <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: saturdayDispatch" /> <?= $escaper->escapeHtml(__('Saturday Pickup')) ?>
-                                </label>
-                                <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: pdi" /> <?= $escaper->escapeHtml(__('Pre-delivery Information')) ?>
-                                </label>
-                                <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: rod" /> <?= $escaper->escapeHtml(__('Return Confirmed Documents')) ?>
-                                </label>
-                                <div style="margin-left: 24px; margin-top: 4px; margin-bottom: 8px; max-width: 250px;" data-bind="visible: rod">
+                                <div class="admin__field admin__field-option">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_evening_delivery" data-bind="checked: eveningDelivery" />
+                                    <label class="admin__field-label" for="service_evening_delivery">
+                                        <span><?= $escaper->escapeHtml(__('Evening Delivery (18-22)')) ?></span>
+                                    </label>
+                                </div>
+                                <div class="admin__field admin__field-option">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_saturday_delivery" data-bind="checked: saturdayDelivery" />
+                                    <label class="admin__field-label" for="service_saturday_delivery">
+                                        <span><?= $escaper->escapeHtml(__('Saturday Delivery')) ?></span>
+                                    </label>
+                                </div>
+                                <div class="admin__field admin__field-option">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_saturday_dispatch" data-bind="checked: saturdayDispatch" />
+                                    <label class="admin__field-label" for="service_saturday_dispatch">
+                                        <span><?= $escaper->escapeHtml(__('Saturday Pickup')) ?></span>
+                                    </label>
+                                </div>
+                                <div class="admin__field admin__field-option">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_pdi" data-bind="checked: pdi" />
+                                    <label class="admin__field-label" for="service_pdi">
+                                        <span><?= $escaper->escapeHtml(__('Pre-delivery Information')) ?></span>
+                                    </label>
+                                </div>
+                                <div class="admin__field admin__field-option">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_rod" data-bind="checked: rod" />
+                                    <label class="admin__field-label" for="service_rod">
+                                        <span><?= $escaper->escapeHtml(__('Return Confirmed Documents')) ?></span>
+                                    </label>
+                                </div>
+                                <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: rod">
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('ROD Document Name')) ?>" data-bind="value: rodDocumentText, attr: {required: rod() ? 'required' : null}" data-validate="{'required-entry': true}" />
                                 </div>
-                                <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: pod" /> <?= $escaper->escapeHtml(__('Proof of Delivery')) ?>
-                                </label>
-                                <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: agever" /> <?= $escaper->escapeHtml(__('Adult Verification / Delivery')) ?>
-                                </label>
-                                <label class="admin__field-label" style="display: block; margin-bottom: 4px; text-align: left;">
-                                    <input type="checkbox" data-bind="checked: odb" /> <?= $escaper->escapeHtml(__('Self Pickup')) ?>
-                                </label>
+                                <div class="admin__field admin__field-option">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_pod" data-bind="checked: pod" />
+                                    <label class="admin__field-label" for="service_pod">
+                                        <span><?= $escaper->escapeHtml(__('Proof of Delivery')) ?></span>
+                                    </label>
+                                </div>
+                                <div class="admin__field admin__field-option">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_agever" data-bind="checked: agever" />
+                                    <label class="admin__field-label" for="service_agever">
+                                        <span><?= $escaper->escapeHtml(__('Adult Verification / Delivery')) ?></span>
+                                    </label>
+                                </div>
+                                <div class="admin__field admin__field-option">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_odb" data-bind="checked: odb" />
+                                    <label class="admin__field-label" for="service_odb">
+                                        <span><?= $escaper->escapeHtml(__('Self Pickup')) ?></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </fieldset>
@@ -326,7 +359,7 @@ $dateFormat = $viewModel->getDateFormat();
                                     <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 80px;"><?= $escaper->escapeHtml(__('Height [cm]')) ?></th>
                                     <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 60px;"><?= $escaper->escapeHtml(__('NST')) ?></th>
                                     <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 70px;"><?= $escaper->escapeHtml(__('Euro Return')) ?></th>
-                                    <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 60px;"><?= $escaper->escapeHtml(__('Actions')) ?></th>
+                                    <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 60px;"><?= $escaper->escapeHtml(__('Akcje')) ?></th>
                                 </tr>
                             </thead>
                             <tbody data-bind="foreach: $data.packages">
@@ -349,18 +382,22 @@ $dateFormat = $viewModel->getDateFormat();
                                     <td style="padding: 6px 4px; vertical-align: top;">
                                         <input type="text" class="admin__control-text" data-bind="value: height, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true}' : null }" />
                                     </td>
-                                    <td style="padding: 6px 4px; vertical-align: middle; text-align: center;">
-                                        <input type="checkbox" data-bind="checked: isNonStandard" title="<?= $escaper->escapeHtmlAttr(__('Non-standard package option')) ?>" />
+                                    <td class="_fit" style="padding: 6px 4px; vertical-align: middle; text-align: center;">
+                                        <div class="admin__field admin__field-option" style="margin: 0; display: inline-block; vertical-align: middle;">
+                                            <input type="checkbox" class="admin__control-checkbox" data-bind="checked: isNonStandard, attr: { id: 'pkg_nst_' + $index() }" title="<?= $escaper->escapeHtmlAttr(__('Non-standard package option')) ?>" />
+                                            <label class="admin__field-label" data-bind="attr: { for: 'pkg_nst_' + $index() }"></label>
+                                        </div>
+                                    </td>
+                                    <td class="_fit" style="padding: 6px 4px; vertical-align: middle; text-align: center;">
+                                        <div class="admin__field admin__field-option" style="margin: 0; display: inline-block; vertical-align: middle;">
+                                            <input type="checkbox" class="admin__control-checkbox" data-bind="checked: hasEuroReturn, enable: packageType() === 'PALLET', attr: { id: 'pkg_euro_' + $index() }" />
+                                            <label class="admin__field-label" data-bind="attr: { for: 'pkg_euro_' + $index() }"></label>
+                                        </div>
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: middle; text-align: center;">
-                                        <input type="checkbox" data-bind="checked: hasEuroReturn, enable: packageType() === 'PALLET'" />
-                                    </td>
-                                    <td style="padding: 6px 4px; vertical-align: middle; text-align: center;">
-                                        <!-- ko if: $parent.packages().length > 1 -->
                                         <button type="button" class="action-delete" data-bind="click: function() { $parent.removePackageRow($index()) }" title="<?= $escaper->escapeHtmlAttr(__('Delete Row')) ?>">
                                             <span><?= $escaper->escapeHtml(__('Delete')) ?></span>
                                         </button>
-                                        <!-- /ko -->
                                     </td>
                                 </tr>
                             </tbody>
@@ -368,7 +405,7 @@ $dateFormat = $viewModel->getDateFormat();
                                 <tr>
                                     <td colspan="9" style="padding-top: 10px;">
                                         <button type="button" class="action-secondary" data-bind="click: function() { $data.addPackageRow() }">
-                                            <span>+ <?= $escaper->escapeHtml(__('Add Package')) ?></span>
+                                            <span><?= $escaper->escapeHtml(__('Add Package')) ?></span>
                                         </button>
                                     </td>
                                 </tr>

@@ -136,13 +136,6 @@ class LoadTemplate extends Action
                     'success' => true,
                     'data' => [
                         'serviceType' => $this->methodCatalog->getServiceCodeForMethod($shippingMethod),
-                        'packageType' => $serviceData['package_type'] ?? 'PACKAGE',
-                        'weight' => (float)($serviceData['weight'] ?? 1.0),
-                        'width' => isset($serviceData['width']) ? (float)$serviceData['width'] : null,
-                        'height' => isset($serviceData['height']) ? (float)$serviceData['height'] : null,
-                        'length' => isset($serviceData['length']) ? (float)$serviceData['length'] : null,
-                        'isNonStandard' => !empty($serviceData['is_non_standard']),
-                        'hasEuroReturn' => !empty($serviceData['has_euro_return']),
                         'content' => $resolvedContent,
                         'comment' => $resolvedComment,
                         'reference' => $resolvedReference,
@@ -153,9 +146,7 @@ class LoadTemplate extends Action
                         'returnQrCodeType' => $service->getReturnQrCodeType() ?: 'QR_PDF',
                         'returnLabelExpDays' => $service->getReturnLabelExpDays() ?? 14,
                         'returnBookCourier' => $service->getReturnBookCourier() ?? 0,
-                        'dropOffPointId' => isset($serviceData['drop_off_point_id'])
-                            ? (int)$serviceData['drop_off_point_id']
-                            : null,
+                        'packages' => $service->getPackages() ?: [],
                         'addressType' => $serviceData['address_type'] ?? 'N',
                         'specialServices' => $additionalServices,
                     ]

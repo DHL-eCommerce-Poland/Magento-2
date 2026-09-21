@@ -139,19 +139,11 @@ class ShipmentDataService
             try {
                 $serviceEntity = $this->deliveryServiceRepository->getById($presetShipmentId);
                 $shipmentDefaults = $serviceEntity->getData();
-                if (!empty($shipmentDefaults['additional_services'])) {
-                    $servicesArr = $shipmentDefaults['additional_services'];
-                    if (is_string($servicesArr)) {
-                        try {
-                            $servicesArr = $this->serializer->unserialize($servicesArr);
-                        } catch (InvalidArgumentException $e) {
-                            $servicesArr = [];
-                        }
-                    }
-                    if (is_array($servicesArr)) {
-                        $shipmentDefaults['specialServices'] = $servicesArr;
-                    }
+                $servicesArr = $this->decodeAdditionalServices($shipmentDefaults['additional_services'] ?? null);
+                if ($servicesArr !== null) {
+                    $shipmentDefaults['specialServices'] = $servicesArr;
                 }
+                $shipmentDefaults['packages'] = $serviceEntity->getPackages();
             } catch (NoSuchEntityException $e) {
                 $this->logger?->warning(
                     'Specified shipment preset not found: ' . $presetShipmentId,
@@ -167,6 +159,11 @@ class ShipmentDataService
                 $matchedService = $this->deliveryServiceRepository->getByMethod($shippingMethod);
                 if ($matchedService) {
                     $shipmentDefaults = $matchedService->getData();
+                    $servicesArr = $this->decodeAdditionalServices($shipmentDefaults['additional_services'] ?? null);
+                    if ($servicesArr !== null) {
+                        $shipmentDefaults['specialServices'] = $servicesArr;
+                    }
+                    $shipmentDefaults['packages'] = $matchedService->getPackages();
                 }
             }
         }
@@ -349,5 +346,31 @@ class ShipmentDataService
     public function hasShipmentForOrder(int $orderId): bool
     {
         return $this->shipmentDataRepository->getByOrderId($orderId) !== null;
+    }
+
+    /**
+     * Decode additional services raw data if needed.
+     *
+     * @param mixed $servicesRaw
+     *
+     * @return array|null
+     */
+    private function decodeAdditionalServices(mixed $servicesRaw): ?array
+    {
+        if (empty($servicesRaw)) {
+            return null;
+        }
+        if (is_array($servicesRaw)) {
+            return $servicesRaw;
+        }
+        if (is_string($servicesRaw)) {
+            try {
+                $decoded = $this->serializer->unserialize($servicesRaw);
+                return is_array($decoded) ? $decoded : null;
+            } catch (InvalidArgumentException) {
+                return null;
+            }
+        }
+        return null;
     }
 }

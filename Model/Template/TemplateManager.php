@@ -281,7 +281,8 @@ class TemplateManager
         $options = [];
 
         foreach ($collection as $item) {
-            $label = $item->getTemplateName() ?: sprintf('%s (%s)', $item->getMethodCode() ?: 'Template', $item->getPackageType());
+            $defaultLabel = $item->getMethodCode() ?: (string)__('Template #%1', $item->getEntityId());
+            $label = $item->getTemplateName() ?: $defaultLabel;
             $options[] = [
                 'value' => (int)$item->getEntityId(),
                 'label' => $label,
@@ -376,6 +377,18 @@ class TemplateManager
                 };
             }
 
+            $packages = $service->getPackages();
+            $packagesData = [];
+            if (!empty($packages)) {
+                foreach ($packages as $pkg) {
+                    if (is_array($pkg)) {
+                        $packagesData[] = PackageData::fromArray($pkg);
+                    }
+                }
+            }
+
+            $firstPkg = $packagesData[0] ?? null;
+
             return new ShipmentSettingsData(
                 serviceType: $this->methodCatalog->getServiceCodeForMethod($shippingMethod),
                 pickupType: 'COURIER',
@@ -384,21 +397,21 @@ class TemplateManager
                 comment: (string)($service->getComment() ?? ''),
                 reference: (string)($service->getReference() ?? ''),
                 shipmentDate: $this->timezone->scopeDate()->format('Y-m-d'),
-                packageType: (string)($service->getPackageType() ?: 'PACKAGE'),
-                weight: (float)number_format((float)($service->getWeight() ?: 1.0), 4, '.', ''),
-                width: $service->getWidth() ? (float)number_format((float)$service->getWidth(), 4, '.', '') : null,
-                height: $service->getHeight() ? (float)number_format((float)$service->getHeight(), 4, '.', '') : null,
-                length: $service->getLength() ? (float)number_format((float)$service->getLength(), 4, '.', '') : null,
+                packageType: $firstPkg ? $firstPkg->getPackageType() : 'PACKAGE',
+                weight: $firstPkg ? $firstPkg->getWeight() : 1.0,
+                width: $firstPkg ? $firstPkg->getWidth() : null,
+                height: $firstPkg ? $firstPkg->getHeight() : null,
+                length: $firstPkg ? $firstPkg->getLength() : null,
                 labelType: (string)($service->getLabelType() ?: 'BLP'),
-                isNonStandard: $service->getIsNonStandard(),
-                hasEuroReturn: $service->getHasEuroReturn(),
+                isNonStandard: $firstPkg ? $firstPkg->isNonStandard() : false,
+                hasEuroReturn: $firstPkg ? $firstPkg->hasEuroReturn() : false,
                 autoCreateReturnShipment: $service->getAutoCreateReturnShipment(),
                 returnLabelType: $service->getReturnLabelType(),
                 returnQrCodeType: $service->getReturnQrCodeType(),
                 returnLabelExpDays: $service->getReturnLabelExpDays(),
                 returnBookCourier: $service->getReturnBookCourier(),
-                dropOffPointId: $service->getDropOffPointId(),
-                addressType: (string)($service->getAddressType() ?: 'N')
+                addressType: (string)($service->getAddressType() ?: 'N'),
+                packages: $packagesData
             );
         } catch (Exception $e) {
             $this->logger?->error('Error loading shipment template: ' . $e->getMessage(), ['exception' => $e]);

@@ -114,8 +114,10 @@ define([
 
     function createPackageObservable(p) {
         p = p || {};
-        var pkgTypeObs = ko.observable(p.packageType || 'PACKAGE');
-        var euroReturnObs = ko.observable(pkgTypeObs() === 'PALLET' ? isTruthy(p.hasEuroReturn) : false);
+        var pkgType = p.packageType || p.package_type || 'PACKAGE';
+        var pkgTypeObs = ko.observable(pkgType);
+        var isEuro = p.hasEuroReturn !== undefined ? p.hasEuroReturn : p.has_euro_return;
+        var euroReturnObs = ko.observable(pkgTypeObs() === 'PALLET' ? isTruthy(isEuro) : false);
 
         pkgTypeObs.subscribe(function (newType) {
             if (newType !== 'PALLET') {
@@ -123,14 +125,16 @@ define([
             }
         });
 
+        var isNonStd = p.isNonStandard !== undefined ? p.isNonStandard : p.is_non_standard;
+
         return {
             packageType: pkgTypeObs,
             quantity: ko.observable(p.quantity !== undefined ? p.quantity : 1),
-            weight: ko.observable(formatDecimal4(p.weight !== undefined ? p.weight : 1.0)),
+            weight: ko.observable(formatDecimal4(p.weight !== undefined && p.weight !== null && p.weight !== '' ? p.weight : 1.0)),
             width: ko.observable(formatDecimal4(p.width)),
             length: ko.observable(formatDecimal4(p.length)),
             height: ko.observable(formatDecimal4(p.height)),
-            isNonStandard: ko.observable(isTruthy(p.isNonStandard)),
+            isNonStandard: ko.observable(isTruthy(isNonStd)),
             hasEuroReturn: euroReturnObs
         };
     }
@@ -187,17 +191,6 @@ define([
             $.each(packagesRaw, function (i, pData) {
                 packagesObsArr.push(createPackageObservable(pData));
             });
-        } else {
-            packagesObsArr.push(createPackageObservable({
-                packageType: st.packageType || 'PACKAGE',
-                quantity: st.packageQuantity || 1,
-                weight: st.weight,
-                width: st.width,
-                height: st.height,
-                length: st.length,
-                isNonStandard: st.isNonStandard,
-                hasEuroReturn: st.hasEuroReturn
-            }));
         }
 
         var todayStr = new Date().toISOString().split('T')[0];
@@ -240,9 +233,7 @@ define([
         };
 
         shipmentSettingsObj.removePackageRow = function (index) {
-            if (shipmentSettingsObj.packages().length > 1) {
-                shipmentSettingsObj.packages.splice(index, 1);
-            }
+            shipmentSettingsObj.packages.splice(index, 1);
         };
 
         return {
@@ -346,9 +337,32 @@ define([
             }
         },
 
-        onSenderTemplateChange: function () {
-            var sender = this.draft().sender;
-            var templateId = sender.selectedDropOffPointId();
+        onSenderTemplateChange: function (templateId, event) {
+            var sender = this.draft() ? this.draft().sender : null;
+            if (!sender) return;
+
+            if (event && event.target) {
+                templateId = event.target.value;
+            } else if (templateId === undefined || templateId === null || typeof templateId === 'object') {
+                templateId = (typeof sender.selectedDropOffPointId === 'function')
+                    ? sender.selectedDropOffPointId()
+                    : null;
+            }
+
+            templateId = (templateId !== null && templateId !== undefined) ? String(templateId).trim() : '';
+
+            if (typeof sender.selectedDropOffPointId === 'function') {
+                var currentObsVal = sender.selectedDropOffPointId();
+                var parsedVal = templateId ? (isNaN(Number(templateId)) ? templateId : Number(templateId)) : null;
+                if (currentObsVal != parsedVal) {
+                    sender.selectedDropOffPointId(parsedVal);
+                }
+            }
+
+            if (this._activeSenderTemplateId === templateId) {
+                return;
+            }
+            this._activeSenderTemplateId = templateId;
 
             if (!templateId) {
                 sender.name('');
@@ -406,9 +420,32 @@ define([
             return this.onSenderTemplateChange();
         },
 
-        onShipmentTemplateChange: function () {
-            var settings = this.draft().shipmentSettings;
-            var templateId = settings.selectedDeliveryServiceId();
+        onShipmentTemplateChange: function (templateId, event) {
+            var settings = this.draft() ? this.draft().shipmentSettings : null;
+            if (!settings) return;
+
+            if (event && event.target) {
+                templateId = event.target.value;
+            } else if (templateId === undefined || templateId === null || typeof templateId === 'object') {
+                templateId = (typeof settings.selectedDeliveryServiceId === 'function')
+                    ? settings.selectedDeliveryServiceId()
+                    : null;
+            }
+
+            templateId = (templateId !== null && templateId !== undefined) ? String(templateId).trim() : '';
+
+            if (typeof settings.selectedDeliveryServiceId === 'function') {
+                var currentObsVal = settings.selectedDeliveryServiceId();
+                var parsedVal = templateId ? (isNaN(Number(templateId)) ? templateId : Number(templateId)) : null;
+                if (currentObsVal != parsedVal) {
+                    settings.selectedDeliveryServiceId(parsedVal);
+                }
+            }
+
+            if (this._activeShipmentTemplateId === templateId) {
+                return;
+            }
+            this._activeShipmentTemplateId = templateId;
 
             if (!templateId) {
                 settings.serviceType('');
@@ -423,15 +460,8 @@ define([
                 settings.returnLabelExpDays(14);
                 settings.returnBookCourier(0);
                 settings.addressType('N');
-                if (settings.packages && settings.packages().length > 0) {
-                    var p0 = settings.packages()[0];
-                    p0.packageType('PACKAGE');
-                    p0.weight('1.0000');
-                    p0.width('');
-                    p0.height('');
-                    p0.length('');
-                    p0.isNonStandard(false);
-                    p0.hasEuroReturn(false);
+                if (settings.packages) {
+                    settings.packages.removeAll();
                 }
                 if (this.draft().specialServices) {
                     var ssReset = this.draft().specialServices;
@@ -482,16 +512,15 @@ define([
                             }
                         });
 
-                        // Update first package row with template defaults
-                        if (currentSettings.packages && currentSettings.packages().length > 0) {
-                            var p0 = currentSettings.packages()[0];
-                            if (shipmentSettings.packageType) p0.packageType(shipmentSettings.packageType);
-                            if (shipmentSettings.weight !== undefined) p0.weight(formatDecimal4(shipmentSettings.weight));
-                            if (shipmentSettings.width !== undefined) p0.width(formatDecimal4(shipmentSettings.width));
-                            if (shipmentSettings.height !== undefined) p0.height(formatDecimal4(shipmentSettings.height));
-                            if (shipmentSettings.length !== undefined) p0.length(formatDecimal4(shipmentSettings.length));
-                            if (shipmentSettings.isNonStandard !== undefined) p0.isNonStandard(!!shipmentSettings.isNonStandard);
-                            if (shipmentSettings.hasEuroReturn !== undefined) p0.hasEuroReturn(!!shipmentSettings.hasEuroReturn);
+                        // Update package rows with template defaults
+                        var tplPackages = shipmentSettings.packages || res.data.packages;
+                        if (currentSettings.packages) {
+                            currentSettings.packages.removeAll();
+                            if (Array.isArray(tplPackages) && tplPackages.length > 0) {
+                                $.each(tplPackages, function (i, pData) {
+                                    currentSettings.packages.push(createPackageObservable(pData));
+                                });
+                            }
                         }
                     }
 
@@ -541,12 +570,6 @@ define([
                             self.draft().recipient.type('C');
                         }
                     }
-
-                    var dropOffPointId = (shipmentSettings && shipmentSettings.dropOffPointId) || res.data.dropOffPointId;
-                    if (dropOffPointId && self.draft().sender) {
-                        self.draft().sender.selectedDropOffPointId(dropOffPointId);
-                        self.onSenderTemplateChange();
-                    }
                 }
             });
         },
@@ -594,6 +617,9 @@ define([
                             response.data.shipmentSettings.selectedDeliveryServiceId = defaultDeliveryServiceId;
                         }
 
+                        self._activeSenderTemplateId = null;
+                        self._activeShipmentTemplateId = null;
+
                         // 3. Create reactive shipmentData instance AFTER options are set
                         var newDraft = createShipmentData(response.data);
                         self.draft(newDraft);
@@ -603,8 +629,15 @@ define([
                         }
                         if (defaultDeliveryServiceId) {
                             newDraft.shipmentSettings.selectedDeliveryServiceId(defaultDeliveryServiceId);
-                            self.onShipmentTemplateChange();
+                            self.onShipmentTemplateChange(defaultDeliveryServiceId);
                         }
+
+                        newDraft.sender.selectedDropOffPointId.subscribe(function (newVal) {
+                            self.onSenderTemplateChange(newVal);
+                        });
+                        newDraft.shipmentSettings.selectedDeliveryServiceId.subscribe(function (newVal) {
+                            self.onShipmentTemplateChange(newVal);
+                        });
 
                         var modalOptions = {
                             type: 'slide',
@@ -624,6 +657,14 @@ define([
                                     var draftJs = ko.toJS(self.shipmentData());
                                     var pFrom = draftJs.sender ? draftJs.sender.pickupHourFrom : null;
                                     var pTo = draftJs.sender ? draftJs.sender.pickupHourTo : null;
+                                    var pkgs = (draftJs.shipmentSettings && draftJs.shipmentSettings.packages) ? draftJs.shipmentSettings.packages : [];
+                                    if (!pkgs.length) {
+                                        alert({
+                                            title: $.mage.__('Error'),
+                                            content: $.mage.__('At least one package is required.')
+                                        });
+                                        return false;
+                                    }
 
                                     if ((pFrom && !pTo) || (!pFrom && pTo)) {
                                         alert({

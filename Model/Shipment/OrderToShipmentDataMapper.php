@@ -181,17 +181,14 @@ class OrderToShipmentDataMapper
 
         if (empty($popId)) {
             $shippingMethod = (string)($order->getShippingMethod() ?? '');
-            if (
-                str_contains(strtolower($shippingMethod), 'pop')
+            if (str_contains(strtolower($shippingMethod), 'pop')
                 || str_contains(strtolower($shippingMethod), 'servicepoint')
             ) {
-                if (
-                    preg_match(
-                        '/(?:POP|Point)\s*:?\s*([A-Z0-9\-]+)/i',
-                        (string)($order->getShippingDescription() ?? ''),
-                        $matches
-                    )
-                ) {
+                if (preg_match(
+                    '/(?:POP|Point)\s*:?\s*([A-Z0-9\-]+)/i',
+                    (string)($order->getShippingDescription() ?? ''),
+                    $matches
+                )) {
                     $popId = $matches[1];
                     $popName = (string)$order->getShippingDescription();
                 }
@@ -319,26 +316,37 @@ class OrderToShipmentDataMapper
         );
 
         // 6. Packages
-        $widthVal = isset($defaultShipmentDefaults['width']) && $defaultShipmentDefaults['width'] !== null
-            ? (float)number_format((float)$defaultShipmentDefaults['width'], 4, '.', '')
-            : null;
-        $lengthVal = isset($defaultShipmentDefaults['length']) && $defaultShipmentDefaults['length'] !== null
-            ? (float)number_format((float)$defaultShipmentDefaults['length'], 4, '.', '')
-            : null;
-        $heightVal = isset($defaultShipmentDefaults['height']) && $defaultShipmentDefaults['height'] !== null
-            ? (float)number_format((float)$defaultShipmentDefaults['height'], 4, '.', '')
-            : null;
+        $packagesList = [];
+        $packagesRaw = $defaultShipmentDefaults['packages'] ?? null;
+        if (is_string($packagesRaw) && $packagesRaw !== '') {
+            try {
+                $packagesRaw = $this->serializer->unserialize($packagesRaw);
+            } catch (InvalidArgumentException $e) {
+                $packagesRaw = [];
+            }
+        }
+        if (!empty($packagesRaw) && is_array($packagesRaw)) {
+            foreach ($packagesRaw as $pkgDef) {
+                if ($pkgDef instanceof PackageData) {
+                    $packagesList[] = $pkgDef;
+                } elseif (is_array($pkgDef)) {
+                    $packagesList[] = PackageData::fromArray($pkgDef);
+                }
+            }
+        }
 
-        $initialPackage = new PackageData(
-            packageType: (string)($defaultShipmentDefaults['packageType'] ?? 'PACKAGE'),
-            quantity: 1,
-            weight: (float)number_format($finalWeight, 4, '.', ''),
-            width: $widthVal,
-            length: $lengthVal,
-            height: $heightVal,
-            isNonStandard: !empty($defaultShipmentDefaults['isNonStandard']),
-            hasEuroReturn: !empty($defaultShipmentDefaults['hasEuroReturn'])
-        );
+        if (empty($packagesList)) {
+            $packagesList[] = new PackageData(
+                packageType: 'PACKAGE',
+                quantity: 1,
+                weight: (float)number_format($finalWeight, 4, '.', ''),
+                width: null,
+                length: null,
+                height: null,
+                isNonStandard: false,
+                hasEuroReturn: false
+            );
+        }
 
         // 7. Shipment Settings Data
         $sWidth = isset($defaultShipmentDefaults['width']) && $defaultShipmentDefaults['width'] !== null
@@ -349,9 +357,6 @@ class OrderToShipmentDataMapper
             : null;
         $sLength = isset($defaultShipmentDefaults['length']) && $defaultShipmentDefaults['length'] !== null
             ? (float)$defaultShipmentDefaults['length']
-            : null;
-        $sDropOff = isset($defaultShipmentDefaults['dropOffPointId'])
-            ? (int)$defaultShipmentDefaults['dropOffPointId']
             : null;
 
         $pickupHourFrom = !empty($defaultSenderDefaults['pickup_time_from'])
@@ -364,8 +369,12 @@ class OrderToShipmentDataMapper
         $shippingMethod = (string)($order->getShippingMethod() ?? '');
         $serviceType = $this->methodCatalog->getServiceCodeForMethod($shippingMethod);
 
-        if (
-            in_array(strtoupper(trim((string)$serviceType)), [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EKS], true)
+        $isSpOrPsOrEks = in_array(
+            strtoupper(trim((string)$serviceType)),
+            [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EKS],
+            true
+        );
+        if ($isSpOrPsOrEks
             && (empty($popId) || trim((string)$popId) === '')
             && $this->nearestPointResolver !== null
         ) {
@@ -399,9 +408,8 @@ class OrderToShipmentDataMapper
             returnQrCodeType: isset($defaultShipmentDefaults['returnQrCodeType']) && (string)$defaultShipmentDefaults['returnQrCodeType'] !== '' ? (string)$defaultShipmentDefaults['returnQrCodeType'] : null,
             returnLabelExpDays: isset($defaultShipmentDefaults['returnLabelExpDays']) && $defaultShipmentDefaults['returnLabelExpDays'] !== '' && $defaultShipmentDefaults['returnLabelExpDays'] !== null ? (int)$defaultShipmentDefaults['returnLabelExpDays'] : null,
             returnBookCourier: isset($defaultShipmentDefaults['returnBookCourier']) && $defaultShipmentDefaults['returnBookCourier'] !== '' && $defaultShipmentDefaults['returnBookCourier'] !== null ? (int)$defaultShipmentDefaults['returnBookCourier'] : null,
-            dropOffPointId: $sDropOff,
             addressType: (string)($defaultShipmentDefaults['addressType'] ?? 'N'),
-            packages: [$initialPackage]
+            packages: $packagesList
         );
 
         return new DhlShipmentData(

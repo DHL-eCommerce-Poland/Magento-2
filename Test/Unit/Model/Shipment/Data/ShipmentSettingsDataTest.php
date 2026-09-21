@@ -155,4 +155,40 @@ class ShipmentSettingsDataTest extends TestCase
         $exported = $settings->toArray();
         $this->assertEquals($data, $exported);
     }
+
+    /**
+     * Test that fromArray filters out packages flagged as deleted.
+     *
+     * @return void
+     */
+    public function testFromArraySkipsDeletedPackages(): void
+    {
+        $data = [
+            'serviceType' => 'AH',
+            'packages' => [
+                [
+                    'packageType' => 'PACKAGE',
+                    'quantity' => 1,
+                    'weight' => 2.0,
+                    'is_deleted' => '1',
+                ],
+                [
+                    'packageType' => 'PACKAGE',
+                    'quantity' => 2,
+                    'weight' => 3.0,
+                ],
+                [
+                    'packageType' => 'ENVELOPE',
+                    'quantity' => 1,
+                    'weight' => 0.5,
+                    'delete' => true,
+                ],
+            ],
+        ];
+
+        $settings = ShipmentSettingsData::fromArray($data);
+        $this->assertCount(1, $settings->getPackages());
+        $this->assertEquals(2, $settings->getPackageQuantity());
+        $this->assertEquals(3.0, $settings->getWeight());
+    }
 }

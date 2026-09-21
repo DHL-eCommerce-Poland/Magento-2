@@ -64,4 +64,43 @@ class DhlShipmentDataTest extends TestCase
         $exported = $shipmentData->toArray();
         $this->assertEquals($data, $exported);
     }
+
+    /**
+     * Test fromArray mapping when packages are provided at top level or under packages_fieldset.
+     *
+     * @return void
+     */
+    public function testFromArrayWithPackagesOutsideShipmentSettings(): void
+    {
+        $pkg1 = [
+            'packageType' => 'PACKAGE',
+            'quantity' => 2,
+            'weight' => 4.5,
+        ];
+        $pkg2 = [
+            'packageType' => 'ENVELOPE',
+            'quantity' => 1,
+            'weight' => 0.5,
+        ];
+
+        // 1. Root level packages
+        $data1 = [
+            'orderId' => 303,
+            'shipmentSettings' => ['serviceType' => 'AH'],
+            'packages' => [$pkg1, $pkg2],
+        ];
+        $shipmentData1 = DhlShipmentData::fromArray($data1);
+        $this->assertCount(2, $shipmentData1->getShipmentSettings()->getPackages());
+        $this->assertEquals(3, $shipmentData1->getShipmentSettings()->getPackageQuantity());
+
+        // 2. packages_fieldset packages
+        $data2 = [
+            'orderId' => 304,
+            'shipmentSettings' => ['serviceType' => 'AH'],
+            'packages_fieldset' => ['packages' => [$pkg1]],
+        ];
+        $shipmentData2 = DhlShipmentData::fromArray($data2);
+        $this->assertCount(1, $shipmentData2->getShipmentSettings()->getPackages());
+        $this->assertEquals(2, $shipmentData2->getShipmentSettings()->getPackageQuantity());
+    }
 }

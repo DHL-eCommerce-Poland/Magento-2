@@ -141,14 +141,14 @@ class PackageData
     public static function fromArray(array $data): self
     {
         return new self(
-            (string)($data['packageType'] ?? 'PACKAGE'),
+            (string)($data['packageType'] ?? $data['package_type'] ?? 'PACKAGE'),
             isset($data['quantity']) ? (int)$data['quantity'] : 1,
             (float)($data['weight'] ?? 0.0),
             isset($data['width']) && $data['width'] !== null ? (float)$data['width'] : null,
             isset($data['length']) && $data['length'] !== null ? (float)$data['length'] : null,
             isset($data['height']) && $data['height'] !== null ? (float)$data['height'] : null,
-            filter_var($data['isNonStandard'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            filter_var($data['hasEuroReturn'] ?? false, FILTER_VALIDATE_BOOLEAN)
+            filter_var($data['isNonStandard'] ?? $data['is_non_standard'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            filter_var($data['hasEuroReturn'] ?? $data['has_euro_return'] ?? false, FILTER_VALIDATE_BOOLEAN)
         );
     }
 }

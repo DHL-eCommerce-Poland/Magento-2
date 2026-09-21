@@ -913,15 +913,16 @@
         <dynamicRows name="packages">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="deleteButtonLabel" xsi:type="string" translate="true">Delete</item>
                     <item name="dndConfig" xsi:type="array">
                         <item name="enabled" xsi:type="boolean">false</item>
                     </item>
                 </item>
             </argument>
             <settings>
+                <addButtonLabel translate="true">Add Package</addButtonLabel>
                 <label translate="true">Packages</label>
                 <componentType>dynamicRows</componentType>
-                <addButton>false</addButton>
                 <dndConfig>
                     <param name="enabled" xsi:type="boolean">false</param>
                 </dndConfig>
@@ -949,6 +950,11 @@
                     </settings>
                 </field>
                 <field name="packageType" formElement="select">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>text</dataType>
                         <label translate="true">Package Type</label>
@@ -959,10 +965,22 @@
                                     <value>PACKAGE</value>
                                     <actions>
                                         <action name="0">
+                                            <target>${ $.parentName }.width</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="1">
+                                            <target>${ $.parentName }.length</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="2">
+                                            <target>${ $.parentName }.height</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="3">
                                             <target>${ $.parentName }.hasEuroReturn</target>
                                             <callback>disable</callback>
                                         </action>
-                                        <action name="1">
+                                        <action name="4">
                                             <target>${ $.parentName }.hasEuroReturn</target>
                                             <callback>value</callback>
                                             <params>
@@ -975,10 +993,43 @@
                                     <value>ENVELOPE</value>
                                     <actions>
                                         <action name="0">
-                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <target>${ $.parentName }.width</target>
                                             <callback>disable</callback>
                                         </action>
                                         <action name="1">
+                                            <target>${ $.parentName }.width</target>
+                                            <callback>value</callback>
+                                            <params>
+                                                <param name="0" xsi:type="string"></param>
+                                            </params>
+                                        </action>
+                                        <action name="2">
+                                            <target>${ $.parentName }.length</target>
+                                            <callback>disable</callback>
+                                        </action>
+                                        <action name="3">
+                                            <target>${ $.parentName }.length</target>
+                                            <callback>value</callback>
+                                            <params>
+                                                <param name="0" xsi:type="string"></param>
+                                            </params>
+                                        </action>
+                                        <action name="4">
+                                            <target>${ $.parentName }.height</target>
+                                            <callback>disable</callback>
+                                        </action>
+                                        <action name="5">
+                                            <target>${ $.parentName }.height</target>
+                                            <callback>value</callback>
+                                            <params>
+                                                <param name="0" xsi:type="string"></param>
+                                            </params>
+                                        </action>
+                                        <action name="6">
+                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <callback>disable</callback>
+                                        </action>
+                                        <action name="7">
                                             <target>${ $.parentName }.hasEuroReturn</target>
                                             <callback>value</callback>
                                             <params>
@@ -991,6 +1042,18 @@
                                     <value>PALLET</value>
                                     <actions>
                                         <action name="0">
+                                            <target>${ $.parentName }.width</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="1">
+                                            <target>${ $.parentName }.length</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="2">
+                                            <target>${ $.parentName }.height</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="3">
                                             <target>${ $.parentName }.hasEuroReturn</target>
                                             <callback>enable</callback>
                                         </action>
@@ -1011,6 +1074,7 @@
                 <field name="quantity" formElement="input">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
+                            <item name="default" xsi:type="number">1</item>
                             <item name="fit" xsi:type="boolean">true</item>
                             <item name="cols" xsi:type="number">3</item>
                             <item name="size" xsi:type="number">3</item>
@@ -1026,6 +1090,7 @@
                 <field name="weight" formElement="input">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
+                            <item name="default" xsi:type="string">1.0000</item>
                             <item name="fit" xsi:type="boolean">true</item>
                             <item name="cols" xsi:type="number">5</item>
                             <item name="size" xsi:type="number">5</item>
@@ -1130,6 +1195,21 @@
                         </checkbox>
                     </formElements>
                 </field>
+                <actionDelete name="actionDelete">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">false</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <additionalClasses>
+                            <class name="data-grid-actions-cell">true</class>
+                        </additionalClasses>
+                        <dataType>text</dataType>
+                        <label translate="true">Actions</label>
+                        <componentType>actionDelete</componentType>
+                    </settings>
+                </actionDelete>
             </container>
         </dynamicRows>
     </fieldset>

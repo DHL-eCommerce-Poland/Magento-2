@@ -211,4 +211,71 @@ class OrderToShipmentDataMapperTest extends TestCase
 
         $this->mapper->map($order);
     }
+
+    /**
+     * Test mapping order with packages provided as serialized JSON string.
+     *
+     * @return void
+     */
+    public function testMapWithSerializedPackagesJson(): void
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getFirstname')->willReturn('Jan');
+        $address->method('getLastname')->willReturn('Kowalski');
+        $address->method('getStreet')->willReturn(['Testowa 1']);
+        $address->method('getCity')->willReturn('Warszawa');
+        $address->method('getPostcode')->willReturn('00-001');
+        $address->method('getCountryId')->willReturn('PL');
+        $address->method('getTelephone')->willReturn('500600700');
+        $address->method('getEmail')->willReturn('jan@example.com');
+
+        $payment = $this->createStub(Payment::class);
+        $payment->method('getMethod')->willReturn('checkmo');
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getEntityId')->willReturn(102);
+        $order->method('getIncrementId')->willReturn('100000102');
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getPayment')->willReturn($payment);
+        $order->method('getItems')->willReturn([]);
+
+        $packagesJson = json_encode([
+            [
+                'package_type' => 'PALLET',
+                'quantity' => 1,
+                'weight' => 25.0,
+                'width' => 80.0,
+                'length' => 120.0,
+                'height' => 160.0,
+                'is_non_standard' => 1,
+                'has_euro_return' => 1,
+            ],
+            [
+                'package_type' => 'PACKAGE',
+                'quantity' => 2,
+                'weight' => 5.0,
+                'width' => 20.0,
+                'length' => 30.0,
+                'height' => 15.0,
+                'is_non_standard' => 0,
+                'has_euro_return' => 0,
+            ],
+        ]);
+
+        $shipmentDefaults = [
+            'packages' => $packagesJson,
+        ];
+
+        $shipmentData = $this->mapper->map($order, [], $shipmentDefaults);
+        $packages = $shipmentData->getShipmentSettings()->getPackages();
+
+        $this->assertCount(2, $packages);
+        $this->assertSame('PALLET', $packages[0]->getPackageType());
+        $this->assertSame(25.0, $packages[0]->getWeight());
+        $this->assertTrue($packages[0]->hasEuroReturn());
+        $this->assertSame('PACKAGE', $packages[1]->getPackageType());
+        $this->assertSame(2, $packages[1]->getQuantity());
+        $this->assertSame(5.0, $packages[1]->getWeight());
+    }
 }

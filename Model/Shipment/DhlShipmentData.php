@@ -133,12 +133,23 @@ class DhlShipmentData
     // phpcs:ignore Magento2.Functions.StaticFunction.StaticFunction
     public static function fromArray(array $data): self
     {
+        $shipmentSettings = $data['shipmentSettings'] ?? [];
+        if (!isset($shipmentSettings['packages'])) {
+            if (isset($data['packages']) && is_array($data['packages'])) {
+                $shipmentSettings['packages'] = $data['packages'];
+            } elseif (isset($data['packages_fieldset']['packages'])
+                && is_array($data['packages_fieldset']['packages'])
+            ) {
+                $shipmentSettings['packages'] = $data['packages_fieldset']['packages'];
+            }
+        }
+
         return new self(
             isset($data['orderId']) ? (int)$data['orderId'] : null,
             SenderData::fromArray($data['sender'] ?? []),
             RecipientData::fromArray($data['recipient'] ?? []),
             SpecialServicesData::fromArray($data['specialServices'] ?? []),
-            ShipmentSettingsData::fromArray($data['shipmentSettings'] ?? []),
+            ShipmentSettingsData::fromArray($shipmentSettings),
             is_array($data['itemsQty'] ?? null) ? $data['itemsQty'] : []
         );
     }
