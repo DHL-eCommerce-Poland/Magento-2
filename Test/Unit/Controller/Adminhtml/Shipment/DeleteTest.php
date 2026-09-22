@@ -117,4 +117,48 @@ class DeleteTest extends TestCase
         $result = $this->controller->execute();
         $this->assertSame($this->redirectMock, $result);
     }
+
+    public function testExecuteLocalizedExceptionAddsDirectMessageWithoutDuplicatePrefix(): void
+    {
+        $this->requestMock->expects($this->once())
+            ->method('getParam')
+            ->with('entity_id')
+            ->willReturn('42');
+
+        $errorMessage = 'Nie udało się usunąć przesyłki w DHL: Nie znaleziono przesyłki o zadanym identyfikatorze';
+        $this->deletionServiceMock->expects($this->once())
+            ->method('deleteShipment')
+            ->with(42)
+            ->willThrowException(new \Magento\Framework\Exception\LocalizedException(__($errorMessage)));
+
+        $this->messageManagerMock->expects($this->once())
+            ->method('addErrorMessage')
+            ->with($errorMessage);
+
+        $result = $this->controller->execute();
+        $this->assertSame($this->redirectMock, $result);
+    }
+
+    public function testExecuteGenericExceptionAddsPrefixedMessage(): void
+    {
+        $this->requestMock->expects($this->once())
+            ->method('getParam')
+            ->with('entity_id')
+            ->willReturn('42');
+
+        $this->deletionServiceMock->expects($this->once())
+            ->method('deleteShipment')
+            ->with(42)
+            ->willThrowException(new \RuntimeException('Connection reset'));
+
+        $this->messageManagerMock->expects($this->once())
+            ->method('addErrorMessage')
+            ->with($this->callback(function ($phrase) {
+                return (string)$phrase === 'Failed to delete shipment: Connection reset';
+            }));
+
+        $result = $this->controller->execute();
+        $this->assertSame($this->redirectMock, $result);
+    }
 }
+

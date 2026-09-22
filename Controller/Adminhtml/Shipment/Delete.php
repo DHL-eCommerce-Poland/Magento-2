@@ -11,6 +11,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
 
 class Delete extends Action implements HttpGetActionInterface, HttpPostActionInterface
@@ -48,6 +49,9 @@ class Delete extends Action implements HttpGetActionInterface, HttpPostActionInt
         try {
             $this->shipmentDeletionService->deleteShipment($entityId);
             $this->messageManager->addSuccessMessage(__('Shipment has been deleted successfully.'));
+        } catch (LocalizedException $e) {
+            $this->logger?->error('Error deleting DHL shipment: ' . $e->getMessage(), ['exception' => $e]);
+            $this->messageManager->addErrorMessage($e->getMessage());
         } catch (Exception $e) {
             $this->logger?->error('Error deleting DHL shipment: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage(__('Failed to delete shipment: %1', $e->getMessage()));
