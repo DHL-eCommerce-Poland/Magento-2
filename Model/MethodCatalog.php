@@ -26,8 +26,12 @@ class MethodCatalog
     public const METHOD_PARCEL_9_COD = 'parcel_9_cod';
     public const METHOD_PARCEL_12 = 'parcel_12';
     public const METHOD_PARCEL_12_COD = 'parcel_12_cod';
-    public const METHOD_ECONOMY = 'economy';
-    public const METHOD_ECONOMY_COD = 'economy_cod';
+    public const METHOD_ECONOMY_ALL = 'economy_all';
+    public const METHOD_ECONOMY_ALL_COD = 'economy_all_cod';
+    public const METHOD_ECONOMY_POP = 'economy_pop';
+    public const METHOD_ECONOMY_POP_COD = 'economy_pop_cod';
+    public const METHOD_ECONOMY_BOX = 'economy_box';
+    public const METHOD_ECONOMY_BOX_COD = 'economy_box_cod';
     public const METHOD_MAX_PALETA = 'max_paleta';
     public const METHOD_MAX_PALETA_COD = 'max_paleta_cod';
     public const METHOD_CONNECT = 'connect';
@@ -57,8 +61,12 @@ class MethodCatalog
         self::METHOD_PARCEL_9_COD => self::SERVICE_09,
         self::METHOD_PARCEL_12 => self::SERVICE_12,
         self::METHOD_PARCEL_12_COD => self::SERVICE_12,
-        self::METHOD_ECONOMY => self::SERVICE_SP,
-        self::METHOD_ECONOMY_COD => self::SERVICE_SP,
+        self::METHOD_ECONOMY_ALL => self::SERVICE_SP,
+        self::METHOD_ECONOMY_ALL_COD => self::SERVICE_SP,
+        self::METHOD_ECONOMY_POP => self::SERVICE_SP,
+        self::METHOD_ECONOMY_POP_COD => self::SERVICE_SP,
+        self::METHOD_ECONOMY_BOX => self::SERVICE_SP,
+        self::METHOD_ECONOMY_BOX_COD => self::SERVICE_SP,
         self::METHOD_CONNECT => self::SERVICE_EK,
         self::METHOD_CONNECT_COD => self::SERVICE_EK,
         self::METHOD_CONNECT_PARCELSHOP => self::SERVICE_EK,
@@ -86,7 +94,7 @@ class MethodCatalog
             ],
             [
                 'code' => self::METHOD_PARCEL_POLSKA_COD,
-                'title' => __('DHL Parcel Polska - Cash on Delivery'),
+                'title' => __('DHL Parcel Polska - płatność przy odbiorze'),
                 'service_code' => self::SERVICE_AH,
                 'is_cod' => true,
             ],
@@ -97,7 +105,7 @@ class MethodCatalog
             ],
             [
                 'code' => self::METHOD_PREMIUM_COD,
-                'title' => __('DHL Parcel Premium - Cash on Delivery'),
+                'title' => __('DHL Parcel Premium - płatność przy odbiorze'),
                 'service_code' => self::SERVICE_PR,
                 'is_cod' => true,
             ],
@@ -108,7 +116,7 @@ class MethodCatalog
             ],
             [
                 'code' => self::METHOD_PARCEL_9_COD,
-                'title' => __('DHL Parcel 9 - Cash on Delivery'),
+                'title' => __('DHL Parcel 9 - płatność przy odbiorze'),
                 'service_code' => self::SERVICE_09,
                 'is_cod' => true,
             ],
@@ -119,18 +127,40 @@ class MethodCatalog
             ],
             [
                 'code' => self::METHOD_PARCEL_12_COD,
-                'title' => __('DHL Parcel 12 - Cash on Delivery'),
+                'title' => __('DHL Parcel 12 - płatność przy odbiorze'),
                 'service_code' => self::SERVICE_12,
                 'is_cod' => true,
             ],
             [
-                'code' => self::METHOD_ECONOMY,
-                'title' => __('DHL Parcel Economy'),
+                'code' => self::METHOD_ECONOMY_ALL,
+                'title' => __('DHL Parcel Economy - Punkty i Automaty'),
                 'service_code' => self::SERVICE_SP,
             ],
             [
-                'code' => self::METHOD_ECONOMY_COD,
-                'title' => __('DHL Parcel Economy - Cash on Delivery'),
+                'code' => self::METHOD_ECONOMY_ALL_COD,
+                'title' => __('DHL Parcel Economy - Punkty i Automaty - płatność przy odbiorze'),
+                'service_code' => self::SERVICE_SP,
+                'is_cod' => true,
+            ],
+            [
+                'code' => self::METHOD_ECONOMY_POP,
+                'title' => __('DHL Parcel Economy - Punkty'),
+                'service_code' => self::SERVICE_SP,
+            ],
+            [
+                'code' => self::METHOD_ECONOMY_POP_COD,
+                'title' => __('DHL Parcel Economy - Punkty - płatność przy odbiorze'),
+                'service_code' => self::SERVICE_SP,
+                'is_cod' => true,
+            ],
+            [
+                'code' => self::METHOD_ECONOMY_BOX,
+                'title' => __('DHL Parcel Economy - Automaty'),
+                'service_code' => self::SERVICE_SP,
+            ],
+            [
+                'code' => self::METHOD_ECONOMY_BOX_COD,
+                'title' => __('DHL Parcel Economy - Automaty - płatność przy odbiorze'),
                 'service_code' => self::SERVICE_SP,
                 'is_cod' => true,
             ],
@@ -141,7 +171,7 @@ class MethodCatalog
             ],
             [
                 'code' => self::METHOD_MAX_PALETA_COD,
-                'title' => __('DHL Parcel Max Paleta - Cash on Delivery'),
+                'title' => __('DHL Parcel Max Paleta - płatność przy odbiorze'),
                 'service_code' => self::SERVICE_AH,
                 'is_cod' => true,
             ],
@@ -152,7 +182,7 @@ class MethodCatalog
             ],
             [
                 'code' => self::METHOD_CONNECT_COD,
-                'title' => __('DHL Parcel Connect - Cash on Delivery'),
+                'title' => __('DHL Parcel Connect - płatność przy odbiorze'),
                 'service_code' => self::SERVICE_EK,
                 'is_cod' => true,
             ],
@@ -163,7 +193,7 @@ class MethodCatalog
             ],
             [
                 'code' => self::METHOD_CONNECT_PARCELSHOP_COD,
-                'title' => __('DHL Parcel Connect Parcelshop - Cash on Delivery'),
+                'title' => __('DHL Parcel Connect Parcelshop - płatność przy odbiorze'),
                 'service_code' => self::SERVICE_EK,
                 'is_cod' => true,
             ],
@@ -174,7 +204,7 @@ class MethodCatalog
             ],
             [
                 'code' => self::METHOD_CONNECT_PACKSTATION_COD,
-                'title' => __('DHL Parcel Connect Packstation - Cash on Delivery'),
+                'title' => __('DHL Parcel Connect Packstation - płatność przy odbiorze'),
                 'service_code' => self::SERVICE_EK,
                 'is_cod' => true,
             ],
@@ -185,7 +215,7 @@ class MethodCatalog
             ],
             [
                 'code' => self::METHOD_CONNECT_PLUS_COD,
-                'title' => __('DHL Parcel Connect Plus - Cash on Delivery'),
+                'title' => __('DHL Parcel Connect Plus - płatność przy odbiorze'),
                 'service_code' => self::SERVICE_CP,
                 'is_cod' => true,
             ],
@@ -196,7 +226,7 @@ class MethodCatalog
             ],
             [
                 'code' => self::METHOD_CONNECT_PALLET_COD,
-                'title' => __('DHL Parcel Connect Pallet - Paleta - Cash on Delivery'),
+                'title' => __('DHL Parcel Connect Pallet - Paleta - płatność przy odbiorze'),
                 'service_code' => self::SERVICE_CM,
                 'is_cod' => true,
             ],

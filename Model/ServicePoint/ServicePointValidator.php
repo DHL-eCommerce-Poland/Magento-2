@@ -14,11 +14,15 @@ use Magento\Store\Model\ScopeInterface;
 
 class ServicePointValidator
 {
-    private const XML_PATH_DELIVERY_MODE = 'carriers/dhlparcel/method_economy_point_delivery_mode';
+    private const XML_PATH_DELIVERY_MODE = 'carriers/dhlparcel/method_economy_all_point_delivery_mode';
 
     private const POINT_METHODS = [
-        MethodCatalog::METHOD_ECONOMY,
-        MethodCatalog::METHOD_ECONOMY_COD,
+        MethodCatalog::METHOD_ECONOMY_ALL,
+        MethodCatalog::METHOD_ECONOMY_ALL_COD,
+        MethodCatalog::METHOD_ECONOMY_POP,
+        MethodCatalog::METHOD_ECONOMY_POP_COD,
+        MethodCatalog::METHOD_ECONOMY_BOX,
+        MethodCatalog::METHOD_ECONOMY_BOX_COD,
         MethodCatalog::METHOD_CONNECT,
         MethodCatalog::METHOD_CONNECT_COD,
         MethodCatalog::METHOD_CONNECT_PARCELSHOP,
@@ -114,9 +118,9 @@ class ServicePointValidator
         }
 
         // Domestic SP (economy) in 'nearest' delivery mode does NOT require map point selection
-        if ($cleanMethodCode === MethodCatalog::METHOD_ECONOMY || $cleanMethodCode === MethodCatalog::METHOD_ECONOMY_COD) {
-            $path = $cleanMethodCode === MethodCatalog::METHOD_ECONOMY_COD
-                ? 'carriers/dhlparcel/method_economy_cod_point_delivery_mode'
+        if ($cleanMethodCode === MethodCatalog::METHOD_ECONOMY_ALL || $cleanMethodCode === MethodCatalog::METHOD_ECONOMY_ALL_COD) {
+            $path = $cleanMethodCode === MethodCatalog::METHOD_ECONOMY_ALL_COD
+                ? 'carriers/dhlparcel/method_economy_all_cod_point_delivery_mode'
                 : self::XML_PATH_DELIVERY_MODE;
 
             $deliveryMode = (string) $this->scopeConfig->getValue(

@@ -57,7 +57,9 @@ define([
                     pointMapType: 'all',
                     deliveryMode: 'map',
                     pointMethods: [
-                        methodCodes.FULL_ECONOMY,
+                        methodCodes.FULL_ECONOMY_ALL,
+                        methodCodes.FULL_ECONOMY_POP,
+                        methodCodes.FULL_ECONOMY_BOX,
                         methodCodes.FULL_CONNECT_PARCELSHOP,
                         methodCodes.FULL_CONNECT_PACKSTATION
                     ]

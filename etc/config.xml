@@ -30,7 +30,7 @@
 
                 <method_parcel_polska_cod_active>0</method_parcel_polska_cod_active>
                 <method_parcel_polska_cod_title>DHL Parcel</method_parcel_polska_cod_title>
-                <method_parcel_polska_cod_method_name>DHL Parcel Polska - Cash on Delivery</method_parcel_polska_cod_method_name>
+                <method_parcel_polska_cod_method_name>DHL Parcel Polska - płatność przy odbiorze</method_parcel_polska_cod_method_name>
                 <method_parcel_polska_cod_pricing_type>fixed</method_parcel_polska_cod_pricing_type>
                 <method_parcel_polska_cod_price>17.00</method_parcel_polska_cod_price>
                 <method_parcel_polska_cod_sallowspecific>1</method_parcel_polska_cod_sallowspecific>
@@ -56,7 +56,7 @@
 
                 <method_premium_cod_active>0</method_premium_cod_active>
                 <method_premium_cod_title>DHL Parcel</method_premium_cod_title>
-                <method_premium_cod_method_name>DHL Parcel Premium - Cash on Delivery</method_premium_cod_method_name>
+                <method_premium_cod_method_name>DHL Parcel Premium - płatność przy odbiorze</method_premium_cod_method_name>
                 <method_premium_cod_pricing_type>fixed</method_premium_cod_pricing_type>
                 <method_premium_cod_price>20.90</method_premium_cod_price>
                 <method_premium_cod_sallowspecific>1</method_premium_cod_sallowspecific>
@@ -82,7 +82,7 @@
 
                 <method_parcel_9_cod_active>0</method_parcel_9_cod_active>
                 <method_parcel_9_cod_title>DHL Parcel</method_parcel_9_cod_title>
-                <method_parcel_9_cod_method_name>DHL Parcel 9 - Cash on Delivery</method_parcel_9_cod_method_name>
+                <method_parcel_9_cod_method_name>DHL Parcel 9 - płatność przy odbiorze</method_parcel_9_cod_method_name>
                 <method_parcel_9_cod_pricing_type>fixed</method_parcel_9_cod_pricing_type>
                 <method_parcel_9_cod_price>47.40</method_parcel_9_cod_price>
                 <method_parcel_9_cod_sallowspecific>1</method_parcel_9_cod_sallowspecific>
@@ -108,7 +108,7 @@
 
                 <method_parcel_12_cod_active>0</method_parcel_12_cod_active>
                 <method_parcel_12_cod_title>DHL Parcel</method_parcel_12_cod_title>
-                <method_parcel_12_cod_method_name>DHL Parcel 12 - Cash on Delivery</method_parcel_12_cod_method_name>
+                <method_parcel_12_cod_method_name>DHL Parcel 12 - płatność przy odbiorze</method_parcel_12_cod_method_name>
                 <method_parcel_12_cod_pricing_type>fixed</method_parcel_12_cod_pricing_type>
                 <method_parcel_12_cod_price>30.80</method_parcel_12_cod_price>
                 <method_parcel_12_cod_sallowspecific>1</method_parcel_12_cod_sallowspecific>
@@ -119,35 +119,85 @@
                 <method_parcel_12_cod_specificerrmsg>This shipping method is currently unavailable.</method_parcel_12_cod_specificerrmsg>
                 <method_parcel_12_cod_showmethod>0</method_parcel_12_cod_showmethod>
 
-                <method_economy_active>0</method_economy_active>
-                <method_economy_title>DHL Parcel</method_economy_title>
-                <method_economy_method_name>DHL Parcel Economy</method_economy_method_name>
-                <method_economy_pricing_type>fixed</method_economy_pricing_type>
-                <method_economy_price>14.00</method_economy_price>
-                <method_economy_point_delivery_mode>map</method_economy_point_delivery_mode>
-                <method_economy_point_map_type>all</method_economy_point_map_type>
-                <method_economy_sallowspecific>1</method_economy_sallowspecific>
-                <method_economy_specificcountry>PL</method_economy_specificcountry>
-                <method_economy_sort_order>50</method_economy_sort_order>
-                <method_economy_free_shipping_enable>0</method_economy_free_shipping_enable>
-                <method_economy_free_shipping_subtotal>0.00</method_economy_free_shipping_subtotal>
-                <method_economy_specificerrmsg>This shipping method is currently unavailable.</method_economy_specificerrmsg>
-                <method_economy_showmethod>0</method_economy_showmethod>
+                <method_economy_all_active>0</method_economy_all_active>
+                <method_economy_all_title>DHL Parcel</method_economy_all_title>
+                <method_economy_all_method_name>DHL Parcel Economy - Punkty i Automaty</method_economy_all_method_name>
+                <method_economy_all_pricing_type>fixed</method_economy_all_pricing_type>
+                <method_economy_all_price>14.00</method_economy_all_price>
+                <method_economy_all_point_delivery_mode>map</method_economy_all_point_delivery_mode>
+                <method_economy_all_sallowspecific>1</method_economy_all_sallowspecific>
+                <method_economy_all_specificcountry>PL</method_economy_all_specificcountry>
+                <method_economy_all_sort_order>50</method_economy_all_sort_order>
+                <method_economy_all_free_shipping_enable>0</method_economy_all_free_shipping_enable>
+                <method_economy_all_free_shipping_subtotal>0.00</method_economy_all_free_shipping_subtotal>
+                <method_economy_all_specificerrmsg>This shipping method is currently unavailable.</method_economy_all_specificerrmsg>
+                <method_economy_all_showmethod>0</method_economy_all_showmethod>
 
-                <method_economy_cod_active>0</method_economy_cod_active>
-                <method_economy_cod_title>DHL Parcel</method_economy_cod_title>
-                <method_economy_cod_method_name>DHL Parcel Economy - Cash on Delivery</method_economy_cod_method_name>
-                <method_economy_cod_pricing_type>fixed</method_economy_cod_pricing_type>
-                <method_economy_cod_price>14.00</method_economy_cod_price>
-                <method_economy_cod_point_delivery_mode>map</method_economy_cod_point_delivery_mode>
-                <method_economy_cod_point_map_type>all</method_economy_cod_point_map_type>
-                <method_economy_cod_sallowspecific>1</method_economy_cod_sallowspecific>
-                <method_economy_cod_specificcountry>PL</method_economy_cod_specificcountry>
-                <method_economy_cod_sort_order>55</method_economy_cod_sort_order>
-                <method_economy_cod_free_shipping_enable>0</method_economy_cod_free_shipping_enable>
-                <method_economy_cod_free_shipping_subtotal>0.00</method_economy_cod_free_shipping_subtotal>
-                <method_economy_cod_specificerrmsg>This shipping method is currently unavailable.</method_economy_cod_specificerrmsg>
-                <method_economy_cod_showmethod>0</method_economy_cod_showmethod>
+                <method_economy_all_cod_active>0</method_economy_all_cod_active>
+                <method_economy_all_cod_title>DHL Parcel</method_economy_all_cod_title>
+                <method_economy_all_cod_method_name>DHL Parcel Economy - Punkty i Automaty - płatność przy odbiorze</method_economy_all_cod_method_name>
+                <method_economy_all_cod_pricing_type>fixed</method_economy_all_cod_pricing_type>
+                <method_economy_all_cod_price>14.00</method_economy_all_cod_price>
+                <method_economy_all_cod_point_delivery_mode>map</method_economy_all_cod_point_delivery_mode>
+                <method_economy_all_cod_sallowspecific>1</method_economy_all_cod_sallowspecific>
+                <method_economy_all_cod_specificcountry>PL</method_economy_all_cod_specificcountry>
+                <method_economy_all_cod_sort_order>55</method_economy_all_cod_sort_order>
+                <method_economy_all_cod_free_shipping_enable>0</method_economy_all_cod_free_shipping_enable>
+                <method_economy_all_cod_free_shipping_subtotal>0.00</method_economy_all_cod_free_shipping_subtotal>
+                <method_economy_all_cod_specificerrmsg>This shipping method is currently unavailable.</method_economy_all_cod_specificerrmsg>
+                <method_economy_all_showmethod>0</method_economy_all_showmethod>
+
+                <method_economy_pop_active>0</method_economy_pop_active>
+                <method_economy_pop_title>DHL Parcel</method_economy_pop_title>
+                <method_economy_pop_method_name>DHL Parcel Economy - Punkty</method_economy_pop_method_name>
+                <method_economy_pop_pricing_type>fixed</method_economy_pop_pricing_type>
+                <method_economy_pop_price>14.00</method_economy_pop_price>
+                <method_economy_pop_sallowspecific>1</method_economy_pop_sallowspecific>
+                <method_economy_pop_specificcountry>PL</method_economy_pop_specificcountry>
+                <method_economy_pop_sort_order>56</method_economy_pop_sort_order>
+                <method_economy_pop_free_shipping_enable>0</method_economy_pop_free_shipping_enable>
+                <method_economy_pop_free_shipping_subtotal>0.00</method_economy_pop_free_shipping_subtotal>
+                <method_economy_pop_specificerrmsg>This shipping method is currently unavailable.</method_economy_pop_specificerrmsg>
+                <method_economy_pop_showmethod>0</method_economy_pop_showmethod>
+
+                <method_economy_pop_cod_active>0</method_economy_pop_cod_active>
+                <method_economy_pop_cod_title>DHL Parcel</method_economy_pop_cod_title>
+                <method_economy_pop_cod_method_name>DHL Parcel Economy - Punkty - płatność przy odbiorze</method_economy_pop_cod_method_name>
+                <method_economy_pop_cod_pricing_type>fixed</method_economy_pop_cod_pricing_type>
+                <method_economy_pop_cod_price>14.00</method_economy_pop_cod_price>
+                <method_economy_pop_cod_sallowspecific>1</method_economy_pop_cod_sallowspecific>
+                <method_economy_pop_cod_specificcountry>PL</method_economy_pop_cod_specificcountry>
+                <method_economy_pop_cod_sort_order>57</method_economy_pop_cod_sort_order>
+                <method_economy_pop_cod_free_shipping_enable>0</method_economy_pop_cod_free_shipping_enable>
+                <method_economy_pop_cod_free_shipping_subtotal>0.00</method_economy_pop_cod_free_shipping_subtotal>
+                <method_economy_pop_cod_specificerrmsg>This shipping method is currently unavailable.</method_economy_pop_cod_specificerrmsg>
+                <method_economy_pop_cod_showmethod>0</method_economy_pop_cod_showmethod>
+
+                <method_economy_box_active>0</method_economy_box_active>
+                <method_economy_box_title>DHL Parcel</method_economy_box_title>
+                <method_economy_box_method_name>DHL Parcel Economy - Automaty</method_economy_box_method_name>
+                <method_economy_box_pricing_type>fixed</method_economy_box_pricing_type>
+                <method_economy_box_price>14.00</method_economy_box_price>
+                <method_economy_box_sallowspecific>1</method_economy_box_sallowspecific>
+                <method_economy_box_specificcountry>PL</method_economy_box_specificcountry>
+                <method_economy_box_sort_order>58</method_economy_box_sort_order>
+                <method_economy_box_free_shipping_enable>0</method_economy_box_free_shipping_enable>
+                <method_economy_box_free_shipping_subtotal>0.00</method_economy_box_free_shipping_subtotal>
+                <method_economy_box_specificerrmsg>This shipping method is currently unavailable.</method_economy_box_specificerrmsg>
+                <method_economy_box_showmethod>0</method_economy_box_showmethod>
+
+                <method_economy_box_cod_active>0</method_economy_box_cod_active>
+                <method_economy_box_cod_title>DHL Parcel</method_economy_box_cod_title>
+                <method_economy_box_cod_method_name>DHL Parcel Economy - Automaty - płatność przy odbiorze</method_economy_box_cod_method_name>
+                <method_economy_box_cod_pricing_type>fixed</method_economy_box_cod_pricing_type>
+                <method_economy_box_cod_price>14.00</method_economy_box_cod_price>
+                <method_economy_box_cod_sallowspecific>1</method_economy_box_cod_sallowspecific>
+                <method_economy_box_cod_specificcountry>PL</method_economy_box_cod_specificcountry>
+                <method_economy_box_cod_sort_order>59</method_economy_box_cod_sort_order>
+                <method_economy_box_cod_free_shipping_enable>0</method_economy_box_cod_free_shipping_enable>
+                <method_economy_box_cod_free_shipping_subtotal>0.00</method_economy_box_cod_free_shipping_subtotal>
+                <method_economy_box_cod_specificerrmsg>This shipping method is currently unavailable.</method_economy_box_cod_specificerrmsg>
+                <method_economy_box_cod_showmethod>0</method_economy_box_cod_showmethod>
 
                 <method_max_paleta_active>0</method_max_paleta_active>
                 <method_max_paleta_title>DHL Parcel</method_max_paleta_title>
@@ -164,7 +214,7 @@
 
                 <method_max_paleta_cod_active>0</method_max_paleta_cod_active>
                 <method_max_paleta_cod_title>DHL Parcel</method_max_paleta_cod_title>
-                <method_max_paleta_cod_method_name>DHL Parcel Max Paleta - Cash on Delivery</method_max_paleta_cod_method_name>
+                <method_max_paleta_cod_method_name>DHL Parcel Max Paleta - płatność przy odbiorze</method_max_paleta_cod_method_name>
                 <method_max_paleta_cod_pricing_type>fixed</method_max_paleta_cod_pricing_type>
                 <method_max_paleta_cod_price>250.00</method_max_paleta_cod_price>
                 <method_max_paleta_cod_sallowspecific>1</method_max_paleta_cod_sallowspecific>
@@ -190,7 +240,7 @@
 
                 <method_connect_cod_active>0</method_connect_cod_active>
                 <method_connect_cod_title>DHL Parcel</method_connect_cod_title>
-                <method_connect_cod_method_name>DHL Parcel Connect - Cash on Delivery</method_connect_cod_method_name>
+                <method_connect_cod_method_name>DHL Parcel Connect - płatność przy odbiorze</method_connect_cod_method_name>
                 <method_connect_cod_pricing_type>country</method_connect_cod_pricing_type>
                 <method_connect_cod_price>70.00</method_connect_cod_price>
                 <method_connect_cod_sallowspecific>0</method_connect_cod_sallowspecific>
@@ -206,7 +256,6 @@
                 <method_connect_parcelshop_method_name>DHL Parcel Connect Parcelshop</method_connect_parcelshop_method_name>
                 <method_connect_parcelshop_pricing_type>country</method_connect_parcelshop_pricing_type>
                 <method_connect_parcelshop_price>126.00</method_connect_parcelshop_price>
-                <method_connect_parcelshop_point_map_type>pop</method_connect_parcelshop_point_map_type>
                 <method_connect_parcelshop_sallowspecific>0</method_connect_parcelshop_sallowspecific>
                 <method_connect_parcelshop_specificcountry></method_connect_parcelshop_specificcountry>
                 <method_connect_parcelshop_sort_order>110</method_connect_parcelshop_sort_order>
@@ -217,10 +266,9 @@
 
                 <method_connect_parcelshop_cod_active>0</method_connect_parcelshop_cod_active>
                 <method_connect_parcelshop_cod_title>DHL Parcel</method_connect_parcelshop_cod_title>
-                <method_connect_parcelshop_cod_method_name>DHL Parcel Connect Parcelshop - Cash on Delivery</method_connect_parcelshop_cod_method_name>
+                <method_connect_parcelshop_cod_method_name>DHL Parcel Connect Parcelshop - płatność przy odbiorze</method_connect_parcelshop_cod_method_name>
                 <method_connect_parcelshop_cod_pricing_type>country</method_connect_parcelshop_cod_pricing_type>
                 <method_connect_parcelshop_cod_price>126.00</method_connect_parcelshop_cod_price>
-                <method_connect_parcelshop_cod_point_map_type>pop</method_connect_parcelshop_cod_point_map_type>
                 <method_connect_parcelshop_cod_sallowspecific>0</method_connect_parcelshop_cod_sallowspecific>
                 <method_connect_parcelshop_cod_specificcountry></method_connect_parcelshop_cod_specificcountry>
                 <method_connect_parcelshop_cod_sort_order>115</method_connect_parcelshop_cod_sort_order>
@@ -234,7 +282,6 @@
                 <method_connect_packstation_method_name>DHL Parcel Connect Packstation</method_connect_packstation_method_name>
                 <method_connect_packstation_pricing_type>country</method_connect_packstation_pricing_type>
                 <method_connect_packstation_price>126.00</method_connect_packstation_price>
-                <method_connect_packstation_point_map_type>box</method_connect_packstation_point_map_type>
                 <method_connect_packstation_sallowspecific>0</method_connect_packstation_sallowspecific>
                 <method_connect_packstation_specificcountry></method_connect_packstation_specificcountry>
                 <method_connect_packstation_sort_order>115</method_connect_packstation_sort_order>
@@ -245,10 +292,9 @@
 
                 <method_connect_packstation_cod_active>0</method_connect_packstation_cod_active>
                 <method_connect_packstation_cod_title>DHL Parcel</method_connect_packstation_cod_title>
-                <method_connect_packstation_cod_method_name>DHL Parcel Connect Packstation - Cash on Delivery</method_connect_packstation_cod_method_name>
+                <method_connect_packstation_cod_method_name>DHL Parcel Connect Packstation - płatność przy odbiorze</method_connect_packstation_cod_method_name>
                 <method_connect_packstation_cod_pricing_type>country</method_connect_packstation_cod_pricing_type>
                 <method_connect_packstation_cod_price>126.00</method_connect_packstation_cod_price>
-                <method_connect_packstation_cod_point_map_type>box</method_connect_packstation_cod_point_map_type>
                 <method_connect_packstation_cod_sallowspecific>0</method_connect_packstation_cod_sallowspecific>
                 <method_connect_packstation_cod_specificcountry></method_connect_packstation_cod_specificcountry>
                 <method_connect_packstation_cod_sort_order>118</method_connect_packstation_cod_sort_order>
@@ -272,7 +318,7 @@
 
                 <method_connect_plus_cod_active>0</method_connect_plus_cod_active>
                 <method_connect_plus_cod_title>DHL Parcel</method_connect_plus_cod_title>
-                <method_connect_plus_cod_method_name>DHL Parcel Connect Plus - Cash on Delivery</method_connect_plus_cod_method_name>
+                <method_connect_plus_cod_method_name>DHL Parcel Connect Plus - płatność przy odbiorze</method_connect_plus_cod_method_name>
                 <method_connect_plus_cod_pricing_type>country</method_connect_plus_cod_pricing_type>
                 <method_connect_plus_cod_price>70.00</method_connect_plus_cod_price>
                 <method_connect_plus_cod_sallowspecific>0</method_connect_plus_cod_sallowspecific>
@@ -298,7 +344,7 @@
 
                 <method_connect_pallet_cod_active>0</method_connect_pallet_cod_active>
                 <method_connect_pallet_cod_title>DHL Parcel</method_connect_pallet_cod_title>
-                <method_connect_pallet_cod_method_name>DHL Parcel Connect Pallet - Paleta - Cash on Delivery</method_connect_pallet_cod_method_name>
+                <method_connect_pallet_cod_method_name>DHL Parcel Connect Pallet - Paleta - płatność przy odbiorze</method_connect_pallet_cod_method_name>
                 <method_connect_pallet_cod_pricing_type>country</method_connect_pallet_cod_pricing_type>
                 <method_connect_pallet_cod_price>614.00</method_connect_pallet_cod_price>
                 <method_connect_pallet_cod_sallowspecific>0</method_connect_pallet_cod_sallowspecific>

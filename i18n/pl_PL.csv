@@ -435,9 +435,10 @@ Sort Order,Kolejność sortowania
 DHL Parcel Premium,DHL Parcel Premium
 DHL Parcel 9,DHL Parcel 9
 DHL Parcel 12,DHL Parcel 12
-DHL Parcel Economy,DHL Parcel Economy
+"DHL Parcel Economy - Points and Lockers","DHL Parcel Economy - Punkty i Automaty"
+"DHL Parcel Economy - Points","DHL Parcel Economy - Punkty"
+"DHL Parcel Economy - Lockers","DHL Parcel Economy - Automaty"
 Point Delivery Mode,Tryb dostawy do punktu
-Map Point Type Filter,Filtr typu punktów na mapie
 DHL Parcel Max Paleta,DHL Parcel Max Paleta
 DHL Parcel Connect,DHL Parcel Connect
 DHL Parcel Connect Parcelshop,DHL Parcel Connect Parcelshop
@@ -552,7 +553,9 @@ Help,Pomoc
 "DHL Parcel Premium - Cash on Delivery","DHL Parcel Premium - płatność przy odbiorze"
 "DHL Parcel 9 - Cash on Delivery","DHL Parcel 9 - płatność przy odbiorze"
 "DHL Parcel 12 - Cash on Delivery","DHL Parcel 12 - płatność przy odbiorze"
-"DHL Parcel Economy - Cash on Delivery","DHL Parcel Economy - płatność przy odbiorze"
+"DHL Parcel Economy - Points and Lockers - Cash on Delivery","DHL Parcel Economy - Punkty i Automaty - płatność przy odbiorze"
+"DHL Parcel Economy - Points - Cash on Delivery","DHL Parcel Economy - Punkty - płatność przy odbiorze"
+"DHL Parcel Economy - Lockers - Cash on Delivery","DHL Parcel Economy - Automaty - płatność przy odbiorze"
 "DHL Parcel Max Paleta - Cash on Delivery","DHL Parcel Max Paleta - płatność przy odbiorze"
 "DHL Parcel Connect - Cash on Delivery","DHL Parcel Connect - płatność przy odbiorze"
 "DHL Parcel Connect Parcelshop - Cash on Delivery","DHL Parcel Connect Parcelshop - płatność przy odbiorze"

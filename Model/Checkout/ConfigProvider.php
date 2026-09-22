@@ -18,8 +18,7 @@ use Throwable;
 
 class ConfigProvider implements ConfigProviderInterface
 {
-    private const XML_PATH_MAP_TYPE = 'carriers/dhlparcel/method_economy_point_map_type';
-    private const XML_PATH_DELIVERY_MODE = 'carriers/dhlparcel/method_economy_point_delivery_mode';
+    private const XML_PATH_DELIVERY_MODE = 'carriers/dhlparcel/method_economy_all_point_delivery_mode';
     private const XML_PATH_DEBUG = 'carriers/dhlparcel/debug';
     public const DEFAULT_MAP_URL = 'https://parcelshop.dhl.pl/mapa';
 
@@ -42,11 +41,6 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfig(): array
     {
-        $mapType = (string)$this->scopeConfig->getValue(
-            self::XML_PATH_MAP_TYPE,
-            ScopeInterface::SCOPE_STORE
-        ) ?: MapPointType::TYPE_ALL;
-
         $deliveryMode = (string)$this->scopeConfig->getValue(
             self::XML_PATH_DELIVERY_MODE,
             ScopeInterface::SCOPE_STORE
@@ -57,51 +51,52 @@ class ConfigProvider implements ConfigProviderInterface
             ScopeInterface::SCOPE_STORE
         );
 
-        $economyCode = MethodCatalog::METHOD_ECONOMY;
-        $economyPrefixed = Carrier::CODE_PREFIX . $economyCode;
+        $economyAllCode = MethodCatalog::METHOD_ECONOMY_ALL;
+        $economyAllPrefixed = Carrier::CODE_PREFIX . $economyAllCode;
+        $economyAllCodCode = MethodCatalog::METHOD_ECONOMY_ALL_COD;
+        $economyAllCodPrefixed = Carrier::CODE_PREFIX . $economyAllCodCode;
 
-        $economyCodCode = MethodCatalog::METHOD_ECONOMY_COD;
-        $economyCodPrefixed = Carrier::CODE_PREFIX . $economyCodCode;
+        $economyPopCode = MethodCatalog::METHOD_ECONOMY_POP;
+        $economyPopPrefixed = Carrier::CODE_PREFIX . $economyPopCode;
+        $economyPopCodCode = MethodCatalog::METHOD_ECONOMY_POP_COD;
+        $economyPopCodPrefixed = Carrier::CODE_PREFIX . $economyPopCodCode;
+
+        $economyBoxCode = MethodCatalog::METHOD_ECONOMY_BOX;
+        $economyBoxPrefixed = Carrier::CODE_PREFIX . $economyBoxCode;
+        $economyBoxCodCode = MethodCatalog::METHOD_ECONOMY_BOX_COD;
+        $economyBoxCodPrefixed = Carrier::CODE_PREFIX . $economyBoxCodCode;
 
         $connectParcelshopCode = MethodCatalog::METHOD_CONNECT_PARCELSHOP;
         $connectParcelshopPrefixed = Carrier::CODE_PREFIX . $connectParcelshopCode;
-
         $connectParcelshopCodCode = MethodCatalog::METHOD_CONNECT_PARCELSHOP_COD;
         $connectParcelshopCodPrefixed = Carrier::CODE_PREFIX . $connectParcelshopCodCode;
 
         $connectPackstationCode = MethodCatalog::METHOD_CONNECT_PACKSTATION;
         $connectPackstationPrefixed = Carrier::CODE_PREFIX . $connectPackstationCode;
-
         $connectPackstationCodCode = MethodCatalog::METHOD_CONNECT_PACKSTATION_COD;
         $connectPackstationCodPrefixed = Carrier::CODE_PREFIX . $connectPackstationCodCode;
 
         $pointMapTypes = [
-            $economyPrefixed => (string)$this->scopeConfig->getValue(
-                'carriers/dhlparcel/method_economy_point_map_type',
-                ScopeInterface::SCOPE_STORE
-            ) ?: MapPointType::TYPE_ALL,
-            $economyCode => (string)$this->scopeConfig->getValue(
-                'carriers/dhlparcel/method_economy_point_map_type',
-                ScopeInterface::SCOPE_STORE
-            ) ?: MapPointType::TYPE_ALL,
-            $economyCodPrefixed => (string)$this->scopeConfig->getValue(
-                'carriers/dhlparcel/method_economy_cod_point_map_type',
-                ScopeInterface::SCOPE_STORE
-            ) ?: ((string)$this->scopeConfig->getValue(
-                'carriers/dhlparcel/method_economy_point_map_type',
-                ScopeInterface::SCOPE_STORE
-            ) ?: MapPointType::TYPE_ALL),
-            $economyCodCode => (string)$this->scopeConfig->getValue(
-                'carriers/dhlparcel/method_economy_cod_point_map_type',
-                ScopeInterface::SCOPE_STORE
-            ) ?: ((string)$this->scopeConfig->getValue(
-                'carriers/dhlparcel/method_economy_point_map_type',
-                ScopeInterface::SCOPE_STORE
-            ) ?: MapPointType::TYPE_ALL),
+            $economyAllPrefixed => MapPointType::TYPE_ALL,
+            $economyAllCode => MapPointType::TYPE_ALL,
+            $economyAllCodPrefixed => MapPointType::TYPE_ALL,
+            $economyAllCodCode => MapPointType::TYPE_ALL,
+
+            $economyPopPrefixed => MapPointType::TYPE_POP,
+            $economyPopCode => MapPointType::TYPE_POP,
+            $economyPopCodPrefixed => MapPointType::TYPE_POP,
+            $economyPopCodCode => MapPointType::TYPE_POP,
+
+            $economyBoxPrefixed => MapPointType::TYPE_BOX,
+            $economyBoxCode => MapPointType::TYPE_BOX,
+            $economyBoxCodPrefixed => MapPointType::TYPE_BOX,
+            $economyBoxCodCode => MapPointType::TYPE_BOX,
+
             $connectParcelshopPrefixed => MapPointType::TYPE_POP,
             $connectParcelshopCode => MapPointType::TYPE_POP,
             $connectParcelshopCodPrefixed => MapPointType::TYPE_POP,
             $connectParcelshopCodCode => MapPointType::TYPE_POP,
+
             $connectPackstationPrefixed => MapPointType::TYPE_BOX,
             $connectPackstationCode => MapPointType::TYPE_BOX,
             $connectPackstationCodPrefixed => MapPointType::TYPE_BOX,
@@ -112,14 +107,18 @@ class ConfigProvider implements ConfigProviderInterface
             'shipping' => [
                 'dhlparcel' => [
                     'mapUrl' => self::DEFAULT_MAP_URL,
-                    'pointMapType' => $mapType,
+                    'pointMapType' => MapPointType::TYPE_ALL,
                     'pointMapTypes' => $pointMapTypes,
                     'deliveryMode' => $deliveryMode,
                     'debug' => $debug,
                     'selectedPoint' => $this->getQuoteSelectedPoint(),
                     'logos' => [
-                        $economyPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box_pop.png'),
-                        $economyCodPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box_pop.png'),
+                        $economyAllPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box_pop.png'),
+                        $economyAllCodPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box_pop.png'),
+                        $economyPopPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_pop.png'),
+                        $economyPopCodPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_pop.png'),
+                        $economyBoxPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box.png'),
+                        $economyBoxCodPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box.png'),
                         $connectParcelshopPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
                         $connectParcelshopCodPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
                         $connectPackstationPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
@@ -127,8 +126,12 @@ class ConfigProvider implements ConfigProviderInterface
                         'default' => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
                     ],
                     'pointMethods' => [
-                        $economyPrefixed,
-                        $economyCodPrefixed,
+                        $economyAllPrefixed,
+                        $economyAllCodPrefixed,
+                        $economyPopPrefixed,
+                        $economyPopCodPrefixed,
+                        $economyBoxPrefixed,
+                        $economyBoxCodPrefixed,
                         $connectParcelshopPrefixed,
                         $connectParcelshopCodPrefixed,
                         $connectPackstationPrefixed,

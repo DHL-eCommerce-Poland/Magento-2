@@ -214,8 +214,12 @@ define([
             var fullCode = carrierCode + '_' + methodCode;
             var config = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) || {};
             var pointMethods = config.pointMethods || [
-                methodCodes.FULL_ECONOMY,
-                methodCodes.FULL_ECONOMY_COD,
+                methodCodes.FULL_ECONOMY_ALL,
+                methodCodes.FULL_ECONOMY_ALL_COD,
+                methodCodes.FULL_ECONOMY_POP,
+                methodCodes.FULL_ECONOMY_POP_COD,
+                methodCodes.FULL_ECONOMY_BOX,
+                methodCodes.FULL_ECONOMY_BOX_COD,
                 methodCodes.FULL_CONNECT_PARCELSHOP,
                 methodCodes.FULL_CONNECT_PARCELSHOP_COD,
                 methodCodes.FULL_CONNECT_PACKSTATION,
@@ -224,8 +228,12 @@ define([
 
             return pointMethods.indexOf(fullCode) !== -1 || pointMethods.indexOf(methodCode) !== -1 ||
                 (carrierCode === methodCodes.CARRIER_CODE && [
-                    methodCodes.METHOD_ECONOMY,
-                    methodCodes.METHOD_ECONOMY_COD,
+                    methodCodes.METHOD_ECONOMY_ALL,
+                    methodCodes.METHOD_ECONOMY_ALL_COD,
+                    methodCodes.METHOD_ECONOMY_POP,
+                    methodCodes.METHOD_ECONOMY_POP_COD,
+                    methodCodes.METHOD_ECONOMY_BOX,
+                    methodCodes.METHOD_ECONOMY_BOX_COD,
                     methodCodes.METHOD_CONNECT_PARCELSHOP,
                     methodCodes.METHOD_CONNECT_PARCELSHOP_COD,
                     methodCodes.METHOD_CONNECT_PACKSTATION,
@@ -246,7 +254,7 @@ define([
             }
             var methodCode = method.method_code || method.methodCode || '';
             var config = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) || {};
-            return (methodCode === methodCodes.METHOD_ECONOMY || methodCode === methodCodes.FULL_ECONOMY) && config.deliveryMode === 'nearest';
+            return (methodCode === methodCodes.METHOD_ECONOMY_ALL || methodCode === methodCodes.FULL_ECONOMY_ALL) && config.deliveryMode === 'nearest';
         },
 
         /**

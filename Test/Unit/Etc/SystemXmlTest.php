@@ -71,8 +71,12 @@ class SystemXmlTest extends TestCase
             'parcel_9_cod' => 'parcel_9_cod',
             'parcel_12' => 'parcel_12',
             'parcel_12_cod' => 'parcel_12_cod',
-            'economy' => 'economy',
-            'economy_cod' => 'economy_cod',
+            'economy_all' => 'economy_all',
+            'economy_all_cod' => 'economy_all_cod',
+            'economy_pop' => 'economy_pop',
+            'economy_pop_cod' => 'economy_pop_cod',
+            'economy_box' => 'economy_box',
+            'economy_box_cod' => 'economy_box_cod',
             'max_paleta' => 'max_paleta',
             'max_paleta_cod' => 'max_paleta_cod',
             'connect' => 'connect',
@@ -117,29 +121,32 @@ class SystemXmlTest extends TestCase
             }
         }
 
-        $economyGroup = $xml->xpath(
-            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="economy"]'
+        $oldEconomyXpath = '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="economy"]';
+        self::assertCount(0, $xml->xpath($oldEconomyXpath));
+        $oldEconomyCodXpath = '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="economy_cod"]';
+        self::assertCount(0, $xml->xpath($oldEconomyCodXpath));
+
+        $economyAllGroup = $xml->xpath(
+            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="economy_all"]'
         );
-        self::assertCount(1, $economyGroup);
-        self::assertCount(1, $economyGroup[0]->xpath('./field[@id="point_delivery_mode"]'));
-        self::assertCount(1, $economyGroup[0]->xpath('./field[@id="point_map_type"]'));
+        self::assertCount(1, $economyAllGroup);
+        self::assertCount(1, $economyAllGroup[0]->xpath('./field[@id="point_delivery_mode"]'));
+
+        self::assertCount(0, $xml->xpath('//field[@id="point_map_type"]'));
 
         $connectGroup = $xml->xpath(
             '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="connect"]'
         );
         self::assertCount(1, $connectGroup);
-        self::assertCount(0, $connectGroup[0]->xpath('./field[@id="point_map_type"]'));
 
         $connectParcelShopGroup = $xml->xpath(
             '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="connect_parcelshop"]'
         );
         self::assertCount(1, $connectParcelShopGroup);
-        self::assertCount(0, $connectParcelShopGroup[0]->xpath('./field[@id="point_map_type"]'));
 
         $connectPackstationGroup = $xml->xpath(
             '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="connect_packstation"]'
         );
         self::assertCount(1, $connectPackstationGroup);
-        self::assertCount(0, $connectPackstationGroup[0]->xpath('./field[@id="point_map_type"]'));
     }
 }

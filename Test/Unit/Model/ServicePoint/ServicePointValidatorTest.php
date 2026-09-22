@@ -38,7 +38,7 @@ class ServicePointValidatorTest extends TestCase
 
         $validator = new ServicePointValidator($scopeConfigStub);
         $this->expectNotToPerformAssertions();
-        $validator->validate(Carrier::CODE, 'economy', null);
+        $validator->validate(Carrier::CODE, 'economy_all', null);
     }
 
     public function testValidationThrowsExceptionWhenPointMissingForMapMode(): void
@@ -51,7 +51,33 @@ class ServicePointValidatorTest extends TestCase
         $this->expectException(LocalizedException::class);
         $this->expectExceptionMessage('Please select a DHL pickup point on the map.');
 
-        $validator->validate(Carrier::CODE, 'economy', null);
+        $validator->validate(Carrier::CODE, 'economy_all', null);
+    }
+
+    public function testValidationThrowsExceptionWhenPointMissingForBoxMode(): void
+    {
+        $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+        $scopeConfigStub->method('getValue')->willReturn('map');
+
+        $validator = new ServicePointValidator($scopeConfigStub);
+
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('Please select a DHL pickup point on the map.');
+
+        $validator->validate(Carrier::CODE, 'economy_box', null);
+    }
+
+    public function testValidationThrowsExceptionWhenPointMissingForPopMode(): void
+    {
+        $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+        $scopeConfigStub->method('getValue')->willReturn('map');
+
+        $validator = new ServicePointValidator($scopeConfigStub);
+
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('Please select a DHL pickup point on the map.');
+
+        $validator->validate(Carrier::CODE, 'economy_pop', null);
     }
 
     public function testValidationThrowsExceptionWhenPointInvalid(): void
@@ -65,7 +91,7 @@ class ServicePointValidatorTest extends TestCase
         $this->expectException(LocalizedException::class);
         $this->expectExceptionMessage('Please select a DHL pickup point on the map.');
 
-        $validator->validate(Carrier::CODE, 'economy', $invalidPoint);
+        $validator->validate(Carrier::CODE, 'economy_all', $invalidPoint);
     }
 
     public function testValidationPassesWhenValidPointProvided(): void
@@ -77,7 +103,9 @@ class ServicePointValidatorTest extends TestCase
         $validPoint = new ServicePointValueObject('SAP123', 'Żabka');
 
         $this->expectNotToPerformAssertions();
-        $validator->validate(Carrier::CODE, 'economy', $validPoint);
+        $validator->validate(Carrier::CODE, 'economy_all', $validPoint);
+        $validator->validate(Carrier::CODE, 'economy_box', $validPoint);
+        $validator->validate(Carrier::CODE, 'economy_pop', $validPoint);
     }
 
     public function testValidationThrowsExceptionForGermanPackstationWithoutPostnummer(): void

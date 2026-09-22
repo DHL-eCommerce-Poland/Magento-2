@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Plugin\Checkout;
 
+use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\ServicePoint\ServicePointValidator;
 use Ideo\Dhl\Plugin\Checkout\SaveServicePointToQuoteAddress;
 use Magento\Checkout\Api\Data\ShippingInformationInterface;
@@ -48,7 +49,7 @@ class SaveServicePointToQuoteAddressTest extends TestCase
 
         $informationStub->method('getShippingAddress')->willReturn($addressMock);
         $informationStub->method('getShippingCarrierCode')->willReturn('dhlparcel');
-        $informationStub->method('getShippingMethodCode')->willReturn('economy');
+        $informationStub->method('getShippingMethodCode')->willReturn(MethodCatalog::METHOD_ECONOMY_ALL);
 
         $result = $plugin->beforeSaveAddressInformation($managementStub, 1, $informationStub);
 
