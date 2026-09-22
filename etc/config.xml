@@ -230,8 +230,8 @@
                 <method_connect_method_name>DHL Parcel Connect</method_connect_method_name>
                 <method_connect_pricing_type>country</method_connect_pricing_type>
                 <method_connect_price>70.00</method_connect_price>
-                <method_connect_sallowspecific>0</method_connect_sallowspecific>
-                <method_connect_specificcountry></method_connect_specificcountry>
+                <method_connect_sallowspecific>1</method_connect_sallowspecific>
+                <method_connect_specificcountry>AT,BE,BG,CY,CZ,DE,DK,EE,ES,FI,FR,GB,GR,HR,HU,IE,IT,LT,LU,LV,MC,MT,NL,PT,RO,SE,SI,SK</method_connect_specificcountry>
                 <method_connect_sort_order>100</method_connect_sort_order>
                 <method_connect_free_shipping_enable>0</method_connect_free_shipping_enable>
                 <method_connect_free_shipping_subtotal>0.00</method_connect_free_shipping_subtotal>
@@ -243,8 +243,8 @@
                 <method_connect_cod_method_name>DHL Parcel Connect - płatność przy odbiorze</method_connect_cod_method_name>
                 <method_connect_cod_pricing_type>country</method_connect_cod_pricing_type>
                 <method_connect_cod_price>70.00</method_connect_cod_price>
-                <method_connect_cod_sallowspecific>0</method_connect_cod_sallowspecific>
-                <method_connect_cod_specificcountry></method_connect_cod_specificcountry>
+                <method_connect_cod_sallowspecific>1</method_connect_cod_sallowspecific>
+                <method_connect_cod_specificcountry>AT,BE,BG,CY,CZ,DE,DK,EE,ES,FI,FR,GB,GR,HR,HU,IE,IT,LT,LU,LV,MC,MT,NL,PT,RO,SE,SI,SK</method_connect_cod_specificcountry>
                 <method_connect_cod_sort_order>105</method_connect_cod_sort_order>
                 <method_connect_cod_free_shipping_enable>0</method_connect_cod_free_shipping_enable>
                 <method_connect_cod_free_shipping_subtotal>0.00</method_connect_cod_free_shipping_subtotal>
@@ -256,8 +256,8 @@
                 <method_connect_parcelshop_method_name>DHL Parcel Connect Parcelshop</method_connect_parcelshop_method_name>
                 <method_connect_parcelshop_pricing_type>country</method_connect_parcelshop_pricing_type>
                 <method_connect_parcelshop_price>126.00</method_connect_parcelshop_price>
-                <method_connect_parcelshop_sallowspecific>0</method_connect_parcelshop_sallowspecific>
-                <method_connect_parcelshop_specificcountry></method_connect_parcelshop_specificcountry>
+                <method_connect_parcelshop_sallowspecific>1</method_connect_parcelshop_sallowspecific>
+                <method_connect_parcelshop_specificcountry>DE</method_connect_parcelshop_specificcountry>
                 <method_connect_parcelshop_sort_order>110</method_connect_parcelshop_sort_order>
                 <method_connect_parcelshop_free_shipping_enable>0</method_connect_parcelshop_free_shipping_enable>
                 <method_connect_parcelshop_free_shipping_subtotal>0.00</method_connect_parcelshop_free_shipping_subtotal>
@@ -269,8 +269,8 @@
                 <method_connect_parcelshop_cod_method_name>DHL Parcel Connect Parcelshop - płatność przy odbiorze</method_connect_parcelshop_cod_method_name>
                 <method_connect_parcelshop_cod_pricing_type>country</method_connect_parcelshop_cod_pricing_type>
                 <method_connect_parcelshop_cod_price>126.00</method_connect_parcelshop_cod_price>
-                <method_connect_parcelshop_cod_sallowspecific>0</method_connect_parcelshop_cod_sallowspecific>
-                <method_connect_parcelshop_cod_specificcountry></method_connect_parcelshop_cod_specificcountry>
+                <method_connect_parcelshop_cod_sallowspecific>1</method_connect_parcelshop_cod_sallowspecific>
+                <method_connect_parcelshop_cod_specificcountry>DE</method_connect_parcelshop_cod_specificcountry>
                 <method_connect_parcelshop_cod_sort_order>115</method_connect_parcelshop_cod_sort_order>
                 <method_connect_parcelshop_cod_free_shipping_enable>0</method_connect_parcelshop_cod_free_shipping_enable>
                 <method_connect_parcelshop_cod_free_shipping_subtotal>0.00</method_connect_parcelshop_cod_free_shipping_subtotal>
@@ -282,8 +282,8 @@
                 <method_connect_packstation_method_name>DHL Parcel Connect Packstation</method_connect_packstation_method_name>
                 <method_connect_packstation_pricing_type>country</method_connect_packstation_pricing_type>
                 <method_connect_packstation_price>126.00</method_connect_packstation_price>
-                <method_connect_packstation_sallowspecific>0</method_connect_packstation_sallowspecific>
-                <method_connect_packstation_specificcountry></method_connect_packstation_specificcountry>
+                <method_connect_packstation_sallowspecific>1</method_connect_packstation_sallowspecific>
+                <method_connect_packstation_specificcountry>DE</method_connect_packstation_specificcountry>
                 <method_connect_packstation_sort_order>115</method_connect_packstation_sort_order>
                 <method_connect_packstation_free_shipping_enable>0</method_connect_packstation_free_shipping_enable>
                 <method_connect_packstation_free_shipping_subtotal>0.00</method_connect_packstation_free_shipping_subtotal>
@@ -295,8 +295,8 @@
                 <method_connect_packstation_cod_method_name>DHL Parcel Connect Packstation - płatność przy odbiorze</method_connect_packstation_cod_method_name>
                 <method_connect_packstation_cod_pricing_type>country</method_connect_packstation_cod_pricing_type>
                 <method_connect_packstation_cod_price>126.00</method_connect_packstation_cod_price>
-                <method_connect_packstation_cod_sallowspecific>0</method_connect_packstation_cod_sallowspecific>
-                <method_connect_packstation_cod_specificcountry></method_connect_packstation_cod_specificcountry>
+                <method_connect_packstation_cod_sallowspecific>1</method_connect_packstation_cod_sallowspecific>
+                <method_connect_packstation_cod_specificcountry>DE</method_connect_packstation_cod_specificcountry>
                 <method_connect_packstation_cod_sort_order>118</method_connect_packstation_cod_sort_order>
                 <method_connect_packstation_cod_free_shipping_enable>0</method_connect_packstation_cod_free_shipping_enable>
                 <method_connect_packstation_cod_free_shipping_subtotal>0.00</method_connect_packstation_cod_free_shipping_subtotal>
@@ -308,8 +308,8 @@
                 <method_connect_plus_method_name>DHL Parcel Connect Plus</method_connect_plus_method_name>
                 <method_connect_plus_pricing_type>country</method_connect_plus_pricing_type>
                 <method_connect_plus_price>70.00</method_connect_plus_price>
-                <method_connect_plus_sallowspecific>0</method_connect_plus_sallowspecific>
-                <method_connect_plus_specificcountry></method_connect_plus_specificcountry>
+                <method_connect_plus_sallowspecific>1</method_connect_plus_sallowspecific>
+                <method_connect_plus_specificcountry>DE</method_connect_plus_specificcountry>
                 <method_connect_plus_sort_order>120</method_connect_plus_sort_order>
                 <method_connect_plus_free_shipping_enable>0</method_connect_plus_free_shipping_enable>
                 <method_connect_plus_free_shipping_subtotal>0.00</method_connect_plus_free_shipping_subtotal>
@@ -321,8 +321,8 @@
                 <method_connect_plus_cod_method_name>DHL Parcel Connect Plus - płatność przy odbiorze</method_connect_plus_cod_method_name>
                 <method_connect_plus_cod_pricing_type>country</method_connect_plus_cod_pricing_type>
                 <method_connect_plus_cod_price>70.00</method_connect_plus_cod_price>
-                <method_connect_plus_cod_sallowspecific>0</method_connect_plus_cod_sallowspecific>
-                <method_connect_plus_cod_specificcountry></method_connect_plus_cod_specificcountry>
+                <method_connect_plus_cod_sallowspecific>1</method_connect_plus_cod_sallowspecific>
+                <method_connect_plus_cod_specificcountry>DE</method_connect_plus_cod_specificcountry>
                 <method_connect_plus_cod_sort_order>125</method_connect_plus_cod_sort_order>
                 <method_connect_plus_cod_free_shipping_enable>0</method_connect_plus_cod_free_shipping_enable>
                 <method_connect_plus_cod_free_shipping_subtotal>0.00</method_connect_plus_cod_free_shipping_subtotal>
@@ -334,8 +334,8 @@
                 <method_connect_pallet_method_name>DHL Parcel Connect Pallet - Paleta</method_connect_pallet_method_name>
                 <method_connect_pallet_pricing_type>country</method_connect_pallet_pricing_type>
                 <method_connect_pallet_price>614.00</method_connect_pallet_price>
-                <method_connect_pallet_sallowspecific>0</method_connect_pallet_sallowspecific>
-                <method_connect_pallet_specificcountry></method_connect_pallet_specificcountry>
+                <method_connect_pallet_sallowspecific>1</method_connect_pallet_sallowspecific>
+                <method_connect_pallet_specificcountry>CZ,DE</method_connect_pallet_specificcountry>
                 <method_connect_pallet_sort_order>150</method_connect_pallet_sort_order>
                 <method_connect_pallet_free_shipping_enable>0</method_connect_pallet_free_shipping_enable>
                 <method_connect_pallet_free_shipping_subtotal>0.00</method_connect_pallet_free_shipping_subtotal>
@@ -347,8 +347,8 @@
                 <method_connect_pallet_cod_method_name>DHL Parcel Connect Pallet - Paleta - płatność przy odbiorze</method_connect_pallet_cod_method_name>
                 <method_connect_pallet_cod_pricing_type>country</method_connect_pallet_cod_pricing_type>
                 <method_connect_pallet_cod_price>614.00</method_connect_pallet_cod_price>
-                <method_connect_pallet_cod_sallowspecific>0</method_connect_pallet_cod_sallowspecific>
-                <method_connect_pallet_cod_specificcountry></method_connect_pallet_cod_specificcountry>
+                <method_connect_pallet_cod_sallowspecific>1</method_connect_pallet_cod_sallowspecific>
+                <method_connect_pallet_cod_specificcountry>CZ,DE</method_connect_pallet_cod_specificcountry>
                 <method_connect_pallet_cod_sort_order>155</method_connect_pallet_cod_sort_order>
                 <method_connect_pallet_cod_free_shipping_enable>0</method_connect_pallet_cod_free_shipping_enable>
                 <method_connect_pallet_cod_free_shipping_subtotal>0.00</method_connect_pallet_cod_free_shipping_subtotal>
