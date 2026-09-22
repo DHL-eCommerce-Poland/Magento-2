@@ -23,8 +23,6 @@ class ServicePointValidator
         MethodCatalog::METHOD_ECONOMY_POP_COD,
         MethodCatalog::METHOD_ECONOMY_BOX,
         MethodCatalog::METHOD_ECONOMY_BOX_COD,
-        MethodCatalog::METHOD_CONNECT,
-        MethodCatalog::METHOD_CONNECT_COD,
         MethodCatalog::METHOD_CONNECT_PARCELSHOP,
         MethodCatalog::METHOD_CONNECT_PARCELSHOP_COD,
         MethodCatalog::METHOD_CONNECT_PACKSTATION,
@@ -46,9 +44,8 @@ class ServicePointValidator
      * @param string|null $methodCode
      * @param ServicePointValueObject|null $servicePoint
      *
-     * @throws LocalizedException
-     *
      * @return void
+     * @throws LocalizedException
      */
     public function validate(
         ?string $carrierCode,

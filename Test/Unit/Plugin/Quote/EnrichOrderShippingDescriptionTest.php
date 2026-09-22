@@ -91,4 +91,24 @@ class EnrichOrderShippingDescriptionTest extends TestCase
 
         $this->assertSame($orderMock, $result);
     }
+
+    public function testAfterConvertLeavesDescriptionUntouchedForConnectMethod(): void
+    {
+        $toOrderStub = $this->createStub(ToOrder::class);
+        $orderMock = $this->createMock(Order::class);
+        $quoteAddressStub = $this->createStub(QuoteAddress::class);
+
+        $quoteAddressStub->method('getData')->willReturnCallback(
+            static fn (string $key) => match ($key) {
+                'shipping_method' => 'dhlparcel_connect',
+                default => null,
+            }
+        );
+
+        $orderMock->expects($this->never())->method('setShippingDescription');
+
+        $result = $this->plugin->afterConvert($toOrderStub, $orderMock, $quoteAddressStub);
+
+        $this->assertSame($orderMock, $result);
+    }
 }

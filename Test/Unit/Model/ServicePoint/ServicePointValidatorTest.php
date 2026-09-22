@@ -130,7 +130,7 @@ class ServicePointValidatorTest extends TestCase
             'German Customer Number (Postnummer) is required for delivery to a German Packstation.'
         );
 
-        $validator->validate(Carrier::CODE, 'connect', $point);
+        $validator->validate(Carrier::CODE, 'connect_packstation', $point);
     }
 
     public function testValidationThrowsExceptionForInvalidPostnummerFormat(): void
@@ -155,7 +155,7 @@ class ServicePointValidatorTest extends TestCase
             'Invalid German Customer Number (Postnummer). It must contain between 6 and 10 digits.'
         );
 
-        $validator->validate(Carrier::CODE, 'connect', $point);
+        $validator->validate(Carrier::CODE, 'connect_packstation', $point);
     }
 
     public function testValidationPassesForGermanPackstationWithValidPostnummer(): void
@@ -176,7 +176,7 @@ class ServicePointValidatorTest extends TestCase
         );
 
         $this->expectNotToPerformAssertions();
-        $validator->validate(Carrier::CODE, 'connect', $point);
+        $validator->validate(Carrier::CODE, 'connect_packstation', $point);
     }
 
     public function testValidationThrowsExceptionForConnectPackstationMethodWithoutPostnummer(): void
@@ -202,5 +202,43 @@ class ServicePointValidatorTest extends TestCase
         );
 
         $validator->validate(Carrier::CODE, 'connect_packstation', $point);
+    }
+
+    public function testValidationPassesForConnectMethodWithoutServicePoint(): void
+    {
+        $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+        $validator = new ServicePointValidator($scopeConfigStub);
+
+        $this->expectNotToPerformAssertions();
+        $validator->validate(Carrier::CODE, 'connect', null);
+        $validator->validate(Carrier::CODE, 'connect_cod', null);
+        $validator->validate(Carrier::CODE, 'dhlparcel_connect', null);
+        $validator->validate(Carrier::CODE, 'dhlparcel_connect_cod', null);
+    }
+
+    public function testIsPointSelectionRequiredReturnsFalseForConnectDoorToDoor(): void
+    {
+        $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+        $validator = new ServicePointValidator($scopeConfigStub);
+
+        $this->assertFalse($validator->isPointSelectionRequired(Carrier::CODE, 'connect'));
+        $this->assertFalse($validator->isPointSelectionRequired(Carrier::CODE, 'connect_cod'));
+        $this->assertFalse($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect'));
+        $this->assertFalse($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_cod'));
+    }
+
+    public function testIsPointSelectionRequiredReturnsTrueForConnectPointMethods(): void
+    {
+        $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+        $validator = new ServicePointValidator($scopeConfigStub);
+
+        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'connect_parcelshop'));
+        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'connect_parcelshop_cod'));
+        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'connect_packstation'));
+        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'connect_packstation_cod'));
+        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_parcelshop'));
+        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_parcelshop_cod'));
+        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_packstation'));
+        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_packstation_cod'));
     }
 }
