@@ -99,12 +99,6 @@
                 <label translate="true">Currency</label>
             </settings>
         </column>
-        <column name="default_tariff_code">
-            <settings>
-                <filter>text</filter>
-                <label translate="true">Default HS Tariff Code</label>
-            </settings>
-        </column>
         <column name="country_of_origin" component="Magento_Ui/js/grid/columns/select">
             <settings>
                 <options class="Magento\Directory\Model\Config\Source\Country"/>

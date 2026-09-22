@@ -269,9 +269,9 @@ Return of Goods (21),Zwrot towarów (21)
 Gift (31),Prezent (31)
 "Patterns and Samples (32)","Wzory, próbki (32)"
 Documents (91),Dokumenty (91)
-Simplified Clearance (U),Odprawa uproszczona (U)
-Individual Clearance (I),Odprawa indywidualna (I)
-Short Declaration - IE/UK (S),Krótka deklaracja - IE/UK (S)
+Simplified Clearance (U),Uproszczona (U)
+Individual Clearance (I),Indywidualna (I)
+Short Declaration - IE/UK (S),Skrócona (S)
 DHL Shipment,Przesyłka DHL
 No Customs Clearance configuration found for international shipment. Please configure default Customs.,Nie znaleziono konfiguracji odprawy celnej dla przesyłki międzynarodowej. Prosimy skonfigurować domyślną odprawę celną.
 A VAT Invoice PDF file is required for individual customs clearance (I). Please upload invoice in Customs Template.,Plik PDF z fakturą VAT jest wymagany dla odprawy celnej indywidualnej (I). Prosimy przesłać fakturę w szablonie odprawy celnej.
