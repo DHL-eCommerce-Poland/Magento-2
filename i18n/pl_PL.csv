@@ -567,3 +567,4 @@ Help,Pomoc
 "International Shipments","Przesyłki międzynarodowe"
 "International Shipments - Cash on Delivery","Przesyłki międzynarodowe - płatność przy odbiorze"
 "Only templates matching the shipping method selected by the customer when placing the order are displayed.","Wyświetlane są tylko szablony pasujące do metody dostawy wybranej przez klienta przy składaniu zamówienia."
+"Currency ""%1"" is not allowed for customs clearance type ""%2"". Allowed currencies: %3.","Waluta ""%1"" nie jest dozwolona dla typu odprawy celnej ""%2"". Dostępne waluty: %3."

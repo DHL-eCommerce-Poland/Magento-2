@@ -7,12 +7,12 @@ namespace Ideo\Dhl\Controller\Adminhtml\CustomsTemplate;
 use Exception;
 use Ideo\Dhl\Model\CustomsTemplateFactory;
 use Ideo\Dhl\Model\CustomsTemplateRepository;
+use Ideo\Dhl\Model\Source\CustomsCurrency;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\LocalizedException;
-
 use Magento\Framework\Serialize\SerializerInterface;
 
 class Save extends Action implements HttpPostActionInterface
@@ -24,12 +24,14 @@ class Save extends Action implements HttpPostActionInterface
      * @param CustomsTemplateRepository $repository
      * @param CustomsTemplateFactory $templateFactory
      * @param SerializerInterface $serializer
+     * @param CustomsCurrency $customsCurrency
      */
     public function __construct(
         Context $context,
         private readonly CustomsTemplateRepository $repository,
         private readonly CustomsTemplateFactory $templateFactory,
-        private readonly SerializerInterface $serializer
+        private readonly SerializerInterface $serializer,
+        private readonly CustomsCurrency $customsCurrency
     ) {
         parent::__construct($context);
     }
@@ -55,6 +57,21 @@ class Save extends Action implements HttpPostActionInterface
                 $template = $this->repository->getById($id);
             } else {
                 $template = $this->templateFactory->create();
+            }
+
+            if (!empty($data['customs_type']) && !empty($data['currency'])) {
+                $customsType = (string)$data['customs_type'];
+                $currency = (string)$data['currency'];
+                if (!$this->customsCurrency->isCurrencyAllowed($customsType, $currency)) {
+                    throw new LocalizedException(
+                        __(
+                            'Currency "%1" is not allowed for customs clearance type "%2". Allowed currencies: %3.',
+                            $data['currency'],
+                            $data['customs_type'],
+                            implode(', ', $this->customsCurrency->getCurrenciesForType((string)$data['customs_type']))
+                        )
+                    );
+                }
             }
 
             if (isset($data['customs_items']) && is_array($data['customs_items'])) {

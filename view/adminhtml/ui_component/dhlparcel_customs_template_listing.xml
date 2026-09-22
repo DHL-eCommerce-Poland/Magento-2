@@ -93,7 +93,7 @@
         </column>
         <column name="currency" component="Magento_Ui/js/grid/columns/select">
             <settings>
-                <options class="Magento\Config\Model\Config\Source\Locale\Currency\All"/>
+                <options class="Ideo\Dhl\Model\Source\CustomsCurrency"/>
                 <filter>select</filter>
                 <dataType>select</dataType>
                 <label translate="true">Currency</label>

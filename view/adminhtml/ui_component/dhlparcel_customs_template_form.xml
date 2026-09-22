@@ -84,6 +84,11 @@
             </formElements>
         </field>
         <field name="customs_type" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">U</item>
+                </item>
+            </argument>
             <settings>
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
@@ -158,7 +163,7 @@
                 </select>
             </formElements>
         </field>
-        <field name="currency" formElement="select">
+        <field name="currency" formElement="select" component="Ideo_Dhl/js/form/element/customs-currency">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="string">PLN</item>
@@ -170,13 +175,12 @@
                 </validation>
                 <dataType>text</dataType>
                 <label translate="true">Currency</label>
-                <notice translate="true">ISO currency code (e.g. PLN, EUR, GBP, USD, CHF)</notice>
                 <dataScope>currency</dataScope>
             </settings>
             <formElements>
                 <select>
                     <settings>
-                        <options class="Magento\Config\Model\Config\Source\Locale\Currency\All"/>
+                        <options class="Ideo\Dhl\Model\Source\CustomsCurrency"/>
                     </settings>
                 </select>
             </formElements>
