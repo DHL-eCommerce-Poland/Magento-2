@@ -163,6 +163,16 @@ class CustomsDataBuilder
         if (is_string($templateItems) && !empty($templateItems)) {
             $decoded = $this->serializer->unserialize($templateItems);
             if (is_array($decoded) && !empty($decoded)) {
+                if (isset($decoded['customs_items']) && is_array($decoded['customs_items'])) {
+                    $decoded = $decoded['customs_items'];
+                } elseif (count($decoded) === 1
+                    && isset($decoded[0])
+                    && is_array($decoded[0])
+                    && !isset($decoded[0]['nameEn'])
+                    && !isset($decoded[0]['namePl'])
+                ) {
+                    $decoded = $decoded[0];
+                }
                 $defaultTariffCode = (string)($template->getDefaultTariffCode() ?? '');
                 $countryOfOrigin = (string)($template->getCountryOfOrigin() ?: 'PL');
 

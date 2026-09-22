@@ -324,4 +324,57 @@ class CustomsDataBuilderTest extends TestCase
         $this->assertSame('DEFAULT123', $customsData['customsItem'][1]['tariffCode']);
         $this->assertSame('PL', $customsData['customsItem'][1]['countryOfOrigin']);
     }
+
+    public function testBuildCustomsDataHandlesNestedCustomsItems(): void
+    {
+        $templateRepositoryMock = $this->createMock(CustomsTemplateRepository::class);
+        $serializer = new Json();
+        $fileDriver = $this->createStub(FileDriver::class);
+
+        $templateMock = $this->createStub(CustomsTemplate::class);
+        $templateMock->method('getCustomsType')->willReturn(CustomsType::TYPE_SIMPLIFIED);
+        $templateMock->method('getCostsOfShipment')->willReturn(10.0);
+        $templateMock->method('getCurrency')->willReturn('PLN');
+        $templateMock->method('getCategoryOfItem')->willReturn('11');
+        $templateMock->method('getCountryOfOrigin')->willReturn('PL');
+        $templateMock->method('getDefaultTariffCode')->willReturn('DEFAULT123');
+        $templateMock->method('getGrossWeight')->willReturn(1.0);
+        $templateMock->method('getContactFirstName')->willReturn('Jan');
+        $templateMock->method('getContactLastName')->willReturn('Kowalski');
+        $templateMock->method('getShipperEori')->willReturn('PL123');
+        $templateMock->method('getShipperNip')->willReturn('123');
+        $templateMock->method('getShipperVatNo')->willReturn('PL123');
+
+        $nestedItems = [
+            [
+                [
+                    'nameEn' => 'Phone',
+                    'namePl' => 'Telefon',
+                    'quantity' => 1.0,
+                    'weight' => 1.0,
+                    'value' => 100.0,
+                    'tariffCode' => '123456',
+                    'countryOfOrigin' => 'PL',
+                ],
+            ],
+        ];
+        $templateMock->method('getCustomsItems')->willReturn(json_encode($nestedItems));
+
+        $templateRepositoryMock->expects($this->once())
+            ->method('getById')
+            ->with(6)
+            ->willReturn($templateMock);
+
+        $builder = new CustomsDataBuilder(
+            $templateRepositoryMock,
+            $serializer,
+            $fileDriver
+        );
+
+        $customsData = $builder->buildCustomsData(6);
+
+        $this->assertCount(1, $customsData['customsItem']);
+        $this->assertSame('Phone', $customsData['customsItem'][0]['nameEn']);
+        $this->assertSame('Telefon', $customsData['customsItem'][0]['namePl']);
+    }
 }

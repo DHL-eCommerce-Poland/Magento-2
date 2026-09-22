@@ -20,9 +20,11 @@ class SaveAndContinue extends Generic implements ButtonProviderInterface
             'class' => 'save',
             'data_attribute' => [
                 'mage-init' => [
-                    'button' => ['event' => 'saveAndContinueEdit'],
+                    'button' => ['event' => 'saveAndContinue'],
                 ],
+                'form-role' => 'saveAndContinue',
             ],
+            'on_click' => '',
             'sort_order' => 80,
         ];
     }

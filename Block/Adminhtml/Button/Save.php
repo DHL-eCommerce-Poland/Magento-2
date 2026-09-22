@@ -22,6 +22,7 @@ class Save extends Generic implements ButtonProviderInterface
                 'mage-init' => ['button' => ['event' => 'save']],
                 'form-role' => 'save',
             ],
+            'on_click' => '',
             'sort_order' => 90,
         ];
     }

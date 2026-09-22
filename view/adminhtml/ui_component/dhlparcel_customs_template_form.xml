@@ -225,7 +225,7 @@
         </field>
     </fieldset>
 
-    <fieldset name="individual_customs">
+    <fieldset name="individual_customs" component="Ideo_Dhl/js/form/components/individual-customs">
         <settings>
             <label translate="true">Data for Individual Clearance</label>
             <collapsible>true</collapsible>
@@ -254,9 +254,6 @@
         </field>
         <field name="receiver_eori" formElement="input">
             <settings>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
-                </validation>
                 <dataType>text</dataType>
                 <label translate="true">Receiver EORI Number</label>
                 <dataScope>receiver_eori</dataScope>
@@ -264,9 +261,6 @@
         </field>
         <field name="invoice_date" formElement="date">
             <settings>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
-                </validation>
                 <dataType>text</dataType>
                 <label translate="true">Date of invoice</label>
                 <dataScope>invoice_date</dataScope>
@@ -284,9 +278,6 @@
         </field>
         <field name="invoice_file" formElement="fileUploader">
             <settings>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
-                </validation>
                 <dataType>string</dataType>
                 <label translate="true">VAT Invoice</label>
                 <notice translate="true">Allowed file extensions: .pdf (max 10 MB)</notice>
@@ -463,7 +454,6 @@
                 <addButtonLabel translate="true">Add Goods Item</addButtonLabel>
                 <label translate="true">Goods List</label>
                 <componentType>dynamicRows</componentType>
-                <dataScope>customs_items</dataScope>
                 <dndConfig>
                     <param name="enabled" xsi:type="boolean">false</param>
                 </dndConfig>

@@ -50,7 +50,10 @@ class Save extends Action implements HttpPostActionInterface
             return $resultRedirect->setPath('*/*/index');
         }
 
-        $id = (int)$this->getRequest()->getParam('entity_id');
+        $id = (int)($this->getRequest()->getParam('entity_id') ?: ($data['entity_id'] ?? 0));
+        if (empty($data['entity_id'])) {
+            unset($data['entity_id']);
+        }
 
         try {
             if ($id) {
@@ -75,7 +78,18 @@ class Save extends Action implements HttpPostActionInterface
             }
 
             if (isset($data['customs_items']) && is_array($data['customs_items'])) {
-                $data['customs_items'] = $this->serializer->serialize(array_values($data['customs_items']));
+                $items = $data['customs_items'];
+                if (isset($items['customs_items']) && is_array($items['customs_items'])) {
+                    $items = $items['customs_items'];
+                } elseif (count($items) === 1
+                    && isset($items[0])
+                    && is_array($items[0])
+                    && !isset($items[0]['nameEn'])
+                    && !isset($items[0]['namePl'])
+                ) {
+                    $items = $items[0];
+                }
+                $data['customs_items'] = $this->serializer->serialize(array_values($items));
             }
 
             if (isset($data['invoice_file']) && is_array($data['invoice_file'])) {

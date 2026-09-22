@@ -57,6 +57,16 @@ class DataProvider extends AbstractDataProvider
             if (!empty($data['customs_items']) && is_string($data['customs_items'])) {
                 $decoded = $this->serializer->unserialize($data['customs_items']);
                 if (is_array($decoded)) {
+                    if (isset($decoded['customs_items']) && is_array($decoded['customs_items'])) {
+                        $decoded = $decoded['customs_items'];
+                    } elseif (count($decoded) === 1
+                        && isset($decoded[0])
+                        && is_array($decoded[0])
+                        && !isset($decoded[0]['nameEn'])
+                        && !isset($decoded[0]['namePl'])
+                    ) {
+                        $decoded = $decoded[0];
+                    }
                     $data['customs_items'] = array_values($decoded);
                 }
             }

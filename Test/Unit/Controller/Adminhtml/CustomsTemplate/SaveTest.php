@@ -22,15 +22,54 @@ use PHPUnit\Framework\TestCase;
 
 class SaveTest extends TestCase
 {
+    /**
+     * @var Context
+     */
     private Context $context;
-    private CustomsTemplateRepository&MockObject $repository;
-    private CustomsTemplateFactory&MockObject $templateFactory;
+
+    /**
+     * @var CustomsTemplateRepository&MockObject
+     */
+    private $repository;
+
+    /**
+     * @var CustomsTemplateFactory&MockObject
+     */
+    private $templateFactory;
+
+    /**
+     * @var SerializerInterface
+     */
     private SerializerInterface $serializer;
+
+    /**
+     * @var CustomsCurrency
+     */
     private CustomsCurrency $customsCurrency;
+
+    /**
+     * @var HttpRequest
+     */
     private HttpRequest $request;
+
+    /**
+     * @var RedirectFactory
+     */
     private RedirectFactory $resultRedirectFactory;
-    private Redirect&MockObject $resultRedirect;
-    private ManagerInterface&MockObject $messageManager;
+
+    /**
+     * @var Redirect&MockObject
+     */
+    private $resultRedirect;
+
+    /**
+     * @var ManagerInterface&MockObject
+     */
+    private $messageManager;
+
+    /**
+     * @var Save
+     */
     private Save $controller;
 
     protected function setUp(): void
@@ -39,6 +78,7 @@ class SaveTest extends TestCase
         $this->repository = $this->createMock(CustomsTemplateRepository::class);
         $this->templateFactory = $this->createMock(CustomsTemplateFactory::class);
         $this->serializer = $this->createStub(SerializerInterface::class);
+        $this->serializer->method('serialize')->willReturnCallback(fn($val) => json_encode($val));
         $localeLists = $this->createStub(ListsInterface::class);
         $this->customsCurrency = new CustomsCurrency($localeLists);
         $this->request = $this->createStub(HttpRequest::class);
@@ -79,6 +119,13 @@ class SaveTest extends TestCase
     public function testExecuteSuccessWithValidCurrency(): void
     {
         $postData = [
+            'entity_id' => '',
+            'template_name' => 'Individual Clearance Template',
+            'customs_type' => CustomsType::TYPE_INDIVIDUAL,
+            'currency' => 'EUR',
+        ];
+
+        $expectedData = [
             'template_name' => 'Individual Clearance Template',
             'customs_type' => CustomsType::TYPE_INDIVIDUAL,
             'currency' => 'EUR',
@@ -86,11 +133,94 @@ class SaveTest extends TestCase
 
         $this->request->method('getPostValue')->willReturn($postData);
         $this->request->method('getParam')->willReturnMap([
-            ['entity_id', null, 0],
+            ['entity_id', null, null],
             ['back', null, null],
         ]);
 
         $template = $this->createMock(CustomsTemplate::class);
+        $this->templateFactory->expects($this->once())
+            ->method('create')
+            ->willReturn($template);
+
+        $template->expects($this->once())
+            ->method('addData')
+            ->with($expectedData);
+
+        $this->repository->expects($this->once())
+            ->method('save')
+            ->with($template);
+
+        $this->messageManager->expects($this->once())
+            ->method('addSuccessMessage');
+
+        $this->resultRedirect->expects($this->once())
+            ->method('setPath')
+            ->with('*/*/index')
+            ->willReturnSelf();
+
+        $result = $this->controller->execute();
+        $this->assertSame($this->resultRedirect, $result);
+    }
+
+    public function testExecuteUpdatesExistingTemplateWhenEntityIdProvided(): void
+    {
+        $postData = [
+            'entity_id' => '10',
+            'template_name' => 'Updated Template',
+            'customs_type' => CustomsType::TYPE_SIMPLIFIED,
+            'currency' => 'PLN',
+        ];
+
+        $this->request->method('getPostValue')->willReturn($postData);
+        $this->request->method('getParam')->willReturnMap([
+            ['entity_id', null, null],
+            ['back', null, null],
+        ]);
+
+        $template = $this->createMock(CustomsTemplate::class);
+        $this->templateFactory->expects($this->never())->method('create');
+        $this->repository->expects($this->once())
+            ->method('getById')
+            ->with(10)
+            ->willReturn($template);
+
+        $template->expects($this->once())
+            ->method('addData')
+            ->with($postData);
+
+        $this->repository->expects($this->once())
+            ->method('save')
+            ->with($template);
+
+        $this->messageManager->expects($this->once())
+            ->method('addSuccessMessage');
+
+        $this->resultRedirect->expects($this->once())
+            ->method('setPath')
+            ->with('*/*/index')
+            ->willReturnSelf();
+
+        $result = $this->controller->execute();
+        $this->assertSame($this->resultRedirect, $result);
+    }
+
+    public function testExecuteSuccessWithBackParamRedirectsToEdit(): void
+    {
+        $postData = [
+            'template_name' => 'Template Save And Continue',
+            'customs_type' => CustomsType::TYPE_SIMPLIFIED,
+            'currency' => 'PLN',
+        ];
+
+        $this->request->method('getPostValue')->willReturn($postData);
+        $this->request->method('getParam')->willReturnMap([
+            ['entity_id', null, 0],
+            ['back', null, 'edit'],
+        ]);
+
+        $template = $this->createMock(CustomsTemplate::class);
+        $template->method('getId')->willReturn('42');
+
         $this->templateFactory->expects($this->once())
             ->method('create')
             ->willReturn($template);
@@ -108,7 +238,7 @@ class SaveTest extends TestCase
 
         $this->resultRedirect->expects($this->once())
             ->method('setPath')
-            ->with('*/*/index')
+            ->with('*/*/edit', ['entity_id' => '42'])
             ->willReturnSelf();
 
         $result = $this->controller->execute();
@@ -147,6 +277,53 @@ class SaveTest extends TestCase
         $this->resultRedirect->expects($this->once())
             ->method('setPath')
             ->with('*/*/new')
+            ->willReturnSelf();
+
+        $result = $this->controller->execute();
+        $this->assertSame($this->resultRedirect, $result);
+    }
+
+    public function testExecuteFlattensNestedCustomsItemsBeforeSaving(): void
+    {
+        $postData = [
+            'template_name' => 'Template with nested items',
+            'customs_type' => CustomsType::TYPE_SIMPLIFIED,
+            'currency' => 'EUR',
+            'customs_items' => [
+                'customs_items' => [
+                    ['nameEn' => 'Phone', 'namePl' => 'Telefon'],
+                ],
+            ],
+        ];
+
+        $this->request->method('getPostValue')->willReturn($postData);
+        $this->request->method('getParam')->willReturnMap([
+            ['entity_id', null, 0],
+            ['back', null, null],
+        ]);
+
+        $template = $this->createMock(CustomsTemplate::class);
+        $this->templateFactory->expects($this->once())
+            ->method('create')
+            ->willReturn($template);
+
+        $template->expects($this->once())
+            ->method('addData')
+            ->with($this->callback(function (array $data) {
+                return isset($data['customs_items'])
+                    && $data['customs_items'] === json_encode([['nameEn' => 'Phone', 'namePl' => 'Telefon']]);
+            }));
+
+        $this->repository->expects($this->once())
+            ->method('save')
+            ->with($template);
+
+        $this->messageManager->expects($this->once())
+            ->method('addSuccessMessage');
+
+        $this->resultRedirect->expects($this->once())
+            ->method('setPath')
+            ->with('*/*/index')
             ->willReturnSelf();
 
         $result = $this->controller->execute();
