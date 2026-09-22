@@ -90,6 +90,22 @@ class ShipmentSettingsDataTest extends TestCase
     }
 
     /**
+     * Test that explicitly passing empty packages array retains empty packages list.
+     *
+     * @return void
+     */
+    public function testEmptyPackagesExplicitlyPassedRetainsEmptyPackages(): void
+    {
+        $settings = new ShipmentSettingsData(
+            serviceType: 'AH',
+            packages: []
+        );
+
+        $this->assertCount(0, $settings->getPackages());
+        $this->assertSame([], $settings->toArray()['packages']);
+    }
+
+    /**
      * Test array serialization and deserialization via toArray and fromArray with multi-package rows.
      *
      * @return void

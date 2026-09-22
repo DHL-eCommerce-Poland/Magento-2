@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment\Data;
 
-use Ideo\Dhl\Model\MethodCatalog;
-
 class ShipmentSettingsData
 {
     /** @var PackageData[] */
@@ -37,7 +35,7 @@ class ShipmentSettingsData
      * @param int|null $returnBookCourier
      * @param int|null $dropOffPointId
      * @param string|null $addressType
-     * @param PackageData[] $packages
+     * @param PackageData[]|null $packages
      */
     public function __construct(
         private string $serviceType = '',
@@ -65,9 +63,9 @@ class ShipmentSettingsData
         private ?int $returnBookCourier = null,
         private ?int $dropOffPointId = null,
         private ?string $addressType = 'N',
-        array $packages = []
+        ?array $packages = null
     ) {
-        if (!empty($packages)) {
+        if ($packages !== null) {
             foreach ($packages as $pkg) {
                 if ($pkg instanceof PackageData) {
                     $this->packages[] = $pkg;
@@ -75,9 +73,7 @@ class ShipmentSettingsData
                     $this->packages[] = PackageData::fromArray($pkg);
                 }
             }
-        }
-
-        if (empty($this->packages)) {
+        } elseif (empty($this->packages)) {
             $this->packages[] = new PackageData(
                 packageType: $this->packageType,
                 quantity: $this->packageQuantity,
@@ -188,7 +184,7 @@ class ShipmentSettingsData
      */
     public function getPackageType(): string
     {
-        return $this->packages[0]->getPackageType();
+        return !empty($this->packages) ? $this->packages[0]->getPackageType() : $this->packageType;
     }
 
     /**
@@ -198,7 +194,7 @@ class ShipmentSettingsData
      */
     public function getWeight(): float
     {
-        return $this->packages[0]->getWeight();
+        return !empty($this->packages) ? $this->packages[0]->getWeight() : $this->weight;
     }
 
     /**
@@ -208,7 +204,7 @@ class ShipmentSettingsData
      */
     public function getWidth(): ?float
     {
-        return $this->packages[0]->getWidth();
+        return !empty($this->packages) ? $this->packages[0]->getWidth() : $this->width;
     }
 
     /**
@@ -218,7 +214,7 @@ class ShipmentSettingsData
      */
     public function getHeight(): ?float
     {
-        return $this->packages[0]->getHeight();
+        return !empty($this->packages) ? $this->packages[0]->getHeight() : $this->height;
     }
 
     /**
@@ -228,7 +224,7 @@ class ShipmentSettingsData
      */
     public function getLength(): ?float
     {
-        return $this->packages[0]->getLength();
+        return !empty($this->packages) ? $this->packages[0]->getLength() : $this->length;
     }
 
     /**
@@ -238,11 +234,14 @@ class ShipmentSettingsData
      */
     public function getPackageQuantity(): int
     {
+        if (empty($this->packages)) {
+            return $this->packageQuantity;
+        }
         $totalQty = 0;
         foreach ($this->packages as $pkg) {
             $totalQty += $pkg->getQuantity();
         }
-        return max(1, $totalQty);
+        return $totalQty;
     }
 
     /**
@@ -262,7 +261,7 @@ class ShipmentSettingsData
      */
     public function isNonStandard(): bool
     {
-        return $this->packages[0]->isNonStandard();
+        return !empty($this->packages) ? $this->packages[0]->isNonStandard() : $this->isNonStandard;
     }
 
     /**
@@ -272,7 +271,7 @@ class ShipmentSettingsData
      */
     public function hasEuroReturn(): bool
     {
-        return $this->packages[0]->hasEuroReturn();
+        return !empty($this->packages) ? $this->packages[0]->hasEuroReturn() : $this->hasEuroReturn;
     }
 
     /**

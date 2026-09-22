@@ -278,4 +278,29 @@ class OrderToShipmentDataMapperTest extends TestCase
         $this->assertSame(2, $packages[1]->getQuantity());
         $this->assertSame(5.0, $packages[1]->getWeight());
     }
+
+    public function testMapWithoutTemplatePackagesReturnsEmptyPackagesList(): void
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getStreet')->willReturn(['Main St 1']);
+        $address->method('getCity')->willReturn('Warszawa');
+        $address->method('getPostcode')->willReturn('00-001');
+
+        $payment = $this->createStub(Payment::class);
+        $payment->method('getMethod')->willReturn('checkmo');
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getEntityId')->willReturn(107);
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska');
+        $order->method('getPayment')->willReturn($payment);
+        $order->method('getItems')->willReturn([]);
+        $order->method('getGrandTotal')->willReturn(100.00);
+
+        $shipmentData = $this->mapper->map($order);
+        $packages = $shipmentData->getShipmentSettings()->getPackages();
+
+        $this->assertCount(0, $packages);
+    }
 }

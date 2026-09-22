@@ -335,19 +335,6 @@ class OrderToShipmentDataMapper
             }
         }
 
-        if (empty($packagesList)) {
-            $packagesList[] = new PackageData(
-                packageType: 'PACKAGE',
-                quantity: 1,
-                weight: (float)number_format($finalWeight, 4, '.', ''),
-                width: null,
-                length: null,
-                height: null,
-                isNonStandard: false,
-                hasEuroReturn: false
-            );
-        }
-
         // 7. Shipment Settings Data
         $sWidth = isset($defaultShipmentDefaults['width']) && $defaultShipmentDefaults['width'] !== null
             ? (float)$defaultShipmentDefaults['width']

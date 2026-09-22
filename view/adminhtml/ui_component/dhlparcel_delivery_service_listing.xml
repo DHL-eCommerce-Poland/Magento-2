@@ -83,20 +83,6 @@
                 <label translate="true">Associated Shipping Method</label>
             </settings>
         </column>
-        <column name="package_type" component="Magento_Ui/js/grid/columns/select">
-            <settings>
-                <options class="Ideo\Dhl\Model\Config\Source\PackageType"/>
-                <filter>select</filter>
-                <dataType>select</dataType>
-                <label translate="true">Shipment Type</label>
-            </settings>
-        </column>
-        <column name="weight">
-            <settings>
-                <filter>text</filter>
-                <label translate="true">Weight (kg)</label>
-            </settings>
-        </column>
         <column name="auto_create_return_shipment" component="Magento_Ui/js/grid/columns/select">
             <settings>
                 <options class="Magento\Config\Model\Config\Source\Yesno"/>

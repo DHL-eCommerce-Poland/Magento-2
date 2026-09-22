@@ -129,8 +129,8 @@ define([
 
         return {
             packageType: pkgTypeObs,
-            quantity: ko.observable(p.quantity !== undefined ? p.quantity : 1),
-            weight: ko.observable(formatDecimal4(p.weight !== undefined && p.weight !== null && p.weight !== '' ? p.weight : 1.0)),
+            quantity: ko.observable(p.quantity !== undefined && p.quantity !== null && p.quantity !== '' ? p.quantity : ''),
+            weight: ko.observable(formatDecimal4(p.weight)),
             width: ko.observable(formatDecimal4(p.width)),
             length: ko.observable(formatDecimal4(p.length)),
             height: ko.observable(formatDecimal4(p.height)),
@@ -222,8 +222,8 @@ define([
         shipmentSettingsObj.addPackageRow = function () {
             shipmentSettingsObj.packages.push(createPackageObservable({
                 packageType: 'PACKAGE',
-                quantity: 1,
-                weight: '1.0000',
+                quantity: '',
+                weight: '',
                 width: '',
                 length: '',
                 height: '',
