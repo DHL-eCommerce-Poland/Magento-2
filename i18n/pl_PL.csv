@@ -563,5 +563,4 @@ Help,Pomoc
 "Domestic Shipments - Cash on Delivery","Przesyłki krajowe - płatność przy odbiorze"
 "International Shipments","Przesyłki międzynarodowe"
 "International Shipments - Cash on Delivery","Przesyłki międzynarodowe - płatność przy odbiorze"
-
-
+"Only templates matching the shipping method selected by the customer when placing the order are displayed.","Wyświetlane są tylko szablony pasujące do metody dostawy wybranej przez klienta przy składaniu zamówienia."

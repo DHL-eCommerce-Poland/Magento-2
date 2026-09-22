@@ -12,8 +12,8 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
@@ -36,7 +36,7 @@ class PrepareTest extends TestCase
         $this->context->method('getRequest')->willReturn($this->request);
 
         $this->orderRepository = $this->createStub(OrderRepositoryInterface::class);
-        $this->templateManager = $this->createStub(TemplateManager::class);
+        $this->templateManager = $this->createMock(TemplateManager::class);
         $this->jsonFactory = $this->createStub(JsonFactory::class);
         $this->jsonResult = $this->createMock(Json::class);
         $this->jsonFactory->method('create')->willReturn($this->jsonResult);
@@ -87,15 +87,25 @@ class PrepareTest extends TestCase
             ->with(102)
             ->willReturn(false);
 
-        $order = $this->createStub(OrderInterface::class);
+        $order = $this->createStub(Order::class);
+        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska');
         $this->orderRepository->method('get')->willReturn($order);
+
+        $this->templateManager->expects($this->once())
+            ->method('getShipmentTemplatesOptions')
+            ->with('dhlparcel_parcel_polska')
+            ->willReturn([['value' => 1, 'label' => 'Template Polska']]);
 
         $shipmentData = new DhlShipmentData(orderId: 102);
         $this->shipmentDataService->method('prepareShipmentData')->willReturn($shipmentData);
 
         $this->jsonResult->expects($this->once())
             ->method('setData')
-            ->with(self::callback(fn ($data) => is_array($data) && ($data['success'] ?? false) === true))
+            ->with(self::callback(function ($data) {
+                return is_array($data)
+                    && ($data['success'] ?? false) === true
+                    && ($data['shipmentTemplates'] ?? []) === [['value' => 1, 'label' => 'Template Polska']];
+            }))
             ->willReturnSelf();
 
         $result = $this->controller->execute();

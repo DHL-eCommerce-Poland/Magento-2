@@ -7,6 +7,7 @@ namespace Ideo\Dhl\Model\Template;
 use Exception;
 use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
+use Ideo\Dhl\Model\Carrier;
 use Ideo\Dhl\Model\Config\Source\AddressType as AddressTypeSource;
 use Ideo\Dhl\Model\Config\Source\ContentSource;
 use Ideo\Dhl\Model\Config\Source\LabelType as LabelTypeSource;
@@ -98,6 +99,48 @@ class TemplateManager
     }
 
     /**
+     * Check if a delivery service template matches the given shipping method.
+     *
+     * @param string $templateMethodCodes
+     * @param string $shippingMethod
+     *
+     * @return bool
+     */
+    public function isMethodMatching(string $templateMethodCodes, string $shippingMethod): bool
+    {
+        $orderMethod = $this->normalizeMethodCode($shippingMethod);
+        if ($orderMethod === '') {
+            return false;
+        }
+
+        $templateCodes = array_filter(array_map('trim', explode(',', $templateMethodCodes)));
+        foreach ($templateCodes as $code) {
+            if ($this->normalizeMethodCode($code) === $orderMethod) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Normalize shipping method code by stripping carrier prefix and trimming.
+     *
+     * @param string $methodCode
+     *
+     * @return string
+     */
+    private function normalizeMethodCode(string $methodCode): string
+    {
+        $clean = strtolower(trim($methodCode));
+        if (str_starts_with($clean, Carrier::CODE_PREFIX)) {
+            $clean = substr($clean, strlen(Carrier::CODE_PREFIX));
+        }
+
+        return $clean;
+    }
+
+    /**
      * Get matching DeliveryService ID for an order based on its shipping method.
      *
      * Returns the FIRST matching DeliveryService template ID.
@@ -115,14 +158,8 @@ class TemplateManager
 
         $collection = $this->deliveryServiceCollectionFactory->create();
         foreach ($collection as $item) {
-            $methodCodes = array_filter(array_map('trim', explode(',', (string)$item->getMethodCode())));
-            foreach ($methodCodes as $code) {
-                if ($code === $shippingMethod
-                    || str_contains($shippingMethod, $code)
-                    || str_contains($code, $shippingMethod)
-                ) {
-                    return (int)$item->getEntityId();
-                }
+            if ($this->isMethodMatching((string)$item->getMethodCode(), $shippingMethod)) {
+                return (int)$item->getEntityId();
             }
         }
 
@@ -271,16 +308,22 @@ class TemplateManager
     }
 
     /**
-     * Get list of shipment templates options.
+     * Get list of shipment templates options, optionally filtered by order shipping method.
+     *
+     * @param string|null $shippingMethod
      *
      * @return array
      */
-    public function getShipmentTemplatesOptions(): array
+    public function getShipmentTemplatesOptions(?string $shippingMethod = null): array
     {
         $collection = $this->deliveryServiceCollectionFactory->create();
         $options = [];
 
         foreach ($collection as $item) {
+            if ($shippingMethod !== null && !$this->isMethodMatching((string)$item->getMethodCode(), $shippingMethod)) {
+                continue;
+            }
+
             $defaultLabel = $item->getMethodCode() ?: (string)__('Template #%1', $item->getEntityId());
             $label = $item->getTemplateName() ?: $defaultLabel;
             $options[] = [

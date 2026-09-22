@@ -79,8 +79,9 @@ class Prepare extends Action
                 $presetShipmentId
             );
 
+            $shippingMethod = (string)($order->getShippingMethod() ?? '');
             $senderTemplates = $this->templateManager->getSenderTemplatesOptions();
-            $shipmentTemplates = $this->templateManager->getShipmentTemplatesOptions();
+            $shipmentTemplates = $this->templateManager->getShipmentTemplatesOptions($shippingMethod);
             $defaultDropOffPointId = $this->templateManager->getDefaultDropOffPointId();
             $defaultDeliveryServiceId = $this->templateManager->getMatchingDeliveryServiceIdForOrder($order);
 

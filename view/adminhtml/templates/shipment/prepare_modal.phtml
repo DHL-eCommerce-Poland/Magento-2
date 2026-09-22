@@ -178,6 +178,9 @@ $dateFormat = $viewModel->getDateFormat();
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Delivery Service Template')) ?></span></label>
                             <div class="admin__field-control">
                                 <select class="admin__control-select" data-bind="options: $parent.shipmentTemplates, optionsText: 'label', optionsValue: 'value', value: selectedDeliveryServiceId, optionsCaption: '<?= $escaper->escapeHtmlAttr(__('Select Template...')) ?>', event: { change: function(d, e) { $parent.onShipmentTemplateChange(null, e); } }"></select>
+                                <div class="admin__field-note">
+                                    <span><?= $escaper->escapeHtml(__('Only templates matching the shipping method selected by the customer when placing the order are displayed.')) ?></span>
+                                </div>
                             </div>
                         </div>
                         <div class="admin__field required">

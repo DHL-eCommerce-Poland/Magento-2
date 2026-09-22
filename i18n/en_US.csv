@@ -563,5 +563,4 @@ Help,Help
 "Domestic Shipments - Cash on Delivery","Domestic Shipments - Cash on Delivery"
 "International Shipments","International Shipments"
 "International Shipments - Cash on Delivery","International Shipments - Cash on Delivery"
-
-
+"Only templates matching the shipping method selected by the customer when placing the order are displayed.","Only templates matching the shipping method selected by the customer when placing the order are displayed."
