@@ -18,13 +18,17 @@ class Delete extends Generic implements ButtonProviderInterface
         $data = [];
         $entityId = $this->getEntityId();
         if ($entityId) {
+            $confirmMessage = $this->escaper->escapeJs(
+                $this->escaper->escapeHtml(__('Are you sure you want to delete this record?'))
+            );
+            $deleteUrl = $this->getUrl('*/*/delete', ['entity_id' => $entityId]);
             $data = [
                 'label' => __('Delete'),
                 'class' => 'delete',
                 'on_click' => sprintf(
-                    "deleteConfirm('%s', '%s')",
-                    __('Are you sure you want to delete this record?'),
-                    $this->getUrl('*/*/delete', ['entity_id' => $entityId])
+                    "deleteConfirm('%s', '%s', {data: {}})",
+                    $confirmMessage,
+                    $deleteUrl
                 ),
                 'sort_order' => 20,
             ];
