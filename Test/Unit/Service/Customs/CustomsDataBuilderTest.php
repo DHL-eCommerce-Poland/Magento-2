@@ -260,4 +260,68 @@ class CustomsDataBuilderTest extends TestCase
         $this->assertSame('11223344', $customsData['customsItem'][0]['tariffCode']);
         $this->assertSame('PL', $customsData['customsItem'][0]['countryOfOrigin']);
     }
+
+    public function testBuildCustomsDataUsesItemLevelTariffCodeAndCountryOfOrigin(): void
+    {
+        $templateRepositoryMock = $this->createMock(CustomsTemplateRepository::class);
+        $serializer = new Json();
+        $fileDriver = $this->createStub(FileDriver::class);
+
+        $templateMock = $this->createStub(CustomsTemplate::class);
+        $templateMock->method('getCustomsType')->willReturn(CustomsType::TYPE_SIMPLIFIED);
+        $templateMock->method('getCostsOfShipment')->willReturn(10.0);
+        $templateMock->method('getCurrency')->willReturn('PLN');
+        $templateMock->method('getCategoryOfItem')->willReturn('11');
+        $templateMock->method('getCountryOfOrigin')->willReturn('PL');
+        $templateMock->method('getDefaultTariffCode')->willReturn('DEFAULT123');
+        $templateMock->method('getGrossWeight')->willReturn(1.0);
+        $templateMock->method('getContactFirstName')->willReturn('Jan');
+        $templateMock->method('getContactLastName')->willReturn('Kowalski');
+        $templateMock->method('getShipperEori')->willReturn('PL123');
+        $templateMock->method('getShipperNip')->willReturn('123');
+        $templateMock->method('getShipperVatNo')->willReturn('PL123');
+
+        $itemsWithCustomCodes = [
+            [
+                'nameEn' => 'Item 1',
+                'namePl' => 'Przedmiot 1',
+                'quantity' => 1.0,
+                'weight' => 0.5,
+                'value' => 20.0,
+                'tariffCode' => 'ITEM_CODE1',
+                'countryOfOrigin' => 'DE',
+            ],
+            [
+                'nameEn' => 'Item 2',
+                'namePl' => 'Przedmiot 2',
+                'quantity' => 2.0,
+                'weight' => 0.5,
+                'value' => 30.0,
+                // tariffCode and countryOfOrigin omitted -> fallback to template
+            ],
+        ];
+        $templateMock->method('getCustomsItems')->willReturn(json_encode($itemsWithCustomCodes));
+
+        $templateRepositoryMock->expects($this->once())
+            ->method('getById')
+            ->with(5)
+            ->willReturn($templateMock);
+
+        $builder = new CustomsDataBuilder(
+            $templateRepositoryMock,
+            $serializer,
+            $fileDriver
+        );
+
+        $customsData = $builder->buildCustomsData(5);
+
+        $this->assertCount(2, $customsData['customsItem']);
+        // Item 1 uses its own tariffCode and countryOfOrigin
+        $this->assertSame('ITEM_CODE1', $customsData['customsItem'][0]['tariffCode']);
+        $this->assertSame('DE', $customsData['customsItem'][0]['countryOfOrigin']);
+
+        // Item 2 falls back to template defaultTariffCode and countryOfOrigin
+        $this->assertSame('DEFAULT123', $customsData['customsItem'][1]['tariffCode']);
+        $this->assertSame('PL', $customsData['customsItem'][1]['countryOfOrigin']);
+    }
 }

@@ -189,7 +189,6 @@
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Country of Origin (ISO 3166-1 alpha-2)</label>
-                <notice translate="true">Default 2-letter ISO country code if not set on product</notice>
                 <dataScope>country_of_origin</dataScope>
             </settings>
             <formElements>
@@ -344,7 +343,7 @@
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
                 <dataType>text</dataType>
-                <label translate="true">Contact First Name</label>
+                <label translate="true">First Name</label>
                 <dataScope>contact_first_name</dataScope>
             </settings>
         </field>
@@ -354,7 +353,7 @@
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
                 <dataType>text</dataType>
-                <label translate="true">Contact Last Name</label>
+                <label translate="true">Last Name</label>
                 <dataScope>contact_last_name</dataScope>
             </settings>
         </field>
@@ -459,12 +458,15 @@
             <collapsible>true</collapsible>
             <opened>true</opened>
         </settings>
-        <dynamicRows name="customs_items">
+        <dynamicRows name="customs_items" component="Ideo_Dhl/js/dynamic-rows/customs-items">
             <settings>
                 <addButtonLabel translate="true">Add Goods Item</addButtonLabel>
                 <label translate="true">Goods List</label>
                 <componentType>dynamicRows</componentType>
                 <dataScope>customs_items</dataScope>
+                <dndConfig>
+                    <param name="enabled" xsi:type="boolean">false</param>
+                </dndConfig>
             </settings>
             <container name="record" component="Magento_Ui/js/dynamic-rows/record">
                 <argument name="data" xsi:type="array">
@@ -476,9 +478,6 @@
                 </argument>
                 <field name="nameEn" formElement="input">
                     <settings>
-                        <validation>
-                            <rule name="required-entry" xsi:type="boolean">true</rule>
-                        </validation>
                         <dataType>text</dataType>
                         <label translate="true">English Name</label>
                         <dataScope>nameEn</dataScope>
@@ -486,9 +485,6 @@
                 </field>
                 <field name="namePl" formElement="input">
                     <settings>
-                        <validation>
-                            <rule name="required-entry" xsi:type="boolean">true</rule>
-                        </validation>
                         <dataType>text</dataType>
                         <label translate="true">Polish Name</label>
                         <dataScope>namePl</dataScope>
@@ -496,11 +492,6 @@
                 </field>
                 <field name="quantity" formElement="input">
                     <settings>
-                        <validation>
-                            <rule name="required-entry" xsi:type="boolean">true</rule>
-                            <rule name="validate-number" xsi:type="boolean">true</rule>
-                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
-                        </validation>
                         <dataType>number</dataType>
                         <label translate="true">Quantity</label>
                         <dataScope>quantity</dataScope>
@@ -508,11 +499,6 @@
                 </field>
                 <field name="weight" formElement="input">
                     <settings>
-                        <validation>
-                            <rule name="required-entry" xsi:type="boolean">true</rule>
-                            <rule name="validate-number" xsi:type="boolean">true</rule>
-                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
-                        </validation>
                         <dataType>number</dataType>
                         <label translate="true">Weight (kg)</label>
                         <dataScope>weight</dataScope>
@@ -520,15 +506,31 @@
                 </field>
                 <field name="value" formElement="input">
                     <settings>
-                        <validation>
-                            <rule name="required-entry" xsi:type="boolean">true</rule>
-                            <rule name="validate-number" xsi:type="boolean">true</rule>
-                            <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
-                        </validation>
                         <dataType>number</dataType>
                         <label translate="true">Value</label>
                         <dataScope>value</dataScope>
                     </settings>
+                </field>
+                <field name="tariffCode" formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Customs Tariff Code</label>
+                        <dataScope>tariffCode</dataScope>
+                    </settings>
+                </field>
+                <field name="countryOfOrigin" formElement="select">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Country Of Origin</label>
+                        <dataScope>countryOfOrigin</dataScope>
+                    </settings>
+                    <formElements>
+                        <select>
+                            <settings>
+                                <options class="Magento\Directory\Model\Config\Source\Country"/>
+                            </settings>
+                        </select>
+                    </formElements>
                 </field>
                 <actionDelete template="Magento_Backend/dynamic-rows/cells/action-delete">
                     <argument name="data" xsi:type="array">

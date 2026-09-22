@@ -568,3 +568,4 @@ Help,Help
 "International Shipments - Cash on Delivery","International Shipments - Cash on Delivery"
 "Only templates matching the shipping method selected by the customer when placing the order are displayed.","Only templates matching the shipping method selected by the customer when placing the order are displayed."
 "Currency ""%1"" is not allowed for customs clearance type ""%2"". Allowed currencies: %3.","Currency ""%1"" is not allowed for customs clearance type ""%2"". Allowed currencies: %3."
+"Customs Tariff Code","Customs Tariff Code"

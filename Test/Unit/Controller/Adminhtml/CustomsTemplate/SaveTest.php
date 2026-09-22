@@ -63,6 +63,10 @@ class SaveTest extends TestCase
     public function testExecuteRedirectsToIndexWhenEmptyData(): void
     {
         $this->request->method('getPostValue')->willReturn([]);
+        $this->templateFactory->expects($this->never())->method('create');
+        $this->repository->expects($this->never())->method('save');
+        $this->messageManager->expects($this->never())->method('addSuccessMessage');
+        $this->messageManager->expects($this->never())->method('addErrorMessage');
         $this->resultRedirect->expects($this->once())
             ->method('setPath')
             ->with('*/*/index')

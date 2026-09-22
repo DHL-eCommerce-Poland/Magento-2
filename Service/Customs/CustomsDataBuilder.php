@@ -168,14 +168,21 @@ class CustomsDataBuilder
 
                 return array_map(
                     function ($item) use ($defaultTariffCode, $countryOfOrigin) {
+                        $itemTariffCode = !empty($item['tariffCode'])
+                            ? (string)$item['tariffCode']
+                            : $defaultTariffCode;
+                        $itemCountryOfOrigin = !empty($item['countryOfOrigin'])
+                            ? (string)$item['countryOfOrigin']
+                            : $countryOfOrigin;
+
                         return [
                             'namePl' => mb_substr((string)($item['namePl'] ?? ''), 0, 35),
                             'nameEn' => mb_substr((string)($item['nameEn'] ?? ''), 0, 35),
                             'quantity' => (float)($item['quantity'] ?? 1.0),
                             'weight' => (float)($item['weight'] ?? 0.0),
                             'value' => (float)($item['value'] ?? 0.0),
-                            'tariffCode' => mb_substr($defaultTariffCode, 0, 10),
-                            'countryOfOrigin' => $countryOfOrigin,
+                            'tariffCode' => mb_substr($itemTariffCode, 0, 10),
+                            'countryOfOrigin' => mb_substr($itemCountryOfOrigin, 0, 35),
                         ];
                     },
                     $decoded
