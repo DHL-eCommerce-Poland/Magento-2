@@ -140,12 +140,17 @@ class Save extends Action implements HttpPostActionInterface
             $rawShipmentId = $this->getRequest()->getParam('preset_shipment_id')
                 ?? ($payload['shipmentSettings']['selectedDeliveryServiceId']
                     ?? $payload['preset_shipment_id'] ?? null);
+            $rawCustomsId = $this->getRequest()->getParam('preset_customs_id')
+                ?? ($payload['customs']['selectedCustomsTemplateId'] ?? $payload['preset_customs_id'] ?? null);
 
             $presetSenderId = (!empty($rawSenderId) && trim((string)$rawSenderId) !== '')
                 ? (string)$rawSenderId
                 : null;
             $presetShipmentId = (!empty($rawShipmentId) && trim((string)$rawShipmentId) !== '')
                 ? (string)$rawShipmentId
+                : null;
+            $presetCustomsId = (!empty($rawCustomsId) && trim((string)$rawCustomsId) !== '')
+                ? (string)$rawCustomsId
                 : null;
 
             // 1. Resolve environment configuration (sandbox vs production)

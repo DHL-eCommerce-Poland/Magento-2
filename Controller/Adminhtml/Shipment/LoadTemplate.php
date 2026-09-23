@@ -7,6 +7,7 @@ namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
 use Exception;
 use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
+use Ideo\Dhl\Model\CustomsTemplateRepository;
 use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use Ideo\Dhl\Model\Template\TemplateManager;
@@ -15,6 +16,7 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
@@ -35,6 +37,8 @@ class LoadTemplate extends Action
      * @param JsonFactory $jsonFactory
      * @param TemplateVariableResolver $variableResolver
      * @param MethodCatalog $methodCatalog
+     * @param CustomsTemplateRepository $customsTemplateRepository
+     * @param SerializerInterface $serializer
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -47,6 +51,8 @@ class LoadTemplate extends Action
         private readonly JsonFactory $jsonFactory,
         private readonly TemplateVariableResolver $variableResolver,
         private readonly MethodCatalog $methodCatalog,
+        private readonly CustomsTemplateRepository $customsTemplateRepository,
+        private readonly SerializerInterface $serializer,
         private readonly ?LoggerInterface $logger = null
     ) {
         parent::__construct($context);
@@ -80,7 +86,7 @@ class LoadTemplate extends Action
                 return $resultJson->setData([
                     'success' => true,
                     'data' => [
-                        'presetSenderId' => (string)$point->getId(),
+                        'presetSenderId' => (string)($point->getEntityId() ?? $point->getId()),
                         'sapNumber' => $point->getSapNumber() ?? '',
                         'name' => $point->getSenderName() ?? '',
                         'firstName' => $point->getFirstName() ?? '',
@@ -150,6 +156,94 @@ class LoadTemplate extends Action
                         'addressType' => $serviceData['address_type'] ?? 'N',
                         'specialServices' => $additionalServices,
                     ]
+                ]);
+            }
+
+            if ($templateType === 'customs') {
+                $template = $this->customsTemplateRepository->getById($templateId);
+                $customsItems = [];
+                $rawItems = $template->getCustomsItems();
+                if (is_string($rawItems) && !empty($rawItems)) {
+                    try {
+                        $decoded = $this->serializer->unserialize($rawItems);
+                        if (is_array($decoded)) {
+                            if (isset($decoded['customs_items']) && is_array($decoded['customs_items'])) {
+                                $decoded = $decoded['customs_items'];
+                            } elseif (count($decoded) === 1
+                                && isset($decoded[0])
+                                && is_array($decoded[0])
+                                && !isset($decoded[0]['nameEn'])
+                                && !isset($decoded[0]['namePl'])
+                            ) {
+                                $decoded = $decoded[0];
+                            }
+                            $customsItems = array_values($decoded);
+                        }
+                    } catch (Exception $e) {
+                        $customsItems = [];
+                    }
+                } elseif (is_array($rawItems)) {
+                    $customsItems = $rawItems;
+                }
+
+                $defaultTariff = $template->getDefaultTariffCode() ?? '';
+                $countryOrigin = $template->getCountryOfOrigin() ?: 'PL';
+
+                // Ensure item defaults if missing in individual row
+                $formattedItems = array_map(function ($item) use ($defaultTariff, $countryOrigin) {
+                    return [
+                        'namePl' => (string)($item['namePl'] ?? ''),
+                        'nameEn' => (string)($item['nameEn'] ?? ''),
+                        'quantity' => isset($item['quantity']) ? (int)$item['quantity'] : 1,
+                        'weight' => isset($item['weight']) ? (float)$item['weight'] : 0.0,
+                        'value' => isset($item['value']) ? (float)$item['value'] : 0.0,
+                        'tariffCode' => (string)(!empty($item['tariffCode']) ? $item['tariffCode'] : $defaultTariff),
+                        'countryOfOrigin' => (string)(!empty($item['countryOfOrigin'])
+                            ? $item['countryOfOrigin']
+                            : $countryOrigin),
+                    ];
+                }, $customsItems);
+
+                $costs = $template->getCostsOfShipment() !== null
+                    ? (float)$template->getCostsOfShipment()
+                    : null;
+                $grossWeight = $template->getGrossWeight() !== null
+                    ? (float)$template->getGrossWeight()
+                    : null;
+                $isIndividual = ($template->getCustomsType() ===
+                    \Ideo\Dhl\Model\Source\CustomsType::TYPE_INDIVIDUAL);
+
+                return $resultJson->setData([
+                    'success' => true,
+                    'data' => [
+                        'selectedCustomsTemplateId' => (int)$template->getId(),
+                        'customsType' => $template->getCustomsType() ?: 'U',
+                        'categoryOfItem' => $template->getCategoryOfItem() ?: '11',
+                        'currency' => $template->getCurrency() ?: 'EUR',
+                        'countryOfOrigin' => $countryOrigin,
+                        'defaultTariffCode' => $defaultTariff,
+                        'costsOfShipment' => $costs,
+                        'grossWeight' => $grossWeight,
+                        'firstName' => $template->getContactFirstName() ?? '',
+                        'secondaryName' => $template->getContactLastName() ?? '',
+                        'nipNr' => $template->getShipperNip() ?? '',
+                        'eoriNr' => $template->getShipperEori() ?? '',
+                        'vatRegistrationNumber' => $template->getShipperVatNo() ?? '',
+                        'eoriNrReceiver' => $template->getReceiverEori() ?? '',
+                        'vatRegistrationNumberReceiver' => $template->getReceiverVatNo() ?? '',
+                        'invoiceNr' => 'INV-' . date('Ymd'),
+                        'invoiceDate' => $template->getInvoiceDate() ?: date('Y-m-d'),
+                        'invoiceFile' => $template->getInvoiceFile() ?? '',
+                        'additionalInfo' => $template->getAdditionalInfo() ?? '',
+                        'notExceedValue' => $template->getNotExceedValue() !== null
+                            ? (bool)$template->getNotExceedValue() : true,
+                        'notProhibitedGoods' => $template->getNotProhibitedGoods() !== null
+                            ? (bool)$template->getNotProhibitedGoods() : true,
+                        'notRestrictedGoods' => $template->getNotRestrictedGoods() !== null
+                            ? (bool)$template->getNotRestrictedGoods() : true,
+                        'invoiceContent' => $isIndividual,
+                        'customsItems' => $formattedItems,
+                    ],
                 ]);
             }
 

@@ -7,6 +7,7 @@ namespace Ideo\Dhl\Controller\Adminhtml\CustomsTemplate;
 use Exception;
 use Ideo\Dhl\Model\CustomsTemplateFactory;
 use Ideo\Dhl\Model\CustomsTemplateRepository;
+use Ideo\Dhl\Model\Source\CategoryOfItem;
 use Ideo\Dhl\Model\Source\CustomsCurrency;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -25,13 +26,15 @@ class Save extends Action implements HttpPostActionInterface
      * @param CustomsTemplateFactory $templateFactory
      * @param SerializerInterface $serializer
      * @param CustomsCurrency $customsCurrency
+     * @param CategoryOfItem $categoryOfItem
      */
     public function __construct(
         Context $context,
         private readonly CustomsTemplateRepository $repository,
         private readonly CustomsTemplateFactory $templateFactory,
         private readonly SerializerInterface $serializer,
-        private readonly CustomsCurrency $customsCurrency
+        private readonly CustomsCurrency $customsCurrency,
+        private readonly CategoryOfItem $categoryOfItem
     ) {
         parent::__construct($context);
     }
@@ -72,6 +75,21 @@ class Save extends Action implements HttpPostActionInterface
                             $data['currency'],
                             $data['customs_type'],
                             implode(', ', $this->customsCurrency->getCurrenciesForType((string)$data['customs_type']))
+                        )
+                    );
+                }
+            }
+
+            if (!empty($data['customs_type']) && !empty($data['category_of_item'])) {
+                $customsType = (string)$data['customs_type'];
+                $category = (string)$data['category_of_item'];
+                if (!$this->categoryOfItem->isCategoryAllowed($customsType, $category)) {
+                    throw new LocalizedException(
+                        __(
+                            'Category of item "%1" is not allowed for customs clearance type "%2". Allowed categories: %3.',
+                            $data['category_of_item'],
+                            $data['customs_type'],
+                            implode(', ', $this->categoryOfItem->getCategoriesForType((string)$data['customs_type']))
                         )
                     );
                 }

@@ -6,15 +6,26 @@ namespace Ideo\Dhl\Model\Api;
 
 use Ideo\Dhl\Model\Config\Source\AddressType;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Filesystem\Driver\File as FileDriver;
 
 class ShipmentFullDataMapper
 {
+    /**
+     * @param FileDriver $fileDriver
+     */
+    public function __construct(
+        private readonly FileDriver $fileDriver
+    ) {
+    }
+
     /**
      * Map DhlShipmentData to DHL WebAPI2 ShipmentFullData array format.
      *
      * @param DhlShipmentData $shipmentData
      *
      * @return array
+     * @throws FileSystemException
      */
     public function map(DhlShipmentData $shipmentData): array
     {
@@ -165,6 +176,97 @@ class ShipmentFullDataMapper
         }
         if ($settings->getPickupHourTo() !== null && $settings->getPickupHourTo() !== '') {
             $result['shipmentEndHour'] = $settings->getPickupHourTo();
+        }
+
+        if ($countryCode !== 'PL'
+            && $shipmentData->getCustoms() !== null
+        ) {
+            $customs = $shipmentData->getCustoms();
+            $customsType = $customs->getCustomsType() ?: 'U';
+
+            $customsDef = [
+                'customsType' => $customsType,
+                'costsOfShipment' => (int)round((float)($customs->getCostsOfShipment() ?? 0)),
+                'currency' => $customs->getCurrency() ?: 'EUR',
+                'categoryOfItem' => $customs->getCategoryOfItem() ?: '11',
+                'countryOfOrigin' => $customs->getCountryOfOrigin() ?: 'PL',
+                'grossWeight' => (float)($customs->getGrossWeight() ?? 0.0),
+                'firstName' => mb_substr($this->sanitizeString($customs->getFirstName() ?? ''), 0, 30),
+                'secondaryName' => mb_substr($this->sanitizeString($customs->getSecondaryName() ?? ''), 0, 30),
+                'vatRegistrationNumber' => mb_substr(
+                    $this->sanitizeString($customs->getVatRegistrationNumber() ?? ''),
+                    0,
+                    15
+                ),
+            ];
+
+            if ($customs->getNipNr()) {
+                $customsDef['nipNr'] = mb_substr($this->sanitizeString($customs->getNipNr()), 0, 17);
+            }
+            if ($customs->getEoriNr()) {
+                $customsDef['eoriNr'] = mb_substr($this->sanitizeString($customs->getEoriNr()), 0, 17);
+            }
+            if ($customs->getEoriNrReceiver()) {
+                $customsDef['eoriNrReceiver'] = mb_substr($this->sanitizeString($customs->getEoriNrReceiver()), 0, 17);
+            }
+            if ($customs->getVatRegistrationNumberReceiver()) {
+                $customsDef['vatRegistrationNumberReceiver'] = mb_substr(
+                    $this->sanitizeString($customs->getVatRegistrationNumberReceiver()),
+                    0,
+                    15
+                );
+            }
+            if ($customs->getAdditionalInfo()) {
+                $customsDef['additionalInfo'] = mb_substr(
+                    $this->sanitizeString($customs->getAdditionalInfo()),
+                    0,
+                    100
+                );
+            }
+
+            if ($customsType === 'I') {
+                if ($customs->getInvoiceNr()) {
+                    $customsDef['invoiceNr'] = mb_substr($this->sanitizeString($customs->getInvoiceNr()), 0, 35);
+                }
+                if ($customs->getInvoiceDate()) {
+                    $customsDef['invoiceDate'] = $customs->getInvoiceDate();
+                }
+                if ($customs->getInvoiceFile()
+                    && $this->fileDriver->isExists($customs->getInvoiceFile())
+                ) {
+                    $fileContent = $this->fileDriver->fileGetContents($customs->getInvoiceFile());
+                    $customsDef['invoice'] = base64_encode($fileContent);
+                }
+            }
+
+            $customsDef['customAgreements'] = [
+                'notExceedValue' => $customs->isNotExceedValue(),
+                'notProhibitedGoods' => $customs->isNotProhibitedGoods(),
+                'notRestrictedGoods' => $customs->isNotRestrictedGoods(),
+                'invoiceContent' => ($customsType === 'I') || $customs->isInvoiceContent(),
+            ];
+
+            $items = [];
+            foreach ($customs->getCustomsItems() as $item) {
+                if (is_array($item)) {
+                    $items[] = [
+                        'namePl' => mb_substr($this->sanitizeString((string)($item['namePl'] ?? '')), 0, 35),
+                        'nameEn' => mb_substr($this->sanitizeString((string)($item['nameEn'] ?? '')), 0, 35),
+                        'quantity' => (int)($item['quantity'] ?? 1),
+                        'weight' => (float)($item['weight'] ?? 0.0),
+                        'value' => (float)($item['value'] ?? 0.0),
+                        'tariffCode' => mb_substr($this->sanitizeString((string)($item['tariffCode'] ?? '')), 0, 10),
+                        'countryOfOrigin' => mb_substr(
+                            $this->sanitizeString((string)($item['countryOfOrigin'] ?? '')),
+                            0,
+                            35
+                        ),
+                    ];
+                }
+            }
+            $customsDef['customsItem'] = $items;
+
+            $result['customs'] = $customsDef;
         }
 
         return $result;

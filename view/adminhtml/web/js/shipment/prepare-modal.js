@@ -139,6 +139,100 @@ define([
         };
     }
 
+    function createCustomsItemObservable(item) {
+        item = item || {};
+        return {
+            namePl: ko.observable(item.namePl || ''),
+            nameEn: ko.observable(item.nameEn || ''),
+            quantity: ko.observable(item.quantity !== undefined && item.quantity !== null && item.quantity !== '' ? item.quantity : 1),
+            weight: ko.observable(formatDecimal4(item.weight)),
+            value: ko.observable(item.value !== undefined && item.value !== null && item.value !== '' ? item.value : ''),
+            tariffCode: ko.observable(item.tariffCode || ''),
+            countryOfOrigin: ko.observable(item.countryOfOrigin || 'PL')
+        };
+    }
+
+    function createCustomsData(c) {
+        c = c || {};
+        var itemsRaw = c.customsItems || [];
+        var itemsObsArr = ko.observableArray([]);
+        if (Array.isArray(itemsRaw) && itemsRaw.length > 0) {
+            $.each(itemsRaw, function (i, itemData) {
+                itemsObsArr.push(createCustomsItemObservable(itemData));
+            });
+        }
+
+        var customsTypeObs = ko.observable(c.customsType || 'U');
+        var currencyObs = ko.observable(c.currency || 'EUR');
+        var categoryOfItemObs = ko.observable(c.categoryOfItem || '11');
+
+        customsTypeObs.subscribe(function (newType) {
+            var allowedCurrencies = {
+                'I': ['GBP', 'EUR'],
+                'U': ['GBP', 'EUR', 'USD', 'PLN', 'CHF'],
+                'S': ['GBP', 'EUR', 'USD']
+            };
+            var allowed = allowedCurrencies[newType];
+            if (allowed && allowed.indexOf(currencyObs()) === -1) {
+                currencyObs(allowed[0]);
+            }
+
+            var allowedCategories = {
+                'I': ['9', '11', '21', '32'],
+                'U': ['9', '11', '21', '31', '32', '91'],
+                'S': ['9', '11', '21', '31', '32', '91']
+            };
+            var allowedCats = allowedCategories[newType] || ['9', '11', '21', '31', '32', '91'];
+            if (allowedCats.indexOf(categoryOfItemObs()) === -1) {
+                categoryOfItemObs('11');
+            }
+        });
+
+        var customsObj = {
+            selectedCustomsTemplateId: ko.observable(c.selectedCustomsTemplateId || null),
+            customsType: customsTypeObs,
+            categoryOfItem: categoryOfItemObs,
+            currency: currencyObs,
+            countryOfOrigin: ko.observable(c.countryOfOrigin || 'PL'),
+            defaultTariffCode: ko.observable(c.defaultTariffCode || ''),
+            costsOfShipment: ko.observable(c.costsOfShipment !== undefined && c.costsOfShipment !== null ? c.costsOfShipment : ''),
+            grossWeight: ko.observable(c.grossWeight !== undefined && c.grossWeight !== null ? c.grossWeight : ''),
+            firstName: ko.observable(c.firstName || ''),
+            secondaryName: ko.observable(c.secondaryName || ''),
+            nipNr: ko.observable(c.nipNr || ''),
+            eoriNr: ko.observable(c.eoriNr || ''),
+            vatRegistrationNumber: ko.observable(c.vatRegistrationNumber || ''),
+            eoriNrReceiver: ko.observable(c.eoriNrReceiver || ''),
+            vatRegistrationNumberReceiver: ko.observable(c.vatRegistrationNumberReceiver || ''),
+            invoiceNr: ko.observable(c.invoiceNr || ''),
+            invoiceDate: ko.observable(c.invoiceDate || ''),
+            invoiceFile: ko.observable(c.invoiceFile || ''),
+            additionalInfo: ko.observable(c.additionalInfo || ''),
+            notExceedValue: ko.observable(c.notExceedValue !== undefined ? isTruthy(c.notExceedValue) : true),
+            notProhibitedGoods: ko.observable(c.notProhibitedGoods !== undefined ? isTruthy(c.notProhibitedGoods) : true),
+            notRestrictedGoods: ko.observable(c.notRestrictedGoods !== undefined ? isTruthy(c.notRestrictedGoods) : true),
+            customsItems: itemsObsArr
+        };
+
+        customsObj.addCustomsItemRow = function () {
+            customsObj.customsItems.push(createCustomsItemObservable({
+                namePl: '',
+                nameEn: '',
+                quantity: 1,
+                weight: '',
+                value: '',
+                tariffCode: customsObj.defaultTariffCode() || '',
+                countryOfOrigin: customsObj.countryOfOrigin() || 'PL'
+            }));
+        };
+
+        customsObj.removeCustomsItemRow = function (index) {
+            customsObj.customsItems.splice(index, 1);
+        };
+
+        return customsObj;
+    }
+
     function createShipmentData(data) {
         data = data || {};
         var s = data.sender || {};
@@ -271,7 +365,8 @@ define([
                 agever: ko.observable(isTruthy(ss.agever || ss.service_AGEVER)),
                 odb: ko.observable(isTruthy(ss.odb || ss.service_ODB))
             },
-            shipmentSettings: shipmentSettingsObj
+            shipmentSettings: shipmentSettingsObj,
+            customs: createCustomsData(data.customs || {})
         };
     }
 
@@ -314,8 +409,72 @@ define([
             this.contentSourceOptions = ko.observableArray([]);
             this.returnQrCodeTypeOptions = ko.observableArray([]);
             this.returnBookCourierOptions = ko.observableArray([]);
+            this.customsTemplates = ko.observableArray([]);
+            this.customsTypeOptions = ko.observableArray([]);
+            this.categoryOfItemOptions = ko.observableArray([]);
+            this.customsCurrencyOptions = ko.observableArray([]);
 
             var self = this;
+
+            this.isCustomsClearanceVisible = ko.pureComputed(function () {
+                var draft = self.shipmentData();
+                if (!draft || !draft.recipient || typeof draft.recipient.country !== 'function') {
+                    return false;
+                }
+                var country = draft.recipient.country();
+                return country && country.toUpperCase() !== 'PL';
+            });
+
+            var defaultCategoryOptions = [
+                { value: '9', label: $.mage.__('Other (9)') },
+                { value: '11', label: $.mage.__('Sales of Goods (11)') },
+                { value: '21', label: $.mage.__('Return of Goods (21)') },
+                { value: '31', label: $.mage.__('Gift (31)') },
+                { value: '32', label: $.mage.__('Patterns and Samples (32)') },
+                { value: '91', label: $.mage.__('Documents (91)') }
+            ];
+
+            this.filteredCurrencyOptions = ko.pureComputed(function () {
+                var allCurrencies = self.customsCurrencyOptions();
+                var draft = self.shipmentData();
+                if (!draft || !draft.customs || !draft.customs.customsType) {
+                    return allCurrencies;
+                }
+                var cType = draft.customs.customsType;
+                var type = typeof cType === 'function' ? cType() : cType;
+                var allowedCurrencies = {
+                    'I': ['GBP', 'EUR'],
+                    'U': ['GBP', 'EUR', 'USD', 'PLN', 'CHF'],
+                    'S': ['GBP', 'EUR', 'USD']
+                };
+                var allowed = allowedCurrencies[type] || ['GBP', 'EUR', 'USD', 'PLN', 'CHF'];
+                return ko.utils.arrayFilter(allCurrencies, function (curr) {
+                    return curr && allowed.indexOf(curr.value) !== -1;
+                });
+            });
+
+            this.filteredCategoryOfItemOptions = ko.pureComputed(function () {
+                var allCategories = self.categoryOfItemOptions();
+                if (!allCategories || !allCategories.length) {
+                    allCategories = defaultCategoryOptions;
+                }
+                var draft = self.shipmentData();
+                if (!draft || !draft.customs || !draft.customs.customsType) {
+                    return allCategories;
+                }
+                var cType = draft.customs.customsType;
+                var type = typeof cType === 'function' ? cType() : cType;
+                var allowedCategories = {
+                    'I': ['9', '11', '21', '32'],
+                    'U': ['9', '11', '21', '31', '32', '91'],
+                    'S': ['9', '11', '21', '31', '32', '91']
+                };
+                var allowed = allowedCategories[type] || ['9', '11', '21', '31', '32', '91'];
+                return ko.utils.arrayFilter(allCategories, function (cat) {
+                    return cat && allowed.indexOf(String(cat.value)) !== -1;
+                });
+            });
+
             window.ideoDhlOpenPrepareModal = function (orderId, prepareUrl) {
                 self.openModal(orderId, prepareUrl);
             };
@@ -335,6 +494,137 @@ define([
             if (settings && typeof settings.removePackageRow === 'function') {
                 settings.removePackageRow(index);
             }
+        },
+
+        addCustomsItemRow: function () {
+            var customs = this.draft() ? this.draft().customs : null;
+            if (customs && typeof customs.addCustomsItemRow === 'function') {
+                customs.addCustomsItemRow();
+            }
+        },
+
+        removeCustomsItemRow: function (index) {
+            var customs = this.draft() ? this.draft().customs : null;
+            if (customs && typeof customs.removeCustomsItemRow === 'function') {
+                customs.removeCustomsItemRow(index);
+            }
+        },
+
+        resetCustomsData: function () {
+            var customs = this.draft() ? this.draft().customs : null;
+            if (!customs) return;
+
+            customs.selectedCustomsTemplateId(null);
+            customs.customsType('U');
+            customs.categoryOfItem('11');
+            customs.currency('EUR');
+            customs.countryOfOrigin('PL');
+            customs.defaultTariffCode('');
+            customs.costsOfShipment('');
+            customs.grossWeight('');
+            customs.firstName('');
+            customs.secondaryName('');
+            customs.nipNr('');
+            customs.eoriNr('');
+            customs.vatRegistrationNumber('');
+            customs.eoriNrReceiver('');
+            customs.vatRegistrationNumberReceiver('');
+            customs.invoiceNr('');
+            customs.invoiceDate('');
+            customs.invoiceFile('');
+            customs.additionalInfo('');
+            customs.notExceedValue(true);
+            customs.notProhibitedGoods(true);
+            customs.notRestrictedGoods(true);
+            if (customs.customsItems) {
+                customs.customsItems.removeAll();
+            }
+            this._activeCustomsTemplateId = null;
+        },
+
+        populateCustomsData: function (data) {
+            var customs = this.draft() ? this.draft().customs : null;
+            if (!customs || !data) return;
+
+            if (data.customsType !== undefined) customs.customsType(data.customsType);
+            if (data.categoryOfItem !== undefined) customs.categoryOfItem(data.categoryOfItem);
+            if (data.currency !== undefined) customs.currency(data.currency);
+            if (data.countryOfOrigin !== undefined) customs.countryOfOrigin(data.countryOfOrigin);
+            if (data.defaultTariffCode !== undefined) customs.defaultTariffCode(data.defaultTariffCode);
+            if (data.costsOfShipment !== undefined && data.costsOfShipment !== null) customs.costsOfShipment(data.costsOfShipment);
+            if (data.grossWeight !== undefined && data.grossWeight !== null) customs.grossWeight(data.grossWeight);
+            if (data.firstName !== undefined) customs.firstName(data.firstName);
+            if (data.secondaryName !== undefined) customs.secondaryName(data.secondaryName);
+            if (data.nipNr !== undefined) customs.nipNr(data.nipNr);
+            if (data.eoriNr !== undefined) customs.eoriNr(data.eoriNr);
+            if (data.vatRegistrationNumber !== undefined) customs.vatRegistrationNumber(data.vatRegistrationNumber);
+            if (data.eoriNrReceiver !== undefined) customs.eoriNrReceiver(data.eoriNrReceiver);
+            if (data.vatRegistrationNumberReceiver !== undefined) customs.vatRegistrationNumberReceiver(data.vatRegistrationNumberReceiver);
+            if (data.invoiceNr !== undefined) customs.invoiceNr(data.invoiceNr);
+            if (data.invoiceDate !== undefined) customs.invoiceDate(data.invoiceDate);
+            if (data.invoiceFile !== undefined) customs.invoiceFile(data.invoiceFile);
+            if (data.additionalInfo !== undefined) customs.additionalInfo(data.additionalInfo);
+            if (data.notExceedValue !== undefined) customs.notExceedValue(isTruthy(data.notExceedValue));
+            if (data.notProhibitedGoods !== undefined) customs.notProhibitedGoods(isTruthy(data.notProhibitedGoods));
+            if (data.notRestrictedGoods !== undefined) customs.notRestrictedGoods(isTruthy(data.notRestrictedGoods));
+
+            if (customs.customsItems) {
+                customs.customsItems.removeAll();
+                if (Array.isArray(data.customsItems) && data.customsItems.length > 0) {
+                    $.each(data.customsItems, function (i, item) {
+                        customs.customsItems.push(createCustomsItemObservable(item));
+                    });
+                }
+            }
+        },
+
+        onCustomsTemplateChange: function (templateId, event) {
+            var customs = this.draft() ? this.draft().customs : null;
+            if (!customs) return;
+
+            if (event && event.target) {
+                templateId = event.target.value;
+            } else if (templateId === undefined || templateId === null || typeof templateId === 'object') {
+                templateId = (typeof customs.selectedCustomsTemplateId === 'function')
+                    ? customs.selectedCustomsTemplateId()
+                    : null;
+            }
+
+            templateId = (templateId !== null && templateId !== undefined) ? String(templateId).trim() : '';
+
+            if (typeof customs.selectedCustomsTemplateId === 'function') {
+                var currentObsVal = customs.selectedCustomsTemplateId();
+                var parsedVal = templateId ? (isNaN(Number(templateId)) ? templateId : Number(templateId)) : null;
+                if (currentObsVal != parsedVal) {
+                    customs.selectedCustomsTemplateId(parsedVal);
+                }
+            }
+
+            if (this._activeCustomsTemplateId === templateId) {
+                return;
+            }
+            this._activeCustomsTemplateId = templateId;
+
+            if (!templateId) {
+                this.resetCustomsData();
+                return;
+            }
+
+            var url = this.loadTemplateUrl || this.loadPresetUrl;
+            if (!url) return;
+
+            var self = this;
+            $.getJSON(url, {
+                template_id: templateId,
+                template_type: 'customs',
+                preset_id: templateId,
+                preset_type: 'customs',
+                order_id: self.draft().orderId
+            }).done(function (res) {
+                if (res.success && res.data) {
+                    self.populateCustomsData(res.data);
+                }
+            });
         },
 
         onSenderTemplateChange: function (templateId, event) {
@@ -605,6 +895,10 @@ define([
                         self.contentSourceOptions(response.contentSourceOptions || []);
                         self.returnQrCodeTypeOptions(response.returnQrCodeTypeOptions || []);
                         self.returnBookCourierOptions(response.returnBookCourierOptions || []);
+                        self.customsTemplates(response.customsTemplates || []);
+                        self.customsTypeOptions(response.customsTypeOptions || []);
+                        self.categoryOfItemOptions(response.categoryOfItemOptions || []);
+                        self.customsCurrencyOptions(response.customsCurrencyOptions || []);
 
                         // 2. Set default IDs if missing
                         var defaultPointId = response.defaultDropOffPointId || (response.data.sender ? response.data.sender.selectedDropOffPointId : null);
@@ -619,6 +913,7 @@ define([
 
                         self._activeSenderTemplateId = null;
                         self._activeShipmentTemplateId = null;
+                        self._activeCustomsTemplateId = null;
 
                         // 3. Create reactive shipmentData instance AFTER options are set
                         var newDraft = createShipmentData(response.data);
@@ -637,6 +932,14 @@ define([
                         });
                         newDraft.shipmentSettings.selectedDeliveryServiceId.subscribe(function (newVal) {
                             self.onShipmentTemplateChange(newVal);
+                        });
+                        newDraft.recipient.country.subscribe(function (newCountry) {
+                            if (newCountry && newCountry.toUpperCase() === 'PL') {
+                                self.resetCustomsData();
+                            }
+                        });
+                        newDraft.customs.selectedCustomsTemplateId.subscribe(function (newVal) {
+                            self.onCustomsTemplateChange(newVal);
                         });
 
                         var modalOptions = {
@@ -682,6 +985,17 @@ define([
                                         return false;
                                     }
 
+                                    if (self.isCustomsClearanceVisible() && draftJs.customs) {
+                                        var customsItems = draftJs.customs.customsItems || [];
+                                        if (!customsItems.length) {
+                                            alert({
+                                                title: $.mage.__('Error'),
+                                                content: $.mage.__('At least one customs goods item is required when customs clearance is selected.')
+                                            });
+                                            return false;
+                                        }
+                                    }
+
                                     // Double-click protection & native full-page loader
                                     $btn.prop('disabled', true);
                                     if (typeof $('body').loader === 'function') {
@@ -691,12 +1005,14 @@ define([
 
                                     var senderPresetId = (draftJs.sender && draftJs.sender.selectedDropOffPointId) ? draftJs.sender.selectedDropOffPointId : null;
                                     var shipmentPresetId = (draftJs.shipmentSettings && draftJs.shipmentSettings.selectedDeliveryServiceId) ? draftJs.shipmentSettings.selectedDeliveryServiceId : null;
+                                    var customsPresetId = (draftJs.customs && draftJs.customs.selectedCustomsTemplateId) ? draftJs.customs.selectedCustomsTemplateId : null;
 
                                     $.post(self.saveUrl, {
                                         shipment_data: JSON.stringify(draftJs),
                                         draft: JSON.stringify(draftJs),
                                         preset_sender_id: senderPresetId,
-                                        preset_shipment_id: shipmentPresetId
+                                        preset_shipment_id: shipmentPresetId,
+                                        preset_customs_id: customsPresetId
                                     }).done(function (saveRes) {
                                         if (saveRes.success) {
                                             selfModal.closeModal();

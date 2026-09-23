@@ -54,12 +54,14 @@ class DhlShipmentDataTest extends TestCase
             'recipient' => (new RecipientData(name: 'Recipient Ltd'))->toArray(),
             'specialServices' => (new SpecialServicesData(insurance: true, insuranceValue: 500.0))->toArray(),
             'shipmentSettings' => (new ShipmentSettingsData(serviceType: '09'))->toArray(),
+            'customs' => null,
         ];
 
         $shipmentData = DhlShipmentData::fromArray($data);
         $this->assertEquals(202, $shipmentData->getOrderId());
         $this->assertEquals('Sender Inc', $shipmentData->getSender()->getName());
         $this->assertEquals('09', $shipmentData->getShipmentSettings()->getServiceType());
+        $this->assertNull($shipmentData->getCustoms());
 
         $exported = $shipmentData->toArray();
         $this->assertEquals($data, $exported);

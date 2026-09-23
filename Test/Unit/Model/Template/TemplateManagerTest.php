@@ -51,6 +51,10 @@ class TemplateManagerTest extends TestCase
     private $serializer;
     private $timezone;
     private $methodCatalog;
+    private $customsTemplateCollectionFactory;
+    private $customsTypeSource;
+    private $categoryOfItemSource;
+    private $customsCurrencySource;
     private TemplateManager $templateManager;
 
     protected function setUp(): void
@@ -73,6 +77,10 @@ class TemplateManagerTest extends TestCase
         $this->serializer = $this->createStub(SerializerInterface::class);
         $this->timezone = $this->createStub(TimezoneInterface::class);
         $this->methodCatalog = $this->createStub(MethodCatalog::class);
+        $this->customsTemplateCollectionFactory = $this->createStub(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory::class);
+        $this->customsTypeSource = $this->createStub(\Ideo\Dhl\Model\Source\CustomsType::class);
+        $this->categoryOfItemSource = $this->createStub(\Ideo\Dhl\Model\Source\CategoryOfItem::class);
+        $this->customsCurrencySource = $this->createStub(\Ideo\Dhl\Model\Source\CustomsCurrency::class);
 
         $this->templateManager = new TemplateManager(
             $this->dropOffPointCollectionFactory,
@@ -92,7 +100,11 @@ class TemplateManagerTest extends TestCase
             $this->mapper,
             $this->serializer,
             $this->timezone,
-            $this->methodCatalog
+            $this->methodCatalog,
+            $this->customsTemplateCollectionFactory,
+            $this->customsTypeSource,
+            $this->categoryOfItemSource,
+            $this->customsCurrencySource
         );
     }
 
@@ -206,5 +218,58 @@ class TemplateManagerTest extends TestCase
         $matchedId = $this->templateManager->getMatchingDeliveryServiceIdForOrder($order);
 
         $this->assertSame(20, $matchedId);
+    }
+
+    public function testGetCustomsTemplatesOptions(): void
+    {
+        $customsItem = $this->createMock(\Ideo\Dhl\Model\CustomsTemplate::class);
+        $customsItem->method('getEntityId')->willReturn(7);
+        $customsItem->method('getTemplateName')->willReturn('EU Standard Export');
+
+        $collection = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Collection::class);
+        $collection->method('getIterator')->willReturn(new \ArrayIterator([$customsItem]));
+
+        $factory = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory::class);
+        $factory->expects($this->once())->method('create')->willReturn($collection);
+
+        $typeSource = $this->createMock(\Ideo\Dhl\Model\Source\CustomsType::class);
+        $typeSource->method('toOptionArray')->willReturn([['value' => 'U', 'label' => 'Simplified']]);
+
+        $catSource = $this->createMock(\Ideo\Dhl\Model\Source\CategoryOfItem::class);
+        $catSource->method('toOptionArray')->willReturn([['value' => '11', 'label' => 'Sales']]);
+
+        $currSource = $this->createMock(\Ideo\Dhl\Model\Source\CustomsCurrency::class);
+        $currSource->method('toOptionArray')->willReturn([['value' => 'EUR', 'label' => 'EUR']]);
+
+        $manager = new TemplateManager(
+            $this->dropOffPointCollectionFactory,
+            $this->deliveryServiceCollectionFactory,
+            $this->dropOffPointRepository,
+            $this->deliveryServiceRepository,
+            $this->countrySource,
+            $this->serviceCodeSource,
+            $this->labelTypeSource,
+            $this->packageTypeSource,
+            $this->addressTypeSource,
+            $this->shipmentAddressTypeSource,
+            $this->contentSource,
+            $this->returnQrCodeTypeSource,
+            $this->returnBookCourierSource,
+            $this->orderRepository,
+            $this->mapper,
+            $this->serializer,
+            $this->timezone,
+            $this->methodCatalog,
+            $factory,
+            $typeSource,
+            $catSource,
+            $currSource
+        );
+
+        $options = $manager->getCustomsTemplatesOptions();
+        $this->assertSame([['value' => 7, 'label' => 'EU Standard Export']], $options);
+        $this->assertSame([['value' => 'U', 'label' => 'Simplified']], $manager->getCustomsTypeOptions());
+        $this->assertSame([['value' => '11', 'label' => 'Sales']], $manager->getCategoryOfItemOptions());
+        $this->assertSame([['value' => 'EUR', 'label' => 'EUR']], $manager->getCustomsCurrencyOptions());
     }
 }

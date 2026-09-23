@@ -99,12 +99,17 @@ class PrepareTest extends TestCase
         $shipmentData = new DhlShipmentData(orderId: 102);
         $this->shipmentDataService->method('prepareShipmentData')->willReturn($shipmentData);
 
+        $this->templateManager->expects($this->once())
+            ->method('getCustomsTemplatesOptions')
+            ->willReturn([['value' => 5, 'label' => 'Customs Template 1']]);
+
         $this->jsonResult->expects($this->once())
             ->method('setData')
             ->with(self::callback(function ($data) {
                 return is_array($data)
                     && ($data['success'] ?? false) === true
-                    && ($data['shipmentTemplates'] ?? []) === [['value' => 1, 'label' => 'Template Polska']];
+                    && ($data['shipmentTemplates'] ?? []) === [['value' => 1, 'label' => 'Template Polska']]
+                    && ($data['customsTemplates'] ?? []) === [['value' => 5, 'label' => 'Customs Template 1']];
             }))
             ->willReturnSelf();
 

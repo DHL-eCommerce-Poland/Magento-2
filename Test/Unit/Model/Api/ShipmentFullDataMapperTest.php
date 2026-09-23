@@ -11,10 +11,16 @@ use Ideo\Dhl\Model\Shipment\Data\SenderData;
 use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
+use Magento\Framework\Filesystem\Driver\File as FileDriver;
 use PHPUnit\Framework\TestCase;
 
 class ShipmentFullDataMapperTest extends TestCase
 {
+    /**
+     * @var FileDriver
+     */
+    private $fileDriver;
+
     /**
      * @var ShipmentFullDataMapper
      */
@@ -22,7 +28,8 @@ class ShipmentFullDataMapperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mapper = new ShipmentFullDataMapper();
+        $this->fileDriver = $this->createStub(FileDriver::class);
+        $this->mapper = new ShipmentFullDataMapper($this->fileDriver);
     }
 
     /**
@@ -220,5 +227,93 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('987654321', $mapped['receiver']['postnummer']);
         $this->assertEquals('49393', $mapped['receiver']['postalCode']);
         $this->assertEquals('Lohne', $mapped['receiver']['city']);
+        $this->assertArrayNotHasKey('customs', $mapped);
+    }
+
+    public function testMapToShipmentFullDataWithCustomsWhenCountryIsNotPl(): void
+    {
+        $sender = new SenderData(
+            payer: 'SENDER',
+            sapNumber: '1234567',
+            name: 'Sender Corp'
+        );
+
+        $recipient = new RecipientData(
+            name: 'UK Customer Ltd',
+            street: 'High Street',
+            houseNumber: '10',
+            city: 'London',
+            postalCode: 'SW1A 1AA',
+            country: 'GB'
+        );
+
+        $customs = new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
+            selectedCustomsTemplateId: 5,
+            customsType: 'U',
+            categoryOfItem: '11',
+            currency: 'GBP',
+            countryOfOrigin: 'PL',
+            defaultTariffCode: '61091000',
+            costsOfShipment: 19.99,
+            grossWeight: 1.5,
+            firstName: 'John',
+            secondaryName: 'Smith',
+            nipNr: '5218487281',
+            eoriNr: 'PL52184872810000',
+            vatRegistrationNumber: 'PL5218487281',
+            eoriNrReceiver: 'GB123456789000',
+            vatRegistrationNumberReceiver: 'GB123456789',
+            additionalInfo: 'Customs note',
+            notExceedValue: true,
+            notProhibitedGoods: true,
+            notRestrictedGoods: true,
+            customsItems: [
+                [
+                    'namePl' => 'Koszulka',
+                    'nameEn' => 'T-Shirt',
+                    'quantity' => 2,
+                    'weight' => 0.75,
+                    'value' => 30.00,
+                    'tariffCode' => '61091000',
+                    'countryOfOrigin' => 'PL',
+                ],
+            ]
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 105,
+            sender: $sender,
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EKS', packages: [new PackageData()]),
+            itemsQty: [],
+            customs: $customs
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertArrayHasKey('customs', $mapped);
+        $c = $mapped['customs'];
+        $this->assertSame('U', $c['customsType']);
+        $this->assertSame(20, $c['costsOfShipment']); // (int)round(19.99)
+        $this->assertSame('GBP', $c['currency']);
+        $this->assertSame('11', $c['categoryOfItem']);
+        $this->assertSame('PL', $c['countryOfOrigin']);
+        $this->assertSame(1.5, $c['grossWeight']);
+        $this->assertSame('John', $c['firstName']);
+        $this->assertSame('Smith', $c['secondaryName']);
+        $this->assertSame('5218487281', $c['nipNr']);
+        $this->assertSame('PL52184872810000', $c['eoriNr']);
+        $this->assertSame('PL5218487281', $c['vatRegistrationNumber']);
+        $this->assertSame('GB123456789000', $c['eoriNrReceiver']);
+        $this->assertSame('GB123456789', $c['vatRegistrationNumberReceiver']);
+        $this->assertSame('Customs note', $c['additionalInfo']);
+        $this->assertTrue($c['customAgreements']['notExceedValue']);
+        $this->assertTrue($c['customAgreements']['notProhibitedGoods']);
+        $this->assertTrue($c['customAgreements']['notRestrictedGoods']);
+        $this->assertCount(1, $c['customsItem']);
+        $this->assertSame('Koszulka', $c['customsItem'][0]['namePl']);
+        $this->assertSame('T-Shirt', $c['customsItem'][0]['nameEn']);
+        $this->assertSame(2, $c['customsItem'][0]['quantity']);
     }
 }

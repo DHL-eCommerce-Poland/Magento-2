@@ -362,7 +362,7 @@ $dateFormat = $viewModel->getDateFormat();
                                     <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 80px;"><?= $escaper->escapeHtml(__('Height [cm]')) ?></th>
                                     <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 60px;"><?= $escaper->escapeHtml(__('NST')) ?></th>
                                     <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 70px;"><?= $escaper->escapeHtml(__('Euro Return')) ?></th>
-                                    <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 60px;"><?= $escaper->escapeHtml(__('Akcje')) ?></th>
+                                     <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 60px;"><?= $escaper->escapeHtml(__('Actions')) ?></th>
                                 </tr>
                             </thead>
                             <tbody data-bind="foreach: $data.packages">
@@ -409,6 +409,166 @@ $dateFormat = $viewModel->getDateFormat();
                                     <td colspan="9" style="padding-top: 10px;">
                                         <button type="button" class="action-secondary" data-bind="click: function() { $data.addPackageRow() }">
                                             <span><?= $escaper->escapeHtml(__('Add Package')) ?></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </fieldset>
+            <!-- /ko -->
+
+            <!-- 6. Customs Clearance Fieldset -->
+            <!-- ko if: isCustomsClearanceVisible -->
+            <fieldset class="admin__fieldset" data-bind="with: shipmentData().customs" style="margin-top: 20px;">
+                <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Customs Clearance')) ?></span></legend>
+
+                <div class="admin__field">
+                    <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Customs Clearance Template')) ?></span></label>
+                    <div class="admin__field-control">
+                        <select class="admin__control-select" data-bind="options: $parent.customsTemplates, optionsText: 'label', optionsValue: 'value', value: selectedCustomsTemplateId, optionsCaption: '<?= $escaper->escapeHtmlAttr(__('Select Template...')) ?>', event: { change: function(d, e) { $parent.onCustomsTemplateChange(null, e); } }"></select>
+                    </div>
+                </div>
+
+                <div class="admin__field required">
+                    <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Customs Clearance Type, Category of Item & Currency')) ?></span></label>
+                    <div class="admin__field-control" style="display: flex; gap: 8px;">
+                        <select class="admin__control-select" data-bind="options: $parent.customsTypeOptions, optionsText: 'label', optionsValue: 'value', value: customsType" style="flex: 1;" required></select>
+                        <select class="admin__control-select" data-bind="options: $parent.filteredCategoryOfItemOptions, optionsText: 'label', optionsValue: 'value', value: categoryOfItem" style="flex: 1;" required></select>
+                        <select class="admin__control-select" data-bind="options: $parent.filteredCurrencyOptions, optionsText: 'label', optionsValue: 'value', value: currency" style="flex: 1;" required></select>
+                    </div>
+                </div>
+
+                <div class="admin__field required">
+                    <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Origin Country, Costs & Gross Weight')) ?></span></label>
+                    <div class="admin__field-control" style="display: flex; gap: 8px;">
+                        <select class="admin__control-select" data-bind="options: $parent.countryOptions, optionsText: 'label', optionsValue: 'value', value: countryOfOrigin" style="flex: 1;" required></select>
+                        <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Gross Costs of Shipment')) ?>" data-bind="value: costsOfShipment" style="flex: 1;" required data-validate="{'required-entry': true, 'validate-zero-or-greater': true, 'validate-number': true}" />
+                        <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Gross Weight (kg)')) ?>" data-bind="value: grossWeight" style="flex: 1;" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true}" />
+                    </div>
+                </div>
+
+                <div class="admin__field required">
+                    <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Contact Person First & Last Name')) ?></span></label>
+                    <div class="admin__field-control" style="display: flex; gap: 8px;">
+                        <input type="text" maxlength="30" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('First Name')) ?>" data-bind="value: firstName" style="flex: 1;" required />
+                        <input type="text" maxlength="30" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Last Name')) ?>" data-bind="value: secondaryName" style="flex: 1;" required />
+                    </div>
+                </div>
+
+                <div class="admin__field">
+                    <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Additional Information')) ?></span></label>
+                    <div class="admin__field-control">
+                        <input type="text" maxlength="100" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Additional Information')) ?>" data-bind="value: additionalInfo" />
+                    </div>
+                </div>
+
+                <div class="admin__field">
+                    <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipper VAT & Receiver VAT')) ?></span></label>
+                    <div class="admin__field-control" style="display: flex; gap: 8px;">
+                        <input type="text" maxlength="15" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper VAT No')) ?>" data-bind="value: vatRegistrationNumber" style="flex: 1;" />
+                        <input type="text" maxlength="15" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver VAT No')) ?>" data-bind="value: vatRegistrationNumberReceiver" style="flex: 1;" />
+                    </div>
+                </div>
+
+                <!-- ko if: customsType() === 'I' -->
+                <div class="admin__field required">
+                    <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipper NIP, Shipper EORI & Receiver EORI')) ?></span></label>
+                    <div class="admin__field-control" style="display: flex; gap: 8px;">
+                        <input type="text" maxlength="17" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper NIP Number')) ?>" data-bind="value: nipNr" style="flex: 1;" required />
+                        <input type="text" maxlength="17" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper EORI Number')) ?>" data-bind="value: eoriNr" style="flex: 1;" required />
+                        <input type="text" maxlength="17" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver EORI Number')) ?>" data-bind="value: eoriNrReceiver" style="flex: 1;" />
+                    </div>
+                </div>
+
+                <div class="admin__field required">
+                    <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Invoice Number & Date')) ?></span></label>
+                    <div class="admin__field-control" style="display: flex; gap: 8px;">
+                        <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Invoice Number')) ?>" data-bind="value: invoiceNr" style="flex: 1;" required />
+                        <div style="flex: 1; position: relative;">
+                            <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Date of Invoice (YYYY-MM-DD)')) ?>" data-bind="value: invoiceDate, dhlDatepicker: invoiceDate, datepickerOptions: { dateFormat: 'yy-mm-dd' }" style="width: 100%; box-sizing: border-box;" required />
+                        </div>
+                    </div>
+                </div>
+                <!-- /ko -->
+
+                <div class="admin__field required">
+                    <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Agreements and Declarations')) ?></span></label>
+                    <div class="admin__field-control" style="margin-top: 8px;">
+                        <div class="admin__field admin__field-option">
+                            <input type="checkbox" class="admin__control-checkbox" id="customs_not_exceed_value" data-bind="checked: notExceedValue" />
+                            <label class="admin__field-label" for="customs_not_exceed_value">
+                                <span><?= $escaper->escapeHtml(__('Value Does Not Exceed Limit')) ?></span>
+                            </label>
+                        </div>
+                        <div class="admin__field admin__field-option">
+                            <input type="checkbox" class="admin__control-checkbox" id="customs_not_prohibited_goods" data-bind="checked: notProhibitedGoods" />
+                            <label class="admin__field-label" for="customs_not_prohibited_goods">
+                                <span><?= $escaper->escapeHtml(__('Shipment Does Not Contain Prohibited Goods')) ?></span>
+                            </label>
+                        </div>
+                        <div class="admin__field admin__field-option">
+                            <input type="checkbox" class="admin__control-checkbox" id="customs_not_restricted_goods" data-bind="checked: notRestrictedGoods" />
+                            <label class="admin__field-label" for="customs_not_restricted_goods">
+                                <span><?= $escaper->escapeHtml(__('Shipment Does Not Contain Restricted Goods')) ?></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customs Goods Items -->
+                <div class="admin__field" style="margin-top: 15px;">
+                    <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Customs Items (Goods)')) ?></span></label>
+                    <div class="admin__field-control">
+                        <table class="admin__control-table" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left;"><?= $escaper->escapeHtml(__('English Name')) ?></th>
+                                    <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left;"><?= $escaper->escapeHtml(__('Polish Name')) ?></th>
+                                    <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 65px;"><?= $escaper->escapeHtml(__('Qty')) ?></th>
+                                    <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 85px;"><?= $escaper->escapeHtml(__('Weight [kg]')) ?></th>
+                                    <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 85px;"><?= $escaper->escapeHtml(__('Value')) ?></th>
+                                    <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 110px;" data-bind="visible: customsType() === 'I' || customsType() === 'S'"><?= $escaper->escapeHtml(__('Tariff Code')) ?></th>
+                                    <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 130px;" data-bind="visible: customsType() === 'I'"><?= $escaper->escapeHtml(__('Country of Origin')) ?></th>
+                                    <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 60px;"><?= $escaper->escapeHtml(__('Actions')) ?></th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: customsItems">
+                                <tr>
+                                    <td style="padding: 6px 4px; vertical-align: top;">
+                                        <input type="text" maxlength="35" class="admin__control-text" data-bind="value: nameEn" required />
+                                    </td>
+                                    <td style="padding: 6px 4px; vertical-align: top;">
+                                        <input type="text" maxlength="35" class="admin__control-text" data-bind="value: namePl" required />
+                                    </td>
+                                    <td style="padding: 6px 4px; vertical-align: top;">
+                                        <input type="number" class="admin__control-text" min="1" data-bind="value: quantity" required />
+                                    </td>
+                                    <td style="padding: 6px 4px; vertical-align: top;">
+                                        <input type="text" class="admin__control-text" data-bind="value: weight" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true}" />
+                                    </td>
+                                    <td style="padding: 6px 4px; vertical-align: top;">
+                                        <input type="text" class="admin__control-text" data-bind="value: value" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true}" />
+                                    </td>
+                                    <td style="padding: 6px 4px; vertical-align: top;" data-bind="visible: $parent.customsType() === 'I' || $parent.customsType() === 'S'">
+                                        <input type="text" maxlength="10" class="admin__control-text" data-bind="value: tariffCode, attr: { required: ($parent.customsType() === 'I' || $parent.customsType() === 'S') ? 'required' : null }" />
+                                    </td>
+                                    <td style="padding: 6px 4px; vertical-align: top;" data-bind="visible: $parent.customsType() === 'I'">
+                                        <select class="admin__control-select" data-bind="options: $parents[1].countryOptions, optionsText: 'label', optionsValue: 'value', value: countryOfOrigin, attr: { required: $parent.customsType() === 'I' ? 'required' : null }"></select>
+                                    </td>
+                                    <td style="padding: 6px 4px; vertical-align: middle; text-align: center;">
+                                        <button type="button" class="action-delete" data-bind="click: function() { $parent.removeCustomsItemRow($index()) }" title="<?= $escaper->escapeHtmlAttr(__('Delete Row')) ?>">
+                                            <span><?= $escaper->escapeHtml(__('Delete')) ?></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td data-bind="attr: { colspan: (customsType() === 'I' ? 8 : (customsType() === 'S' ? 7 : 6)) }" style="padding-top: 10px;">
+                                        <button type="button" class="action-secondary" data-bind="click: function() { $data.addCustomsItemRow() }">
+                                            <span><?= $escaper->escapeHtml(__('Add Item')) ?></span>
                                         </button>
                                     </td>
                                 </tr>

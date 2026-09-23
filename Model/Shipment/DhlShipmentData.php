@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Ideo\Dhl\Model\Shipment\Data\CustomsData;
 use Ideo\Dhl\Model\Shipment\Data\RecipientData;
 use Ideo\Dhl\Model\Shipment\Data\SenderData;
 use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
@@ -18,6 +19,7 @@ class DhlShipmentData
      * @param SpecialServicesData|null $specialServices
      * @param ShipmentSettingsData|null $shipmentSettings
      * @param array $itemsQty
+     * @param CustomsData|null $customs
      */
     public function __construct(
         private readonly ?int $orderId = null,
@@ -25,7 +27,8 @@ class DhlShipmentData
         private ?RecipientData $recipient = null,
         private ?SpecialServicesData $specialServices = null,
         private ?ShipmentSettingsData $shipmentSettings = null,
-        private array $itemsQty = []
+        private array $itemsQty = [],
+        private ?CustomsData $customs = null
     ) {
         $this->sender = $sender ?? new SenderData();
         $this->recipient = $recipient ?? new RecipientData();
@@ -107,6 +110,29 @@ class DhlShipmentData
     }
 
     /**
+     * Get customs clearance data.
+     *
+     * @return CustomsData|null
+     */
+    public function getCustoms(): ?CustomsData
+    {
+        return $this->customs;
+    }
+
+    /**
+     * Set customs clearance data.
+     *
+     * @param CustomsData|null $customs
+     *
+     * @return self
+     */
+    public function setCustoms(?CustomsData $customs): self
+    {
+        $this->customs = $customs;
+        return $this;
+    }
+
+    /**
      * Convert DTO structure to array representation.
      *
      * @return array
@@ -120,6 +146,7 @@ class DhlShipmentData
             'recipient' => $this->recipient->toArray(),
             'specialServices' => $this->specialServices->toArray(),
             'shipmentSettings' => $this->shipmentSettings->toArray(),
+            'customs' => $this->customs?->toArray(),
         ];
     }
 
@@ -144,13 +171,19 @@ class DhlShipmentData
             }
         }
 
+        $customs = null;
+        if (isset($data['customs']) && is_array($data['customs'])) {
+            $customs = CustomsData::fromArray($data['customs']);
+        }
+
         return new self(
             isset($data['orderId']) ? (int)$data['orderId'] : null,
             SenderData::fromArray($data['sender'] ?? []),
             RecipientData::fromArray($data['recipient'] ?? []),
             SpecialServicesData::fromArray($data['specialServices'] ?? []),
             ShipmentSettingsData::fromArray($shipmentSettings),
-            is_array($data['itemsQty'] ?? null) ? $data['itemsQty'] : []
+            is_array($data['itemsQty'] ?? null) ? $data['itemsQty'] : [],
+            $customs
         );
     }
 }

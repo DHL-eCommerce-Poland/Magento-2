@@ -103,6 +103,10 @@ class Prepare extends Action
                 'contentSourceOptions' => $this->templateManager->getContentSourceOptions(),
                 'returnQrCodeTypeOptions' => $this->templateManager->getReturnQrCodeTypeOptions(),
                 'returnBookCourierOptions' => $this->templateManager->getReturnBookCourierOptions(),
+                'customsTemplates' => $this->templateManager->getCustomsTemplatesOptions(),
+                'customsTypeOptions' => $this->templateManager->getCustomsTypeOptions(),
+                'categoryOfItemOptions' => $this->templateManager->getCategoryOfItemOptions(),
+                'customsCurrencyOptions' => $this->templateManager->getCustomsCurrencyOptions(),
             ]);
         } catch (Exception $e) {
             $this->logger?->error('Error preparing DHL shipment data: ' . $e->getMessage(), ['exception' => $e]);

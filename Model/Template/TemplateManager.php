@@ -17,11 +17,15 @@ use Ideo\Dhl\Model\Config\Source\ReturnQrCodeType as ReturnQrCodeTypeSource;
 use Ideo\Dhl\Model\Config\Source\ServiceCode as ServiceCodeSource;
 use Ideo\Dhl\Model\Config\Source\ShipmentAddressType as ShipmentAddressTypeSource;
 use Ideo\Dhl\Model\MethodCatalog;
+use Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory as CustomsTemplateCollectionFactory;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory as DeliveryServiceCollectionFactory;
 use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory as DropOffPointCollectionFactory;
 use Ideo\Dhl\Model\Shipment\Data\SenderData;
 use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
+use Ideo\Dhl\Model\Source\CategoryOfItem;
+use Ideo\Dhl\Model\Source\CustomsCurrency;
+use Ideo\Dhl\Model\Source\CustomsType;
 use InvalidArgumentException;
 use Magento\Directory\Model\Config\Source\Country as CountrySource;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -51,6 +55,10 @@ class TemplateManager
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
      * @param MethodCatalog $methodCatalog
+     * @param CustomsTemplateCollectionFactory $customsTemplateCollectionFactory
+     * @param CustomsType $customsTypeSource
+     * @param CategoryOfItem $categoryOfItemSource
+     * @param CustomsCurrency $customsCurrencySource
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -72,6 +80,10 @@ class TemplateManager
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
         private readonly MethodCatalog $methodCatalog,
+        private readonly CustomsTemplateCollectionFactory $customsTemplateCollectionFactory,
+        private readonly CustomsType $customsTypeSource,
+        private readonly CategoryOfItem $categoryOfItemSource,
+        private readonly CustomsCurrency $customsCurrencySource,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -333,6 +345,60 @@ class TemplateManager
         }
 
         return $options;
+    }
+
+    /**
+     * Get list of customs clearance templates options.
+     *
+     * @return array
+     */
+    public function getCustomsTemplatesOptions(): array
+    {
+        $collection = $this->customsTemplateCollectionFactory->create();
+        $options = [];
+
+        foreach ($collection as $item) {
+            $label = (string)($item->getTemplateName() ?: __('Template #%1', $item->getEntityId()));
+            if ($item->getIsDefault()) {
+                $label .= ' *';
+            }
+            $options[] = [
+                'value' => (int)$item->getEntityId(),
+                'label' => $label,
+            ];
+        }
+
+        return $options;
+    }
+
+    /**
+     * Get Customs Type options from source model.
+     *
+     * @return array
+     */
+    public function getCustomsTypeOptions(): array
+    {
+        return $this->customsTypeSource->toOptionArray();
+    }
+
+    /**
+     * Get Category Of Item options from source model.
+     *
+     * @return array
+     */
+    public function getCategoryOfItemOptions(): array
+    {
+        return $this->categoryOfItemSource->toOptionArray();
+    }
+
+    /**
+     * Get Customs Currency options from source model.
+     *
+     * @return array
+     */
+    public function getCustomsCurrencyOptions(): array
+    {
+        return $this->customsCurrencySource->toOptionArray();
     }
 
     /**

@@ -8,6 +8,7 @@ use Ideo\Dhl\Controller\Adminhtml\CustomsTemplate\Save;
 use Ideo\Dhl\Model\CustomsTemplate;
 use Ideo\Dhl\Model\CustomsTemplateFactory;
 use Ideo\Dhl\Model\CustomsTemplateRepository;
+use Ideo\Dhl\Model\Source\CategoryOfItem;
 use Ideo\Dhl\Model\Source\CustomsCurrency;
 use Ideo\Dhl\Model\Source\CustomsType;
 use Magento\Backend\App\Action\Context;
@@ -96,7 +97,8 @@ class SaveTest extends TestCase
             $this->repository,
             $this->templateFactory,
             $this->serializer,
-            $this->customsCurrency
+            $this->customsCurrency,
+            new CategoryOfItem()
         );
     }
 

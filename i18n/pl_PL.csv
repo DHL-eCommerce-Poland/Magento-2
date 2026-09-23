@@ -378,7 +378,7 @@ Add Package,Dodaj paczkę
 Track on DHL (https://mojdhl.pl/sprawdz?paczki=%1),Śledź w DHL (https://mojdhl.pl/sprawdz?paczki=%1)
 Date Added,Data dodania
 Status,Status
-Description,OpisF
+Description,Opis
 Terminal,Terminal
 No tracking events recorded yet for this shipment.,Brak zarejestrowanych zdarzeń śledzenia dla tej przesyłki.
 DHL Service Point Pickup,Odbiór w punkcie DHL ServicePoint
@@ -569,3 +569,26 @@ Help,Pomoc
 "Only templates matching the shipping method selected by the customer when placing the order are displayed.","Wyświetlane są tylko szablony pasujące do metody dostawy wybranej przez klienta przy składaniu zamówienia."
 "Currency ""%1"" is not allowed for customs clearance type ""%2"". Allowed currencies: %3.","Waluta ""%1"" nie jest dozwolona dla typu odprawy celnej ""%2"". Dostępne waluty: %3."
 "Customs Tariff Code","Kod taryfy celnej"
+"Customs Clearance Template","Szablon odprawy celnej"
+"Customs Clearance Type, Category & Currency","Typ odprawy celnej, kategoria i waluta"
+"Origin Country, Costs & Gross Weight","Kraj pochodzenia, koszt i waga brutto"
+"Contact Person First & Last Name","Imię i nazwisko osoby kontaktowej"
+"Shipper VAT, NIP & EORI","VAT, NIP i EORI nadawcy"
+"Receiver VAT & EORI","VAT i EORI odbiorcy"
+"Invoice Number & Date","Numer i data faktury"
+"Date of Invoice (YYYY-MM-DD)","Data faktury (RRRR-MM-DD)"
+"Declarations","Oświadczenia"
+"Shipment Does Not Contain Restricted Goods","Przesyłka nie zawiera towarów objętych ograniczeniami"
+"At least one customs goods item is required when customs clearance is selected.","Co najmniej jedna pozycja towarowa jest wymagana, gdy wybrano odprawę celną."
+"Add Item","Dodaj pozycję"
+"Tariff Code","Kod taryfy"
+"Country of Origin","Kraj pochodzenia"
+"Costs of Shipment","Koszt przesyłki"
+"Shipper VAT No","Numer VAT nadawcy"
+"Receiver VAT No","Numer VAT odbiorcy"
+"Customs Clearance Type, Category of Item & Currency","Typ odprawy celnej, rodzaj towaru i waluta"
+"Akcje","Akcje"
+"Shipper VAT & Receiver VAT","VAT nadawcy i VAT odbiorcy"
+"Shipper NIP, Shipper EORI & Receiver EORI","NIP nadawcy, EORI nadawcy i EORI odbiorcy"
+"Additional Information","Informacje dodatkowe"
+"Agreements and Declarations","Zgody i oświadczenia"
