@@ -9,7 +9,7 @@ use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
 use Ideo\Dhl\Model\CustomsTemplateRepository;
 use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
+use Ideo\Dhl\Model\Source\CustomsType;
 use Ideo\Dhl\Model\Template\TemplateManager;
 use Ideo\Dhl\Model\Template\TemplateVariableResolver;
 use Magento\Backend\App\Action;
@@ -32,7 +32,6 @@ class LoadTemplate extends Action
      * @param DropOffPointRepositoryInterface $dropOffPointRepository
      * @param DeliveryServiceRepositoryInterface $deliveryServiceRepository
      * @param OrderRepositoryInterface $orderRepository
-     * @param OrderToShipmentDataMapper $mapper
      * @param TemplateManager $templateManager
      * @param JsonFactory $jsonFactory
      * @param TemplateVariableResolver $variableResolver
@@ -46,7 +45,6 @@ class LoadTemplate extends Action
         private readonly DropOffPointRepositoryInterface $dropOffPointRepository,
         private readonly DeliveryServiceRepositoryInterface $deliveryServiceRepository,
         private readonly OrderRepositoryInterface $orderRepository,
-        private readonly OrderToShipmentDataMapper $mapper,
         private readonly TemplateManager $templateManager,
         private readonly JsonFactory $jsonFactory,
         private readonly TemplateVariableResolver $variableResolver,
@@ -140,6 +138,18 @@ class LoadTemplate extends Action
                     }
                 }
 
+                $rawPackages = $service->getPackages() ?: [];
+                $cleanPackages = array_map(function ($pkg) {
+                    if (is_array($pkg)) {
+                        foreach (['weight', 'width', 'length', 'height', 'quantity'] as $k) {
+                            if (isset($pkg[$k]) && is_string($pkg[$k])) {
+                                $pkg[$k] = str_replace(',', '.', trim($pkg[$k]));
+                            }
+                        }
+                    }
+                    return $pkg;
+                }, $rawPackages);
+
                 return $resultJson->setData([
                     'success' => true,
                     'data' => [
@@ -154,7 +164,7 @@ class LoadTemplate extends Action
                         'returnQrCodeType' => $service->getReturnQrCodeType() ?: 'QR_PDF',
                         'returnLabelExpDays' => $service->getReturnLabelExpDays() ?? 14,
                         'returnBookCourier' => $service->getReturnBookCourier() ?? 0,
-                        'packages' => $service->getPackages() ?: [],
+                        'packages' => $cleanPackages,
                         'addressType' => $serviceData['address_type'] ?? 'N',
                         'specialServices' => $additionalServices,
                     ]
@@ -181,7 +191,7 @@ class LoadTemplate extends Action
                             }
                             $customsItems = array_values($decoded);
                         }
-                    } catch (Exception $e) {
+                    } catch (Exception) {
                         $customsItems = [];
                     }
                 } elseif (is_array($rawItems)) {
@@ -191,14 +201,24 @@ class LoadTemplate extends Action
                 $defaultTariff = $template->getDefaultTariffCode() ?? '';
                 $countryOrigin = $template->getCountryOfOrigin() ?: 'PL';
 
+                $toFloat = static function (mixed $v): ?float {
+                    if ($v === null || $v === '') {
+                        return null;
+                    }
+                    if (is_string($v)) {
+                        $v = str_replace(',', '.', trim($v));
+                    }
+                    return (float)$v;
+                };
+
                 // Ensure item defaults if missing in individual row
-                $formattedItems = array_map(function ($item) use ($defaultTariff, $countryOrigin) {
+                $formattedItems = array_map(function ($item) use ($defaultTariff, $countryOrigin, $toFloat) {
                     return [
                         'namePl' => (string)($item['namePl'] ?? ''),
                         'nameEn' => (string)($item['nameEn'] ?? ''),
-                        'quantity' => isset($item['quantity']) ? (int)$item['quantity'] : 1,
-                        'weight' => isset($item['weight']) ? (float)$item['weight'] : 0.0,
-                        'value' => isset($item['value']) ? (float)$item['value'] : 0.0,
+                        'quantity' => isset($item['quantity']) ? (int)str_replace(',', '.', (string)$item['quantity']) : 1,
+                        'weight' => isset($item['weight']) ? ($toFloat($item['weight']) ?? 0.0) : 0.0,
+                        'value' => isset($item['value']) ? ($toFloat($item['value']) ?? 0.0) : 0.0,
                         'tariffCode' => (string)(!empty($item['tariffCode']) ? $item['tariffCode'] : $defaultTariff),
                         'countryOfOrigin' => (string)(!empty($item['countryOfOrigin'])
                             ? $item['countryOfOrigin']
@@ -206,14 +226,9 @@ class LoadTemplate extends Action
                     ];
                 }, $customsItems);
 
-                $costs = $template->getCostsOfShipment() !== null
-                    ? (float)$template->getCostsOfShipment()
-                    : null;
-                $grossWeight = $template->getGrossWeight() !== null
-                    ? (float)$template->getGrossWeight()
-                    : null;
-                $isIndividual = ($template->getCustomsType() ===
-                    \Ideo\Dhl\Model\Source\CustomsType::TYPE_INDIVIDUAL);
+                $costs = $template->getCostsOfShipment() !== null ? $toFloat($template->getCostsOfShipment()) : null;
+                $grossWeight = $template->getGrossWeight() !== null ? $toFloat($template->getGrossWeight()) : null;
+                $isIndividual = ($template->getCustomsType() === CustomsType::TYPE_INDIVIDUAL);
 
                 return $resultJson->setData([
                     'success' => true,

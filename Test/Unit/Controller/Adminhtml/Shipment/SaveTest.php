@@ -15,10 +15,12 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class SaveTest extends TestCase
 {
     /**
@@ -97,6 +99,7 @@ class SaveTest extends TestCase
         $timezoneStub->method('date')->willReturnCallback(fn ($d) => new \DateTime((string)$d));
 
         $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $shipmentDataValidator = new \Ideo\Dhl\Model\Shipment\ShipmentDataValidator($timezoneStub);
 
         $this->controller = new Save(
             $this->contextStub,
@@ -106,6 +109,7 @@ class SaveTest extends TestCase
             $serializerStub,
             $timezoneStub,
             $dateSanitizer,
+            $shipmentDataValidator,
             $this->loggerStub
         );
     }
@@ -239,4 +243,72 @@ class SaveTest extends TestCase
         $result = $this->controller->execute();
         $this->assertSame($this->jsonResultMock, $result);
     }
+
+    /**
+     * Test execute returns error when payload contains comma in numeric fields.
+     *
+     * @return void
+     */
+    public function testExecuteReturnsErrorWhenNumericFieldContainsComma(): void
+    {
+        $timezoneMock = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+        $validator = new \Ideo\Dhl\Model\Shipment\ShipmentDataValidator($timezoneMock);
+
+        $serializerStub = $this->createStub(\Magento\Framework\Serialize\SerializerInterface::class);
+        $serializerStub->method('unserialize')->willReturnCallback(function ($data) {
+            return is_string($data) ? json_decode($data, true) : null;
+        });
+
+        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneMock);
+
+        $controllerWithValidator = new Save(
+            $this->contextStub,
+            $this->shipmentCreationServiceMock,
+            $this->scopeConfigMock,
+            $this->jsonFactoryStub,
+            $serializerStub,
+            $timezoneMock,
+            $dateSanitizer,
+            $validator,
+            $this->loggerStub
+        );
+
+        $payloadData = [
+            'orderId' => 123,
+            'sender' => ['name' => 'Jan Kowalski'],
+            'recipient' => ['name' => 'Firma ABC'],
+            'specialServices' => [],
+            'shipmentSettings' => [
+                'serviceType' => 'AH',
+                'packages' => [
+                    ['weight' => '12,5']
+                ]
+            ]
+        ];
+
+        $this->requestStub
+            ->method('getParam')
+            ->willReturnCallback(function (string $param) use ($payloadData) {
+                if ($param === 'draft') {
+                    return json_encode($payloadData);
+                }
+                if ($param === 'isAjax') {
+                    return true;
+                }
+                return null;
+            });
+
+        $this->jsonResultMock->expects(self::once())
+            ->method('setData')
+            ->with(Assert::callback(function (array $data) {
+                return $data['success'] === false
+                    && str_contains($data['message'], 'Package #1 weight')
+                    && str_contains($data['message'], 'cannot contain a comma');
+            }))
+            ->willReturn($this->jsonResultMock);
+
+        $result = $controllerWithValidator->execute();
+        $this->assertSame($this->jsonResultMock, $result);
+    }
 }
+

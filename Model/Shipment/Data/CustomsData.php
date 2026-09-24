@@ -348,6 +348,16 @@ class CustomsData
             ? (int)$data['selectedCustomsTemplateId']
             : null;
 
+        $toFloat = static function (mixed $v): ?float {
+            if ($v === null || $v === '') {
+                return null;
+            }
+            if (is_string($v)) {
+                $v = str_replace(',', '.', trim($v));
+            }
+            return (float)$v;
+        };
+
         return new self(
             $templateId,
             (string)($data['customsType'] ?? 'U'),
@@ -356,8 +366,8 @@ class CustomsData
             (string)($data['countryOfOrigin'] ?? 'PL'),
             isset($data['defaultTariffCode']) ? (string)$data['defaultTariffCode'] : null,
             isset($data['costsOfShipment']) && $data['costsOfShipment'] !== ''
-                ? (float)$data['costsOfShipment'] : null,
-            isset($data['grossWeight']) && $data['grossWeight'] !== '' ? (float)$data['grossWeight'] : null,
+                ? $toFloat($data['costsOfShipment']) : null,
+            isset($data['grossWeight']) && $data['grossWeight'] !== '' ? $toFloat($data['grossWeight']) : null,
             isset($data['firstName']) ? (string)$data['firstName'] : null,
             isset($data['secondaryName']) ? (string)$data['secondaryName'] : null,
             isset($data['nipNr'])

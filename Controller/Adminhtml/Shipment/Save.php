@@ -8,6 +8,7 @@ use Exception;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Ideo\Dhl\Model\Shipment\ShipmentCreationService;
 use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
+use Ideo\Dhl\Model\Shipment\ShipmentDataValidator;
 use InvalidArgumentException;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -16,6 +17,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Psr\Log\LoggerInterface;
@@ -35,6 +37,7 @@ class Save extends Action implements HttpPostActionInterface
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
+     * @param ShipmentDataValidator $shipmentDataValidator
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -45,6 +48,7 @@ class Save extends Action implements HttpPostActionInterface
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
+        private readonly ShipmentDataValidator $shipmentDataValidator,
         private readonly ?LoggerInterface $logger = null
     ) {
         parent::__construct($context);
@@ -93,6 +97,19 @@ class Save extends Action implements HttpPostActionInterface
             $this->messageManager->addErrorMessage($msg);
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
         }
+
+        // Validate raw payload against commas in numeric fields
+        try {
+            $this->shipmentDataValidator->validateRawPayload($payload);
+        } catch (LocalizedException $e) {
+            $errorMsg = $e->getMessage();
+            if ($isAjax) {
+                return $resultJson->setData(['success' => false, 'message' => $errorMsg]);
+            }
+            $this->messageManager->addErrorMessage($errorMsg);
+            return $this->resultRedirectFactory->create()->setPath('*/*/index');
+        }
+
 
         // Validate and sanitize shipmentDate (must be valid and not in the past)
         if (isset($payload['shipmentSettings']) && is_array($payload['shipmentSettings'])) {

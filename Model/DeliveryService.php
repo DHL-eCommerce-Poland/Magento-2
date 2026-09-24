@@ -205,6 +205,11 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
             if ($hasPkgField) {
                 if (empty($current['is_deleted']) && empty($current['delete'])) {
                     unset($current['initialize'], $current['record_id'], $current['is_deleted'], $current['delete']);
+                    foreach (['weight', 'width', 'length', 'height', 'quantity'] as $numKey) {
+                        if (isset($current[$numKey]) && is_string($current[$numKey])) {
+                            $current[$numKey] = str_replace(',', '.', trim($current[$numKey]));
+                        }
+                    }
                     $flattened[] = $current;
                 }
             } else {

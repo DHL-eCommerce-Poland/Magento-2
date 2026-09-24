@@ -153,4 +153,102 @@ class ShipmentDataValidator
             throw new LocalizedException(__(implode("\n", array_unique($errors))));
         }
     }
+
+    /**
+     * Validate raw request payload for numeric fields containing commas.
+     *
+     * @param array $payload
+     *
+     * @return void
+     * @throws LocalizedException
+     */
+    public function validateRawPayload(array $payload): void
+    {
+        $errors = [];
+
+        // 1. Packages
+        $packages = $payload['shipmentSettings']['packages'] ?? ($payload['packages'] ?? []);
+        if (is_array($packages)) {
+            foreach ($packages as $index => $pkg) {
+                if (!is_array($pkg)) {
+                    continue;
+                }
+                $rowNum = $index + 1;
+                $numericFields = [
+                    'weight' => __('Package #%1 weight', $rowNum),
+                    'width' => __('Package #%1 width', $rowNum),
+                    'length' => __('Package #%1 length', $rowNum),
+                    'height' => __('Package #%1 height', $rowNum),
+                    'quantity' => __('Package #%1 quantity', $rowNum),
+                ];
+
+                foreach ($numericFields as $fieldKey => $label) {
+                    if (isset($pkg[$fieldKey]) && is_string($pkg[$fieldKey]) && str_contains($pkg[$fieldKey], ',')) {
+                        $errors[] = __('Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.', $label)->render();
+                    }
+                }
+            }
+        }
+
+        // 2. Special Services
+        $ss = $payload['specialServices'] ?? [];
+        if (is_array($ss)) {
+            $ssFields = [
+                'insuranceValue' => __('Insurance Value'),
+                'codAmount' => __('COD Amount'),
+            ];
+            foreach ($ssFields as $fieldKey => $label) {
+                if (isset($ss[$fieldKey]) && is_string($ss[$fieldKey]) && str_contains($ss[$fieldKey], ',')) {
+                    $errors[] = __('Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.', $label)->render();
+                }
+            }
+        }
+
+        // 3. Shipment Settings
+        $st = $payload['shipmentSettings'] ?? [];
+        if (is_array($st)) {
+            if (isset($st['returnLabelExpDays']) && is_string($st['returnLabelExpDays']) && str_contains($st['returnLabelExpDays'], ',')) {
+                $errors[] = __('Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.', __('Return Label Expiration Days'))->render();
+            }
+        }
+
+        // 4. Customs Clearance
+        $customs = $payload['customs'] ?? [];
+        if (is_array($customs)) {
+            $customsFields = [
+                'costsOfShipment' => __('Gross Costs of Shipment'),
+                'grossWeight' => __('Gross Weight'),
+            ];
+            foreach ($customsFields as $fieldKey => $label) {
+                if (isset($customs[$fieldKey]) && is_string($customs[$fieldKey]) && str_contains($customs[$fieldKey], ',')) {
+                    $errors[] = __('Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.', $label)->render();
+                }
+            }
+
+            $items = $customs['customsItems'] ?? [];
+            if (is_array($items)) {
+                foreach ($items as $index => $item) {
+                    if (!is_array($item)) {
+                        continue;
+                    }
+                    $rowNum = $index + 1;
+                    $itemFields = [
+                        'weight' => __('Customs Item #%1 weight', $rowNum),
+                        'value' => __('Customs Item #%1 value', $rowNum),
+                        'quantity' => __('Customs Item #%1 quantity', $rowNum),
+                    ];
+                    foreach ($itemFields as $fieldKey => $label) {
+                        if (isset($item[$fieldKey]) && is_string($item[$fieldKey]) && str_contains($item[$fieldKey], ',')) {
+                            $errors[] = __('Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.', $label)->render();
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            throw new LocalizedException(__(implode("\n", array_unique($errors))));
+        }
+    }
 }
+

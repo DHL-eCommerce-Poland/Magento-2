@@ -140,13 +140,23 @@ class PackageData
     // phpcs:ignore Magento2.Functions.StaticFunction.StaticFunction
     public static function fromArray(array $data): self
     {
+        $toFloat = static function (mixed $val): ?float {
+            if ($val === null || $val === '') {
+                return null;
+            }
+            if (is_string($val)) {
+                $val = str_replace(',', '.', trim($val));
+            }
+            return (float)$val;
+        };
+
         return new self(
             (string)($data['packageType'] ?? $data['package_type'] ?? 'PACKAGE'),
-            isset($data['quantity']) ? (int)$data['quantity'] : 1,
-            (float)($data['weight'] ?? 0.0),
-            isset($data['width']) && $data['width'] !== null ? (float)$data['width'] : null,
-            isset($data['length']) && $data['length'] !== null ? (float)$data['length'] : null,
-            isset($data['height']) && $data['height'] !== null ? (float)$data['height'] : null,
+            isset($data['quantity']) ? (int)str_replace(',', '.', (string)$data['quantity']) : 1,
+            $toFloat($data['weight'] ?? 0.0) ?? 0.0,
+            isset($data['width']) && $data['width'] !== null ? $toFloat($data['width']) : null,
+            isset($data['length']) && $data['length'] !== null ? $toFloat($data['length']) : null,
+            isset($data['height']) && $data['height'] !== null ? $toFloat($data['height']) : null,
             filter_var($data['isNonStandard'] ?? $data['is_non_standard'] ?? false, FILTER_VALIDATE_BOOLEAN),
             filter_var($data['hasEuroReturn'] ?? $data['has_euro_return'] ?? false, FILTER_VALIDATE_BOOLEAN)
         );

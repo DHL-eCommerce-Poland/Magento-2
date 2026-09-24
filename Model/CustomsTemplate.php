@@ -281,7 +281,13 @@ class CustomsTemplate extends AbstractModel
     public function getCostsOfShipment(): ?float
     {
         $val = $this->getData(self::COSTS_OF_SHIPMENT);
-        return $val !== null ? (float)$val : null;
+        if ($val === null || $val === '') {
+            return null;
+        }
+        if (is_string($val)) {
+            $val = str_replace(',', '.', trim($val));
+        }
+        return (float)$val;
     }
 
     /**
@@ -304,7 +310,13 @@ class CustomsTemplate extends AbstractModel
     public function getGrossWeight(): ?float
     {
         $val = $this->getData(self::GROSS_WEIGHT);
-        return $val !== null ? (float)$val : null;
+        if ($val === null || $val === '') {
+            return null;
+        }
+        if (is_string($val)) {
+            $val = str_replace(',', '.', trim($val));
+        }
+        return (float)$val;
     }
 
     /**

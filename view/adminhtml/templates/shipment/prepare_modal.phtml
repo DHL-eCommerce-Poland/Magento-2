@@ -243,7 +243,7 @@ $dateFormat = $viewModel->getDateFormat();
                         <div class="admin__field" style="margin-top: 8px; padding-left: 20px;">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Return Label Expiration Days')) ?></span></label>
                             <div class="admin__field-control">
-                                <input type="number" class="admin__control-text" min="1" data-bind="value: returnLabelExpDays" style="width: 100px;" />
+                                <input type="number" class="admin__control-text" min="1" data-bind="value: returnLabelExpDays" style="width: 100px;" data-validate="{'validate-no-comma': true}" />
                             </div>
                         </div>
                         <div class="admin__field" style="margin-top: 8px; padding-left: 20px;">
@@ -272,7 +272,7 @@ $dateFormat = $viewModel->getDateFormat();
                                     </label>
                                 </div>
                                 <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: insurance">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Insurance Value')) ?>" data-bind="value: insuranceValue, attr: {required: insurance() ? 'required' : null}" data-validate="{'required-entry': true, 'validate-number': true, 'greater-than-zero': true}" />
+                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Insurance Value')) ?>" data-bind="value: insuranceValue, attr: {required: insurance() ? 'required' : null}" data-validate="{'required-entry': true, 'validate-number': true, 'greater-than-zero': true, 'validate-no-comma': true}" />
                                 </div>
                                 <div class="admin__field admin__field-option">
                                     <input type="checkbox" class="admin__control-checkbox" id="service_cod" data-bind="checked: cod" />
@@ -281,7 +281,7 @@ $dateFormat = $viewModel->getDateFormat();
                                     </label>
                                 </div>
                                 <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: cod">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('COD Amount')) ?>" data-bind="value: codAmount, attr: {required: cod() ? 'required' : null}" data-validate="{'required-entry': true, 'validate-number': true, 'greater-than-zero': true}" />
+                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('COD Amount')) ?>" data-bind="value: codAmount, attr: {required: cod() ? 'required' : null}" data-validate="{'required-entry': true, 'validate-number': true, 'greater-than-zero': true, 'validate-no-comma': true}" />
                                 </div>
                                 <div class="admin__field admin__field-option">
                                     <input type="checkbox" class="admin__control-checkbox" id="service_evening_delivery" data-bind="checked: eveningDelivery" />
@@ -370,19 +370,19 @@ $dateFormat = $viewModel->getDateFormat();
                                         <select class="admin__control-select" data-bind="options: $parents[1].packageTypeOptions, optionsText: 'label', optionsValue: 'value', value: packageType" required></select>
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: top;">
-                                        <input type="text" class="admin__control-text" data-bind="value: quantity" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true}" required />
+                                        <input type="text" class="admin__control-text" data-bind="value: quantity" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true, 'validate-no-comma':true}" required />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: top;">
-                                        <input type="text" class="admin__control-text" data-bind="value: weight" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true}" required />
+                                        <input type="text" class="admin__control-text" data-bind="value: weight" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true, 'validate-no-comma':true}" required />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: top;">
-                                        <input type="text" class="admin__control-text" data-bind="value: width, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true}' : null }" />
+                                        <input type="text" class="admin__control-text" data-bind="value: width, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: top;">
-                                        <input type="text" class="admin__control-text" data-bind="value: length, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true}' : null }" />
+                                        <input type="text" class="admin__control-text" data-bind="value: length, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: top;">
-                                        <input type="text" class="admin__control-text" data-bind="value: height, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true}' : null }" />
+                                        <input type="text" class="admin__control-text" data-bind="value: height, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" />
                                     </td>
                                     <td class="_fit" style="padding: 6px 4px; vertical-align: middle; text-align: center;">
                                         <div class="admin__field admin__field-option" style="margin: 0; display: inline-block; vertical-align: middle;">
@@ -443,8 +443,8 @@ $dateFormat = $viewModel->getDateFormat();
                     <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Origin Country, Costs & Gross Weight')) ?></span></label>
                     <div class="admin__field-control" style="display: flex; gap: 8px;">
                         <select class="admin__control-select" data-bind="options: $parent.countryOptions, optionsText: 'label', optionsValue: 'value', value: countryOfOrigin" style="flex: 1;" required></select>
-                        <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Gross Costs of Shipment')) ?>" data-bind="value: costsOfShipment" style="flex: 1;" required data-validate="{'required-entry': true, 'validate-zero-or-greater': true, 'validate-number': true}" />
-                        <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Gross Weight (kg)')) ?>" data-bind="value: grossWeight" style="flex: 1;" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true}" />
+                        <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Gross Costs of Shipment')) ?>" data-bind="value: costsOfShipment" style="flex: 1;" required data-validate="{'required-entry': true, 'validate-zero-or-greater': true, 'validate-number': true, 'validate-no-comma': true}" />
+                        <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Gross Weight (kg)')) ?>" data-bind="value: grossWeight" style="flex: 1;" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true, 'validate-no-comma': true}" />
                     </div>
                 </div>
 
@@ -565,13 +565,13 @@ $dateFormat = $viewModel->getDateFormat();
                                         <input type="text" maxlength="35" class="admin__control-text" data-bind="value: namePl" required />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: top;">
-                                        <input type="number" class="admin__control-text" min="1" data-bind="value: quantity" required />
+                                        <input type="number" class="admin__control-text" min="1" data-bind="value: quantity" required data-validate="{'required-entry': true, 'validate-no-comma': true}" />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: top;">
-                                        <input type="text" class="admin__control-text" data-bind="value: weight" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true}" />
+                                        <input type="text" class="admin__control-text" data-bind="value: weight" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true, 'validate-no-comma': true}" />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: top;">
-                                        <input type="text" class="admin__control-text" data-bind="value: value" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true}" />
+                                        <input type="text" class="admin__control-text" data-bind="value: value" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true, 'validate-no-comma': true}" />
                                     </td>
                                     <td style="padding: 6px 4px; vertical-align: top;" data-bind="visible: $parent.customsType() === 'I' || $parent.customsType() === 'S'">
                                         <input type="text" maxlength="10" class="admin__control-text" data-bind="value: tariffCode, attr: { required: ($parent.customsType() === 'I' || $parent.customsType() === 'S') ? 'required' : null }" />

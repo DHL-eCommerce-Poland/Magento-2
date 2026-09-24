@@ -12,7 +12,6 @@ use Ideo\Dhl\Controller\Adminhtml\Shipment\LoadTemplate;
 use Ideo\Dhl\Model\CustomsTemplate;
 use Ideo\Dhl\Model\CustomsTemplateRepository;
 use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use Ideo\Dhl\Model\Template\TemplateManager;
 use Ideo\Dhl\Model\Template\TemplateVariableResolver;
 use Magento\Backend\App\Action\Context;
@@ -32,7 +31,6 @@ class LoadTemplateTest extends TestCase
     private $dropOffPointRepository;
     private $deliveryServiceRepository;
     private $orderRepository;
-    private $mapper;
     private $templateManager;
     private $jsonFactory;
     private $jsonResult;
@@ -51,7 +49,6 @@ class LoadTemplateTest extends TestCase
         $this->dropOffPointRepository = $this->createMock(DropOffPointRepositoryInterface::class);
         $this->deliveryServiceRepository = $this->createMock(DeliveryServiceRepositoryInterface::class);
         $this->orderRepository = $this->createStub(OrderRepositoryInterface::class);
-        $this->mapper = $this->createStub(OrderToShipmentDataMapper::class);
         $this->templateManager = $this->createStub(TemplateManager::class);
         $this->jsonFactory = $this->createStub(JsonFactory::class);
         $this->jsonResult = $this->createMock(Json::class);
@@ -66,7 +63,6 @@ class LoadTemplateTest extends TestCase
             $this->dropOffPointRepository,
             $this->deliveryServiceRepository,
             $this->orderRepository,
-            $this->mapper,
             $this->templateManager,
             $this->jsonFactory,
             $this->variableResolver,

@@ -238,4 +238,94 @@ class ShipmentDataValidatorTest extends TestCase
         $this->expectExceptionMessage('Courier Pickup Time [From] must be earlier than Pickup Time [To].');
         $this->validator->validate($shipmentData);
     }
+
+    /**
+     * Test validateRawPayload passes with valid numeric fields using dot as decimal separator.
+     *
+     * @return void
+     */
+    public function testValidateRawPayloadWithValidDataPasses(): void
+    {
+        $payload = [
+            'shipmentSettings' => [
+                'packages' => [
+                    ['weight' => '2.5', 'width' => '10.0', 'length' => '15.5', 'height' => '5.0', 'quantity' => '1']
+                ],
+                'returnLabelExpDays' => '14'
+            ],
+            'specialServices' => [
+                'insuranceValue' => '100.50',
+                'codAmount' => '50.00'
+            ],
+            'customs' => [
+                'costsOfShipment' => '12.00',
+                'grossWeight' => '2.5',
+                'customsItems' => [
+                    ['weight' => '1.25', 'value' => '99.99', 'quantity' => '2']
+                ]
+            ]
+        ];
+
+        $this->expectNotToPerformAssertions();
+        $this->validator->validateRawPayload($payload);
+    }
+
+    /**
+     * Test validateRawPayload throws LocalizedException when package weight contains a comma.
+     *
+     * @return void
+     */
+    public function testValidateRawPayloadWithCommaInPackageWeightThrowsException(): void
+    {
+        $payload = [
+            'shipmentSettings' => [
+                'packages' => [
+                    ['weight' => '2,5', 'quantity' => '1']
+                ]
+            ]
+        ];
+
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('Field "Package #1 weight" cannot contain a comma. Please use a dot (.) as decimal separator.');
+        $this->validator->validateRawPayload($payload);
+    }
+
+    /**
+     * Test validateRawPayload throws LocalizedException when insurance value contains a comma.
+     *
+     * @return void
+     */
+    public function testValidateRawPayloadWithCommaInInsuranceValueThrowsException(): void
+    {
+        $payload = [
+            'specialServices' => [
+                'insuranceValue' => '150,50'
+            ]
+        ];
+
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('Field "Insurance Value" cannot contain a comma. Please use a dot (.) as decimal separator.');
+        $this->validator->validateRawPayload($payload);
+    }
+
+    /**
+     * Test validateRawPayload throws LocalizedException when customs item value contains a comma.
+     *
+     * @return void
+     */
+    public function testValidateRawPayloadWithCommaInCustomsValueThrowsException(): void
+    {
+        $payload = [
+            'customs' => [
+                'customsItems' => [
+                    ['value' => '10,99']
+                ]
+            ]
+        ];
+
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage('Field "Customs Item #1 value" cannot contain a comma. Please use a dot (.) as decimal separator.');
+        $this->validator->validateRawPayload($payload);
+    }
 }
+

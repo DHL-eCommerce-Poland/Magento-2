@@ -10,6 +10,19 @@ define([
 ], function ($, ko, Component, modal, alert) {
     'use strict';
 
+    if ($.validator && !$.validator.methods['validate-no-comma']) {
+        $.validator.addMethod(
+            'validate-no-comma',
+            function (value) {
+                if (value === null || value === undefined || value === '') {
+                    return true;
+                }
+                return String(value).indexOf(',') === -1;
+            },
+            $.mage.__('Please use a dot (.) instead of a comma (,) as decimal separator.')
+        );
+    }
+
     if (!ko.bindingHandlers.dhlTimepicker) {
         ko.bindingHandlers.dhlTimepicker = {
             init: function (element, valueAccessor) {
@@ -98,7 +111,8 @@ define([
 
     function formatDecimal4(val) {
         if (val === null || val === undefined || val === '') return '';
-        var num = parseFloat(val);
+        var str = String(val).replace(',', '.');
+        var num = parseFloat(str);
         return isNaN(num) ? '' : num.toFixed(4);
     }
 
@@ -126,10 +140,11 @@ define([
         });
 
         var isNonStd = p.isNonStandard !== undefined ? p.isNonStandard : p.is_non_standard;
+        var qtyVal = (p.quantity !== undefined && p.quantity !== null && p.quantity !== '') ? String(p.quantity).replace(',', '.') : '';
 
         return {
             packageType: pkgTypeObs,
-            quantity: ko.observable(p.quantity !== undefined && p.quantity !== null && p.quantity !== '' ? p.quantity : ''),
+            quantity: ko.observable(qtyVal),
             weight: ko.observable(formatDecimal4(p.weight)),
             width: ko.observable(formatDecimal4(p.width)),
             length: ko.observable(formatDecimal4(p.length)),
@@ -141,12 +156,14 @@ define([
 
     function createCustomsItemObservable(item) {
         item = item || {};
+        var valStr = (item.value !== undefined && item.value !== null && item.value !== '') ? String(item.value).replace(',', '.') : '';
+        var qtyStr = (item.quantity !== undefined && item.quantity !== null && item.quantity !== '') ? String(item.quantity).replace(',', '.') : 1;
         return {
             namePl: ko.observable(item.namePl || ''),
             nameEn: ko.observable(item.nameEn || ''),
-            quantity: ko.observable(item.quantity !== undefined && item.quantity !== null && item.quantity !== '' ? item.quantity : 1),
+            quantity: ko.observable(qtyStr),
             weight: ko.observable(formatDecimal4(item.weight)),
-            value: ko.observable(item.value !== undefined && item.value !== null && item.value !== '' ? item.value : ''),
+            value: ko.observable(valStr),
             tariffCode: ko.observable(item.tariffCode || ''),
             countryOfOrigin: ko.observable(item.countryOfOrigin || 'PL')
         };
@@ -1013,6 +1030,52 @@ define([
                                     }
 
                                     var draftJs = ko.toJS(self.shipmentData());
+
+                                    var hasCommaError = false;
+                                    if (draftJs) {
+                                        var checkComma = function (val) {
+                                            return val !== null && val !== undefined && String(val).indexOf(',') !== -1;
+                                        };
+
+                                        if (draftJs.specialServices) {
+                                            if (checkComma(draftJs.specialServices.insuranceValue) || checkComma(draftJs.specialServices.codAmount)) {
+                                                hasCommaError = true;
+                                            }
+                                        }
+                                        if (draftJs.shipmentSettings) {
+                                            if (checkComma(draftJs.shipmentSettings.returnLabelExpDays)) {
+                                                hasCommaError = true;
+                                            }
+                                            if (Array.isArray(draftJs.shipmentSettings.packages)) {
+                                                $.each(draftJs.shipmentSettings.packages, function (i, pkg) {
+                                                    if (checkComma(pkg.weight) || checkComma(pkg.width) || checkComma(pkg.length) || checkComma(pkg.height) || checkComma(pkg.quantity)) {
+                                                        hasCommaError = true;
+                                                    }
+                                                });
+                                            }
+                                        }
+                                        if (draftJs.customs) {
+                                            if (checkComma(draftJs.customs.costsOfShipment) || checkComma(draftJs.customs.grossWeight)) {
+                                                hasCommaError = true;
+                                            }
+                                            if (Array.isArray(draftJs.customs.customsItems)) {
+                                                $.each(draftJs.customs.customsItems, function (i, item) {
+                                                    if (checkComma(item.weight) || checkComma(item.value) || checkComma(item.quantity)) {
+                                                        hasCommaError = true;
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+
+                                    if (hasCommaError) {
+                                        alert({
+                                            title: $.mage.__('Error'),
+                                            content: $.mage.__('Commas are not allowed in numeric fields. Please use a dot (.) as decimal separator.')
+                                        });
+                                        return false;
+                                    }
+
                                     var pFrom = draftJs.sender ? draftJs.sender.pickupHourFrom : null;
                                     var pTo = draftJs.sender ? draftJs.sender.pickupHourTo : null;
                                     var pkgs = (draftJs.shipmentSettings && draftJs.shipmentSettings.packages) ? draftJs.shipmentSettings.packages : [];
