@@ -11,6 +11,7 @@ use Ideo\Dhl\Model\Shipment\Data\SenderData;
 use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ShipmentReturnDataMapperTest extends TestCase
@@ -107,5 +108,22 @@ class ShipmentReturnDataMapperTest extends TestCase
         $dirty = "Test\x00\x07String  ";
         $sanitized = $this->mapper->sanitizeString($dirty);
         $this->assertEquals('TestString', $sanitized);
+    }
+
+    #[DataProvider('postalCodeDataProvider')]
+    public function testSanitizePostalCode(string $inputCode, string $countryCode, string $expected): void
+    {
+        $this->assertSame($expected, $this->mapper->sanitizePostalCode($inputCode, $countryCode));
+    }
+
+    public static function postalCodeDataProvider(): array
+    {
+        return [
+            'PL with hyphen' => ['00-950', 'PL', '00950'],
+            'PL without hyphen' => ['00950', 'PL', '00950'],
+            'GB alphanumeric' => ['SW1A 1AA', 'GB', 'SW1A 1AA'],
+            'DE with hyphen' => ['D-10115', 'DE', 'D-10115'],
+            'US zip extended' => ['90210-1234', 'US', '90210-1234'],
+        ];
     }
 }

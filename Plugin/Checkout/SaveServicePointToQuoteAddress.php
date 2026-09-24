@@ -114,7 +114,7 @@ class SaveServicePointToQuoteAddress
         mixed $extAttributes,
         mixed $shippingAddress = null
     ): ?ServicePointValueObject {
-        if (!$extAttributes) {
+        if (!$extAttributes && (!$shippingAddress || !is_object($shippingAddress))) {
             return null;
         }
 
@@ -128,14 +128,26 @@ class SaveServicePointToQuoteAddress
         $postnummer = null;
 
         if (is_object($extAttributes)) {
-            $id = $this->getAttrValue($extAttributes, 'getDhlServicePointId');
-            $name = $this->getAttrValue($extAttributes, 'getDhlServicePointName');
-            $street = $this->getAttrValue($extAttributes, 'getDhlServicePointStreet');
-            $postcode = $this->getAttrValue($extAttributes, 'getDhlServicePointPostcode');
-            $city = $this->getAttrValue($extAttributes, 'getDhlServicePointCity');
-            $isPackstation = (bool) $this->getAttrValue($extAttributes, 'getDhlIsPackstation');
-            $isPostfiliale = (bool) $this->getAttrValue($extAttributes, 'getDhlIsPostfiliale');
-            $postnummerStr = $this->getAttrValue($extAttributes, 'getDhlPostnummer');
+            $id = (string) (is_callable([$extAttributes, 'getDhlServicePointId']) ? $extAttributes->getDhlServicePointId() : ($extAttributes->dhl_service_point_id ?? ''));
+            $name = (string) (is_callable([$extAttributes, 'getDhlServicePointName']) ? $extAttributes->getDhlServicePointName() : ($extAttributes->dhl_service_point_name ?? ''));
+            $street = (string) (is_callable([$extAttributes, 'getDhlServicePointStreet']) ? $extAttributes->getDhlServicePointStreet() : ($extAttributes->dhl_service_point_street ?? ''));
+            $postcode = (string) (is_callable([$extAttributes, 'getDhlServicePointPostcode']) ? $extAttributes->getDhlServicePointPostcode() : ($extAttributes->dhl_service_point_postcode ?? ''));
+            $city = (string) (is_callable([$extAttributes, 'getDhlServicePointCity']) ? $extAttributes->getDhlServicePointCity() : ($extAttributes->dhl_service_point_city ?? ''));
+            $isPackstation = (bool) (is_callable([$extAttributes, 'getDhlIsPackstation']) ? $extAttributes->getDhlIsPackstation() : ($extAttributes->dhl_is_packstation ?? false));
+            $isPostfiliale = (bool) (is_callable([$extAttributes, 'getDhlIsPostfiliale']) ? $extAttributes->getDhlIsPostfiliale() : ($extAttributes->dhl_is_postfiliale ?? false));
+            $postnummerStr = (string) (is_callable([$extAttributes, 'getDhlPostnummer']) ? $extAttributes->getDhlPostnummer() : ($extAttributes->dhl_postnummer ?? ''));
+            $postnummer = $postnummerStr !== '' ? $postnummerStr : null;
+        }
+
+        if (trim($id) === '' && $shippingAddress && is_object($shippingAddress) && method_exists($shippingAddress, 'getData')) {
+            $id = (string) ($shippingAddress->getData('dhl_service_point_id') ?? '');
+            $name = (string) ($shippingAddress->getData('dhl_service_point_name') ?? '');
+            $street = (string) ($shippingAddress->getData('dhl_service_point_street') ?? '');
+            $postcode = (string) ($shippingAddress->getData('dhl_service_point_postcode') ?? '');
+            $city = (string) ($shippingAddress->getData('dhl_service_point_city') ?? '');
+            $isPackstation = (bool) ($shippingAddress->getData('dhl_is_packstation') ?? false);
+            $isPostfiliale = (bool) ($shippingAddress->getData('dhl_is_postfiliale') ?? false);
+            $postnummerStr = (string) ($shippingAddress->getData('dhl_postnummer') ?? '');
             $postnummer = $postnummerStr !== '' ? $postnummerStr : null;
         }
 
@@ -145,10 +157,8 @@ class SaveServicePointToQuoteAddress
 
         $country = '';
         if ($shippingAddress && is_object($shippingAddress)) {
-            if (method_exists($shippingAddress, 'getCountryId') && $shippingAddress->getCountryId()) {
+            if (method_exists($shippingAddress, 'getCountryId')) {
                 $country = (string) $shippingAddress->getCountryId();
-            } elseif (method_exists($shippingAddress, 'getData')) {
-                $country = (string) ($shippingAddress->getData('country_id') ?? '');
             }
         }
 
@@ -163,22 +173,5 @@ class SaveServicePointToQuoteAddress
             $postnummer,
             $country
         );
-    }
-
-    /**
-     * Read attribute value if method exists or is callable.
-     *
-     * @param object $object
-     * @param string $method
-     *
-     * @return string
-     */
-    private function getAttrValue(object $object, string $method): string
-    {
-        if (method_exists($object, $method) || is_callable([$object, $method])) {
-            return (string) $object->$method();
-        }
-
-        return '';
     }
 }

@@ -81,7 +81,7 @@ class ShipmentReturnDataMapper
 
         $billing = [
             'shippingPaymentType' => 'RECEIVER',
-            'billingAccountNumber' => (int) $this->sanitizePostalCode($billingAccount ?: '0'),
+            'billingAccountNumber' => (int) preg_replace('/[^0-9]/', '', $billingAccount ?: '0'),
             'paymentType' => 'BANK_TRANSFER',
         ];
 
@@ -127,7 +127,7 @@ class ShipmentReturnDataMapper
                     'address' => [
                         'country' => $customerCountry,
                         'name' => $this->sanitizeString($customerSender->getName() ?: $customerContact),
-                        'postalCode' => $this->sanitizePostalCode($customerSender->getPostalCode()),
+                        'postalCode' => $this->sanitizePostalCode($customerSender->getPostalCode(), $customerCountry),
                         'city' => $this->sanitizeString($customerSender->getCity()),
                         'street' => $this->sanitizeString($customerSender->getStreet()),
                         'houseNumber' => $this->sanitizeString($customerSender->getHouseNumber()),
@@ -143,7 +143,7 @@ class ShipmentReturnDataMapper
                     'address' => [
                         'country' => $countryCode,
                         'name' => $this->sanitizeString($merchantName),
-                        'postalCode' => $this->sanitizePostalCode($merchantRecipient->getPostalCode()),
+                        'postalCode' => $this->sanitizePostalCode($merchantRecipient->getPostalCode(), $countryCode),
                         'city' => $this->sanitizeString($merchantRecipient->getCity()),
                         'street' => $this->sanitizeString($merchantRecipient->getStreet()),
                         'houseNumber' => $this->sanitizeString($merchantRecipient->getHouseNumber()),
@@ -193,14 +193,20 @@ class ShipmentReturnDataMapper
     }
 
     /**
-     * Format postal code to 5 digits without hyphens.
+     * Format postal code: remove hyphen for PL, return unchanged for international countries.
      *
      * @param string $postalCode
+     * @param string $countryCode
      *
      * @return string
      */
-    public function sanitizePostalCode(string $postalCode): string
+    public function sanitizePostalCode(string $postalCode, string $countryCode = 'PL'): string
     {
-        return (string) preg_replace('/[^0-9]/', '', $postalCode);
+        $postalCode = trim($postalCode);
+        if (strtoupper($countryCode) === 'PL') {
+            return str_replace('-', '', $postalCode);
+        }
+
+        return $postalCode;
     }
 }

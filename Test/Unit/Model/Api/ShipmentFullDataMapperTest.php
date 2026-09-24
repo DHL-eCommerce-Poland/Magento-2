@@ -11,16 +11,11 @@ use Ideo\Dhl\Model\Shipment\Data\SenderData;
 use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Magento\Framework\Filesystem\Driver\File as FileDriver;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ShipmentFullDataMapperTest extends TestCase
 {
-    /**
-     * @var FileDriver
-     */
-    private $fileDriver;
-
     /**
      * @var ShipmentFullDataMapper
      */
@@ -28,8 +23,7 @@ class ShipmentFullDataMapperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fileDriver = $this->createStub(FileDriver::class);
-        $this->mapper = new ShipmentFullDataMapper($this->fileDriver);
+        $this->mapper = new ShipmentFullDataMapper();
     }
 
     /**
@@ -315,5 +309,59 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertSame('Koszulka', $c['customsItem'][0]['namePl']);
         $this->assertSame('T-Shirt', $c['customsItem'][0]['nameEn']);
         $this->assertSame(2, $c['customsItem'][0]['quantity']);
+    }
+
+    public function testMapToShipmentFullDataWithIndividualCustomsBase64Invoice(): void
+    {
+        $sender = new SenderData(name: 'Sender Corp');
+        $recipient = new RecipientData(name: 'UK Customer Ltd', country: 'GB');
+
+        $base64Content = base64_encode('%PDF-1.4 Fake PDF Content');
+
+        $customs = new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
+            customsType: 'I',
+            invoiceNr: 'INV-2026-001',
+            invoiceDate: '2026-09-23',
+            invoiceFile: 'data:application/pdf;base64,' . $base64Content,
+            customsItems: [
+                ['namePl' => 'Koszulka', 'nameEn' => 'T-Shirt', 'quantity' => 1, 'weight' => 0.5, 'value' => 10.0]
+            ]
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 106,
+            sender: $sender,
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EKS', packages: [new PackageData()]),
+            customs: $customs
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertArrayHasKey('customs', $mapped);
+        $c = $mapped['customs'];
+        $this->assertSame('I', $c['customsType']);
+        $this->assertSame('INV-2026-001', $c['invoiceNr']);
+        $this->assertSame('2026-09-23', $c['invoiceDate']);
+        $this->assertSame($base64Content, $c['invoice']);
+        $this->assertTrue($c['customAgreements']['invoiceContent']);
+    }
+
+    #[DataProvider('postalCodeDataProvider')]
+    public function testSanitizePostalCode(string $inputCode, string $countryCode, string $expected): void
+    {
+        $this->assertSame($expected, $this->mapper->sanitizePostalCode($inputCode, $countryCode));
+    }
+
+    public static function postalCodeDataProvider(): array
+    {
+        return [
+            'PL with hyphen' => ['00-950', 'PL', '00950'],
+            'PL without hyphen' => ['00950', 'PL', '00950'],
+            'GB alphanumeric' => ['SW1A 1AA', 'GB', 'SW1A 1AA'],
+            'DE with hyphen' => ['D-10115', 'DE', 'D-10115'],
+            'US zip extended' => ['90210-1234', 'US', '90210-1234'],
+        ];
     }
 }

@@ -145,6 +145,49 @@ define([
         }
     }
 
+    /**
+     * Check if a given shipping method requires DHL point selection.
+     *
+     * @param {Object|null} method Shipping method object.
+     *
+     * @return {Boolean} True if method requires point selection.
+     */
+    function isDhlPointMethod(method) {
+        if (!method) {
+            return false;
+        }
+        var carrierCode = method.carrier_code || method.carrierCode || '';
+        var methodCode = method.method_code || method.methodCode || '';
+        var fullCode = carrierCode + '_' + methodCode;
+        var config = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) || {};
+        var pointMethods = config.pointMethods || [
+            methodCodes.FULL_ECONOMY_ALL,
+            methodCodes.FULL_ECONOMY_ALL_COD,
+            methodCodes.FULL_ECONOMY_POP,
+            methodCodes.FULL_ECONOMY_POP_COD,
+            methodCodes.FULL_ECONOMY_BOX,
+            methodCodes.FULL_ECONOMY_BOX_COD,
+            methodCodes.FULL_CONNECT_PARCELSHOP,
+            methodCodes.FULL_CONNECT_PARCELSHOP_COD,
+            methodCodes.FULL_CONNECT_PACKSTATION,
+            methodCodes.FULL_CONNECT_PACKSTATION_COD
+        ];
+
+        return pointMethods.indexOf(fullCode) !== -1 || pointMethods.indexOf(methodCode) !== -1 ||
+            (carrierCode === methodCodes.CARRIER_CODE && [
+                methodCodes.METHOD_ECONOMY_ALL,
+                methodCodes.METHOD_ECONOMY_ALL_COD,
+                methodCodes.METHOD_ECONOMY_POP,
+                methodCodes.METHOD_ECONOMY_POP_COD,
+                methodCodes.METHOD_ECONOMY_BOX,
+                methodCodes.METHOD_ECONOMY_BOX_COD,
+                methodCodes.METHOD_CONNECT_PARCELSHOP,
+                methodCodes.METHOD_CONNECT_PARCELSHOP_COD,
+                methodCodes.METHOD_CONNECT_PACKSTATION,
+                methodCodes.METHOD_CONNECT_PACKSTATION_COD
+            ].indexOf(methodCode) !== -1);
+    }
+
     // Initialize initial point state from checkoutConfig or storage
     var initialPoint = null;
     if (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel && window.checkoutConfig.shipping.dhlparcel.selectedPoint) {
@@ -156,12 +199,24 @@ define([
         setSelectedPoint(initialPoint);
     }
 
-    // Subscribe to shippingMethod updates to clear point on method switch
+    // Subscribe to shippingAddress updates to keep extension_attributes attached when address updates
+    quote.shippingAddress.subscribe(function (newAddress) {
+        if (newAddress) {
+            updateQuoteExtensionAttributes(selectedPoint());
+        }
+    });
+
+    // Subscribe to shippingMethod updates to clear point only when switching away from DHL point methods
     var lastMethodCode = null;
     quote.shippingMethod.subscribe(function (newMethod) {
-        var currentCode = newMethod ? ((newMethod.carrier_code || newMethod.carrierCode || '') + '_' + (newMethod.method_code || newMethod.methodCode || '')) : '';
+        if (!newMethod) {
+            return;
+        }
+        var currentCode = (newMethod.carrier_code || newMethod.carrierCode || '') + '_' + (newMethod.method_code || newMethod.methodCode || '');
         if (lastMethodCode !== null && lastMethodCode !== currentCode) {
-            clearPoint();
+            if (!isDhlPointMethod(newMethod)) {
+                clearPoint();
+            }
         }
         lastMethodCode = currentCode;
     });
@@ -174,6 +229,7 @@ define([
         clearPoint: clearPoint,
         setPostnummer: setPostnummer,
         getQuoteId: getQuoteId,
+        updateQuoteExtensionAttributes: updateQuoteExtensionAttributes,
 
         /**
          * Resolve destination country code for current quote/point.
@@ -205,41 +261,7 @@ define([
          *
          * @return {Boolean} True if method requires point selection.
          */
-        isDhlPointMethod: function (method) {
-            if (!method) {
-                return false;
-            }
-            var carrierCode = method.carrier_code || method.carrierCode || '';
-            var methodCode = method.method_code || method.methodCode || '';
-            var fullCode = carrierCode + '_' + methodCode;
-            var config = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) || {};
-            var pointMethods = config.pointMethods || [
-                methodCodes.FULL_ECONOMY_ALL,
-                methodCodes.FULL_ECONOMY_ALL_COD,
-                methodCodes.FULL_ECONOMY_POP,
-                methodCodes.FULL_ECONOMY_POP_COD,
-                methodCodes.FULL_ECONOMY_BOX,
-                methodCodes.FULL_ECONOMY_BOX_COD,
-                methodCodes.FULL_CONNECT_PARCELSHOP,
-                methodCodes.FULL_CONNECT_PARCELSHOP_COD,
-                methodCodes.FULL_CONNECT_PACKSTATION,
-                methodCodes.FULL_CONNECT_PACKSTATION_COD
-            ];
-
-            return pointMethods.indexOf(fullCode) !== -1 || pointMethods.indexOf(methodCode) !== -1 ||
-                (carrierCode === methodCodes.CARRIER_CODE && [
-                    methodCodes.METHOD_ECONOMY_ALL,
-                    methodCodes.METHOD_ECONOMY_ALL_COD,
-                    methodCodes.METHOD_ECONOMY_POP,
-                    methodCodes.METHOD_ECONOMY_POP_COD,
-                    methodCodes.METHOD_ECONOMY_BOX,
-                    methodCodes.METHOD_ECONOMY_BOX_COD,
-                    methodCodes.METHOD_CONNECT_PARCELSHOP,
-                    methodCodes.METHOD_CONNECT_PARCELSHOP_COD,
-                    methodCodes.METHOD_CONNECT_PACKSTATION,
-                    methodCodes.METHOD_CONNECT_PACKSTATION_COD
-                ].indexOf(methodCode) !== -1);
-        },
+        isDhlPointMethod: isDhlPointMethod,
 
         /**
          * Check if method is configured for automatic nearest service point delivery.

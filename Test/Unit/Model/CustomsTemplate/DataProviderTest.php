@@ -111,32 +111,20 @@ class DataProviderTest extends TestCase
         );
     }
 
-    public function testGetDataFormatsInvoiceFile(): void
+    public function testGetDataIncludesTemplateData(): void
     {
         $templateMock = $this->createStub(CustomsTemplate::class);
         $templateMock->method('getId')->willReturn(7);
         $templateMock->method('getData')->willReturn([
             'entity_id' => 7,
-            'invoice_file' => 'dhl/invoices/test.pdf',
+            'template_name' => 'Customs Standard',
         ]);
 
         $this->collectionMock->method('getItems')->willReturn([$templateMock]);
-        $this->fileIoMock->method('getPathInfo')
-            ->willReturn(['basename' => 'test.pdf']);
 
         $data = $this->dataProvider->getData();
 
         $this->assertArrayHasKey(7, $data);
-        $this->assertSame(
-            [
-                [
-                    'name' => 'test.pdf',
-                    'file' => 'dhl/invoices/test.pdf',
-                    'size' => 0,
-                    'type' => 'application/pdf',
-                ],
-            ],
-            $data[7]['invoice_file']
-        );
+        $this->assertSame('Customs Standard', $data[7]['template_name']);
     }
 }

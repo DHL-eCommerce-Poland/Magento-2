@@ -113,8 +113,6 @@
         <column xsi:type="varchar" name="category_of_item" length="2" nullable="false" default="11" comment="Category Of Item (9, 11, 21, 31, 32, 91)"/>
         <column xsi:type="varchar" name="currency" length="3" nullable="false" default="PLN" comment="Currency ISO Code"/>
         <column xsi:type="varchar" name="default_tariff_code" length="10" nullable="true" comment="Default HS Tariff Code"/>
-        <column xsi:type="varchar" name="invoice_date" length="10" nullable="true" comment="Date of Invoice (YYYY-MM-DD)"/>
-        <column xsi:type="varchar" name="invoice_file" length="255" nullable="true" comment="VAT Invoice PDF File Path"/>
         <column xsi:type="varchar" name="shipper_eori" length="35" nullable="true" comment="Shipper EORI Number"/>
         <column xsi:type="varchar" name="shipper_nip" length="35" nullable="true" comment="Shipper NIP Number"/>
         <column xsi:type="varchar" name="shipper_vat_no" length="35" nullable="true" comment="Shipper VAT Registration Number"/>

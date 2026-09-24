@@ -110,35 +110,6 @@ class CustomsDataBuilderTest extends TestCase
         $builder->buildCustomsData(null);
     }
 
-    public function testBuildCustomsDataIndividualClearanceThrowsExceptionWhenNoInvoiceFile(): void
-    {
-        $templateRepositoryMock = $this->createMock(CustomsTemplateRepository::class);
-        $serializer = new Json();
-        $fileDriver = $this->createStub(FileDriver::class);
-
-        $templateMock = $this->createStub(CustomsTemplate::class);
-        $templateMock->method('getCustomsType')->willReturn(CustomsType::TYPE_INDIVIDUAL);
-        $templateMock->method('getInvoiceFile')->willReturn(null);
-
-        $templateRepositoryMock->expects($this->once())
-            ->method('getDefaultTemplate')
-            ->willReturn($templateMock);
-
-        $builder = new CustomsDataBuilder(
-            $templateRepositoryMock,
-            $serializer,
-            $fileDriver
-        );
-
-        $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage(
-            'A VAT Invoice PDF file is required for individual customs clearance (I). ' .
-            'Please upload invoice in Customs Template.'
-        );
-
-        $builder->buildCustomsData(null);
-    }
-
     public function testBuildCustomsDataIndividualClearanceSuccess(): void
     {
         $templateRepositoryMock = $this->createMock(CustomsTemplateRepository::class);
@@ -164,12 +135,7 @@ class CustomsDataBuilderTest extends TestCase
         $templateMock->method('getShipperEori')->willReturn('PL9999999999');
         $templateMock->method('getShipperNip')->willReturn('9999999999');
         $templateMock->method('getReceiverVatNo')->willReturn('DE987654321');
-        $templateMock->method('getInvoiceDate')->willReturn('2026-09-04');
-        $templateMock->method('getInvoiceFile')->willReturn('/media/dhl/customs_templates/invoice.pdf');
         $templateMock->method('getCustomsItems')->willReturn(json_encode($presetItems));
-
-        $fileDriver->method('isExists')->willReturn(true);
-        $fileDriver->method('fileGetContents')->willReturn('DUMMY_PDF_CONTENT');
 
         $templateRepositoryMock->expects($this->once())
             ->method('getDefaultTemplate')
@@ -184,8 +150,7 @@ class CustomsDataBuilderTest extends TestCase
         $customsData = $builder->buildCustomsData(null);
 
         $this->assertSame(CustomsType::TYPE_INDIVIDUAL, $customsData['customsType']);
-        $this->assertSame('2026-09-04', $customsData['invoiceDate']);
-        $this->assertSame(base64_encode('DUMMY_PDF_CONTENT'), $customsData['invoice']);
+        $this->assertSame(date('Y-m-d'), $customsData['invoiceDate']);
         $this->assertSame('9999999999', $customsData['nipNr']);
         $this->assertSame('PL9999999999', $customsData['eoriNr']);
         $this->assertSame('DE987654321', $customsData['vatRegistrationNumberReceiver']);

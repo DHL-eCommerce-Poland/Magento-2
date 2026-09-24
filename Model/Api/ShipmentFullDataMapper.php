@@ -6,26 +6,15 @@ namespace Ideo\Dhl\Model\Api;
 
 use Ideo\Dhl\Model\Config\Source\AddressType;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Magento\Framework\Exception\FileSystemException;
-use Magento\Framework\Filesystem\Driver\File as FileDriver;
 
 class ShipmentFullDataMapper
 {
-    /**
-     * @param FileDriver $fileDriver
-     */
-    public function __construct(
-        private readonly FileDriver $fileDriver
-    ) {
-    }
-
     /**
      * Map DhlShipmentData to DHL WebAPI2 ShipmentFullData array format.
      *
      * @param DhlShipmentData $shipmentData
      *
      * @return array
-     * @throws FileSystemException
      */
     public function map(DhlShipmentData $shipmentData): array
     {
@@ -111,12 +100,13 @@ class ShipmentFullDataMapper
             : $recipientContact;
 
         $countryCode = strtoupper($recipient->getCountry() ?: 'PL');
+        $senderCountryCode = strtoupper($sender->getCountry() ?: 'PL');
 
         $receiver = [
             'addressType' => $receiverAddressType,
             'country' => $countryCode,
             'name' => $this->sanitizeString($recipientName),
-            'postalCode' => $this->sanitizePostalCode($recipient->getPostalCode()),
+            'postalCode' => $this->sanitizePostalCode($recipient->getPostalCode(), $countryCode),
             'city' => $this->sanitizeString($recipient->getCity()),
             'street' => $this->sanitizeString($recipient->getStreet()),
             'houseNumber' => $this->sanitizeString($recipient->getHouseNumber()),
@@ -143,7 +133,7 @@ class ShipmentFullDataMapper
         $result = [
             'shipper' => [
                 'name' => $this->sanitizeString($sender->getName()),
-                'postalCode' => $this->sanitizePostalCode($sender->getPostalCode()),
+                'postalCode' => $this->sanitizePostalCode($sender->getPostalCode(), $senderCountryCode),
                 'city' => $this->sanitizeString($sender->getCity()),
                 'street' => $this->sanitizeString($sender->getStreet()),
                 'houseNumber' => $this->sanitizeString($sender->getHouseNumber()),
@@ -231,11 +221,9 @@ class ShipmentFullDataMapper
                 if ($customs->getInvoiceDate()) {
                     $customsDef['invoiceDate'] = $customs->getInvoiceDate();
                 }
-                if ($customs->getInvoiceFile()
-                    && $this->fileDriver->isExists($customs->getInvoiceFile())
-                ) {
-                    $fileContent = $this->fileDriver->fileGetContents($customs->getInvoiceFile());
-                    $customsDef['invoice'] = base64_encode($fileContent);
+                if ($customs->getInvoiceFile()) {
+                    $rawInvoice = $customs->getInvoiceFile();
+                    $customsDef['invoice'] = (string) preg_replace('/^data:[^;]+;base64,/', '', $rawInvoice);
                 }
             }
 
@@ -289,14 +277,20 @@ class ShipmentFullDataMapper
     }
 
     /**
-     * Format postal code to 5 digits without hyphens.
+     * Format postal code: remove hyphen for PL, return unchanged for international countries.
      *
      * @param string $postalCode
+     * @param string $countryCode
      *
      * @return string
      */
-    public function sanitizePostalCode(string $postalCode): string
+    public function sanitizePostalCode(string $postalCode, string $countryCode = 'PL'): string
     {
-        return (string) preg_replace('/[^0-9]/', '', $postalCode);
+        $postalCode = trim($postalCode);
+        if (strtoupper($countryCode) === 'PL') {
+            return str_replace('-', '', $postalCode);
+        }
+
+        return $postalCode;
     }
 }

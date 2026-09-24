@@ -186,6 +186,13 @@ define([
             if (allowedCats.indexOf(categoryOfItemObs()) === -1) {
                 categoryOfItemObs('11');
             }
+
+            if (newType !== 'I' && customsObj && typeof customsObj.invoiceFile === 'function') {
+                customsObj.invoiceFile('');
+                if (typeof customsObj.invoiceFileName === 'function') {
+                    customsObj.invoiceFileName('');
+                }
+            }
         });
 
         var customsObj = {
@@ -207,6 +214,7 @@ define([
             invoiceNr: ko.observable(c.invoiceNr || ''),
             invoiceDate: ko.observable(c.invoiceDate || ''),
             invoiceFile: ko.observable(c.invoiceFile || ''),
+            invoiceFileName: ko.observable(c.invoiceFileName || ''),
             additionalInfo: ko.observable(c.additionalInfo || ''),
             notExceedValue: ko.observable(c.notExceedValue !== undefined ? isTruthy(c.notExceedValue) : true),
             notProhibitedGoods: ko.observable(c.notProhibitedGoods !== undefined ? isTruthy(c.notProhibitedGoods) : true),
@@ -508,6 +516,55 @@ define([
             if (customs && typeof customs.removeCustomsItemRow === 'function') {
                 customs.removeCustomsItemRow(index);
             }
+        },
+
+        onInvoiceFileSelected: function (event) {
+            var files = event.target ? event.target.files : null;
+            if (!files || !files.length) {
+                return;
+            }
+            var file = files[0];
+            if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+                alert({
+                    title: $.mage.__('Error'),
+                    content: $.mage.__('Only PDF files are allowed for VAT Invoice.')
+                });
+                event.target.value = '';
+                return;
+            }
+
+            var maxSizeBytes = 10 * 1024 * 1024; // 10MB limit
+            if (file.size > maxSizeBytes) {
+                alert({
+                    title: $.mage.__('Error'),
+                    content: $.mage.__('File size exceeds the 10MB limit.')
+                });
+                event.target.value = '';
+                return;
+            }
+
+            var self = this;
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var result = e.target.result || '';
+                var base64 = result.indexOf(',') !== -1 ? result.split(',')[1] : result;
+                var customs = self.draft() ? self.draft().customs : null;
+                if (customs) {
+                    customs.invoiceFile(base64);
+                    if (typeof customs.invoiceFileName === 'function') {
+                        customs.invoiceFileName(file.name);
+                    }
+                }
+                event.target.value = '';
+            };
+            reader.onerror = function () {
+                alert({
+                    title: $.mage.__('Error'),
+                    content: $.mage.__('Failed to read PDF file.')
+                });
+                event.target.value = '';
+            };
+            reader.readAsDataURL(file);
         },
 
         resetCustomsData: function () {
@@ -991,6 +1048,14 @@ define([
                                             alert({
                                                 title: $.mage.__('Error'),
                                                 content: $.mage.__('At least one customs goods item is required when customs clearance is selected.')
+                                            });
+                                            return false;
+                                        }
+
+                                        if (draftJs.customs.customsType === 'I' && (!draftJs.customs.invoiceFile || !draftJs.customs.invoiceFile.trim())) {
+                                            alert({
+                                                title: $.mage.__('Error'),
+                                                content: $.mage.__('VAT Invoice PDF file is required for individual customs clearance.')
                                             });
                                             return false;
                                         }

@@ -491,6 +491,29 @@ $dateFormat = $viewModel->getDateFormat();
                         </div>
                     </div>
                 </div>
+
+                <div class="admin__field required">
+                    <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('VAT Invoice')) ?></span></label>
+                    <div class="admin__field-control">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="file" id="dhl_invoice_file_input" accept="application/pdf,.pdf" data-bind="event: { change: function(d, e) { $parent.onInvoiceFileSelected(e); } }" style="display: none;" />
+                            <button type="button" class="action-secondary" onclick="document.getElementById('dhl_invoice_file_input').click();">
+                                <span><?= $escaper->escapeHtml(__('Upload VAT Invoice')) ?></span>
+                            </button>
+                            <!-- ko if: invoiceFile -->
+                            <span style="font-weight: bold; color: #007bdb;">
+                                📄 <span data-bind="text: invoiceFileName() || invoiceFile()"></span>
+                            </span>
+                            <button type="button" class="action-delete" data-bind="click: function() { invoiceFile(''); invoiceFileName(''); }" title="<?= $escaper->escapeHtmlAttr(__('Remove File')) ?>">
+                                <span><?= $escaper->escapeHtml(__('Remove')) ?></span>
+                            </button>
+                            <!-- /ko -->
+                            <!-- ko ifnot: invoiceFile -->
+                            <span class="admin__field-note" style="margin: 0; align-self: center;"><?= $escaper->escapeHtml(__('Only .pdf files allowed (max 10MB)')) ?></span>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
                 <!-- /ko -->
 
                 <div class="admin__field required">

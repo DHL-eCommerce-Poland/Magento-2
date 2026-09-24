@@ -70,18 +70,6 @@ class DataProvider extends AbstractDataProvider
                     $data['customs_items'] = array_values($decoded);
                 }
             }
-            if (!empty($data['invoice_file']) && is_string($data['invoice_file'])) {
-                $pathInfo = $this->fileIo->getPathInfo($data['invoice_file']);
-                $fileName = $pathInfo['basename'] ?? '';
-                $data['invoice_file'] = [
-                    [
-                        'name' => $fileName,
-                        'file' => $data['invoice_file'],
-                        'size' => 0,
-                        'type' => 'application/pdf',
-                    ]
-                ];
-            }
             $this->loadedData[$item->getId()] = $data;
         }
 

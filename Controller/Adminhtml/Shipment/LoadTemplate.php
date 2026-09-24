@@ -231,9 +231,9 @@ class LoadTemplate extends Action
                         'vatRegistrationNumber' => $template->getShipperVatNo() ?? '',
                         'eoriNrReceiver' => $template->getReceiverEori() ?? '',
                         'vatRegistrationNumberReceiver' => $template->getReceiverVatNo() ?? '',
-                        'invoiceNr' => 'INV-' . date('Ymd'),
-                        'invoiceDate' => $template->getInvoiceDate() ?: date('Y-m-d'),
-                        'invoiceFile' => $template->getInvoiceFile() ?? '',
+                        'invoiceNr' => '',
+                        'invoiceDate' => date('Y-m-d'),
+                        'invoiceFile' => '',
                         'additionalInfo' => $template->getAdditionalInfo() ?? '',
                         'notExceedValue' => $template->getNotExceedValue() !== null
                             ? (bool)$template->getNotExceedValue() : true,

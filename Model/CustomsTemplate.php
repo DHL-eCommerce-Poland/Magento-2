@@ -22,8 +22,6 @@ class CustomsTemplate extends AbstractModel
     public const CATEGORY_OF_ITEM = 'category_of_item';
     public const CURRENCY = 'currency';
     public const DEFAULT_TARIFF_CODE = 'default_tariff_code';
-    public const INVOICE_DATE = 'invoice_date';
-    public const INVOICE_FILE = 'invoice_file';
     public const SHIPPER_EORI = 'shipper_eori';
     public const SHIPPER_NIP = 'shipper_nip';
     public const SHIPPER_VAT_NO = 'shipper_vat_no';
@@ -185,50 +183,6 @@ class CustomsTemplate extends AbstractModel
     public function setDefaultTariffCode(?string $defaultTariffCode): static
     {
         return $this->setData(self::DEFAULT_TARIFF_CODE, $defaultTariffCode);
-    }
-
-    /**
-     * Get Invoice Date.
-     *
-     * @return string|null
-     */
-    public function getInvoiceDate(): ?string
-    {
-        return $this->getData(self::INVOICE_DATE);
-    }
-
-    /**
-     * Set Invoice Date.
-     *
-     * @param string|null $invoiceDate
-     *
-     * @return $this
-     */
-    public function setInvoiceDate(?string $invoiceDate): static
-    {
-        return $this->setData(self::INVOICE_DATE, $invoiceDate);
-    }
-
-    /**
-     * Get Invoice File.
-     *
-     * @return string|null
-     */
-    public function getInvoiceFile(): ?string
-    {
-        return $this->getData(self::INVOICE_FILE);
-    }
-
-    /**
-     * Set Invoice File.
-     *
-     * @param string|null $invoiceFile
-     *
-     * @return $this
-     */
-    public function setInvoiceFile(?string $invoiceFile): static
-    {
-        return $this->setData(self::INVOICE_FILE, $invoiceFile);
     }
 
     /**

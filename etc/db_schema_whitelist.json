@@ -146,8 +146,6 @@
             "category_of_item": true,
             "currency": true,
             "default_tariff_code": true,
-            "invoice_date": true,
-            "invoice_file": true,
             "shipper_eori": true,
             "shipper_nip": true,
             "shipper_vat_no": true,

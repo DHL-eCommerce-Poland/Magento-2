@@ -109,35 +109,16 @@ class CustomsDataBuilder
      * @param CustomsTemplate $template
      *
      * @return array
-     * @throws LocalizedException
      */
     private function buildIndividualInvoiceData(CustomsTemplate $template): array
     {
-        $base64Invoice = '';
-        if (!empty($template->getInvoiceFile())) {
-            $filePath = $template->getInvoiceFile();
-            if ($this->fileDriver->isExists($filePath)) {
-                $base64Invoice = base64_encode($this->fileDriver->fileGetContents($filePath));
-            }
-        }
-
-        if (empty($base64Invoice)) {
-            throw new LocalizedException(
-                __(
-                    'A VAT Invoice PDF file is required for individual customs clearance (I). '
-                    . 'Please upload invoice in Customs Template.'
-                )
-            );
-        }
-
-        $invoiceDate = !empty($template->getInvoiceDate())
-            ? $template->getInvoiceDate()
-            : date('Y-m-d');
+        $invoiceDate = date('Y-m-d');
+        $invoiceNr = '';
 
         $data = [
-            'invoiceNr' => 'INV-' . date('Ymd'),
+            'invoiceNr' => $invoiceNr,
             'invoiceDate' => $invoiceDate,
-            'invoice' => $base64Invoice,
+            'invoice' => '',
             'nipNr' => (string)$template->getShipperNip(),
             'eoriNr' => (string)$template->getShipperEori(),
             'vatRegistrationNumberReceiver' => (string)$template->getReceiverVatNo(),

@@ -159,6 +159,7 @@ class SoapClientAdapter implements ClientInterface
                 errorMessage: $errorMsg
             );
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client ?? null, 'createShipments' . $orderContext);
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during createShipments%s: [%s] %s',
                 $orderContext,
@@ -175,6 +176,7 @@ class SoapClientAdapter implements ClientInterface
                 errorMessage: 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client ?? null, 'createShipments' . $orderContext);
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during createShipments%s: %s',
                 $orderContext,
@@ -271,6 +273,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new DeleteShipmentResult(false, $shipmentId, 'DELETE_SHIPMENT_ERROR', $errorMsg);
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client ?? null, 'deleteShipments');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during deleteShipment: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -284,6 +287,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client ?? null, 'deleteShipments');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during deleteShipment: %s',
                 $e->getMessage()
@@ -1195,7 +1199,7 @@ class SoapClientAdapter implements ClientInterface
         $xml = $this->ensureUtf8($xml);
 
         $xml = (string) preg_replace(
-            '/(<(?:[a-zA-Z0-9_]+:)?(?:password|username)>)[^<]+(<\/(?:[a-zA-Z0-9_]+:)?(?:password|username)>)/i',
+            '/(<(?:[a-zA-Z0-9_]+:)?password>)[^<]+(<\/(?:[a-zA-Z0-9_]+:)?password>)/i',
             '$1***MASKED***$2',
             $xml
         );
@@ -1206,7 +1210,9 @@ class SoapClientAdapter implements ClientInterface
             . '(<\/(?:[a-zA-Z0-9_]+:)?'
             . '(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)/i';
 
-        return (string) preg_replace($binPattern, '$1***BINARY DATA TRUNCATED***$2', $xml);
+        $xml = (string) preg_replace($binPattern, '$1***BINARY DATA TRUNCATED***$2', $xml);
+
+        return trim((string) preg_replace('/\s+/', ' ', $xml));
     }
 
     /**
@@ -1239,8 +1245,11 @@ class SoapClientAdapter implements ClientInterface
      *
      * @return void
      */
-    private function logSoapCommunication(SoapClient $client, string $action): void
+    private function logSoapCommunication(?SoapClient $client, string $action): void
     {
+        if ($client === null) {
+            return;
+        }
         try {
             $isDebug = false;
             if ($this->scopeConfig !== null) {
@@ -1255,8 +1264,11 @@ class SoapClientAdapter implements ClientInterface
                 }
             }
 
-            $requestXml = $this->sanitizeXml((string) $client->__getLastRequest());
-            $this->logger->info(sprintf('[DHL SOAP Request - %s] %s', $action, $requestXml));
+            $lastRequest = (string) $client->__getLastRequest();
+            if (!empty($lastRequest)) {
+                $requestXml = $this->sanitizeXml($lastRequest);
+                $this->logger->info(sprintf('[DHL SOAP Request - %s] %s', $action, $requestXml));
+            }
 
             if ($isDebug) {
                 $responseHeaders = (string) $client->__getLastResponseHeaders();
@@ -1266,8 +1278,11 @@ class SoapClientAdapter implements ClientInterface
                 }
             }
 
-            $responseXml = $this->sanitizeXml((string) $client->__getLastResponse());
-            $this->logger->info(sprintf('[DHL SOAP Response - %s] %s', $action, $responseXml));
+            $lastResponse = (string) $client->__getLastResponse();
+            if (!empty($lastResponse)) {
+                $responseXml = $this->sanitizeXml($lastResponse);
+                $this->logger->info(sprintf('[DHL SOAP Response - %s] %s', $action, $responseXml));
+            }
         } catch (Throwable $e) {
             $this->logger->warning('Failed to log SOAP communication: ' . $e->getMessage());
         }
@@ -1372,6 +1387,7 @@ class SoapClientAdapter implements ClientInterface
                 $errorMsg
             );
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client ?? null, 'createShipmentReturn' . $orderContext);
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during createShipmentReturn%s: [%s] %s',
                 $orderContext,
@@ -1392,6 +1408,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client ?? null, 'createShipmentReturn' . $orderContext);
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during createShipmentReturn%s: %s',
                 $orderContext,

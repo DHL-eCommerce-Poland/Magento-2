@@ -110,16 +110,6 @@ class Save extends Action implements HttpPostActionInterface
                 $data['customs_items'] = $this->serializer->serialize(array_values($items));
             }
 
-            if (isset($data['invoice_file']) && is_array($data['invoice_file'])) {
-                if (!empty($data['invoice_file'][0]['name'])) {
-                    $data['invoice_file'] = $data['invoice_file'][0]['name'];
-                } elseif (!empty($data['invoice_file'][0]['file'])) {
-                    $data['invoice_file'] = $data['invoice_file'][0]['file'];
-                } else {
-                    $data['invoice_file'] = null;
-                }
-            }
-
             $template->addData($data);
             $this->repository->save($template);
 

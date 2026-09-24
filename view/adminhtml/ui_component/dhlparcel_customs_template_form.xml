@@ -259,42 +259,6 @@
                 <dataScope>receiver_eori</dataScope>
             </settings>
         </field>
-        <field name="invoice_date" formElement="date">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Date of invoice</label>
-                <dataScope>invoice_date</dataScope>
-            </settings>
-            <formElements>
-                <date>
-                    <settings>
-                        <options>
-                            <option name="dateFormat" xsi:type="string">y-MM-dd</option>
-                            <option name="outputFormat" xsi:type="string">y-MM-dd</option>
-                        </options>
-                    </settings>
-                </date>
-            </formElements>
-        </field>
-        <field name="invoice_file" formElement="fileUploader">
-            <settings>
-                <dataType>string</dataType>
-                <label translate="true">VAT Invoice</label>
-                <notice translate="true">Allowed file extensions: .pdf (max 10 MB)</notice>
-                <dataScope>invoice_file</dataScope>
-            </settings>
-            <formElements>
-                <fileUploader>
-                    <settings>
-                        <allowedExtensions>pdf</allowedExtensions>
-                        <maxFileSize>10485760</maxFileSize>
-                        <uploaderConfig>
-                            <param name="url" xsi:type="string">dhlparcel/customstemplate/upload</param>
-                        </uploaderConfig>
-                    </settings>
-                </fileUploader>
-            </formElements>
-        </field>
     </fieldset>
 
     <fieldset name="vat_data">

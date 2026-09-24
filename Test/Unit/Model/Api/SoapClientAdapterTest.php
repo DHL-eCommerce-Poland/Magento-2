@@ -76,8 +76,7 @@ class SoapClientAdapterTest extends TestCase
         $sanitized = $this->adapter->sanitizeXml($rawXml);
 
         $this->assertStringNotContainsString('Secret123!', $sanitized);
-        $this->assertStringNotContainsString('user1', $sanitized);
-        $this->assertStringContainsString('<username>***MASKED***</username>', $sanitized);
+        $this->assertStringContainsString('<username>user1</username>', $sanitized);
         $this->assertStringContainsString('<password>***MASKED***</password>', $sanitized);
     }
 

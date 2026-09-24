@@ -33,6 +33,8 @@ define([
                 }
             }
 
+            pointState.updateQuoteExtensionAttributes(pointState.selectedPoint());
+
             return originalAction().fail(function (response) {
                 if (response && response.responseJSON && response.responseJSON.message) {
                     globalMessageList.addErrorMessage({ message: response.responseJSON.message });

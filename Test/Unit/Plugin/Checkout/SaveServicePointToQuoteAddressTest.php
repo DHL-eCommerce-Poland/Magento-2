@@ -63,4 +63,54 @@ class SaveServicePointToQuoteAddressTest extends TestCase
         $this->assertEquals(0, $savedData['dhl_is_postfiliale']);
         $this->assertEquals('123456', $savedData['dhl_postnummer']);
     }
+
+    public function testBeforeSaveAddressInformationFallbackToAddressData(): void
+    {
+        $validatorStub = $this->createStub(ServicePointValidator::class);
+        $plugin = new SaveServicePointToQuoteAddress($validatorStub);
+
+        $managementStub = $this->createStub(ShippingInformationManagementInterface::class);
+        $informationStub = $this->createStub(ShippingInformationInterface::class);
+        $addressMock = $this->createStub(Address::class);
+
+        $addressMock->method('getExtensionAttributes')->willReturn(null);
+
+        $savedData = [
+            'dhl_service_point_id' => 'SAP999',
+            'dhl_service_point_name' => 'Żabka Fallback',
+            'dhl_service_point_street' => 'Długa 2',
+            'dhl_service_point_postcode' => '38-542',
+            'dhl_service_point_city' => 'Rzepedź',
+            'dhl_is_packstation' => false,
+            'dhl_is_postfiliale' => true,
+        ];
+
+        $addressMock->method('getData')->willReturnCallback(
+            static function ($key = null) use (&$savedData) {
+                if ($key === null) {
+                    return $savedData;
+                }
+                return $savedData[$key] ?? null;
+            }
+        );
+
+        $addressMock->method('setData')->willReturnCallback(
+            static function ($key, $value = null) use (&$savedData) {
+                if (is_string($key)) {
+                    $savedData[$key] = $value;
+                }
+                return null;
+            }
+        );
+
+        $informationStub->method('getShippingAddress')->willReturn($addressMock);
+        $informationStub->method('getShippingCarrierCode')->willReturn('dhlparcel');
+        $informationStub->method('getShippingMethodCode')->willReturn(MethodCatalog::METHOD_ECONOMY_ALL);
+
+        $result = $plugin->beforeSaveAddressInformation($managementStub, 1, $informationStub);
+
+        $this->assertEquals([1, $informationStub], $result);
+        $this->assertEquals('SAP999', $savedData['dhl_service_point_id']);
+        $this->assertEquals('Żabka Fallback', $savedData['dhl_service_point_name']);
+    }
 }
