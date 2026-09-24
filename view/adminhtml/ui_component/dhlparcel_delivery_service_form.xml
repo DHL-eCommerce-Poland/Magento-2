@@ -125,7 +125,7 @@
                 <dataScope>content</dataScope>
             </settings>
         </field>
-        <field name="comment" formElement="textarea">
+        <field name="comment" formElement="input">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Additional Comments</label>

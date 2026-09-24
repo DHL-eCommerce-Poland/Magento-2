@@ -85,8 +85,8 @@
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="template_name" length="255" nullable="false" comment="Template Name"/>
         <column xsi:type="varchar" name="method_code" length="1024" nullable="true" comment="Magento Shipping Method Code"/>
-        <column xsi:type="text" name="content" nullable="true" comment="Package Contents Description"/>
-        <column xsi:type="text" name="comment" nullable="true" comment="Special Comments"/>
+        <column xsi:type="varchar" name="content" length="255" nullable="true" comment="Package Contents Description"/>
+        <column xsi:type="varchar" name="comment" length="255" nullable="true" comment="Special Comments"/>
         <column xsi:type="varchar" name="reference" length="255" nullable="true" comment="Reference Number"/>
         <column xsi:type="varchar" name="mpk" length="64" nullable="true" comment="MPK Cost Center Code"/>
         <column xsi:type="text" name="additional_services" nullable="true" comment="Additional Services JSON"/>
