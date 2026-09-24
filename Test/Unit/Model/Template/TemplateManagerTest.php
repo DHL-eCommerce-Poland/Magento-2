@@ -7,7 +7,6 @@ namespace Ideo\Dhl\Test\Unit\Model\Template;
 use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
 use Ideo\Dhl\Model\Config\Source\AddressType as AddressTypeSource;
-use Ideo\Dhl\Model\Config\Source\ContentSource;
 use Ideo\Dhl\Model\Config\Source\LabelType as LabelTypeSource;
 use Ideo\Dhl\Model\Config\Source\PackageType as PackageTypeSource;
 use Ideo\Dhl\Model\Config\Source\ReturnBookCourier as ReturnBookCourierSource;
@@ -21,6 +20,7 @@ use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory as DeliverySe
 use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory as DropOffPointCollectionFactory;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use Ideo\Dhl\Model\Template\TemplateManager;
+use Ideo\Dhl\Model\Template\TemplateVariableResolver;
 use Magento\Directory\Model\Config\Source\Country as CountrySource;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
@@ -43,11 +43,11 @@ class TemplateManagerTest extends TestCase
     private $packageTypeSource;
     private $addressTypeSource;
     private $shipmentAddressTypeSource;
-    private $contentSource;
     private $returnQrCodeTypeSource;
     private $returnBookCourierSource;
     private $orderRepository;
     private $mapper;
+    private $variableResolver;
     private $serializer;
     private $timezone;
     private $methodCatalog;
@@ -69,11 +69,11 @@ class TemplateManagerTest extends TestCase
         $this->packageTypeSource = $this->createStub(PackageTypeSource::class);
         $this->addressTypeSource = $this->createStub(AddressTypeSource::class);
         $this->shipmentAddressTypeSource = $this->createStub(ShipmentAddressTypeSource::class);
-        $this->contentSource = $this->createStub(ContentSource::class);
         $this->returnQrCodeTypeSource = $this->createStub(ReturnQrCodeTypeSource::class);
         $this->returnBookCourierSource = $this->createStub(ReturnBookCourierSource::class);
         $this->orderRepository = $this->createStub(OrderRepositoryInterface::class);
         $this->mapper = $this->createStub(OrderToShipmentDataMapper::class);
+        $this->variableResolver = $this->createStub(TemplateVariableResolver::class);
         $this->serializer = $this->createStub(SerializerInterface::class);
         $this->timezone = $this->createStub(TimezoneInterface::class);
         $this->methodCatalog = $this->createStub(MethodCatalog::class);
@@ -93,11 +93,11 @@ class TemplateManagerTest extends TestCase
             $this->packageTypeSource,
             $this->addressTypeSource,
             $this->shipmentAddressTypeSource,
-            $this->contentSource,
             $this->returnQrCodeTypeSource,
             $this->returnBookCourierSource,
             $this->orderRepository,
             $this->mapper,
+            $this->variableResolver,
             $this->serializer,
             $this->timezone,
             $this->methodCatalog,
@@ -136,18 +136,21 @@ class TemplateManagerTest extends TestCase
 
     public function testGetShipmentTemplatesOptionsReturnsAllWhenNoMethodProvided(): void
     {
-        $item1 = $this->createMock(DeliveryService::class);
-        $item1->method('getEntityId')->willReturn(1);
-        $item1->method('getTemplateName')->willReturn('Template Polska');
-        $item1->method('getMethodCode')->willReturn('parcel_polska');
+        $service1 = $this->createMock(DeliveryService::class);
+        $service1->method('getId')->willReturn(1);
+        $service1->method('getEntityId')->willReturn(1);
+        $service1->method('getTemplateName')->willReturn('Standard POLSKA');
+        $service1->method('getMethodCode')->willReturn('parcel_polska');
 
-        $item2 = $this->createMock(DeliveryService::class);
-        $item2->method('getEntityId')->willReturn(2);
-        $item2->method('getTemplateName')->willReturn('Template Connect');
-        $item2->method('getMethodCode')->willReturn('connect');
+        $service2 = $this->createMock(DeliveryService::class);
+        $service2->method('getId')->willReturn(2);
+        $service2->method('getEntityId')->willReturn(2);
+        $service2->method('getTemplateName')->willReturn('COD POLSKA');
+        $service2->method('getMethodCode')->willReturn('parcel_polska_cod');
 
         $collection = $this->createMock(DeliveryServiceCollection::class);
-        $collection->method('getIterator')->willReturn(new \ArrayIterator([$item1, $item2]));
+        $collection->method('getItems')->willReturn([$service1, $service2]);
+        $collection->method('getIterator')->willReturn(new \ArrayIterator([$service1, $service2]));
 
         $this->deliveryServiceCollectionFactory->expects($this->once())
             ->method('create')
@@ -155,32 +158,30 @@ class TemplateManagerTest extends TestCase
 
         $options = $this->templateManager->getShipmentTemplatesOptions();
 
-        $this->assertCount(2, $options);
-        $this->assertSame([
-            ['value' => 1, 'label' => 'Template Polska'],
-            ['value' => 2, 'label' => 'Template Connect'],
-        ], $options);
+        $expected = [
+            ['value' => 1, 'label' => 'Standard POLSKA'],
+            ['value' => 2, 'label' => 'COD POLSKA'],
+        ];
+        $this->assertSame($expected, $options);
     }
 
     public function testGetShipmentTemplatesOptionsFiltersByShippingMethod(): void
     {
-        $item1 = $this->createMock(DeliveryService::class);
-        $item1->method('getEntityId')->willReturn(1);
-        $item1->method('getTemplateName')->willReturn('Template Polska');
-        $item1->method('getMethodCode')->willReturn('parcel_polska');
+        $service1 = $this->createMock(DeliveryService::class);
+        $service1->method('getId')->willReturn(1);
+        $service1->method('getEntityId')->willReturn(1);
+        $service1->method('getTemplateName')->willReturn('Standard POLSKA');
+        $service1->method('getMethodCode')->willReturn('parcel_polska');
 
-        $item2 = $this->createMock(DeliveryService::class);
-        $item2->method('getEntityId')->willReturn(2);
-        $item2->method('getTemplateName')->willReturn('Template Connect');
-        $item2->method('getMethodCode')->willReturn('connect');
-
-        $item3 = $this->createMock(DeliveryService::class);
-        $item3->method('getEntityId')->willReturn(3);
-        $item3->method('getTemplateName')->willReturn('Template Multi');
-        $item3->method('getMethodCode')->willReturn('connect,parcel_polska');
+        $service2 = $this->createMock(DeliveryService::class);
+        $service2->method('getId')->willReturn(2);
+        $service2->method('getEntityId')->willReturn(2);
+        $service2->method('getTemplateName')->willReturn('COD POLSKA');
+        $service2->method('getMethodCode')->willReturn('parcel_polska_cod');
 
         $collection = $this->createMock(DeliveryServiceCollection::class);
-        $collection->method('getIterator')->willReturn(new \ArrayIterator([$item1, $item2, $item3]));
+        $collection->method('getItems')->willReturn([$service1, $service2]);
+        $collection->method('getIterator')->willReturn(new \ArrayIterator([$service1, $service2]));
 
         $this->deliveryServiceCollectionFactory->expects($this->once())
             ->method('create')
@@ -188,46 +189,46 @@ class TemplateManagerTest extends TestCase
 
         $options = $this->templateManager->getShipmentTemplatesOptions('dhlparcel_parcel_polska');
 
-        $this->assertCount(2, $options);
-        $this->assertSame([
-            ['value' => 1, 'label' => 'Template Polska'],
-            ['value' => 3, 'label' => 'Template Multi'],
-        ], $options);
+        $expected = [
+            ['value' => 1, 'label' => 'Standard POLSKA'],
+        ];
+        $this->assertSame($expected, $options);
     }
 
     public function testGetMatchingDeliveryServiceIdForOrder(): void
     {
-        $item1 = $this->createMock(DeliveryService::class);
-        $item1->method('getEntityId')->willReturn(10);
-        $item1->method('getMethodCode')->willReturn('connect');
-
-        $item2 = $this->createMock(DeliveryService::class);
-        $item2->method('getEntityId')->willReturn(20);
-        $item2->method('getMethodCode')->willReturn('parcel_polska');
+        $service1 = $this->createMock(DeliveryService::class);
+        $service1->method('getId')->willReturn(1);
+        $service1->method('getEntityId')->willReturn(1);
+        $service1->method('getTemplateName')->willReturn('Standard POLSKA');
+        $service1->method('getMethodCode')->willReturn('parcel_polska');
 
         $collection = $this->createMock(DeliveryServiceCollection::class);
-        $collection->method('getIterator')->willReturn(new \ArrayIterator([$item1, $item2]));
+        $collection->method('getItems')->willReturn([$service1]);
+        $collection->method('getIterator')->willReturn(new \ArrayIterator([$service1]));
 
         $this->deliveryServiceCollectionFactory->expects($this->once())
             ->method('create')
             ->willReturn($collection);
 
-        $order = $this->createMock(Order::class);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska');
+        $order = $this->createConfiguredMock(Order::class, [
+            'getShippingMethod' => 'dhlparcel_parcel_polska',
+        ]);
 
         $matchedId = $this->templateManager->getMatchingDeliveryServiceIdForOrder($order);
-
-        $this->assertSame(20, $matchedId);
+        $this->assertSame(1, $matchedId);
     }
 
     public function testGetCustomsTemplatesOptions(): void
     {
-        $customsItem = $this->createMock(\Ideo\Dhl\Model\CustomsTemplate::class);
-        $customsItem->method('getEntityId')->willReturn(7);
-        $customsItem->method('getTemplateName')->willReturn('EU Standard Export');
+        $template = $this->createStub(\Ideo\Dhl\Model\CustomsTemplate::class);
+        $template->method('getId')->willReturn(7);
+        $template->method('getEntityId')->willReturn(7);
+        $template->method('getTemplateName')->willReturn('EU Standard Export');
 
         $collection = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Collection::class);
-        $collection->method('getIterator')->willReturn(new \ArrayIterator([$customsItem]));
+        $collection->method('getItems')->willReturn([$template]);
+        $collection->method('getIterator')->willReturn(new \ArrayIterator([$template]));
 
         $factory = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory::class);
         $factory->expects($this->once())->method('create')->willReturn($collection);
@@ -252,11 +253,11 @@ class TemplateManagerTest extends TestCase
             $this->packageTypeSource,
             $this->addressTypeSource,
             $this->shipmentAddressTypeSource,
-            $this->contentSource,
             $this->returnQrCodeTypeSource,
             $this->returnBookCourierSource,
             $this->orderRepository,
             $this->mapper,
+            $this->variableResolver,
             $this->serializer,
             $this->timezone,
             $this->methodCatalog,

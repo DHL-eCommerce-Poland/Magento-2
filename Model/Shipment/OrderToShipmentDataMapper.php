@@ -46,52 +46,7 @@ class OrderToShipmentDataMapper
     ) {
     }
 
-    /**
-     * Resolve text value for Package Contents Description based on template setting and order data.
-     *
-     * @param string|null $contentSetting
-     * @param OrderInterface $order
-     *
-     * @return string
-     */
-    public function resolveContentValue(?string $contentSetting, OrderInterface $order): string
-    {
-        if (empty($contentSetting)) {
-            return $this->variableResolver->resolve('{product_names}', $order);
-        }
 
-        return match ($contentSetting) {
-            'ORDER_NUMBER' => $this->variableResolver->resolve('{order_increment_id}', $order),
-            'ORDER_ID' => (string)$order->getEntityId(),
-            'INVOICE_NUMBER' => $this->getInvoiceNumberFromOrder($order),
-            'STATIC_VALUE' => '',
-            default => $this->variableResolver->resolve($contentSetting, $order),
-        };
-    }
-
-    /**
-     * Extract first invoice increment ID from order if available.
-     *
-     * @param OrderInterface $order
-     *
-     * @return string
-     */
-    private function getInvoiceNumberFromOrder(OrderInterface $order): string
-    {
-        try {
-            $invoices = $order->getInvoiceCollection();
-            if ($invoices && $invoices->getSize() > 0) {
-                $firstInvoice = $invoices->getFirstItem();
-                return (string)($firstInvoice->getIncrementId() ?? '');
-            }
-        } catch (Throwable $e) {
-            $this->logger?->warning(
-                'Error fetching invoice collection for order: ' . $e->getMessage(),
-                ['exception' => $e]
-            );
-        }
-        return '';
-    }
 
     /**
      * Map Magento Order into a DhlShipmentData object.

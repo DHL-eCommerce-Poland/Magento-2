@@ -175,7 +175,7 @@ Company Address (B),Adres firmowy (B)
 Could not save Customs Clearance: %1,Nie można było zapisać odprawy celnej: %1
 "Customs Clearance with ID ""%1"" does not exist.","Odprawa celna o numerze ""%1"" nie istnieje."
 Could not delete Customs Clearance: %1,Nie można było usunąć odprawy celnej: %1
-"Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method} (max %1 chars)","Dostępne tagi: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method} (maks. %1 znaków)"
+"Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description} (max %1 chars)","Dostępne tagi: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description} (maks. %1 znaków)"
 Could not save delivery service: %1,Nie można było zapisać usługi dostawy: %1
 "Delivery service with ID ""%1"" does not exist.","Usługa dostawy o numerze ""%1"" nie istnieje."
 Could not delete delivery service: %1,Nie można było usunąć usługi dostawy: %1
@@ -500,8 +500,8 @@ Default Drop-Off Point is loaded from the DHL Drop-Off Points grid.,Domyślny pu
 Associated Shipping Method,Powiązana metoda dostawy
 Select DHL methods for this template.,Wybierz metody DHL dla tego szablonu.
 Shipment Label Format,Format etykiety przesyłki
-"Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method}","Dostępne tagi: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method}"
-"Cost center code. Available tags: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method}","Kod MPK (miejsce powstawania kosztów). Dostępne tagi: {order_increment_id}, {product_names}, {sku_list}, {qty_total}, {customer_name}, {payment_method}"
+"Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}","Dostępne tagi: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}"
+"Cost center code. Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}","Kod MPK (miejsce powstawania kosztów). Dostępne tagi: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}"
 Return Label Expiration (Days),Ważność etykiety zwrotnej (dni)
 Package Dimensions,Wymiary paczki
 Shipment Type,Typ przesyłki

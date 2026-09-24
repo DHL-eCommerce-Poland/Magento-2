@@ -37,9 +37,12 @@ class TemplateVariableResolver
      */
     public function extractVariables(OrderInterface $order): array
     {
-        $productNames = [];
+        $itemIds = [];
+        $quoteItemIds = [];
+        $productIds = [];
         $skus = [];
-        $totalQty = 0;
+        $names = [];
+        $descriptions = [];
 
         $items = $order->getItems() ?? [];
         /** @var OrderItemInterface $item */
@@ -47,38 +50,34 @@ class TemplateVariableResolver
             if ($item->getParentItem() !== null) {
                 continue;
             }
-            if ($item->getName()) {
-                $productNames[] = $item->getName();
+            if ($item->getItemId() !== null && (string)$item->getItemId() !== '') {
+                $itemIds[] = (string)$item->getItemId();
             }
-            if ($item->getSku()) {
-                $skus[] = $item->getSku();
+            if ($item->getQuoteItemId() !== null && (string)$item->getQuoteItemId() !== '') {
+                $quoteItemIds[] = (string)$item->getQuoteItemId();
             }
-            $totalQty += (int)($item->getQtyOrdered() ?? 1);
-        }
-
-        $custFirst = (string)($order->getCustomerFirstname() ?? '');
-        $custLast = (string)($order->getCustomerLastname() ?? '');
-        $customerName = trim(sprintf('%s %s', $custFirst, $custLast));
-
-        if (empty($customerName) && $order->getShippingAddress()) {
-            $shipFirst = (string)($order->getShippingAddress()->getFirstname() ?? '');
-            $shipLast = (string)($order->getShippingAddress()->getLastname() ?? '');
-            $customerName = trim(sprintf('%s %s', $shipFirst, $shipLast));
-        }
-
-        $paymentTitle = '';
-        if ($order->getPayment()) {
-            $paymentInfo = $order->getPayment()->getAdditionalInformation('method_title');
-            $paymentTitle = (string)($paymentInfo ?? $order->getPayment()->getMethod() ?? '');
+            if ($item->getProductId() !== null && (string)$item->getProductId() !== '') {
+                $productIds[] = (string)$item->getProductId();
+            }
+            if ($item->getSku() !== null && trim((string)$item->getSku()) !== '') {
+                $skus[] = trim((string)$item->getSku());
+            }
+            if ($item->getName() !== null && trim((string)$item->getName()) !== '') {
+                $names[] = trim((string)$item->getName());
+            }
+            if ($item->getDescription() !== null && trim((string)$item->getDescription()) !== '') {
+                $descriptions[] = trim((string)$item->getDescription());
+            }
         }
 
         return [
-            '{order_increment_id}' => (string)($order->getIncrementId() ?? ''),
-            '{product_names}' => implode(', ', $productNames),
-            '{sku_list}' => implode(', ', $skus),
-            '{qty_total}' => (string)$totalQty,
-            '{customer_name}' => $customerName,
-            '{payment_method}' => $paymentTitle,
+            '{item_id}' => implode(', ', $itemIds),
+            '{order_id}' => (string)($order->getEntityId() ?? ''),
+            '{quote_item_id}' => implode(', ', $quoteItemIds),
+            '{product_id}' => implode(', ', $productIds),
+            '{sku}' => implode(', ', $skus),
+            '{product_name}' => implode(', ', $names),
+            '{order_description}' => implode(', ', $descriptions),
         ];
     }
 }

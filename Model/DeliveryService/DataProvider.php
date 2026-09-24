@@ -90,16 +90,22 @@ class DataProvider extends AbstractDataProvider
     {
         $meta = parent::getMeta();
 
-        $commentConfig = &$meta['general']['children']['comment']['arguments']['data']['config'];
-        $commentConfig['notice'] = __(
-            'Available tags: {order_increment_id}, {product_names}, {sku_list}, '
-            . '{qty_total}, {customer_name}, {payment_method}'
+        $tagsNotice = __(
+            'Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}'
         );
 
+        $contentConfig = &$meta['general']['children']['content']['arguments']['data']['config'];
+        $contentConfig['notice'] = $tagsNotice;
+
+        $commentConfig = &$meta['general']['children']['comment']['arguments']['data']['config'];
+        $commentConfig['notice'] = $tagsNotice;
+
         $refConfig = &$meta['general']['children']['reference']['arguments']['data']['config'];
-        $refConfig['notice'] = __(
-            'Available tags: {order_increment_id}, {product_names}, {sku_list}, '
-            . '{qty_total}, {customer_name}, {payment_method}'
+        $refConfig['notice'] = $tagsNotice;
+
+        $mpkConfig = &$meta['general']['children']['mpk']['arguments']['data']['config'];
+        $mpkConfig['notice'] = __(
+            'Cost center code. Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}'
         );
 
         return $meta;

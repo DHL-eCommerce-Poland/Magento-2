@@ -414,7 +414,6 @@ define([
             this.packageTypeOptions = ko.observableArray([]);
             this.addressTypeOptions = ko.observableArray([]);
             this.shipmentAddressTypeOptions = ko.observableArray([]);
-            this.contentSourceOptions = ko.observableArray([]);
             this.returnQrCodeTypeOptions = ko.observableArray([]);
             this.returnBookCourierOptions = ko.observableArray([]);
             this.customsTemplates = ko.observableArray([]);
@@ -949,7 +948,6 @@ define([
                         self.packageTypeOptions(response.packageTypeOptions || []);
                         self.addressTypeOptions(response.addressTypeOptions || []);
                         self.shipmentAddressTypeOptions(response.shipmentAddressTypeOptions || []);
-                        self.contentSourceOptions(response.contentSourceOptions || []);
                         self.returnQrCodeTypeOptions(response.returnQrCodeTypeOptions || []);
                         self.returnBookCourierOptions(response.returnBookCourierOptions || []);
                         self.customsTemplates(response.customsTemplates || []);

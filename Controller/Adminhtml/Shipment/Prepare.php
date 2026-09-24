@@ -100,7 +100,6 @@ class Prepare extends Action
                 'packageTypeOptions' => $this->templateManager->getPackageTypeOptions(),
                 'addressTypeOptions' => $this->templateManager->getAddressTypeOptions(),
                 'shipmentAddressTypeOptions' => $this->templateManager->getShipmentAddressTypeOptions(),
-                'contentSourceOptions' => $this->templateManager->getContentSourceOptions(),
                 'returnQrCodeTypeOptions' => $this->templateManager->getReturnQrCodeTypeOptions(),
                 'returnBookCourierOptions' => $this->templateManager->getReturnBookCourierOptions(),
                 'customsTemplates' => $this->templateManager->getCustomsTemplatesOptions(),

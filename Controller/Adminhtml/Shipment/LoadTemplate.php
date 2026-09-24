@@ -110,7 +110,7 @@ class LoadTemplate extends Action
                 $serviceData = $service->getData();
                 $additionalServices = $this->templateManager->getSpecialServicesTemplate($templateId) ?: [];
 
-                $resolvedContent = (string)($serviceData['content'] ?? 'ORDER_NUMBER');
+                $resolvedContent = (string)($serviceData['content'] ?? '');
                 $resolvedComment = (string)($serviceData['comment'] ?? '');
                 $resolvedReference = (string)($serviceData['reference'] ?? '');
                 $resolvedMpk = (string)($serviceData['mpk'] ?? '');
@@ -120,7 +120,9 @@ class LoadTemplate extends Action
                     try {
                         $order = $this->orderRepository->get($orderId);
                         $shippingMethod = (string)($order->getShippingMethod() ?? '');
-                        $resolvedContent = $this->mapper->resolveContentValue($resolvedContent, $order);
+                        $resolvedContent = $resolvedContent !== ''
+                            ? $this->variableResolver->resolve($resolvedContent, $order)
+                            : '';
                         $resolvedComment = $resolvedComment !== ''
                             ? $this->variableResolver->resolve($resolvedComment, $order)
                             : '';

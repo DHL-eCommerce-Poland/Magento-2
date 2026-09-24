@@ -9,7 +9,6 @@ use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
 use Ideo\Dhl\Model\Carrier;
 use Ideo\Dhl\Model\Config\Source\AddressType as AddressTypeSource;
-use Ideo\Dhl\Model\Config\Source\ContentSource;
 use Ideo\Dhl\Model\Config\Source\LabelType as LabelTypeSource;
 use Ideo\Dhl\Model\Config\Source\PackageType as PackageTypeSource;
 use Ideo\Dhl\Model\Config\Source\ReturnBookCourier as ReturnBookCourierSource;
@@ -26,6 +25,7 @@ use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use Ideo\Dhl\Model\Source\CategoryOfItem;
 use Ideo\Dhl\Model\Source\CustomsCurrency;
 use Ideo\Dhl\Model\Source\CustomsType;
+use Ideo\Dhl\Model\Template\TemplateVariableResolver;
 use InvalidArgumentException;
 use Magento\Directory\Model\Config\Source\Country as CountrySource;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -47,11 +47,11 @@ class TemplateManager
      * @param PackageTypeSource $packageTypeSource
      * @param AddressTypeSource $addressTypeSource
      * @param ShipmentAddressTypeSource $shipmentAddressTypeSource
-     * @param ContentSource $contentSource
      * @param ReturnQrCodeTypeSource $returnQrCodeTypeSource
      * @param ReturnBookCourierSource $returnBookCourierSource
      * @param OrderRepositoryInterface $orderRepository
      * @param OrderToShipmentDataMapper $mapper
+     * @param TemplateVariableResolver $variableResolver
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
      * @param MethodCatalog $methodCatalog
@@ -72,11 +72,11 @@ class TemplateManager
         private readonly PackageTypeSource $packageTypeSource,
         private readonly AddressTypeSource $addressTypeSource,
         private readonly ShipmentAddressTypeSource $shipmentAddressTypeSource,
-        private readonly ContentSource $contentSource,
         private readonly ReturnQrCodeTypeSource $returnQrCodeTypeSource,
         private readonly ReturnBookCourierSource $returnBookCourierSource,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly OrderToShipmentDataMapper $mapper,
+        private readonly TemplateVariableResolver $variableResolver,
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
         private readonly MethodCatalog $methodCatalog,
@@ -243,16 +243,7 @@ class TemplateManager
         return $this->shipmentAddressTypeSource->toOptionArray();
     }
 
-    /**
-     * Get Content Source options from source model.
-     *
-     * @return array
-     */
-    public function getContentSourceOptions(): array
-    {
-        $options = $this->contentSource->toOptionArray();
-        return array_values(array_filter($options, fn ($opt) => !empty($opt['value'])));
-    }
+
 
     /**
      * Get Return QR Code Type options from source model.
@@ -472,18 +463,15 @@ class TemplateManager
     {
         try {
             $service = $this->deliveryServiceRepository->getById($templateId);
-            $rawContent = (string)($service->getContent() ?? 'ORDER_NUMBER');
+            $rawContent = (string)($service->getContent() ?? '');
 
             $shippingMethod = null;
             if ($orderId) {
                 $order = $this->orderRepository->get($orderId);
-                $contentVal = $this->mapper->resolveContentValue($rawContent, $order);
+                $contentVal = $rawContent !== '' ? $this->variableResolver->resolve($rawContent, $order) : '';
                 $shippingMethod = (string)($order->getShippingMethod() ?? '');
             } else {
-                $contentVal = match ($rawContent) {
-                    'ORDER_NUMBER', 'ORDER_ID', 'INVOICE_NUMBER', 'STATIC_VALUE' => '',
-                    default => $rawContent,
-                };
+                $contentVal = $rawContent;
             }
 
             $packages = $service->getPackages();
