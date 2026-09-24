@@ -58,11 +58,10 @@ $dateFormat = $viewModel->getDateFormat();
                             </div>
                         </div>
                         <div class="admin__field required">
-                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Postal Code, City & Country')) ?></span></label>
+                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Postal Code & City')) ?></span></label>
                             <div class="admin__field-control" style="display: flex; gap: 8px;">
                                 <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Postal Code')) ?>" data-bind="value: postalCode" style="flex: 1;" required />
                                 <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('City')) ?>" data-bind="value: city" style="flex: 1.5;" required />
-                                <select class="admin__control-select" data-bind="options: $parent.countryOptions, optionsText: 'label', optionsValue: 'value', value: country" style="flex: 1.5;" required></select>
                             </div>
                         </div>
                         <div class="admin__field required">

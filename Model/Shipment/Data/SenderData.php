@@ -213,7 +213,7 @@ class SenderData
             (string)($data['flatNumber'] ?? $data['flat_number'] ?? ''),
             (string)($data['city'] ?? ''),
             (string)($data['postalCode'] ?? $data['postal_code'] ?? ''),
-            (string)($data['country'] ?? $data['country_id'] ?? 'PL'),
+            (string)($data['country'] ?? 'PL'),
             (string)($data['phone'] ?? ''),
             (string)($data['email'] ?? '')
         );

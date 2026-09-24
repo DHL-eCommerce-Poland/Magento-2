@@ -404,10 +404,6 @@ class TemplateManager
         try {
             $point = $this->dropOffPointRepository->getById($templateId);
             $sapNumber = (string)($point->getSapNumber() ?? '');
-            $country = (string)($point->getCountryId() ?: 'PL');
-            if (strlen($country) > 2) {
-                $country = 'PL';
-            }
 
             return new SenderData(
                 payer: 'SENDER',
@@ -419,7 +415,7 @@ class TemplateManager
                 houseNumber: (string)($point->getHouseNumber() ?? ''),
                 city: (string)($point->getCity() ?? ''),
                 postalCode: (string)($point->getPostalCode() ?? ''),
-                country: strtoupper($country),
+                country: 'PL',
                 phone: (string)($point->getPhone() ?? ''),
                 email: (string)($point->getEmail() ?? '')
             );

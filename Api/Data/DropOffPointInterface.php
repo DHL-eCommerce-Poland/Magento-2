@@ -15,7 +15,6 @@ interface DropOffPointInterface
     public const HOUSE_NUMBER = 'house_number';
     public const POSTAL_CODE = 'postal_code';
     public const CITY = 'city';
-    public const COUNTRY_ID = 'country_id';
     public const EMAIL = 'email';
     public const PHONE = 'phone';
     public const SAP_NUMBER = 'sap_number';
@@ -166,22 +165,6 @@ interface DropOffPointInterface
      * @return $this
      */
     public function setCity(string $city): static;
-
-    /**
-     * Get country ID.
-     *
-     * @return string
-     */
-    public function getCountryId(): string;
-
-    /**
-     * Set country ID.
-     *
-     * @param string $countryId
-     *
-     * @return $this
-     */
-    public function setCountryId(string $countryId): static;
 
     /**
      * Get email.

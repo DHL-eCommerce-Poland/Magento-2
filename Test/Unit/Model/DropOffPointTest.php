@@ -55,9 +55,6 @@ class DropOffPointTest extends TestCase
         $this->model->setCity('Warszawa');
         $this->assertEquals('Warszawa', $this->model->getCity());
 
-        $this->model->setCountryId('PL');
-        $this->assertEquals('PL', $this->model->getCountryId());
-
         $this->model->setEmail('test@example.com');
         $this->assertEquals('test@example.com', $this->model->getEmail());
 

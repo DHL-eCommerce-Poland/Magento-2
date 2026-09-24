@@ -137,20 +137,6 @@
                 <dataScope>sender.city</dataScope>
             </settings>
         </field>
-        <field name="sender[country]" formElement="select">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Country</label>
-                <dataScope>sender.country</dataScope>
-            </settings>
-            <formElements>
-                <select>
-                    <settings>
-                        <options class="Magento\Directory\Model\Config\Source\Country"/>
-                    </settings>
-                </select>
-            </formElements>
-        </field>
         <field name="sender[phone]" formElement="input">
             <settings>
                 <dataType>text</dataType>

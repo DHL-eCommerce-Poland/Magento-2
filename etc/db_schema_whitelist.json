@@ -52,7 +52,6 @@
             "house_number": true,
             "postal_code": true,
             "city": true,
-            "country_id": true,
             "email": true,
             "phone": true,
             "sap_number": true,

@@ -188,28 +188,6 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     }
 
     /**
-     * Get country ID.
-     *
-     * @return string
-     */
-    public function getCountryId(): string
-    {
-        return (string)($this->getData(self::COUNTRY_ID) ?: 'PL');
-    }
-
-    /**
-     * Set country ID.
-     *
-     * @param string $countryId
-     *
-     * @return $this
-     */
-    public function setCountryId(string $countryId): static
-    {
-        return $this->setData(self::COUNTRY_ID, $countryId);
-    }
-
-    /**
      * Get email.
      *
      * @return string|null

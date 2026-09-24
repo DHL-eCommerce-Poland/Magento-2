@@ -318,6 +318,7 @@ Street & House No.,Ulica i nr domu
 Street,Ulica
 House No.,Nr domu
 "Postal Code, City & Country","Kod pocztowy, miejscowość i kraj"
+"Postal Code & City","Kod pocztowy i miejscowość"
 Postal Code,Kod pocztowy
 City,Miejscowość
 Phone & Email,Telefon i e-mail

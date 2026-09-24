@@ -71,7 +71,6 @@
         <column xsi:type="varchar" name="house_number" length="32" nullable="false" comment="House Number"/>
         <column xsi:type="varchar" name="postal_code" length="32" nullable="false" comment="Postal Code"/>
         <column xsi:type="varchar" name="city" length="255" nullable="false" comment="City"/>
-        <column xsi:type="varchar" name="country_id" length="2" nullable="false" default="PL" comment="Country ID"/>
         <column xsi:type="varchar" name="email" length="255" nullable="true" comment="Notification Email"/>
         <column xsi:type="varchar" name="phone" length="64" nullable="true" comment="Phone Number"/>
         <column xsi:type="varchar" name="sap_number" length="64" nullable="true" comment="SAP Customer Number"/>

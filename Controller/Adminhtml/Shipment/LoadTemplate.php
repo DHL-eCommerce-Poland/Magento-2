@@ -96,7 +96,7 @@ class LoadTemplate extends Action
                         'flatNumber' => '',
                         'postalCode' => $point->getPostalCode() ?? '',
                         'city' => $point->getCity() ?? '',
-                        'country' => $point->getCountryId() ?? 'PL',
+                        'country' => 'PL',
                         'phone' => $point->getPhone() ?? '',
                         'email' => $point->getEmail() ?? '',
                         'pickupHourFrom' => $point->getPickupTimeFrom() ?: null,
