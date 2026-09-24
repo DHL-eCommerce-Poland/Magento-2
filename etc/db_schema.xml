@@ -85,7 +85,7 @@
     <table name="dhlparcel_delivery_service" resource="default" engine="innodb" comment="DHL Delivery Services">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="template_name" length="255" nullable="false" comment="Template Name"/>
-        <column xsi:type="varchar" name="method_code" length="64" nullable="true" comment="Magento Shipping Method Code"/>
+        <column xsi:type="varchar" name="method_code" length="1024" nullable="true" comment="Magento Shipping Method Code"/>
         <column xsi:type="text" name="content" nullable="true" comment="Package Contents Description"/>
         <column xsi:type="text" name="comment" nullable="true" comment="Special Comments"/>
         <column xsi:type="varchar" name="reference" length="255" nullable="true" comment="Reference Number"/>

@@ -89,16 +89,42 @@ class DeliveryServiceTest extends TestCase
 
     public function testSetMethodCodeAcceptsArrayAndImplodesToString(): void
     {
-        $this->model->setMethodCode(['dhl_courier', 'dhl_express']);
-        $this->assertSame('dhl_courier,dhl_express', $this->model->getMethodCode());
+        $methods = [
+            'parcel_polska',
+            'parcel_polska_cod',
+            'premium',
+            'premium_cod',
+            'parcel_9',
+            'parcel_9_cod',
+            'parcel_12',
+            'parcel_12_cod',
+            'economy_box',
+            'economy_box_cod',
+        ];
+        $this->model->setMethodCode($methods);
+        $expected = implode(',', $methods);
+        $this->assertSame($expected, $this->model->getMethodCode());
     }
 
     public function testBeforeSaveConvertsArrayMethodCodeToString(): void
     {
-        $this->model->setData('method_code', ['dhl_courier', 'dhl_express']);
+        $methods = [
+            'parcel_polska',
+            'parcel_polska_cod',
+            'premium',
+            'premium_cod',
+            'parcel_9',
+            'parcel_9_cod',
+            'parcel_12',
+            'parcel_12_cod',
+            'economy_box',
+            'economy_box_cod',
+        ];
+        $this->model->setData('method_code', $methods);
         $this->model->beforeSave();
 
-        $this->assertSame('dhl_courier,dhl_express', $this->model->getData('method_code'));
+        $expected = implode(',', $methods);
+        $this->assertSame($expected, $this->model->getData('method_code'));
     }
 
     public function testBeforeSaveSerializesPackagesArray(): void

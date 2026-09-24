@@ -14,11 +14,14 @@ class DataProviderTest extends TestCase
 {
     public function testGetDataExplodesMethodCodeStringToArray(): void
     {
+        $methodsString = 'parcel_polska,parcel_polska_cod,premium,premium_cod,parcel_9,parcel_9_cod,parcel_12,parcel_12_cod,economy_box,economy_box_cod';
+        $methodsArray = explode(',', $methodsString);
+
         $item = $this->createStub(DeliveryService::class);
         $item->method('getId')->willReturn(1);
         $item->method('getData')->willReturn([
             'entity_id' => 1,
-            'method_code' => 'dhl_courier,dhl_express',
+            'method_code' => $methodsString,
             'additional_services' => '{"insurance":"1"}',
         ]);
 
@@ -41,7 +44,9 @@ class DataProviderTest extends TestCase
         $data = $dataProvider->getData();
 
         $this->assertArrayHasKey(1, $data);
-        $this->assertSame(['dhl_courier', 'dhl_express'], $data[1]['method_code']);
+        $this->assertSame($methodsArray, $data[1]['method_code']);
+        $this->assertContains('economy_box', $data[1]['method_code']);
+        $this->assertContains('economy_box_cod', $data[1]['method_code']);
         $this->assertSame(['insurance' => '1'], $data[1]['additional_services']);
     }
 }
