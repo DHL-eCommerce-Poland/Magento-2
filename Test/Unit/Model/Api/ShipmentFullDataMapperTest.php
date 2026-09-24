@@ -354,6 +354,29 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertSame($expected, $this->mapper->sanitizePostalCode($inputCode, $countryCode));
     }
 
+    public function testMapPreservesHouseNumberWithSlash(): void
+    {
+        $sender = new SenderData(
+            houseNumber: '13/435'
+        );
+        $recipient = new RecipientData(
+            houseNumber: '12A/4'
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 107,
+            sender: $sender,
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(packages: [new PackageData()])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertSame('13/435', $mapped['shipper']['houseNumber']);
+        $this->assertSame('12A/4', $mapped['receiver']['houseNumber']);
+    }
+
     public static function postalCodeDataProvider(): array
     {
         return [
