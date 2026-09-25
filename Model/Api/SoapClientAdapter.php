@@ -1205,10 +1205,10 @@ class SoapClientAdapter implements ClientInterface
         );
 
         $binPattern = '/(<(?:[a-zA-Z0-9_]+:)?'
-            . '(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)'
+            . '(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile|invoice)>)'
             . '[^<]{30,}'
             . '(<\/(?:[a-zA-Z0-9_]+:)?'
-            . '(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile)>)/i';
+            . '(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile|invoice)>)/i';
 
         $xml = (string) preg_replace($binPattern, '$1***BINARY DATA TRUNCATED***$2', $xml);
 
@@ -1219,6 +1219,7 @@ class SoapClientAdapter implements ClientInterface
      * Ensure string is valid UTF-8 for SOAP transport.
      *
      * @param string $string
+     *
      * @return string
      */
     public function ensureUtf8(string $string): string
@@ -1240,7 +1241,7 @@ class SoapClientAdapter implements ClientInterface
     /**
      * Log SOAP request and response dumps to dhl_api.log with sanitization.
      *
-     * @param SoapClient $client
+     * @param SoapClient|null $client
      * @param string $action
      *
      * @return void

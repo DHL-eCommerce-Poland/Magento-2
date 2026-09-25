@@ -112,6 +112,20 @@ class SoapClientAdapterTest extends TestCase
         $this->assertStringContainsString('<scanMimeType>image/png</scanMimeType>', $sanitized);
     }
 
+    public function testSanitizeXmlTruncatesInvoiceData(): void
+    {
+        $rawXml = '<soap:Envelope><customs><invoice>JVBERi0xLjUKJeLjz9MKNiAwIG9iago8PC9Db2xvclNwYWNlL0RldmljZUdyYXk=' .
+            '</invoice></customs></soap:Envelope>';
+
+        $sanitized = $this->adapter->sanitizeXml($rawXml);
+
+        $this->assertStringNotContainsString(
+            'JVBERi0xLjUKJeLjz9MKNiAwIG9iago8PC9Db2xvclNwYWNlL0RldmljZUdyYXk=',
+            $sanitized
+        );
+        $this->assertStringContainsString('<invoice>***BINARY DATA TRUNCATED***</invoice>', $sanitized);
+    }
+
     /**
      * Test UTF-8 sanitization for invalid non-UTF-8 byte sequences.
      *
