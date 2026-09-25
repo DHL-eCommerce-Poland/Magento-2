@@ -383,21 +383,10 @@
                 </imports>
             </settings>
         </field>
-        <field name="shipmentSettings[returnShipmentId]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Return Shipment ID</label>
-                <dataScope>shipmentSettings.returnShipmentId</dataScope>
-                <disabled>true</disabled>
-                <imports>
-                    <link name="visible">${$.provider}:data.shipmentSettings.returnShipmentId</link>
-                </imports>
-            </settings>
-        </field>
         <field name="shipmentSettings[packageNumbers]" formElement="input">
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Package Numbers</label>
+                <label translate="true">Package Number</label>
                 <dataScope>shipmentSettings.packageNumbers</dataScope>
                 <disabled>true</disabled>
                 <imports>
@@ -989,8 +978,36 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Package Number (BLP)</label>
+                        <label translate="true">Package Number</label>
                         <dataScope>packageNumber</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
+                </field>
+                <field name="returnShipmentId" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Return Package Number</label>
+                        <dataScope>returnShipmentId</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
+                </field>
+                <field name="packagesTrackingNumbers" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Package Tracking Number</label>
+                        <dataScope>packagesTrackingNumbers</dataScope>
                         <disabled>true</disabled>
                     </settings>
                 </field>

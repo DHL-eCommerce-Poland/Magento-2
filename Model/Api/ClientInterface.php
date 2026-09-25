@@ -192,4 +192,17 @@ interface ClientInterface
         string $city = '',
         int $radius = 15
     ): GetNearestServicepointsResult;
+
+    /**
+     * Get piece IDs / package tracking numbers for a shipment via DHL WebAPI2 getPieceId endpoint.
+     *
+     * @param Credentials $credentials
+     * @param string $shipmentId
+     *
+     * @return string[]
+     */
+    public function getPieceId(
+        Credentials $credentials,
+        string $shipmentId
+    ): array;
 }

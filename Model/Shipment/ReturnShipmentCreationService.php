@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Exception;
 use Ideo\Dhl\Model\Api\ClientInterface;
 
 use Ideo\Dhl\Model\Api\CreateShipmentReturnResult;
@@ -92,8 +93,12 @@ class ReturnShipmentCreationService
 
             if ($originalEntityId !== null && $waybill !== null) {
                 try {
-                    $this->shipmentDataService->updateReturnShipmentId($originalEntityId, $waybill);
-                } catch (\Exception $e) {
+                    $this->shipmentDataService->updateReturnShipmentId(
+                        $originalEntityId,
+                        $waybill,
+                        $apiResult->getItems()
+                    );
+                } catch (Exception $e) {
                     $this->logger->warning(
                         'Failed to update return_shipment_id on original shipment entity #' . $originalEntityId,
                         ['exception' => $e]

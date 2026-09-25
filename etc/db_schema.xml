@@ -142,13 +142,11 @@
         <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Magento Order ID"/>
         <column xsi:type="int" name="magento_shipment_id" unsigned="true" nullable="true" comment="Magento Sales Shipment ID"/>
         <column xsi:type="varchar" name="shipment_id" length="64" nullable="true" comment="DHL Shipment ID"/>
-        <column xsi:type="varchar" name="return_shipment_id" length="64" nullable="true" comment="DHL Return Shipment ID / Waybill"/>
         <column xsi:type="varchar" name="dispatch_number" length="64" nullable="true" comment="DHL Courier Order / Dispatch Number"/>
         <column xsi:type="varchar" name="status" length="64" nullable="false" default="pending" comment="Shipment Data Status"/>
         <column xsi:type="varchar" name="preset_sender_id" length="64" nullable="true" comment="Selected Sender Preset ID"/>
         <column xsi:type="varchar" name="preset_shipment_id" length="64" nullable="true" comment="Selected Shipment Preset ID"/>
         <column xsi:type="text" name="shipment_data" nullable="true" comment="Serialized DhlShipmentData JSON"/>
-        <column xsi:type="text" name="error_messages" nullable="true" comment="Validation Error Messages JSON"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Update Time"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
@@ -162,9 +160,6 @@
         </index>
         <index referenceId="IDX_DHLPARCEL_SHIPMENT_DATA_SHIPMENT_ID" indexType="btree">
             <column name="shipment_id"/>
-        </index>
-        <index referenceId="IDX_DHLPARCEL_SHIPMENT_DATA_RETURN_SHIPMENT_ID" indexType="btree">
-            <column name="return_shipment_id"/>
         </index>
         <index referenceId="IDX_DHLPARCEL_SHIPMENT_DATA_STATUS" indexType="btree">
             <column name="status"/>

@@ -8,6 +8,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
+use Throwable;
 
 class ShipmentActions extends Column
 {
@@ -68,7 +69,7 @@ class ShipmentActions extends Column
                             'target' => '_blank',
                         ];
 
-                        if (empty($item['return_shipment_id'])) {
+                        if (!$this->hasReturnShipment($item)) {
                             $actions['create_return'] = [
                                 'href' => $this->urlBuilder->getUrl(
                                     self::URL_PATH_CREATE_RETURN,
@@ -192,5 +193,39 @@ class ShipmentActions extends Column
         }
 
         return $dataSource;
+    }
+
+    /**
+     * Check if shipment entity data contains any return shipment IDs in package dynamic rows.
+     *
+     * @param array $item
+     *
+     * @return bool
+     */
+    private function hasReturnShipment(array $item): bool
+    {
+        if (!empty($item['return_shipment_id'])) {
+            return true;
+        }
+
+        $rawPayload = $item['shipment_data'] ?? null;
+        if (empty($rawPayload) || !is_string($rawPayload)) {
+            return false;
+        }
+
+        try {
+            $payload = (array) json_decode($rawPayload, true);
+            $packages = $payload['packages'] ?? ($payload['shipmentSettings']['packages'] ?? []);
+            if (is_array($packages)) {
+                foreach ($packages as $pkg) {
+                    if (is_array($pkg) && !empty($pkg['returnShipmentId'])) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } catch (Throwable) {
+            return false;
+        }
     }
 }

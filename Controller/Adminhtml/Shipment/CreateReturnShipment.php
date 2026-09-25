@@ -81,7 +81,7 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
 
             if ($result->isSuccess()) {
                 $this->messageManager->addSuccessMessage(
-                    __('Return shipment created successfully. Return Shipment ID: %1', $result->getShipmentId())
+                    __('Return shipment created successfully. Return Package Number: %1', $result->getShipmentId())
                 );
             } else {
                 $this->messageManager->addErrorMessage(

@@ -102,13 +102,11 @@
             "entity_id": true,
             "order_id": true,
             "shipment_id": true,
-            "return_shipment_id": true,
             "dispatch_number": true,
             "status": true,
             "preset_sender_id": true,
             "preset_shipment_id": true,
             "shipment_data": true,
-            "error_messages": true,
             "created_at": true,
             "updated_at": true,
             "magento_shipment_id": true
@@ -116,7 +114,6 @@
         "index": {
             "DHLPARCEL_SHIPMENT_DATA_ORDER_ID": true,
             "DHLPARCEL_SHIPMENT_DATA_SHIPMENT_ID": true,
-            "DHLPARCEL_SHIPMENT_DATA_RETURN_SHIPMENT_ID": true,
             "DHLPARCEL_SHIPMENT_DATA_STATUS": true,
             "DHLPARCEL_SHIPMENT_DATA_MAGENTO_SHIPMENT_ID": true
         },

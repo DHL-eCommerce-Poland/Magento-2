@@ -141,7 +141,7 @@ class ShipmentCreationServiceTest extends TestCase
         // Expect DB save with status Nowa
         $this->shipmentDataServiceMock->expects($this->once())
             ->method('saveShipmentDataWithStatus')
-            ->with($shipmentData, 'Nowa', null, '1', '2', '90039521201', null, ['90039521201']);
+            ->with($shipmentData, 'Nowa', '1', '2', '90039521201', null, []);
 
         $result = $this->service->createShipment($shipmentData, 'sandbox', '1', '2');
         $this->assertTrue($result->isSuccess());
@@ -388,5 +388,70 @@ class ShipmentCreationServiceTest extends TestCase
         $this->expectExceptionMessage('A DHL shipment has already been created for order #100.');
 
         $this->service->createShipment($shipmentData, 'sandbox');
+    }
+
+    /**
+     * Test createShipment calls getPieceId when createShipments returns empty packageNumbers array.
+     *
+     * @return void
+     */
+    public function testCreateShipmentCallsGetPieceIdWhenPackageNumbersEmpty(): void
+    {
+        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(autoCreateReturnShipment: false);
+        $shipmentData = new DhlShipmentData(orderId: 300, shipmentSettings: $shipmentSettings);
+
+        $this->shipmentDataServiceMock->method('hasShipmentForOrder')->willReturn(false);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+
+        $apiResult = new CreateShipmentsResult(true, false, '90040027827', 'Utworzono', []);
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->expects($this->once())
+            ->method('createShipments')
+            ->willReturn($apiResult);
+        $clientMock->expects($this->once())
+            ->method('getPieceId')
+            ->with($credentials, '90040027827')
+            ->willReturn(['JJD000030025688110000001106', 'JJD000030025688110000001117']);
+
+        $this->shipmentDataServiceMock->expects($this->once())
+            ->method('saveShipmentDataWithStatus')
+            ->with(
+                $shipmentData,
+                'Utworzono',
+                null,
+                null,
+                '90040027827',
+                null,
+                ['JJD000030025688110000001106', 'JJD000030025688110000001117'],
+                null
+            );
+
+        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
+        $returnBuilderMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
+        $returnCreationServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
+        $magentoSyncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+        $lockManagerStub = $this->createStub(LockManagerInterface::class);
+        $lockManagerStub->method('lock')->willReturn(true);
+        $lockManagerStub->method('unlock')->willReturn(true);
+
+        $serviceWithMockClient = new ShipmentCreationService(
+            $this->shipmentDataServiceMock,
+            $this->validatorStub,
+            $this->mapperStub,
+            $this->credentialsProviderStub,
+            $clientMock,
+            $lockManagerStub,
+            $this->loggerStub,
+            $serializer,
+            $returnBuilderMock,
+            $returnCreationServiceMock,
+            $magentoSyncServiceMock,
+            $this->nearestPointResolverMock
+        );
+
+        $result = $serviceWithMockClient->createShipment($shipmentData, 'sandbox');
+        $this->assertTrue($result->isSuccess());
     }
 }

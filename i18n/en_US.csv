@@ -67,7 +67,7 @@ Save,Save
 "An error occurred while cancelling courier booking: %1","An error occurred while cancelling courier booking: %1"
 "Invalid shipment entity ID.","Invalid shipment entity ID."
 "Could not load shipment data for return shipment creation.","Could not load shipment data for return shipment creation."
-"Return shipment created successfully. Return Shipment ID: %1","Return shipment created successfully. Return Shipment ID: %1"
+"Return shipment created successfully. Return Package Number: %1","Return shipment created successfully. Return Package Number: %1"
 "Failed to create return shipment: %1","Failed to create return shipment: %1"
 "Shipment has been deleted successfully.","Shipment has been deleted successfully."
 "Failed to delete shipment: %1","Failed to delete shipment: %1"
@@ -531,10 +531,11 @@ Country,Country
 General,General
 "Shipment ID","Shipment ID"
 "Courier Dispatch ID","Courier Dispatch ID"
-"Return Shipment ID","Return Shipment ID"
-"Package Numbers","Package Numbers"
+"Return Package Number","Return Package Number"
+"Package Number","Package Number"
 Packages,Packages
 "Package Number (BLP)","Package Number (BLP)"
+"Package Tracking Number","Package Tracking Number"
 "Shipment Tracking History","Shipment Tracking History"
 "Print Labels","Print Labels"
 "Download Scans","Download Scans"

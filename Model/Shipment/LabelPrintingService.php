@@ -14,7 +14,8 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Shipping\Model\Shipping\LabelGenerator;
 use Psr\Log\LoggerInterface;
-use Throwable;
+use Zend_Pdf_Exception;
+use ZipArchive;
 use Zend_Pdf;
 
 class LabelPrintingService
@@ -173,10 +174,15 @@ class LabelPrintingService
                     }
                 }
 
-                $itemsToPrint[] = [
-                    'shipmentId' => (string) $returnShipmentId,
-                    'labelType' => $labelType ?: $defaultConfigLabelType,
-                ];
+                $returnIds = array_filter(array_map('trim', explode(',', (string) $returnShipmentId)));
+                foreach ($returnIds as $singleReturnId) {
+                    if (!empty($singleReturnId)) {
+                        $itemsToPrint[] = [
+                            'shipmentId' => $singleReturnId,
+                            'labelType' => $labelType ?: $defaultConfigLabelType,
+                        ];
+                    }
+                }
             } catch (Throwable $e) {
                 $this->logger?->warning(sprintf(
                     '[LabelPrintingService] Could not load shipment entity #%d for return label: %s',
@@ -249,10 +255,15 @@ class LabelPrintingService
                     continue;
                 }
 
-                $itemsToPrint[] = [
-                    'shipmentId' => (string) $returnShipmentId,
-                    'labelType' => $qrLabelType,
-                ];
+                $returnIds = array_filter(array_map('trim', explode(',', (string) $returnShipmentId)));
+                foreach ($returnIds as $singleReturnId) {
+                    if (!empty($singleReturnId)) {
+                        $itemsToPrint[] = [
+                            'shipmentId' => $singleReturnId,
+                            'labelType' => $qrLabelType,
+                        ];
+                    }
+                }
             } catch (Throwable $e) {
                 $this->logger?->warning(sprintf(
                     '[LabelPrintingService] Could not load shipment entity #%d for return QR code: %s',
@@ -316,6 +327,29 @@ class LabelPrintingService
         }
 
         if ($hasNonPdf) {
+            $zip = new ZipArchive();
+            $tempFile = tempnam(sys_get_temp_dir(), 'dhl_zip_');
+            if ($tempFile !== false && $zip->open($tempFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+                foreach ($items as $index => $item) {
+                    $mime = strtolower((string) ($item['mimeType'] ?? ''));
+                    $ext = str_contains($mime, 'png') ? 'png' : (str_contains($mime, 'zpl') ? 'zpl' : 'bin');
+                    $filename = sprintf('dhl_label_%s.%s', $item['shipmentId'] ?? ($index + 1), $ext);
+                    $zip->addFromString($filename, (string) $item['labelData']);
+                }
+                $zip->close();
+
+                $zipContent = file_get_contents($tempFile);
+                @unlink($tempFile);
+
+                if ($zipContent !== false) {
+                    return [
+                        'content' => $zipContent,
+                        'mimeType' => 'application/zip',
+                        'filename' => sprintf('dhl_labels_%s.zip', date('Ymd_His')),
+                    ];
+                }
+            }
+
             $combinedText = '';
             foreach ($items as $item) {
                 $combinedText .= $item['labelData'] . "\n\n";
@@ -342,6 +376,7 @@ class LabelPrintingService
      * @param array $items
      *
      * @return string
+     * @throws Zend_Pdf_Exception
      */
     private function mergePdfDocuments(array $items): string
     {

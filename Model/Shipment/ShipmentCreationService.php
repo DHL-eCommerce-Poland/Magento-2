@@ -104,8 +104,21 @@ class ShipmentCreationService
                 return $apiResult;
             }
 
-            $packageNumbers = $apiResult->getPackageNumbers()
-                ?: ($apiResult->getShipmentId() ? [(string)$apiResult->getShipmentId()] : []);
+            $packageNumbers = $apiResult->getPackageNumbers();
+            if (empty($packageNumbers) && $apiResult->getShipmentId()) {
+                try {
+                    $packageNumbers = $this->client->getPieceId($credentials, (string) $apiResult->getShipmentId());
+                } catch (Throwable $e) {
+                    $this->logger->warning(sprintf(
+                        '[ShipmentCreation] Failed to fetch piece IDs for shipment %s: %s',
+                        $apiResult->getShipmentId(),
+                        $e->getMessage()
+                    ));
+                }
+            }
+            $syncTrackingNumbers = !empty($packageNumbers)
+                ? $packageNumbers
+                : ($apiResult->getShipmentId() ? [(string) $apiResult->getShipmentId()] : []);
 
             // 5. Create native Magento shipment if sync service is available
             $magentoShipmentId = null;
@@ -114,7 +127,7 @@ class ShipmentCreationService
                     $itemsQty = $shipmentData->getItemsQty();
                     $magentoShipment = $this->magentoShipmentSyncService->createMagentoShipment(
                         (int)$orderId,
-                        $packageNumbers,
+                        $syncTrackingNumbers,
                         $itemsQty
                     );
                     $magentoShipmentId = (int)$magentoShipment->getEntityId();
@@ -132,7 +145,6 @@ class ShipmentCreationService
             $savedEntity = $this->shipmentDataService->saveShipmentDataWithStatus(
                 $shipmentData,
                 $status,
-                null,
                 $presetSenderId,
                 $presetShipmentId,
                 $apiResult->getShipmentId(),
@@ -234,8 +246,21 @@ class ShipmentCreationService
             $newShipmentId = (string) $apiResult->getShipmentId();
             $status = $apiResult->getOrderStatus() ?: ShipmentDataInterface::DEFAULT_STATUS;
 
-            $packageNumbers = $apiResult->getPackageNumbers()
-                ?: ($newShipmentId !== '' ? [$newShipmentId] : []);
+            $packageNumbers = $apiResult->getPackageNumbers();
+            if (empty($packageNumbers) && $newShipmentId !== '') {
+                try {
+                    $packageNumbers = $this->client->getPieceId($credentials, $newShipmentId);
+                } catch (Throwable $e) {
+                    $this->logger->warning(sprintf(
+                        '[DHL Recreate] Failed to fetch piece IDs for shipment %s: %s',
+                        $newShipmentId,
+                        $e->getMessage()
+                    ));
+                }
+            }
+            $syncTrackingNumbers = !empty($packageNumbers)
+                ? $packageNumbers
+                : ($newShipmentId !== '' ? [$newShipmentId] : []);
 
             // Update tracks on existing Magento shipment
             $magentoShipmentId = $existingEntity->getMagentoShipmentId();
@@ -243,7 +268,7 @@ class ShipmentCreationService
                 try {
                     $this->magentoShipmentSyncService->updateMagentoShipmentTracks(
                         $magentoShipmentId,
-                        $packageNumbers
+                        $syncTrackingNumbers
                     );
                 } catch (Throwable $e) {
                     $this->logger->warning(sprintf(
@@ -259,7 +284,6 @@ class ShipmentCreationService
                 $shipmentData,
                 $status,
                 $newShipmentId,
-                null,
                 $packageNumbers,
                 $magentoShipmentId
             );

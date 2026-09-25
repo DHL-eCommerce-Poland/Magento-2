@@ -67,23 +67,33 @@ class DataProvider extends AbstractDataProvider
             if (!empty($rawPayload) && is_string($rawPayload)) {
                 try {
                     $payload = $this->serializer->unserialize($rawPayload);
-                    if (is_array($payload)) {
-                        if (isset($payload['sender']) && is_array($payload['sender'])) {
-                            $data['sender'] = $payload['sender'];
+                } catch (Throwable $e) {
+                    $payload = null;
+                    $this->logger?->error(sprintf(
+                        '[DataProvider] Failed to unserialize shipment_data payload for shipment entity #%s: %s',
+                        $item->getId(),
+                        $e->getMessage()
+                    ));
+                }
+
+                if (is_array($payload)) {
+                    if (isset($payload['sender']) && is_array($payload['sender'])) {
+                        $data['sender'] = $payload['sender'];
+                    }
+                    if (isset($data['sender']) && is_array($data['sender'])) {
+                        $presetId = $item->getData('preset_sender_id');
+                        $hasPreset = !isset($data['sender']['presetSenderId'])
+                            && !empty($presetId)
+                            && is_scalar($presetId);
+                        if ($hasPreset) {
+                            $data['sender']['presetSenderId'] = (string) $presetId;
                         }
-                        if (isset($data['sender']) && is_array($data['sender'])) {
-                            $presetId = $item->getData('preset_sender_id');
-                            $hasPreset = !isset($data['sender']['presetSenderId'])
-                                && !empty($presetId)
-                                && is_scalar($presetId);
-                            if ($hasPreset) {
-                                $data['sender']['presetSenderId'] = (string) $presetId;
-                            }
-                        }
-                        if (isset($payload['recipient']) && is_array($payload['recipient'])) {
-                            $data['recipient'] = $payload['recipient'];
-                        }
-                        if (isset($payload['shipmentSettings']) && is_array($payload['shipmentSettings'])) {
+                    }
+                    if (isset($payload['recipient']) && is_array($payload['recipient'])) {
+                        $data['recipient'] = $payload['recipient'];
+                    }
+                    if (isset($payload['shipmentSettings']) && is_array($payload['shipmentSettings'])) {
+                        try {
                             $hasNoPkg = empty($payload['shipmentSettings']['packageNumbers'])
                                 && !empty($payload['packageNumbers']);
                             if ($hasNoPkg) {
@@ -103,41 +113,52 @@ class DataProvider extends AbstractDataProvider
                                 $dispatchNumber,
                                 $returnShipmentId
                             );
-                            $packageNumbers = is_array($payload['packageNumbers'] ?? null)
-                                ? $payload['packageNumbers']
-                                : (array) ($payload['shipmentSettings']['packageNumbers'] ?? []);
-
                             $hasPackages = isset($payload['shipmentSettings']['packages'])
                                 && is_array($payload['shipmentSettings']['packages']);
                             if ($hasPackages) {
+                                $rootPkgNums = (array) ($payload['packageNumbers'] ?? ($payload['shipmentSettings']['packageNumbers'] ?? []));
                                 $data['packages'] = $this->normalizePackages(
                                     $payload['shipmentSettings']['packages'],
-                                    $packageNumbers
+                                    $rootPkgNums
                                 );
                                 $data['packages_fieldset'] = ['packages' => $data['packages']];
                             }
-                        }
-                        if (isset($payload['specialServices']) && is_array($payload['specialServices'])) {
-                            $data['specialServices'] = $this->normalizeSpecialServices($payload['specialServices']);
-                            $data['special_services'] = ['specialServices' => $data['specialServices']];
-                        }
-                        $hasRootPackages = !isset($data['packages'])
-                            && isset($payload['packages'])
-                            && is_array($payload['packages']);
-                        if ($hasRootPackages) {
-                            $packageNumbers = is_array($payload['packageNumbers'] ?? null)
-                                ? $payload['packageNumbers']
-                                : [];
-                            $data['packages'] = $this->normalizePackages($payload['packages'], $packageNumbers);
-                            $data['packages_fieldset'] = ['packages' => $data['packages']];
+                        } catch (Throwable $e) {
+                            $this->logger?->error(sprintf(
+                                '[DataProvider] Failed to normalize shipmentSettings for shipment entity #%s: %s',
+                                $item->getId(),
+                                $e->getMessage()
+                            ));
                         }
                     }
-                } catch (Throwable $e) {
-                    $this->logger?->warning(sprintf(
-                        '[DataProvider] Failed to unserialize shipment_data payload for shipment entity #%s: %s',
-                        $item->getId(),
-                        $e->getMessage()
-                    ));
+                    if (isset($payload['specialServices']) && is_array($payload['specialServices'])) {
+                        try {
+                            $data['specialServices'] = $this->normalizeSpecialServices($payload['specialServices']);
+                            $data['special_services'] = ['specialServices' => $data['specialServices']];
+                        } catch (Throwable $e) {
+                            $this->logger?->error(sprintf(
+                                '[DataProvider] Failed to normalize specialServices for shipment entity #%s: %s',
+                                $item->getId(),
+                                $e->getMessage()
+                            ));
+                        }
+                    }
+                    $hasRootPackages = !isset($data['packages'])
+                        && isset($payload['packages'])
+                        && is_array($payload['packages']);
+                    if ($hasRootPackages) {
+                        try {
+                            $rootPkgNums = (array) ($payload['packageNumbers'] ?? ($payload['shipmentSettings']['packageNumbers'] ?? []));
+                            $data['packages'] = $this->normalizePackages($payload['packages'], $rootPkgNums);
+                            $data['packages_fieldset'] = ['packages' => $data['packages']];
+                        } catch (Throwable $e) {
+                            $this->logger?->error(sprintf(
+                                '[DataProvider] Failed to normalize root packages for shipment entity #%s: %s',
+                                $item->getId(),
+                                $e->getMessage()
+                            ));
+                        }
+                    }
                 }
             }
 
@@ -251,24 +272,33 @@ class DataProvider extends AbstractDataProvider
     }
 
     /**
-     * Normalize packages array flags to string '1'/'0', add record_id and packageNumber.
+     * Normalize packages array flags to string '1'/'0', record_id, returnShipmentId, and packagesTrackingNumbers.
      *
      * @param array $packages
-     * @param array $packageNumbers
+     * @param array $rootPackageNumbers
      *
      * @return array
      */
-    private function normalizePackages(array $packages, array $packageNumbers = []): array
+    private function normalizePackages(array $packages, array $rootPackageNumbers = []): array
     {
         $result = [];
+        $rootPackageNumbers = array_values($rootPackageNumbers);
         foreach ($packages as $index => $pkg) {
             if (is_array($pkg)) {
                 $pkg['record_id'] = (string)$index;
                 $pkg['isNonStandard'] = !empty($pkg['isNonStandard']) ? '1' : '0';
                 $pkg['hasEuroReturn'] = !empty($pkg['hasEuroReturn']) ? '1' : '0';
-                $pkgNum = $packageNumbers[$index]
-                    ?? ($pkg['packageNumber'] ?? ($pkg['blpPieceId'] ?? ''));
-                $pkg['packageNumber'] = (string) $pkgNum;
+                $pkgNumber = $pkg['packageNumber'] ?? $pkg['pieceId'] ?? null;
+                if (empty($pkgNumber) && isset($rootPackageNumbers[$index])) {
+                    $pkgNumber = $rootPackageNumbers[$index];
+                }
+                $pkg['packageNumber'] = (string)($pkgNumber ?? '');
+
+                $trackNum = $pkg['packagesTrackingNumbers'] ?? $pkg['packageTrackingNumber'] ?? null;
+                if (empty($trackNum) && isset($rootPackageNumbers[$index])) {
+                    $trackNum = $rootPackageNumbers[$index];
+                }
+                $pkg['packagesTrackingNumbers'] = (string)($trackNum ?? '');
                 $result[$index] = $pkg;
             }
         }

@@ -16,7 +16,6 @@ interface ShipmentDataInterface
     public const PRESET_SENDER_ID = 'preset_sender_id';
     public const PRESET_SHIPMENT_ID = 'preset_shipment_id';
     public const SHIPMENT_DATA = 'shipment_data';
-    public const ERROR_MESSAGES = 'error_messages';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
 
@@ -94,7 +93,7 @@ interface ShipmentDataInterface
     public function getReturnShipmentId(): ?string;
 
     /**
-     * Set DHL return shipment ID / waybill.
+     * Set DHL return shipment ID.
      *
      * @param string|null $returnShipmentId
      *
@@ -181,22 +180,6 @@ interface ShipmentDataInterface
      * @return $this
      */
     public function setShipmentData(?string $shipmentData): static;
-
-    /**
-     * Get error messages JSON string.
-     *
-     * @return string|null
-     */
-    public function getErrorMessages(): ?string;
-
-    /**
-     * Set error messages JSON string.
-     *
-     * @param string|null $errorMessages
-     *
-     * @return $this
-     */
-    public function setErrorMessages(?string $errorMessages): static;
 
     /**
      * Get creation timestamp.

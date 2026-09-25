@@ -75,12 +75,30 @@ class PackageNumbers extends Column
             return '';
         }
 
-        // 1. Check for stored package numbers (blpPieceId / piece IDs)
+        // 1. Check for stored package numbers (piece IDs from getPieceId)
         if (!empty($data['packageNumbers']) && is_array($data['packageNumbers'])) {
-            $filtered = array_filter(array_map('trim', $data['packageNumbers']));
+            $filtered = array_values(array_unique(array_filter(array_map('trim', $data['packageNumbers']))));
             if (!empty($filtered)) {
                 return implode(', ', $filtered);
             }
+        }
+
+        // 2. Check for packageNumber / pieceId on individual package items
+        $packageNumbers = [];
+        $packages = $data['packages'] ?? ($data['shipmentSettings']['packages'] ?? []);
+        if (is_array($packages)) {
+            foreach ($packages as $pkg) {
+                if (is_array($pkg)) {
+                    $num = $pkg['packageNumber'] ?? $pkg['pieceId'] ?? null;
+                    if ($num !== null && trim((string) $num) !== '') {
+                        $packageNumbers[] = trim((string) $num);
+                    }
+                }
+            }
+        }
+        $filteredNums = array_values(array_unique(array_filter($packageNumbers)));
+        if (!empty($filteredNums)) {
+            return implode(', ', $filteredNums);
         }
 
         // 2. Check for pieceList / package definitions in shipment data

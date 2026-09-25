@@ -21,42 +21,15 @@ use Psr\Log\LoggerInterface;
 
 class ReturnShipmentCreationServiceTest extends TestCase
 {
-    /**
-     * @var MockObject
-     */
-    private $shipmentDataServiceMock;
-    /**
-     * @var MockObject
-     */
-    private $validatorMock;
-    /**
-     * @var MockObject
-     */
-    private $returnMapperMock;
-    /**
-     * @var MockObject
-     */
-    private $credentialsProviderMock;
-    /**
-     * @var MockObject
-     */
-    private $clientMock;
-    /**
-     * @var MockObject
-     */
-    private $lockManagerMock;
-    /**
-     * @var MockObject
-     */
-    private $loggerStub;
-    /**
-     * @var MockObject
-     */
-    private $serializerMock;
-    /**
-     * @var ReturnShipmentCreationService
-     */
-    private $service;
+    private MockObject $shipmentDataServiceMock;
+    private MockObject $validatorMock;
+    private MockObject $returnMapperMock;
+    private MockObject $credentialsProviderMock;
+    private MockObject $clientMock;
+    private MockObject $lockManagerMock;
+    private mixed $loggerStub;
+    private MockObject $serializerMock;
+    private ReturnShipmentCreationService $service;
 
     protected function setUp(): void
     {
@@ -81,7 +54,7 @@ class ReturnShipmentCreationServiceTest extends TestCase
         );
     }
 
-    public function testCreateReturnShipmentSuccess(): void
+    public function testCreateReturnShipmentSingleSuccess(): void
     {
         $shipmentData = new DhlShipmentData(orderId: 3003);
 
@@ -96,7 +69,8 @@ class ReturnShipmentCreationServiceTest extends TestCase
 
         $this->lockManagerMock->expects($this->once())
             ->method('unlock')
-            ->with('dhl_return_shipment_create_3003');
+            ->with('dhl_return_shipment_create_3003')
+            ->willReturn(true);
 
         $this->validatorMock->expects($this->once())
             ->method('validate')
@@ -116,9 +90,9 @@ class ReturnShipmentCreationServiceTest extends TestCase
         $apiResult = new CreateShipmentReturnResult(
             success: true,
             timeout: false,
-            shipmentId: 'RET3003',
-            waybill: 'RET3003',
-            labelData: 'pdfdata'
+            items: [
+                ['shipmentId' => 'RET3003', 'waybill' => 'RET3003', 'packageTrackingNumber' => 'P1', 'labelData' => 'pdf', 'labelMimeType' => 'application/pdf'],
+            ]
         );
 
         $this->clientMock->expects($this->once())
@@ -128,7 +102,7 @@ class ReturnShipmentCreationServiceTest extends TestCase
 
         $this->shipmentDataServiceMock->expects($this->once())
             ->method('updateReturnShipmentId')
-            ->with(505, 'RET3003');
+            ->with(505, 'RET3003', $apiResult->getItems());
 
         $result = $this->service->createReturnShipment(
             returnShipmentData: $shipmentData,
@@ -140,5 +114,66 @@ class ReturnShipmentCreationServiceTest extends TestCase
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('RET3003', $result->getShipmentId());
+    }
+
+    public function testCreateReturnShipmentMultipleItemsSuccess(): void
+    {
+        $shipmentData = new DhlShipmentData(orderId: 4004);
+
+        $this->serializerMock->expects($this->once())
+            ->method('serialize')
+            ->willReturn('{"orderId":4004}');
+
+        $this->lockManagerMock->expects($this->once())
+            ->method('lock')
+            ->with('dhl_return_shipment_create_4004', 15)
+            ->willReturn(true);
+
+        $this->lockManagerMock->expects($this->once())
+            ->method('unlock')
+            ->with('dhl_return_shipment_create_4004')
+            ->willReturn(true);
+
+        $this->validatorMock->expects($this->once())
+            ->method('validate')
+            ->with($shipmentData);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderMock->expects($this->once())
+            ->method('getCredentials')
+            ->willReturn($credentials);
+
+        $this->returnMapperMock->expects($this->once())
+            ->method('map')
+            ->willReturn(['serviceType' => 'ZK']);
+
+        $apiResult = new CreateShipmentReturnResult(
+            success: true,
+            timeout: false,
+            items: [
+                ['shipmentId' => '90040025505', 'waybill' => '90040025505', 'packageTrackingNumber' => 'P1', 'labelData' => 'pdf1', 'labelMimeType' => 'application/pdf'],
+                ['shipmentId' => '90040025516', 'waybill' => '90040025516', 'packageTrackingNumber' => 'P2', 'labelData' => 'pdf2', 'labelMimeType' => 'application/pdf'],
+                ['shipmentId' => '90040025527', 'waybill' => '90040025527', 'packageTrackingNumber' => 'P3', 'labelData' => 'pdf3', 'labelMimeType' => 'application/pdf'],
+            ]
+        );
+
+        $this->clientMock->expects($this->once())
+            ->method('createShipmentReturn')
+            ->willReturn($apiResult);
+
+        $this->shipmentDataServiceMock->expects($this->once())
+            ->method('updateReturnShipmentId')
+            ->with(707, '90040025505, 90040025516, 90040025527', $apiResult->getItems());
+
+        $result = $this->service->createReturnShipment(
+            returnShipmentData: $shipmentData,
+            environment: 'sandbox',
+            expirationDays: 14,
+            primaryWaybillNumber: 'ORIG_WAYBILL',
+            originalEntityId: 707
+        );
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals('90040025505, 90040025516, 90040025527', $result->getShipmentId());
     }
 }

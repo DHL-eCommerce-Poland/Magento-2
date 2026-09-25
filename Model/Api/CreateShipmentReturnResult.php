@@ -9,20 +9,14 @@ class CreateShipmentReturnResult
     /**
      * @param bool $success
      * @param bool $timeout
-     * @param string|null $shipmentId
-     * @param string|null $waybill
-     * @param string|null $labelData
-     * @param string|null $labelMimeType
+     * @param array $items
      * @param string|null $errorCode
      * @param string|null $errorMessage
      */
     public function __construct(
         private readonly bool $success,
         private readonly bool $timeout = false,
-        private readonly ?string $shipmentId = null,
-        private readonly ?string $waybill = null,
-        private readonly ?string $labelData = null,
-        private readonly ?string $labelMimeType = null,
+        private readonly array $items = [],
         private readonly ?string $errorCode = null,
         private readonly ?string $errorMessage = null
     ) {
@@ -49,43 +43,99 @@ class CreateShipmentReturnResult
     }
 
     /**
-     * Get the DHL return tracking number / shipment ID.
+     * Get all return items created by DHL.
+     *
+     * @return array
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    /**
+     * Get list of all return shipment tracking numbers / waybills.
+     *
+     * @return string[]
+     */
+    public function getShipmentIds(): array
+    {
+        $ids = [];
+        foreach ($this->items as $item) {
+            if (!empty($item['shipmentId'])) {
+                $ids[] = (string) $item['shipmentId'];
+            }
+        }
+        return $ids;
+    }
+
+    /**
+     * Get primary (first) return shipment ID.
+     *
+     * @return string|null
+     */
+    public function getPrimaryShipmentId(): ?string
+    {
+        $ids = $this->getShipmentIds();
+        return $ids[0] ?? null;
+    }
+
+    /**
+     * Get shipment ID (comma-separated string if multiple items).
      *
      * @return string|null
      */
     public function getShipmentId(): ?string
     {
-        return $this->shipmentId;
+        $ids = $this->getShipmentIds();
+        return !empty($ids) ? implode(', ', $ids) : null;
     }
 
     /**
-     * Get the waybill number.
+     * Get waybill number (comma-separated string if multiple items).
      *
      * @return string|null
      */
     public function getWaybill(): ?string
     {
-        return $this->waybill;
+        $waybills = [];
+        foreach ($this->items as $item) {
+            $waybill = $item['waybill'] ?? $item['shipmentId'] ?? null;
+            if (!empty($waybill)) {
+                $waybills[] = (string) $waybill;
+            }
+        }
+        return !empty($waybills) ? implode(', ', $waybills) : null;
     }
 
     /**
-     * Get binary return label content if provided.
+     * Get primary or combined label binary content.
      *
      * @return string|null
      */
     public function getLabelData(): ?string
     {
-        return $this->labelData;
+        $labels = [];
+        foreach ($this->items as $item) {
+            if (!empty($item['labelData'])) {
+                $labels[] = $item['labelData'];
+            }
+        }
+        return !empty($labels) ? implode('', $labels) : null;
     }
 
     /**
-     * Get return label mime type (e.g. application/pdf, text/plain).
+     * Get primary return label mime type.
      *
      * @return string|null
      */
     public function getLabelMimeType(): ?string
     {
-        return $this->labelMimeType;
+        foreach ($this->items as $item) {
+            if (!empty($item['labelMimeType'])) {
+                return (string) $item['labelMimeType'];
+            }
+        }
+        return null;
     }
 
     /**

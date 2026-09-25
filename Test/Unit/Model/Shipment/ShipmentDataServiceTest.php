@@ -251,4 +251,77 @@ class ShipmentDataServiceTest extends TestCase
 
         $this->assertFalse($service->hasShipmentForOrder(102));
     }
+
+    /**
+     * Test saveShipmentDataWithStatus maps packageNumbers to individual packages in stored JSON payload.
+     *
+     * @return void
+     */
+    public function testSaveShipmentDataWithStatusMapsPackageNumbersToDynamicRows(): void
+    {
+        $orderRepository = $this->createStub(OrderRepositoryInterface::class);
+        $mapper = $this->createStub(OrderToShipmentDataMapper::class);
+        $validator = $this->createStub(ShipmentDataValidator::class);
+        $dropOffPointRepository = $this->createStub(DropOffPointRepositoryInterface::class);
+        $deliveryServiceRepository = $this->createStub(DeliveryServiceRepositoryInterface::class);
+        $shipmentDataRepository = $this->createMock(ShipmentDataRepositoryInterface::class);
+        $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
+        $serializer = new Json();
+
+        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(
+            packages: [
+                ['packageType' => 'PACKAGE', 'weight' => 2.5],
+                ['packageType' => 'PACKAGE', 'weight' => 5.0],
+            ]
+        );
+
+        $shipmentData = new DhlShipmentData(orderId: 200, shipmentSettings: $shipmentSettings);
+        $entity = $this->createMock(ShipmentDataInterface::class);
+
+        $shipmentDataFactory->method('create')->willReturn($entity);
+
+        $capturedJson = null;
+        $entity->expects($this->once())
+            ->method('setShipmentData')
+            ->willReturnCallback(function (string $json) use (&$capturedJson, $entity) {
+                $capturedJson = $json;
+                return $entity;
+            });
+
+        $shipmentDataRepository->expects($this->once())
+            ->method('save')
+            ->willReturn($entity);
+
+        $service = new ShipmentDataService(
+            $orderRepository,
+            $mapper,
+            $validator,
+            $dropOffPointRepository,
+            $deliveryServiceRepository,
+            $shipmentDataRepository,
+            $shipmentDataFactory,
+            $serializer
+        );
+
+        $packageNumbers = ['JJD000030025688110000001106', 'JJD000030025688110000001117'];
+
+        $service->saveShipmentDataWithStatus(
+            $shipmentData,
+            'Utworzono',
+            null,
+            null,
+            '90040027827',
+            null,
+            $packageNumbers
+        );
+
+        $this->assertNotNull($capturedJson);
+        $decoded = json_decode($capturedJson, true);
+
+        $this->assertEquals($packageNumbers, $decoded['packageNumbers']);
+        $this->assertEquals('JJD000030025688110000001106', $decoded['packages'][0]['packageNumber']);
+        $this->assertEquals('JJD000030025688110000001117', $decoded['packages'][1]['packageNumber']);
+        $this->assertEquals('JJD000030025688110000001106', $decoded['shipmentSettings']['packages'][0]['packageNumber']);
+        $this->assertEquals('JJD000030025688110000001117', $decoded['shipmentSettings']['packages'][1]['packageNumber']);
+    }
 }

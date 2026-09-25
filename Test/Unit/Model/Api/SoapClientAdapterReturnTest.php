@@ -12,14 +12,8 @@ use Psr\Log\LoggerInterface;
 
 class SoapClientAdapterReturnTest extends TestCase
 {
-    /**
-     * @var MockObject
-     */
-    private $loggerStub;
-    /**
-     * @var MockObject
-     */
-    private $scopeConfigStub;
+    private mixed $loggerStub;
+    private mixed $scopeConfigStub;
 
     protected function setUp(): void
     {
@@ -27,7 +21,7 @@ class SoapClientAdapterReturnTest extends TestCase
         $this->scopeConfigStub = $this->createStub(\Magento\Framework\App\Config\ScopeConfigInterface::class);
     }
 
-    public function testCreateShipmentReturnSuccess(): void
+    public function testCreateShipmentReturnSingleItemSuccess(): void
     {
         $soapClientStub = new TestSoapClient(false);
 
@@ -51,6 +45,76 @@ class SoapClientAdapterReturnTest extends TestCase
         $this->assertEquals('RET987654321', $result->getShipmentId());
         $this->assertEquals('RET987654321', $result->getWaybill());
         $this->assertNotNull($result->getLabelData());
+        $this->assertEquals('application/pdf', $result->getLabelMimeType());
+    }
+
+    public function testCreateShipmentReturnMultipleItemsSuccess(): void
+    {
+        $multiItemSoapClient = new class extends TestSoapClient {
+            public function __construct()
+            {
+                parent::__construct(false);
+            }
+
+            public function createShipmentReturn(mixed $args): mixed
+            {
+                return (object) [
+                    'createShipmentReturnResult' => (object) [
+                        'item' => [
+                            (object) [
+                                'shipmentNotificationNumber' => '90040025505',
+                                'shipmentTrackingNumber' => '90040025505',
+                                'packagesTrackingNumbers' => 'JJD000030025688110000000807',
+                                'label' => (object) [
+                                    'labelFormat' => 'application/pdf',
+                                    'labelContent' => base64_encode('PDF1'),
+                                ],
+                            ],
+                            (object) [
+                                'shipmentNotificationNumber' => '90040025516',
+                                'shipmentTrackingNumber' => '90040025516',
+                                'packagesTrackingNumbers' => 'JJD000030025688110000000818',
+                                'label' => (object) [
+                                    'labelFormat' => 'application/pdf',
+                                    'labelContent' => base64_encode('PDF2'),
+                                ],
+                            ],
+                            (object) [
+                                'shipmentNotificationNumber' => '90040025527',
+                                'shipmentTrackingNumber' => '90040025527',
+                                'packagesTrackingNumbers' => 'JJD000030025688110000000829',
+                                'label' => (object) [
+                                    'labelFormat' => 'application/pdf',
+                                    'labelContent' => base64_encode('PDF3'),
+                                ],
+                            ],
+                        ],
+                    ],
+                ];
+            }
+        };
+
+        $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $timezoneStub, $dateSanitizer])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($multiItemSoapClient);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->createShipmentReturn($credentials, ['serviceType' => 'ZK'], 1001);
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertCount(3, $result->getItems());
+        $this->assertEquals(['90040025505', '90040025516', '90040025527'], $result->getShipmentIds());
+        $this->assertEquals('90040025505, 90040025516, 90040025527', $result->getShipmentId());
+        $this->assertEquals('90040025505, 90040025516, 90040025527', $result->getWaybill());
+        $this->assertEquals('PDF1PDF2PDF3', $result->getLabelData());
         $this->assertEquals('application/pdf', $result->getLabelMimeType());
     }
 }

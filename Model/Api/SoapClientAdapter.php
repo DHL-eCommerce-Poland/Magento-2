@@ -1320,72 +1320,84 @@ class SoapClientAdapter implements ClientInterface
             $response = $client->createShipmentReturn($params);
             $this->logSoapCommunication($client, 'createShipmentReturn' . $orderContext);
 
-            $result = $response->createShipmentReturnResult->item ?? $response->createShipmentReturnResult ?? null;
-            if (is_array($result)) {
-                $result = $result[0] ?? null;
-            }
+            $rawResult = $response->createShipmentReturnResult->item ?? $response->createShipmentReturnResult ?? null;
+            $rawItems = is_array($rawResult) ? $rawResult : ($rawResult !== null ? [$rawResult] : []);
 
-            if (is_object($result)) {
-                if (!empty($result->error)) {
-                    return new CreateShipmentReturnResult(
-                        false,
-                        false,
-                        null,
-                        null,
-                        null,
-                        null,
-                        'CREATE_RETURN_ERROR',
-                        (string) $result->error
-                    );
+            $parsedItems = [];
+            $firstError = null;
+
+            foreach ($rawItems as $itemObj) {
+                if (!is_object($itemObj)) {
+                    continue;
                 }
 
-                $shipmentId = !empty($result->shipmentNotificationNumber)
-                    ? (string) $result->shipmentNotificationNumber
-                    : (!empty($result->shipmentIdentification)
-                        ? (string) $result->shipmentIdentification
-                        : (!empty($result->shipmentId) ? (string) $result->shipmentId : null));
+                if (!empty($itemObj->error)) {
+                    $firstError = (string) $itemObj->error;
+                    continue;
+                }
 
-                $waybill = !empty($result->waybill) ? (string) $result->waybill : $shipmentId;
+                $shipmentId = !empty($itemObj->shipmentNotificationNumber)
+                    ? (string) $itemObj->shipmentNotificationNumber
+                    : (!empty($itemObj->shipmentTrackingNumber)
+                        ? (string) $itemObj->shipmentTrackingNumber
+                        : (!empty($itemObj->shipmentIdentification)
+                            ? (string) $itemObj->shipmentIdentification
+                            : (!empty($itemObj->shipmentId) ? (string) $itemObj->shipmentId : null)));
+
+                if (empty($shipmentId)) {
+                    continue;
+                }
+
+                $waybill = !empty($itemObj->waybill)
+                    ? (string) $itemObj->waybill
+                    : (!empty($itemObj->shipmentTrackingNumber)
+                        ? (string) $itemObj->shipmentTrackingNumber
+                        : $shipmentId);
+
+                $packageTrackingNumber = !empty($itemObj->packagesTrackingNumbers)
+                    ? (string) $itemObj->packagesTrackingNumbers
+                    : null;
 
                 $labelData = null;
                 $labelMimeType = null;
 
-                if (!empty($result->label)) {
-                    $labelObj = $result->label;
+                if (!empty($itemObj->label)) {
+                    $labelObj = $itemObj->label;
                     if (!empty($labelObj->labelContent)) {
                         // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
                         $labelData = base64_decode((string) $labelObj->labelContent);
                     }
-                    if (!empty($labelObj->labelMimeType)) {
-                        $labelMimeType = (string) $labelObj->labelMimeType;
-                    }
+                    $labelMimeType = !empty($labelObj->labelFormat)
+                        ? (string) $labelObj->labelFormat
+                        : (!empty($labelObj->labelMimeType) ? (string) $labelObj->labelMimeType : null);
                 }
 
-                if (!empty($shipmentId)) {
-                    return new CreateShipmentReturnResult(
-                        true,
-                        false,
-                        $shipmentId,
-                        $waybill,
-                        $labelData,
-                        $labelMimeType
-                    );
-                }
+                $parsedItems[] = [
+                    'shipmentId' => $shipmentId,
+                    'waybill' => $waybill,
+                    'packageTrackingNumber' => $packageTrackingNumber,
+                    'labelData' => $labelData,
+                    'labelMimeType' => $labelMimeType,
+                ];
             }
 
-            $errorMsg = is_object($result) && !empty($result->error)
-                ? (string) $result->error
-                : 'DHL API returned an invalid response structure for createShipmentReturn.';
+            if (!empty($parsedItems)) {
+                return new CreateShipmentReturnResult(
+                    success: true,
+                    timeout: false,
+                    items: $parsedItems
+                );
+            }
+
+            $errorMsg = $firstError
+                ?: 'DHL API returned an invalid response structure for createShipmentReturn.';
 
             return new CreateShipmentReturnResult(
-                false,
-                false,
-                null,
-                null,
-                null,
-                null,
-                'CREATE_RETURN_ERROR',
-                $errorMsg
+                success: false,
+                timeout: false,
+                items: [],
+                errorCode: 'CREATE_RETURN_ERROR',
+                errorMessage: $errorMsg
             );
         } catch (SoapFault $fault) {
             $this->logSoapCommunication($client ?? null, 'createShipmentReturn' . $orderContext);
@@ -1399,14 +1411,11 @@ class SoapClientAdapter implements ClientInterface
             $isTimeout = $this->isTimeoutException($fault);
 
             return new CreateShipmentReturnResult(
-                false,
-                $isTimeout,
-                null,
-                null,
-                null,
-                null,
-                $fault->faultcode ?? 'SOAP_FAULT',
-                'DHL API error: ' . $fault->getMessage()
+                success: false,
+                timeout: $isTimeout,
+                items: [],
+                errorCode: $fault->faultcode ?? 'SOAP_FAULT',
+                errorMessage: 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
             $this->logSoapCommunication($client ?? null, 'createShipmentReturn' . $orderContext);
@@ -1419,14 +1428,11 @@ class SoapClientAdapter implements ClientInterface
             $isTimeout = $this->isTimeoutException($e);
 
             return new CreateShipmentReturnResult(
-                false,
-                $isTimeout,
-                null,
-                null,
-                null,
-                null,
-                'CONNECTION_ERROR',
-                'An error occurred while connecting to DHL: ' . $e->getMessage()
+                success: false,
+                timeout: $isTimeout,
+                items: [],
+                errorCode: 'CONNECTION_ERROR',
+                errorMessage: 'An error occurred while connecting to DHL: ' . $e->getMessage()
             );
         }
     }
@@ -1582,5 +1588,113 @@ class SoapClientAdapter implements ClientInterface
                 'An error occurred while connecting to DHL: ' . $e->getMessage()
             );
         }
+    }
+
+    /**
+     * Get piece IDs / package tracking numbers for a shipment via DHL WebAPI2 getPieceId endpoint.
+     *
+     * @param Credentials $credentials
+     * @param string $shipmentId
+     *
+     * @return string[]
+     */
+    public function getPieceId(
+        Credentials $credentials,
+        string $shipmentId
+    ): array {
+        if (empty(trim($shipmentId))) {
+            return [];
+        }
+
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
+
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+                'request' => [
+                    'items' => [
+                        'item' => [
+                            [
+                                'shipmentNumber' => $this->ensureUtf8($shipmentId),
+                            ],
+                        ],
+                    ],
+                ],
+            ];
+
+            $response = $client->getPieceId($params);
+            $this->logSoapCommunication($client, 'getPieceId');
+
+            $resultItem = $response->getPieceIdResult->shipments->item
+                ?? $response->getPieceIdResult->shipments
+                ?? $response->getPieceIdResult->item
+                ?? $response->getPieceIdResult
+                ?? null;
+            if (is_array($resultItem)) {
+                $resultItem = $resultItem[0] ?? null;
+            }
+
+            return $this->extractPieceIds($resultItem);
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf(
+                '[DHL WebAPI2] Exception during getPieceId for shipment #%s: %s',
+                $shipmentId,
+                $e->getMessage()
+            ));
+            return [];
+        }
+    }
+
+    /**
+     * Helper to extract piece ID strings from getPieceId result item.
+     *
+     * @param mixed $resultItem
+     *
+     * @return string[]
+     */
+    private function extractPieceIds(mixed $resultItem): array
+    {
+        if (!is_object($resultItem) && !is_array($resultItem)) {
+            return [];
+        }
+
+        $pieceList = [];
+        if (is_object($resultItem)) {
+            $rawPieces = $resultItem->packages->item
+                ?? $resultItem->packages
+                ?? $resultItem->abstractPiece->item
+                ?? $resultItem->abstractPiece
+                ?? $resultItem->pieces->item
+                ?? $resultItem->pieces
+                ?? $resultItem->pieceList->item
+                ?? $resultItem->pieceList
+                ?? null;
+            if ($rawPieces !== null) {
+                $pieceList = is_array($rawPieces) ? $rawPieces : [$rawPieces];
+            }
+        } elseif (is_array($resultItem)) {
+            $pieceList = $resultItem;
+        }
+
+        $packageNumbers = [];
+        foreach ($pieceList as $piece) {
+            if (is_object($piece)) {
+                $pieceId = $piece->blpPieceId ?? $piece->pieceId ?? $piece->packageNumber ?? $piece->id ?? null;
+                if ($pieceId !== null && (string)$pieceId !== '') {
+                    $packageNumbers[] = (string)$pieceId;
+                }
+            } elseif (is_string($piece) || is_numeric($piece)) {
+                if (trim((string)$piece) !== '') {
+                    $packageNumbers[] = trim((string)$piece);
+                }
+            }
+        }
+
+        return array_values(array_unique($packageNumbers));
     }
 }

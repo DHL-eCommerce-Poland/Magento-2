@@ -7,6 +7,7 @@ namespace Ideo\Dhl\Model;
 use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
+use Throwable;
 
 class ShipmentData extends AbstractModel implements ShipmentDataInterface
 {
@@ -112,14 +113,40 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
     }
 
     /**
-     * Get DHL return shipment ID / waybill.
+     * Get DHL return shipment ID / waybill (derived from package dynamic rows in shipment_data JSON).
      *
      * @return string|null
      */
     public function getReturnShipmentId(): ?string
     {
-        $val = $this->getData(self::RETURN_SHIPMENT_ID);
-        return $val !== null ? (string)$val : null;
+        $direct = $this->getData(self::RETURN_SHIPMENT_ID);
+        if ($direct !== null && trim((string) $direct) !== '') {
+            return (string) $direct;
+        }
+
+        $rawPayload = $this->getShipmentData();
+        if (empty($rawPayload) || !is_string($rawPayload)) {
+            return null;
+        }
+
+        try {
+            $payload = (array) json_decode($rawPayload, true);
+            $packages = $payload['packages'] ?? ($payload['shipmentSettings']['packages'] ?? []);
+            if (!is_array($packages) || empty($packages)) {
+                return null;
+            }
+
+            $returnIds = [];
+            foreach ($packages as $pkg) {
+                if (is_array($pkg) && !empty($pkg['returnShipmentId'])) {
+                    $returnIds[] = (string) $pkg['returnShipmentId'];
+                }
+            }
+            $filtered = array_values(array_unique(array_filter($returnIds)));
+            return !empty($filtered) ? implode(', ', $filtered) : null;
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     /**
@@ -245,28 +272,6 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
     public function setShipmentData(?string $shipmentData): static
     {
         return $this->setData(self::SHIPMENT_DATA, $shipmentData);
-    }
-
-    /**
-     * Get error messages JSON string.
-     *
-     * @return string|null
-     */
-    public function getErrorMessages(): ?string
-    {
-        return $this->getData(self::ERROR_MESSAGES) !== null ? (string)$this->getData(self::ERROR_MESSAGES) : null;
-    }
-
-    /**
-     * Set error messages JSON string.
-     *
-     * @param string|null $errorMessages
-     *
-     * @return $this
-     */
-    public function setErrorMessages(?string $errorMessages): static
-    {
-        return $this->setData(self::ERROR_MESSAGES, $errorMessages);
     }
 
     /**

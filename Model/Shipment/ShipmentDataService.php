@@ -16,6 +16,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class ShipmentDataService
 {
@@ -176,7 +177,6 @@ class ShipmentDataService
      *
      * @param DhlShipmentData $shipmentData
      * @param string $status
-     * @param string|null $errorMessages
      * @param string|null $presetSenderId
      * @param string|null $presetShipmentId
      * @param string|null $shipmentId
@@ -191,7 +191,6 @@ class ShipmentDataService
     public function saveShipmentDataWithStatus(
         DhlShipmentData $shipmentData,
         string $status = ShipmentDataInterface::DEFAULT_STATUS,
-        ?string $errorMessages = null,
         ?string $presetSenderId = null,
         ?string $presetShipmentId = null,
         ?string $shipmentId = null,
@@ -208,11 +207,8 @@ class ShipmentDataService
         if ($shipmentId !== null && trim($shipmentId) !== '') {
             $payloadArr['shipmentId'] = (string)$shipmentId;
         }
-        if ($returnShipmentId !== null && trim($returnShipmentId) !== '') {
-            $payloadArr['returnShipmentId'] = (string)$returnShipmentId;
-        }
         if ($packageNumbers !== null && !empty($packageNumbers)) {
-            $payloadArr['packageNumbers'] = array_values($packageNumbers);
+            $this->mapPackageTrackingNumbers($payloadArr, $packageNumbers);
         }
         if ($magentoShipmentId !== null) {
             $payloadArr['magentoShipmentId'] = $magentoShipmentId;
@@ -224,30 +220,71 @@ class ShipmentDataService
         if ($shipmentId !== null && trim($shipmentId) !== '') {
             $entity->setShipmentId($shipmentId);
         }
-        if ($returnShipmentId !== null && trim($returnShipmentId) !== '') {
-            $entity->setReturnShipmentId($returnShipmentId);
-        }
         $entity->setPresetSenderId($presetSenderId);
         $entity->setPresetShipmentId($presetShipmentId);
         $entity->setShipmentData($this->serializer->serialize($payloadArr));
-        $entity->setErrorMessages($errorMessages);
 
         return $this->shipmentDataRepository->save($entity);
     }
 
     /**
-     * Update return shipment ID for an existing shipment entity in DB.
+     * Update return shipment ID and package-level return tracking details on shipment entity.
      *
      * @param int $entityId
      * @param string $returnShipmentId
+     * @param array $returnItems
      *
      * @return ShipmentDataInterface
      * @throws LocalizedException
      */
-    public function updateReturnShipmentId(int $entityId, string $returnShipmentId): ShipmentDataInterface
-    {
+    public function updateReturnShipmentId(
+        int $entityId,
+        string $returnShipmentId,
+        array $returnItems = []
+    ): ShipmentDataInterface {
         $entity = $this->shipmentDataRepository->getById($entityId);
-        $entity->setReturnShipmentId($returnShipmentId);
+
+        $rawPayload = $entity->getShipmentData();
+        if (!empty($rawPayload) && is_string($rawPayload)) {
+            try {
+                $payloadArr = (array) $this->serializer->unserialize($rawPayload);
+                $hasChanged = false;
+
+                if (!empty($returnItems)) {
+                    $packages = $payloadArr['packages']
+                        ?? ($payloadArr['shipmentSettings']['packages'] ?? []);
+
+                    if (is_array($packages) && !empty($packages)) {
+                        foreach ($packages as $idx => $pkg) {
+                            $item = $returnItems[$idx] ?? null;
+                            if ($item && is_array($item)) {
+                                $retId = (string) ($item['waybill'] ?? ($item['shipmentId'] ?? ''));
+                                $pkgTrackNum = (string) ($item['packageTrackingNumber'] ?? ($item['packagesTrackingNumbers'] ?? ''));
+
+                                $packages[$idx]['returnShipmentId'] = $retId;
+                                $packages[$idx]['packagesTrackingNumbers'] = $pkgTrackNum;
+                                $hasChanged = true;
+                            }
+                        }
+
+                        if ($hasChanged) {
+                            $payloadArr['packages'] = $packages;
+                            if (isset($payloadArr['shipmentSettings']['packages'])) {
+                                $payloadArr['shipmentSettings']['packages'] = $packages;
+                            }
+                            $entity->setShipmentData($this->serializer->serialize($payloadArr));
+                        }
+                    }
+                }
+            } catch (Throwable $e) {
+                $this->logger?->warning(sprintf(
+                    '[ShipmentDataService] Failed to update package return tracking data for entity #%d: %s',
+                    $entityId,
+                    $e->getMessage()
+                ));
+            }
+        }
+
         return $this->shipmentDataRepository->save($entity);
     }
 
@@ -258,7 +295,6 @@ class ShipmentDataService
      * @param DhlShipmentData $shipmentData
      * @param string $status
      * @param string|null $shipmentId
-     * @param string|null $errorMessages
      * @param array|null $packageNumbers
      * @param int|null $magentoShipmentId
      *
@@ -270,7 +306,6 @@ class ShipmentDataService
         DhlShipmentData $shipmentData,
         string $status = 'created',
         ?string $shipmentId = null,
-        ?string $errorMessages = null,
         ?array $packageNumbers = null,
         ?int $magentoShipmentId = null
     ): ShipmentDataInterface {
@@ -284,7 +319,7 @@ class ShipmentDataService
             $entity->setShipmentId($shipmentId);
         }
         if ($packageNumbers !== null && !empty($packageNumbers)) {
-            $payloadArr['packageNumbers'] = array_values($packageNumbers);
+            $this->mapPackageTrackingNumbers($payloadArr, $packageNumbers);
         }
         if ($magentoShipmentId !== null) {
             $payloadArr['magentoShipmentId'] = $magentoShipmentId;
@@ -293,9 +328,6 @@ class ShipmentDataService
 
         $entity->setStatus($status);
         $entity->setShipmentData($this->serializer->serialize($payloadArr));
-        if ($errorMessages !== null) {
-            $entity->setErrorMessages($errorMessages);
-        }
 
         return $this->shipmentDataRepository->save($entity);
     }
@@ -318,7 +350,6 @@ class ShipmentDataService
         return $this->saveShipmentDataWithStatus(
             $shipmentData,
             ShipmentDataInterface::DEFAULT_STATUS,
-            null,
             $presetSenderId,
             $presetShipmentId
         );
@@ -372,5 +403,38 @@ class ShipmentDataService
             }
         }
         return null;
+    }
+
+    /**
+     * Map package tracking numbers into individual package elements in payload array.
+     *
+     * @param array $payloadArr
+     * @param array $packageNumbers
+     *
+     * @return void
+     */
+    private function mapPackageTrackingNumbers(array &$payloadArr, array $packageNumbers): void
+    {
+        $pkgNums = array_values($packageNumbers);
+        $payloadArr['packageNumbers'] = $pkgNums;
+
+        if (isset($payloadArr['shipmentSettings']['packages']) && is_array($payloadArr['shipmentSettings']['packages'])) {
+            foreach ($payloadArr['shipmentSettings']['packages'] as $idx => &$pkg) {
+                if (is_array($pkg) && isset($pkgNums[$idx])) {
+                    $pkg['packageNumber'] = (string)$pkgNums[$idx];
+                }
+            }
+            unset($pkg);
+            $payloadArr['packages'] = $payloadArr['shipmentSettings']['packages'];
+        }
+
+        if (isset($payloadArr['packages']) && is_array($payloadArr['packages'])) {
+            foreach ($payloadArr['packages'] as $idx => &$pkg) {
+                if (is_array($pkg) && isset($pkgNums[$idx])) {
+                    $pkg['packageNumber'] = (string)$pkgNums[$idx];
+                }
+            }
+            unset($pkg);
+        }
     }
 }

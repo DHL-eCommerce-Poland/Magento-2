@@ -63,6 +63,7 @@ class Collection extends SearchResult
         );
         $this->addFilterToMap('order_increment_id', 'sales_order.increment_id');
         $this->addFilterToMap('entity_id', 'main_table.entity_id');
+        $this->addFilterToMap('return_shipment_id', 'main_table.return_shipment_id');
         $this->addFilterToMap('status', 'main_table.status');
         $this->addFilterToMap('created_at', 'main_table.created_at');
         $this->addFilterToMap('updated_at', 'main_table.updated_at');

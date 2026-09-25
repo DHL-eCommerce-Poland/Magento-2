@@ -161,7 +161,9 @@ class CreateReturnShipmentTest extends TestCase
         $apiResult = new CreateShipmentReturnResult(
             success: true,
             timeout: false,
-            shipmentId: 'RET999'
+            items: [
+                ['shipmentId' => 'RET999', 'waybill' => 'RET999'],
+            ]
         );
 
         $this->returnCreationServiceMock->expects($this->once())

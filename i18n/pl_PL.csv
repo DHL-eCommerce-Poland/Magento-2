@@ -67,7 +67,7 @@ Failed to cancel courier booking: %1,Nie udało się anulować zamówienia kurie
 An error occurred while cancelling courier booking: %1,Wystąpił błąd podczas anulowania zamówienia kuriera: %1
 Invalid shipment entity ID.,Nieprawidłowy numer encji przesyłki.
 Could not load shipment data for return shipment creation.,Nie można było załadować danych przesyłki do utworzenia przesyłki zwrotnej.
-Return shipment created successfully. Return Shipment ID: %1,Przesyłka zwrotna została pomyślnie utworzona. Numer przesyłki zwrotnej: %1
+Return shipment created successfully. Return Package Number: %1,Przesyłka zwrotna została pomyślnie utworzona. Numer paczki zwrotnej: %1
 Failed to create return shipment: %1,Nie udało się utworzyć przesyłki zwrotnej: %1
 Shipment has been deleted successfully.,Przesyłka została pomyślnie usunięta.
 Failed to delete shipment: %1,Nie udało się usunąć przesyłki: %1
@@ -531,10 +531,11 @@ Delete drop-off points,Usuń punkty nadania
 General,Ogólne
 Shipment ID,Numer przesyłki
 Courier Dispatch ID,Numer zlecenia kuriera
-Return Shipment ID,Numer przesyłki zwrotnej
-Package Numbers,Numery paczek
+Return Package Number,Numer paczki zwrotnej
+Package Number,Numer paczki
 Packages,Paczki
 Package Number (BLP),Numer paczki (BLP)
+Package Tracking Number,Numer śledzenia paczki
 Shipment Tracking History,Historia śledzenia przesyłki
 Print Labels,Pobierz etykiety
 Download Scans,Pobierz skan LP
