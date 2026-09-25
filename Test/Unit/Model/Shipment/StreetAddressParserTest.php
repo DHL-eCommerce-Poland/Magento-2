@@ -37,14 +37,15 @@ class StreetAddressParserTest extends TestCase
     public static function addressDataProvider(): array
     {
         return [
-            'slash separated' => ['Marszałkowska 10/12', 'Marszałkowska', '10', '12'],
-            'slash with spaces' => ['ul. 1 Maja 5 / 2', 'ul. 1 Maja', '5', '2'],
+            'warszawska slash separated' => ['Warszawska 29/44', 'Warszawska', '29/44', ''],
+            'slash separated' => ['Marszałkowska 10/12', 'Marszałkowska', '10/12', ''],
+            'slash with spaces' => ['ul. 1 Maja 5 / 2', 'ul. 1 Maja', '5/2', ''],
             'm dot indicator' => ['Al. Jerozolimskie 123 m. 4', 'Al. Jerozolimskie', '123', '4'],
             'lokal indicator' => ['Polna 12 lok. 4A', 'Polna', '12', '4A'],
             'house only' => ['Krakowskie Przedmieście 14', 'Krakowskie Przedmieście', '14', ''],
             'house with letter' => ['Długa 15a', 'Długa', '15a', ''],
-            'array input 2 lines' => [['Marszałkowska', '10/12'], 'Marszałkowska', '10', '12'],
-            'array input 1 line' => [['Marszałkowska 10/12'], 'Marszałkowska', '10', '12'],
+            'array input 2 lines' => [['Marszałkowska', '10/12'], 'Marszałkowska', '10/12', ''],
+            'array input 1 line' => [['Marszałkowska 10/12'], 'Marszałkowska', '10/12', ''],
             'empty string' => ['', '', '', ''],
             'unparseable single text' => ['BezNumeru', 'BezNumeru', '', ''],
         ];

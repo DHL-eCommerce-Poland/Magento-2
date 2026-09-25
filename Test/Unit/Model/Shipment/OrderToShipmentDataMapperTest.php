@@ -93,8 +93,8 @@ class OrderToShipmentDataMapperTest extends TestCase
         $this->assertSame('Jan Kowalski', $shipmentData->getRecipient()->getContactPerson());
         $this->assertSame('C', $shipmentData->getRecipient()->getType());
         $this->assertSame('Marszałkowska', $shipmentData->getRecipient()->getStreet());
-        $this->assertSame('10', $shipmentData->getRecipient()->getHouseNumber());
-        $this->assertSame('12', $shipmentData->getRecipient()->getFlatNumber());
+        $this->assertSame('10/12', $shipmentData->getRecipient()->getHouseNumber());
+        $this->assertSame('', $shipmentData->getRecipient()->getFlatNumber());
         $this->assertSame('Warszawa', $shipmentData->getRecipient()->getCity());
         $this->assertSame('00-001', $shipmentData->getRecipient()->getPostalCode());
         $this->assertSame('500600700', $shipmentData->getRecipient()->getPhone());

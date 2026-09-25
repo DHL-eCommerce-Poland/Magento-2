@@ -25,12 +25,13 @@ class StreetAddressParser
         $fullAddress = implode(' ', $lines);
 
         // Standard pattern: "Street Name 12/34" or "Street Name 12 m. 34" or "Street 12a/3"
-        // Pattern 1: Street with slash separation e.g. "Marszałkowska 10/12" or "1 Maja 5/2"
-        if (preg_match('/^(.*?)\s+([0-9]+\s*[a-zA-Z]?)\s*[\/\|\-]\s*([0-9a-zA-Z]+)$/u', $fullAddress, $matches)) {
+        // Pattern 1: Street with slash separation e.g. "Warszawska 29/44", "Marszałkowska 10/12" or "1 Maja 5/2"
+        if (preg_match('/^(.*?)\s+([0-9]+\s*[a-zA-Z]?\s*[\/\|\-]\s*[0-9a-zA-Z]+)$/u', $fullAddress, $matches)) {
+            $houseNum = (string) preg_replace('/\s*([\/\-\|])\s*/', '$1', trim($matches[2]));
             return [
                 'street' => trim($matches[1]),
-                'houseNumber' => trim($matches[2]),
-                'flatNumber' => trim($matches[3]),
+                'houseNumber' => $houseNum,
+                'flatNumber' => '',
             ];
         }
 
@@ -57,11 +58,12 @@ class StreetAddressParser
         if (count($lines) >= 2) {
             $street = $lines[0];
             $secondLine = $lines[1];
-            if (preg_match('/^([0-9]+\s*[a-zA-Z]?)\s*[\/\|\-]\s*([0-9a-zA-Z]+)$/u', $secondLine, $matches)) {
+            if (preg_match('/^([0-9]+\s*[a-zA-Z]?\s*[\/\|\-]\s*[0-9a-zA-Z]+)$/u', $secondLine, $matches)) {
+                $houseNum = (string) preg_replace('/\s*([\/\-\|])\s*/', '$1', trim($matches[1]));
                 return [
                     'street' => $street,
-                    'houseNumber' => $matches[1],
-                    'flatNumber' => $matches[2],
+                    'houseNumber' => $houseNum,
+                    'flatNumber' => '',
                 ];
             }
             return [
