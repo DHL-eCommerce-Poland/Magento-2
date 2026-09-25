@@ -64,10 +64,48 @@ class Collection extends SearchResult
         $this->addFilterToMap('order_increment_id', 'sales_order.increment_id');
         $this->addFilterToMap('entity_id', 'main_table.entity_id');
         $this->addFilterToMap('return_shipment_id', 'main_table.return_shipment_id');
+        $this->addFilterToMap('package_numbers', 'main_table.package_numbers');
         $this->addFilterToMap('status', 'main_table.status');
         $this->addFilterToMap('created_at', 'main_table.created_at');
         $this->addFilterToMap('updated_at', 'main_table.updated_at');
 
         return $this;
+    }
+
+    /**
+     * Add field filter to collection with LIKE support for tracking/package numbers and JSON payload fallback.
+     *
+     * @param string|array $field
+     * @param string|array|null $condition
+     *
+     * @return $this
+     */
+    public function addFieldToFilter($field, $condition = null)
+    {
+        if (is_string($field)) {
+            $value = null;
+            if (is_string($condition)) {
+                $value = trim($condition);
+            } elseif (is_array($condition)) {
+                $value = isset($condition['like'])
+                    ? trim(str_replace('%', '', (string)$condition['like']))
+                    : (isset($condition['eq']) ? trim((string)$condition['eq']) : null);
+            }
+
+            if (!empty($value)) {
+                $searchTerm = '%' . $value . '%';
+
+                if (in_array($field, ['package_numbers', 'return_shipment_id', 'shipment_id', 'dispatch_number'], true)) {
+                    $whereExpr = $this->getConnection()->quoteInto(
+                        'main_table.' . $field . ' LIKE ?',
+                        $searchTerm
+                    );
+                    $this->getSelect()->where($whereExpr);
+                    return $this;
+                }
+            }
+        }
+
+        return parent::addFieldToFilter($field, $condition);
     }
 }

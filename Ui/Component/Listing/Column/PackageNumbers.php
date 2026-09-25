@@ -58,6 +58,11 @@ class PackageNumbers extends Column
      */
     public function formatPackageNumbers(array $item): string
     {
+        $direct = $item['package_numbers'] ?? null;
+        if (!empty($direct) && trim((string) $direct) !== '') {
+            return (string) $direct;
+        }
+
         $shipmentDataPayload = $item['shipment_data'] ?? null;
         if (empty($shipmentDataPayload)) {
             return '';

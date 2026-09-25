@@ -142,6 +142,8 @@
         <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Magento Order ID"/>
         <column xsi:type="int" name="magento_shipment_id" unsigned="true" nullable="true" comment="Magento Sales Shipment ID"/>
         <column xsi:type="varchar" name="shipment_id" length="64" nullable="true" comment="DHL Shipment ID"/>
+        <column xsi:type="varchar" name="return_shipment_id" length="1024" nullable="true" comment="DHL Return Shipment ID"/>
+        <column xsi:type="varchar" name="package_numbers" length="1024" nullable="true" comment="DHL Package Numbers"/>
         <column xsi:type="varchar" name="dispatch_number" length="64" nullable="true" comment="DHL Courier Order / Dispatch Number"/>
         <column xsi:type="varchar" name="status" length="64" nullable="false" default="pending" comment="Shipment Data Status"/>
         <column xsi:type="varchar" name="preset_sender_id" length="64" nullable="true" comment="Selected Sender Preset ID"/>

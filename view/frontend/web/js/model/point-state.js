@@ -91,7 +91,7 @@ define([
             address.extension_attributes['dhl_service_point_postcode'] = point.zip || point.postalCode || '';
             address.extension_attributes['dhl_service_point_city'] = point.city || '';
             address.extension_attributes['dhl_is_packstation'] = point.isPackstation ? 1 : 0;
-            address.extension_attributes['dhl_is_postfiliale'] = point.isPackstation ? 0 : 1;
+            address.extension_attributes['dhl_is_postfiliale'] = point.isPostfiliale ? 1 : 0;
             address.extension_attributes['dhl_postnummer'] = (point.postnummer || '').trim() || null;
         } else {
             delete address.extension_attributes['dhl_service_point_id'];

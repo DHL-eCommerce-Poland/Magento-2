@@ -293,6 +293,75 @@ class ShipmentCreationServiceTest extends TestCase
     }
 
     /**
+     * Test auto-creation of return shipment when recreateShipment is executed with autoCreateReturnShipment enabled.
+     *
+     * @return void
+     */
+    public function testRecreateShipmentTriggersAutoReturnCreationWhenEnabled(): void
+    {
+        $shipmentSettings = $this->createStub(\Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData::class);
+        $shipmentSettings->method('autoCreateReturnShipment')->willReturn(true);
+        $shipmentSettings->method('getReturnLabelExpDays')->willReturn(14);
+
+        $shipmentData = $this->createStub(DhlShipmentData::class);
+        $shipmentData->method('getOrderId')->willReturn(100);
+        $shipmentData->method('toArray')->willReturn(['orderId' => 100]);
+        $shipmentData->method('getShipmentSettings')->willReturn($shipmentSettings);
+
+        $this->lockManagerMock->method('lock')->willReturn(true);
+
+        $existingEntityMock = $this->createMock(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $existingEntityMock->method('getShipmentId')->willReturn('90039521000');
+        $existingEntityMock->method('getMagentoShipmentId')->willReturn(null);
+        $this->shipmentDataServiceMock->method('getShipmentEntity')->willReturn($existingEntityMock);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+        $this->mapperStub->method('map')->willReturn(['content' => 'Test']);
+
+        $apiResult = new CreateShipmentsResult(true, false, '90039521202', 'Nowa');
+        $this->clientStub->method('createShipments')->willReturn($apiResult);
+
+        $returnBuilderMock = $this->createMock(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
+        $returnCreationServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
+
+        $returnShipmentDataStub = $this->createStub(DhlShipmentData::class);
+        $returnBuilderMock->expects($this->once())
+            ->method('buildReturnShipmentData')
+            ->with($shipmentData)
+            ->willReturn($returnShipmentDataStub);
+
+        $returnCreationServiceMock->expects($this->once())
+            ->method('createReturnShipment')
+            ->with(
+                $returnShipmentDataStub,
+                'sandbox',
+                14,
+                '90039521202',
+                10
+            );
+
+        $serializer = $this->createStub(\Magento\Framework\Serialize\SerializerInterface::class);
+        $serviceWithReturn = new ShipmentCreationService(
+            $this->shipmentDataServiceMock,
+            $this->validatorMock,
+            $this->mapperStub,
+            $this->credentialsProviderStub,
+            $this->clientStub,
+            $this->lockManagerMock,
+            $this->loggerStub,
+            $serializer,
+            $returnBuilderMock,
+            $returnCreationServiceMock,
+            null,
+            $this->nearestPointResolverMock
+        );
+
+        $result = $serviceWithReturn->recreateShipment(10, $shipmentData, 'sandbox');
+        $this->assertTrue($result->isSuccess());
+    }
+
+    /**
      * Test auto-resolving nearest service point when serviceType is SP and popId is empty.
      *
      * @return void

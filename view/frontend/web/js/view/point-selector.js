@@ -214,7 +214,7 @@ define([
                         (pointData.ptype || '').toLowerCase() === 'packstation'
                     );
 
-                    var isPostfiliale = !isPackstation;
+                    var isPostfiliale = recipientCountry.toUpperCase() === 'DE' && !isPackstation;
 
                     var formattedPoint = {
                         quoteId: self.getQuoteId(),

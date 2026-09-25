@@ -135,6 +135,7 @@
         </column>
         <column name="package_numbers" class="Ideo\Dhl\Ui\Component\Listing\Column\PackageNumbers">
             <settings>
+                <filter>text</filter>
                 <label translate="true">Package Number</label>
             </settings>
         </column>

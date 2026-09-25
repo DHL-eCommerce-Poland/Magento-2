@@ -162,6 +162,65 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
     }
 
     /**
+     * Get DHL package numbers (derived from column or package dynamic rows in shipment_data JSON).
+     *
+     * @return string|null
+     */
+    public function getPackageNumbers(): ?string
+    {
+        $direct = $this->getData(self::PACKAGE_NUMBERS);
+        if ($direct !== null && trim((string) $direct) !== '') {
+            return (string) $direct;
+        }
+
+        $rawPayload = $this->getShipmentData();
+        if (empty($rawPayload) || !is_string($rawPayload)) {
+            return null;
+        }
+
+        try {
+            $payload = (array) json_decode($rawPayload, true);
+            if (!empty($payload['packageNumbers']) && is_array($payload['packageNumbers'])) {
+                $filtered = array_values(array_unique(array_filter(array_map('trim', $payload['packageNumbers']))));
+                if (!empty($filtered)) {
+                    return implode(', ', $filtered);
+                }
+            }
+
+            $packages = $payload['packages'] ?? ($payload['shipmentSettings']['packages'] ?? []);
+            if (!is_array($packages) || empty($packages)) {
+                return null;
+            }
+
+            $nums = [];
+            foreach ($packages as $pkg) {
+                if (is_array($pkg)) {
+                    $val = $pkg['packageNumber'] ?? ($pkg['pieceId'] ?? null);
+                    if ($val !== null && trim((string) $val) !== '') {
+                        $nums[] = trim((string) $val);
+                    }
+                }
+            }
+            $filtered = array_values(array_unique(array_filter($nums)));
+            return !empty($filtered) ? implode(', ', $filtered) : null;
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Set DHL package numbers.
+     *
+     * @param string|null $packageNumbers
+     *
+     * @return $this
+     */
+    public function setPackageNumbers(?string $packageNumbers): static
+    {
+        return $this->setData(self::PACKAGE_NUMBERS, $packageNumbers);
+    }
+
+    /**
      * Get DHL courier order / dispatch number.
      *
      * @return string|null

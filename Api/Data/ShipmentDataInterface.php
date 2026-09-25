@@ -11,6 +11,7 @@ interface ShipmentDataInterface
     public const MAGENTO_SHIPMENT_ID = 'magento_shipment_id';
     public const SHIPMENT_ID = 'shipment_id';
     public const RETURN_SHIPMENT_ID = 'return_shipment_id';
+    public const PACKAGE_NUMBERS = 'package_numbers';
     public const DISPATCH_NUMBER = 'dispatch_number';
     public const STATUS = 'status';
     public const PRESET_SENDER_ID = 'preset_sender_id';
@@ -100,6 +101,22 @@ interface ShipmentDataInterface
      * @return $this
      */
     public function setReturnShipmentId(?string $returnShipmentId): static;
+
+    /**
+     * Get DHL package numbers.
+     *
+     * @return string|null
+     */
+    public function getPackageNumbers(): ?string;
+
+    /**
+     * Set DHL package numbers.
+     *
+     * @param string|null $packageNumbers
+     *
+     * @return $this
+     */
+    public function setPackageNumbers(?string $packageNumbers): static;
 
     /**
      * Get DHL courier order / dispatch number.

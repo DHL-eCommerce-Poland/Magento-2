@@ -121,15 +121,13 @@ class ShipmentFullDataMapper
         if ($countryCode === 'DE') {
             if ($recipient->isPackstation()) {
                 $receiver['isPackstation'] = true;
-            } else {
+            } elseif ($recipient->isPostfiliale()) {
                 $receiver['isPostfiliale'] = true;
             }
 
             if ($recipient->getPostnummer() !== null && $recipient->getPostnummer() !== '') {
                 $receiver['postnummer'] = $this->sanitizeString($recipient->getPostnummer());
             }
-        } elseif ($recipient->isPostfiliale()) {
-            $receiver['isPostfiliale'] = true;
         }
 
         $result = [

@@ -209,6 +209,10 @@ class ShipmentDataService
         }
         if ($packageNumbers !== null && !empty($packageNumbers)) {
             $this->mapPackageTrackingNumbers($payloadArr, $packageNumbers);
+            $pkgStr = implode(', ', array_values(array_unique(array_filter(array_map('trim', $packageNumbers)))));
+            if ($pkgStr !== '') {
+                $entity->setPackageNumbers($pkgStr);
+            }
         }
         if ($magentoShipmentId !== null) {
             $payloadArr['magentoShipmentId'] = $magentoShipmentId;
@@ -219,6 +223,9 @@ class ShipmentDataService
         $entity->setStatus($status);
         if ($shipmentId !== null && trim($shipmentId) !== '') {
             $entity->setShipmentId($shipmentId);
+        }
+        if ($returnShipmentId !== null && trim($returnShipmentId) !== '') {
+            $entity->setReturnShipmentId($returnShipmentId);
         }
         $entity->setPresetSenderId($presetSenderId);
         $entity->setPresetShipmentId($presetShipmentId);
@@ -243,6 +250,23 @@ class ShipmentDataService
         array $returnItems = []
     ): ShipmentDataInterface {
         $entity = $this->shipmentDataRepository->getById($entityId);
+        $returnWaybills = [];
+        if (!empty($returnItems) && is_array($returnItems)) {
+            foreach ($returnItems as $item) {
+                if (is_array($item)) {
+                    $wb = (string) ($item['waybill'] ?? ($item['shipmentId'] ?? ''));
+                    if (trim($wb) !== '') {
+                        $returnWaybills[] = trim($wb);
+                    }
+                }
+            }
+        }
+        $filteredWaybills = array_values(array_unique(array_filter($returnWaybills)));
+        $finalReturnShipmentId = !empty($filteredWaybills)
+            ? implode(', ', $filteredWaybills)
+            : $returnShipmentId;
+
+        $entity->setReturnShipmentId($finalReturnShipmentId);
 
         $rawPayload = $entity->getShipmentData();
         if (!empty($rawPayload) && is_string($rawPayload)) {
@@ -314,12 +338,31 @@ class ShipmentDataService
         $entity = $this->shipmentDataRepository->getById($entityId);
         $payloadArr = $shipmentData->toArray();
 
+        // Reset return shipment ID and package-level return tracking details on recreation
+        $entity->setReturnShipmentId(null);
+        if (isset($payloadArr['packages']) && is_array($payloadArr['packages'])) {
+            foreach ($payloadArr['packages'] as $idx => $pkg) {
+                $payloadArr['packages'][$idx]['returnShipmentId'] = null;
+                $payloadArr['packages'][$idx]['packagesTrackingNumbers'] = null;
+            }
+        }
+        if (isset($payloadArr['shipmentSettings']['packages']) && is_array($payloadArr['shipmentSettings']['packages'])) {
+            foreach ($payloadArr['shipmentSettings']['packages'] as $idx => $pkg) {
+                $payloadArr['shipmentSettings']['packages'][$idx]['returnShipmentId'] = null;
+                $payloadArr['shipmentSettings']['packages'][$idx]['packagesTrackingNumbers'] = null;
+            }
+        }
+
         if ($shipmentId !== null && trim($shipmentId) !== '') {
             $payloadArr['shipmentId'] = (string)$shipmentId;
             $entity->setShipmentId($shipmentId);
         }
         if ($packageNumbers !== null && !empty($packageNumbers)) {
             $this->mapPackageTrackingNumbers($payloadArr, $packageNumbers);
+            $pkgStr = implode(', ', array_values(array_unique(array_filter(array_map('trim', $packageNumbers)))));
+            if ($pkgStr !== '') {
+                $entity->setPackageNumbers($pkgStr);
+            }
         }
         if ($magentoShipmentId !== null) {
             $payloadArr['magentoShipmentId'] = $magentoShipmentId;

@@ -219,10 +219,78 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('DE', $mapped['receiver']['country']);
         $this->assertEquals('C', $mapped['receiver']['addressType']);
         $this->assertTrue($mapped['receiver']['isPackstation']);
+        $this->assertArrayNotHasKey('isPostfiliale', $mapped['receiver']);
         $this->assertEquals('987654321', $mapped['receiver']['postnummer']);
         $this->assertEquals('49393', $mapped['receiver']['postalCode']);
         $this->assertEquals('Lohne', $mapped['receiver']['city']);
         $this->assertArrayNotHasKey('customs', $mapped);
+    }
+
+    /**
+     * Test mapping for German international Postfiliale point.
+     *
+     * @return void
+     */
+    public function testMapInternationalGermanPostfilialePoint(): void
+    {
+        $recipient = new RecipientData(
+            name: 'Hans Schmidt',
+            street: 'Hauptstr.',
+            houseNumber: '10',
+            city: 'Berlin',
+            postalCode: '10115',
+            country: 'DE',
+            popId: 'FILIALE-501',
+            isPostfiliale: true,
+            postnummer: '123456789'
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 103,
+            sender: new SenderData(),
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EKS', packages: [new PackageData()])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertEquals('DE', $mapped['receiver']['country']);
+        $this->assertTrue($mapped['receiver']['isPostfiliale']);
+        $this->assertArrayNotHasKey('isPackstation', $mapped['receiver']);
+        $this->assertEquals('123456789', $mapped['receiver']['postnummer']);
+    }
+
+    /**
+     * Test mapping for German standard home address delivery.
+     *
+     * @return void
+     */
+    public function testMapInternationalGermanHomeAddress(): void
+    {
+        $recipient = new RecipientData(
+            name: 'Anna Muller',
+            street: 'Berliner Str.',
+            houseNumber: '42',
+            city: 'Munich',
+            postalCode: '80331',
+            country: 'DE'
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 104,
+            sender: new SenderData(),
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EKS', packages: [new PackageData()])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertEquals('DE', $mapped['receiver']['country']);
+        $this->assertArrayNotHasKey('isPackstation', $mapped['receiver']);
+        $this->assertArrayNotHasKey('isPostfiliale', $mapped['receiver']);
+        $this->assertArrayNotHasKey('postnummer', $mapped['receiver']);
     }
 
     public function testMapToShipmentFullDataWithCustomsWhenCountryIsNotPl(): void
@@ -431,6 +499,40 @@ class ShipmentFullDataMapperTest extends TestCase
                 '',
             ],
         ];
+    }
+
+    /**
+     * Test mapping for domestic Polish shipment does not contain isPostfiliale or postnummer tags.
+     *
+     * @return void
+     */
+    public function testDomesticShipmentDoesNotContainIsPostfilialeOrPostnummer(): void
+    {
+        $recipient = new RecipientData(
+            name: 'Martena Shelton',
+            street: 'Warszawska',
+            houseNumber: '29/44',
+            city: 'Vel volupt',
+            postalCode: '38500',
+            country: 'PL',
+            isPostfiliale: true,
+            postnummer: '12345678'
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 200,
+            sender: new SenderData(),
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(packages: [new PackageData()])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertEquals('PL', $mapped['receiver']['country']);
+        $this->assertArrayNotHasKey('isPostfiliale', $mapped['receiver']);
+        $this->assertArrayNotHasKey('isPackstation', $mapped['receiver']);
+        $this->assertArrayNotHasKey('postnummer', $mapped['receiver']);
     }
 
     public static function postalCodeDataProvider(): array

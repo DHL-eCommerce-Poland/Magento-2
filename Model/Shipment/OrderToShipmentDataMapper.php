@@ -154,7 +154,7 @@ class OrderToShipmentDataMapper
         $isPostfiliale = false;
         $postnummer = null;
 
-        if ($shippingAddress) {
+        if ($shippingAddress && strtoupper($country) === 'DE') {
             $isPackstation = (bool)($shippingAddress->getData('dhl_is_packstation') ?? false);
             $isPostfiliale = (bool)($shippingAddress->getData('dhl_is_postfiliale') ?? false);
             $postnummerVal = (string)($shippingAddress->getData('dhl_postnummer') ?? '');

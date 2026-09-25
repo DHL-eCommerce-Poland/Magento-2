@@ -324,4 +324,64 @@ class ShipmentDataServiceTest extends TestCase
         $this->assertEquals('JJD000030025688110000001106', $decoded['shipmentSettings']['packages'][0]['packageNumber']);
         $this->assertEquals('JJD000030025688110000001117', $decoded['shipmentSettings']['packages'][1]['packageNumber']);
     }
+
+    /**
+     * Test updateExistingShipmentPayload clears old returnShipmentId on entity and package rows.
+     *
+     * @return void
+     */
+    public function testUpdateExistingShipmentPayloadClearsReturnShipmentId(): void
+    {
+        $orderRepository = $this->createStub(OrderRepositoryInterface::class);
+        $mapper = $this->createStub(OrderToShipmentDataMapper::class);
+        $validator = $this->createStub(ShipmentDataValidator::class);
+        $dropOffPointRepository = $this->createStub(DropOffPointRepositoryInterface::class);
+        $deliveryServiceRepository = $this->createStub(DeliveryServiceRepositoryInterface::class);
+        $shipmentDataRepository = $this->createMock(ShipmentDataRepositoryInterface::class);
+        $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
+        $serializer = new Json();
+
+        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(
+            packages: [
+                ['packageType' => 'PACKAGE', 'weight' => 2.5, 'returnShipmentId' => 'OLD_RET_123', 'packagesTrackingNumbers' => 'OLD_RET_123'],
+            ]
+        );
+
+        $shipmentData = new DhlShipmentData(orderId: 200, shipmentSettings: $shipmentSettings);
+        $entity = $this->createMock(ShipmentDataInterface::class);
+
+        $entity->expects($this->once())
+            ->method('setReturnShipmentId')
+            ->with(null);
+
+        $shipmentDataRepository->method('getById')->with(15)->willReturn($entity);
+        $shipmentDataRepository->method('save')->willReturn($entity);
+
+        $capturedJson = null;
+        $entity->expects($this->once())
+            ->method('setShipmentData')
+            ->willReturnCallback(function (string $json) use (&$capturedJson, $entity) {
+                $capturedJson = $json;
+                return $entity;
+            });
+
+        $service = new ShipmentDataService(
+            $orderRepository,
+            $mapper,
+            $validator,
+            $dropOffPointRepository,
+            $deliveryServiceRepository,
+            $shipmentDataRepository,
+            $shipmentDataFactory,
+            $serializer
+        );
+
+        $service->updateExistingShipmentPayload(15, $shipmentData, 'Utworzono', '90040027899');
+
+        $this->assertNotNull($capturedJson);
+        $decoded = json_decode($capturedJson, true);
+
+        $this->assertNull($decoded['packages'][0]['returnShipmentId']);
+        $this->assertNull($decoded['packages'][0]['packagesTrackingNumbers']);
+    }
 }

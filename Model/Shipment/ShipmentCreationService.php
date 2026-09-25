@@ -288,6 +288,35 @@ class ShipmentCreationService
                 $magentoShipmentId
             );
 
+            // 7. Auto-create return shipment if requested
+            if ($shipmentData->getShipmentSettings()->autoCreateReturnShipment()
+                && $newShipmentId !== ''
+            ) {
+                $this->logger->info(sprintf(
+                    '[ShipmentCreation] Triggering auto return shipment creation for order #%s, primary waybill #%s (recreation)',
+                    (string) $shipmentData->getOrderId(),
+                    $newShipmentId
+                ));
+                try {
+                    $returnShipmentData = $this->returnBuilder->buildReturnShipmentData($shipmentData);
+                    $expDays = $shipmentData->getShipmentSettings()->getReturnLabelExpDays() ?: 14;
+
+                    $this->returnCreationService->createReturnShipment(
+                        returnShipmentData: $returnShipmentData,
+                        environment: $environment,
+                        expirationDays: $expDays,
+                        primaryWaybillNumber: $newShipmentId,
+                        originalEntityId: $entityId
+                    );
+                } catch (Throwable $e) {
+                    $this->logger->warning(sprintf(
+                        '[ShipmentCreation] Auto return shipment creation failed for order #%s: %s',
+                        (string) $shipmentData->getOrderId(),
+                        $e->getMessage()
+                    ), ['exception' => $e]);
+                }
+            }
+
             return $apiResult;
         } finally {
             if (!$this->lockManager->unlock($lockName)) {
