@@ -86,6 +86,45 @@ class ShipmentDataValidatorTest extends TestCase
     }
 
     /**
+     * Test validation passes when sender has only first and last name without company name.
+     *
+     * @return void
+     */
+    public function testValidateValidSenderWithOnlyFirstAndLastName(): void
+    {
+        $sender = new SenderData(
+            firstName: 'Jan',
+            lastName: 'Kowalski',
+            street: 'Przemysłowa',
+            houseNumber: '10',
+            city: 'Warszawa',
+            postalCode: '00-001'
+        );
+
+        $recipient = new RecipientData(
+            firstName: 'Anna',
+            lastName: 'Nowak',
+            street: 'Marszałkowska',
+            houseNumber: '5',
+            city: 'Kraków',
+            postalCode: '30-001'
+        );
+
+        $package = new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 2.0);
+        $settings = new ShipmentSettingsData(content: 'Test', packages: [$package]);
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 1,
+            sender: $sender,
+            recipient: $recipient,
+            shipmentSettings: $settings
+        );
+
+        $this->expectNotToPerformAssertions();
+        $this->validator->validate($shipmentData);
+    }
+
+    /**
      * Test validation throws LocalizedException when required fields are missing.
      *
      * @return void
@@ -95,7 +134,7 @@ class ShipmentDataValidatorTest extends TestCase
         $shipmentData = new DhlShipmentData();
 
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('Sender Name is required.');
+        $this->expectExceptionMessage('Sender Name or First & Last Name is required.');
         $this->validator->validate($shipmentData);
     }
 

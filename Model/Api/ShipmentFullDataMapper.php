@@ -72,9 +72,11 @@ class ShipmentFullDataMapper
             $serviceDef['proofOfDelivery'] = true;
         }
 
-        $senderContact = $sender->getName() !== ''
-            ? $sender->getName()
-            : ($sender->getFirstName() . ' ' . $sender->getLastName());
+        $senderCompanyName = trim($sender->getName());
+        $senderFullName = trim($sender->getFirstName() . ' ' . $sender->getLastName());
+
+        $senderName = $senderCompanyName !== '' ? $senderCompanyName : $senderFullName;
+        $senderContact = $senderFullName;
 
         $recipientContact = $recipient->getContactPerson() !== ''
             ? $recipient->getContactPerson()
@@ -132,7 +134,7 @@ class ShipmentFullDataMapper
 
         $result = [
             'shipper' => [
-                'name' => $this->sanitizeString($sender->getName()),
+                'name' => $this->sanitizeString($senderName),
                 'postalCode' => $this->sanitizePostalCode($sender->getPostalCode(), $senderCountryCode),
                 'city' => $this->sanitizeString($sender->getCity()),
                 'street' => $this->sanitizeString($sender->getStreet()),

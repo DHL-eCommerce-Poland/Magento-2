@@ -32,7 +32,9 @@ class ShipmentReturnDataMapperTest extends TestCase
     public function testMapDomesticReturnShipment(): void
     {
         $sender = new SenderData(
-            name: 'Jan Kowalski',
+            name: 'Firma Klienta',
+            firstName: 'Jan',
+            lastName: 'Kowalski',
             postalCode: '00-001',
             city: 'Warszawa',
             street: 'Marszałkowska',
@@ -84,8 +86,9 @@ class ShipmentReturnDataMapperTest extends TestCase
         $this->assertEquals('BANK_TRANSFER', $mapped['shipmentInfo']['billing']['paymentType']);
         $this->assertEquals('BLP', $mapped['shipmentInfo']['labelType']);
 
-        // Check Shipper (customer Jan Kowalski)
-        $this->assertEquals('Jan Kowalski', $mapped['ship']['shipper']['address']['name']);
+        // Check Shipper (customer)
+        $this->assertEquals('Firma Klienta', $mapped['ship']['shipper']['address']['name']);
+        $this->assertEquals('Jan Kowalski', $mapped['ship']['shipper']['contact']['personName']);
         $this->assertEquals('00001', $mapped['ship']['shipper']['address']['postalCode']);
         $this->assertEquals('Warszawa', $mapped['ship']['shipper']['address']['city']);
 

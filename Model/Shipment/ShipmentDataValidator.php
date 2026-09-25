@@ -32,8 +32,11 @@ class ShipmentDataValidator
 
         // 1. Sender validation
         $sender = $shipmentData->getSender();
-        if (empty(trim($sender->getName()))) {
-            $errors[] = __('Sender Name is required.')->render();
+        $hasSenderName = !empty(trim($sender->getName()))
+            || !empty(trim($sender->getFirstName()))
+            || !empty(trim($sender->getLastName()));
+        if (!$hasSenderName) {
+            $errors[] = __('Sender Name or First & Last Name is required.')->render();
         }
         if (empty(trim($sender->getStreet()))) {
             $errors[] = __('Sender Street is required.')->render();

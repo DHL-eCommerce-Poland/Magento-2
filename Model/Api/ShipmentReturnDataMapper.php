@@ -54,9 +54,11 @@ class ShipmentReturnDataMapper
             ];
         }
 
-        $customerContact = $customerSender->getName() !== ''
-            ? $customerSender->getName()
-            : ($customerSender->getFirstName() . ' ' . $customerSender->getLastName());
+        $customerCompanyName = trim($customerSender->getName());
+        $customerFullName = trim($customerSender->getFirstName() . ' ' . $customerSender->getLastName());
+
+        $customerName = $customerCompanyName !== '' ? $customerCompanyName : $customerFullName;
+        $customerContact = $customerFullName;
 
         $merchantContact = $merchantRecipient->getContactPerson() !== ''
             ? $merchantRecipient->getContactPerson()
@@ -126,7 +128,7 @@ class ShipmentReturnDataMapper
                 'shipper' => [
                     'address' => [
                         'country' => $customerCountry,
-                        'name' => $this->sanitizeString($customerSender->getName() ?: $customerContact),
+                        'name' => $this->sanitizeString($customerName),
                         'postalCode' => $this->sanitizePostalCode($customerSender->getPostalCode(), $customerCountry),
                         'city' => $this->sanitizeString($customerSender->getCity()),
                         'street' => $this->sanitizeString($customerSender->getStreet()),

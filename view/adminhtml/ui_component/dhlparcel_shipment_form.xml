@@ -472,6 +472,53 @@
                 <dataType>boolean</dataType>
                 <label translate="true">Generate return label automatically when creating shipment</label>
                 <dataScope>shipmentSettings.autoCreateReturnShipment</dataScope>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>0</value>
+                            <actions>
+                                <action name="0">
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnLabelType]</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="1">
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnQrCodeType]</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="2">
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnLabelExpDays]</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="3">
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnBookCourier]</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnLabelType]</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="1">
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnQrCodeType]</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnLabelExpDays]</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="3">
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnBookCourier]</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
             </settings>
             <formElements>
                 <checkbox>

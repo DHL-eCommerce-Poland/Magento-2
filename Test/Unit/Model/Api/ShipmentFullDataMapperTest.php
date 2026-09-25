@@ -36,7 +36,7 @@ class ShipmentFullDataMapperTest extends TestCase
         $sender = new SenderData(
             payer: 'SENDER',
             sapNumber: '1234567',
-            name: 'Jan Kowalski',
+            name: 'Moja Firma Sp. z o.o.',
             firstName: 'Jan',
             lastName: 'Kowalski',
             street: 'Prosta',
@@ -119,7 +119,8 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('14:00', $mapped['shipmentEndHour']);
 
         // Check shipper
-        $this->assertEquals('Jan Kowalski', $mapped['shipper']['name']);
+        $this->assertEquals('Moja Firma Sp. z o.o.', $mapped['shipper']['name']);
+        $this->assertEquals('Jan Kowalski', $mapped['shipper']['contactPerson']);
         $this->assertEquals('00001', $mapped['shipper']['postalCode']); // Hyphen stripped
         $this->assertEquals('Warszawa', $mapped['shipper']['city']);
         $this->assertEquals('2', $mapped['shipper']['apartmentNumber']);
@@ -375,6 +376,61 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $this->assertSame('13/435', $mapped['shipper']['houseNumber']);
         $this->assertSame('12A/4', $mapped['receiver']['houseNumber']);
+    }
+
+    #[DataProvider('shipperNameAndContactPersonProvider')]
+    public function testMapShipperNameAndContactPersonVariants(
+        string $companyName,
+        string $firstName,
+        string $lastName,
+        string $expectedName,
+        string $expectedContactPerson
+    ): void {
+        $sender = new SenderData(
+            name: $companyName,
+            firstName: $firstName,
+            lastName: $lastName
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 200,
+            sender: $sender,
+            recipient: new RecipientData(name: 'Recipient'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(packages: [new PackageData()])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertSame($expectedName, $mapped['shipper']['name']);
+        $this->assertSame($expectedContactPerson, $mapped['shipper']['contactPerson']);
+    }
+
+    public static function shipperNameAndContactPersonProvider(): array
+    {
+        return [
+            'company and person specified' => [
+                'Firma Testowa',
+                'Jan',
+                'Kowalski',
+                'Firma Testowa',
+                'Jan Kowalski',
+            ],
+            'only person specified' => [
+                '',
+                'Jan',
+                'Kowalski',
+                'Jan Kowalski',
+                'Jan Kowalski',
+            ],
+            'only company specified' => [
+                'Firma Testowa',
+                '',
+                '',
+                'Firma Testowa',
+                '',
+            ],
+        ];
     }
 
     public static function postalCodeDataProvider(): array

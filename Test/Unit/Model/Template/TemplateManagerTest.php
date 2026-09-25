@@ -282,7 +282,7 @@ class TemplateManagerTest extends TestCase
             'cod' => 1
         ]);
 
-        $this->deliveryServiceRepository->method('getById')->with(5)->willReturn($service);
+        $this->deliveryServiceRepository->method('getById')->willReturn($service);
 
         $result = $this->templateManager->getSpecialServicesTemplate(5);
 
