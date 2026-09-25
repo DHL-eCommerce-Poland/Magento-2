@@ -225,33 +225,28 @@ class OrderToShipmentDataMapper
             $presetSS = [];
         }
 
-        $isInsurance = !empty($presetSS['insurance']) || !empty($presetSS['service_UBEZP']);
+        $isInsurance = !empty($presetSS['insurance']);
         $insuranceValue = isset($presetSS['insuranceValue'])
             ? (float)$presetSS['insuranceValue']
-            : (isset($presetSS['serviceValueUbez']) ? (float)$presetSS['serviceValueUbez'] : null);
+            : null;
         $isEvening = !empty($presetSS['eveningDelivery'])
-            || !empty($presetSS['deliveryHours'])
-            || !empty($presetSS['service_1722']);
-        $isSaturdayDelivery = !empty($presetSS['saturdayDelivery']) || !empty($presetSS['service_SOBOTA']);
+            || !empty($presetSS['deliveryHours']);
+        $isSaturdayDelivery = !empty($presetSS['saturdayDelivery']);
         $isSaturdayDispatch = !empty($presetSS['saturdayDispatch'])
-            || !empty($presetSS['pickupOnSaturday'])
-            || !empty($presetSS['service_NAD_SOBOTA']);
+            || !empty($presetSS['pickupOnSaturday']);
         $isPdi = !empty($presetSS['pdi'])
-            || !empty($presetSS['predeliveryInformation'])
-            || !empty($presetSS['service_PDI']);
+            || !empty($presetSS['predeliveryInformation']);
         $isRod = !empty($presetSS['rod'])
-            || !empty($presetSS['returnOnDelivery'])
-            || !empty($presetSS['service_ROD']);
-        $rodDocumentText = (string)($presetSS['rodDocumentText'] ?? $presetSS['textInstruction'] ?? '');
+            || !empty($presetSS['returnOnDelivery']);
+        $rodDocumentText = (string)($presetSS['rodDocumentText'] ?? '');
         $isPod = !empty($presetSS['pod'])
-            || !empty($presetSS['proofOfDelivery'])
-            || !empty($presetSS['service_POD']);
-        $isAgever = !empty($presetSS['agever']) || !empty($presetSS['service_AGEVER']);
-        $isOdb = !empty($presetSS['odb']) || !empty($presetSS['service_ODB']);
+            || !empty($presetSS['proofOfDelivery']);
+        $isAgever = !empty($presetSS['agever']);
+        $isOdb = !empty($presetSS['odb']);
 
         $presetCodAmount = isset($presetSS['codAmount'])
             ? (float)$presetSS['codAmount']
-            : (isset($presetSS['serviceValueCOD']) ? (float)$presetSS['serviceValueCOD'] : null);
+            : null;
 
         $specialServices = new SpecialServicesData(
             deliveryHours: $isEvening ? '1722' : null,
@@ -259,7 +254,7 @@ class OrderToShipmentDataMapper
             saturdayDispatch: $isSaturdayDispatch,
             insurance: $isInsurance,
             insuranceValue: $insuranceValue,
-            cod: $isCod || !empty($presetSS['cod']) || !empty($presetSS['service_COD']),
+            cod: $isCod || !empty($presetSS['cod']),
             codAmount: $isCod ? $codAmount : $presetCodAmount,
             codCurrency: (string)($order->getOrderCurrencyCode() ?? 'PLN'),
             pdi: $isPdi,

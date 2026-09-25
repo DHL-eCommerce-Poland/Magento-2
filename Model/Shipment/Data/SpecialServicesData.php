@@ -269,24 +269,24 @@ class SpecialServicesData
     // phpcs:ignore Magento2.Functions.StaticFunction.StaticFunction
     public static function fromArray(array $data): self
     {
-        $insurance = filter_var($data['insurance'] ?? $data['service_UBEZP'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $insuranceValRaw = $data['insuranceValue'] ?? $data['serviceValueUbez'] ?? null;
+        $insurance = filter_var($data['insurance'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $insuranceValRaw = $data['insuranceValue'] ?? null;
         $insuranceValue = ($insurance && $insuranceValRaw !== null && $insuranceValRaw !== '')
             ? (float)$insuranceValRaw
             : null;
 
-        $cod = filter_var($data['cod'] ?? $data['service_COD'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $codAmtRaw = $data['codAmount'] ?? $data['serviceValueCOD'] ?? null;
+        $cod = filter_var($data['cod'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $codAmtRaw = $data['codAmount'] ?? null;
         $codAmount = ($cod && $codAmtRaw !== null && $codAmtRaw !== '') ? (float)$codAmtRaw : null;
 
-        $rod = filter_var($data['rod'] ?? $data['returnOnDelivery'] ?? $data['service_ROD'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $rodDocRaw = (string)($data['rodDocumentText'] ?? $data['textInstruction'] ?? '');
+        $rod = filter_var($data['rod'] ?? $data['returnOnDelivery'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $rodDocRaw = (string)($data['rodDocumentText'] ?? '');
         $rodDocumentText = $rod ? trim($rodDocRaw) : '';
 
         return new self(
             $data['deliveryHours'] ?? null,
-            filter_var($data['saturdayDelivery'] ?? $data['service_SOBOTA'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            filter_var($data['saturdayDispatch'] ?? $data['pickupOnSaturday'] ?? $data['service_NAD_SOBOTA'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            filter_var($data['saturdayDelivery'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            filter_var($data['saturdayDispatch'] ?? $data['pickupOnSaturday'] ?? false, FILTER_VALIDATE_BOOLEAN),
             $insurance,
             $insuranceValue,
             (string)($data['insuranceCurrency'] ?? 'PLN'),
@@ -294,14 +294,14 @@ class SpecialServicesData
             $codAmount,
             (string)($data['codCurrency'] ?? 'PLN'),
             (string)($data['codPaymentMethod'] ?? 'CASH'),
-            filter_var($data['pdi'] ?? $data['predeliveryInformation'] ?? $data['service_PDI'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            filter_var($data['pdi'] ?? $data['predeliveryInformation'] ?? false, FILTER_VALIDATE_BOOLEAN),
             $rod,
             $rodDocumentText,
-            filter_var($data['pod'] ?? $data['proofOfDelivery'] ?? $data['service_POD'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            filter_var($data['pod'] ?? $data['proofOfDelivery'] ?? false, FILTER_VALIDATE_BOOLEAN),
             filter_var($data['euroReturn'] ?? false, FILTER_VALIDATE_BOOLEAN),
             filter_var($data['nonStandard'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            filter_var($data['agever'] ?? $data['service_AGEVER'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            filter_var($data['odb'] ?? $data['service_ODB'] ?? false, FILTER_VALIDATE_BOOLEAN)
+            filter_var($data['agever'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            filter_var($data['odb'] ?? false, FILTER_VALIDATE_BOOLEAN)
         );
     }
 }

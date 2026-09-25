@@ -537,54 +537,44 @@ class TemplateManager
                 $addServices = [];
             }
 
-            $insVal = isset($addServices['insuranceValue'])
-                ? (float)$addServices['insuranceValue']
-                : (isset($addServices['serviceValueUbez']) ? (float)$addServices['serviceValueUbez'] : null);
-            $codVal = isset($addServices['codAmount'])
-                ? (float)$addServices['codAmount']
-                : (isset($addServices['serviceValueCOD']) ? (float)$addServices['serviceValueCOD'] : null);
-            $isEve = $this->isTrueValue($addServices['eveningDelivery'] ?? $addServices['service_1722'] ?? false);
-            $isSat = $this->isTrueValue($addServices['saturdayDelivery'] ?? $addServices['service_SOBOTA'] ?? false);
+            $isEve = $this->isTrueValue($addServices['eveningDelivery'] ?? false);
+            $isSat = $this->isTrueValue($addServices['saturdayDelivery'] ?? false);
             $isSatPickup = $this->isTrueValue(
                 $addServices['pickupOnSaturday']
                 ?? $addServices['saturdayDispatch']
-                ?? $addServices['service_NAD_SOBOTA']
                 ?? false
             );
             $isPdiVal = $this->isTrueValue(
                 $addServices['predeliveryInformation']
                 ?? $addServices['pdi']
-                ?? $addServices['service_PDI']
                 ?? false
             );
             $isRodVal = $this->isTrueValue(
                 $addServices['returnOnDelivery']
                 ?? $addServices['rod']
-                ?? $addServices['service_ROD']
                 ?? false
             );
             $isPodVal = $this->isTrueValue(
                 $addServices['proofOfDelivery']
                 ?? $addServices['pod']
-                ?? $addServices['service_POD']
                 ?? false
             );
 
             return [
-                'insurance' => $this->isTrueValue($addServices['insurance'] ?? $addServices['service_UBEZP'] ?? false),
-                'insuranceValue' => $insVal,
-                'cod' => $this->isTrueValue($addServices['cod'] ?? $addServices['service_COD'] ?? false),
-                'codAmount' => $codVal,
+                'insurance' => $this->isTrueValue($addServices['insurance'] ?? false),
+                'insuranceValue' => null,
+                'cod' => $this->isTrueValue($addServices['cod'] ?? false),
+                'codAmount' => null,
                 'deliveryHours' => $isEve ? '1722' : null,
                 'eveningDelivery' => $isEve,
                 'saturdayDelivery' => $isSat,
                 'saturdayDispatch' => $isSatPickup,
                 'pdi' => $isPdiVal,
                 'rod' => $isRodVal,
-                'rodDocumentText' => (string)($addServices['rodDocumentText'] ?? $addServices['textInstruction'] ?? ''),
+                'rodDocumentText' => (string)($addServices['rodDocumentText'] ?? ''),
                 'pod' => $isPodVal,
-                'agever' => $this->isTrueValue($addServices['agever'] ?? $addServices['service_AGEVER'] ?? false),
-                'odb' => $this->isTrueValue($addServices['odb'] ?? $addServices['service_ODB'] ?? false),
+                'agever' => $this->isTrueValue($addServices['agever'] ?? false),
+                'odb' => $this->isTrueValue($addServices['odb'] ?? false),
             ];
         } catch (Exception $e) {
             $this->logger?->error('Error loading special services template: ' . $e->getMessage(), ['exception' => $e]);

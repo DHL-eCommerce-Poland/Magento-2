@@ -273,4 +273,23 @@ class TemplateManagerTest extends TestCase
         $this->assertSame([['value' => '11', 'label' => 'Sales']], $manager->getCategoryOfItemOptions());
         $this->assertSame([['value' => 'EUR', 'label' => 'EUR']], $manager->getCustomsCurrencyOptions());
     }
+
+    public function testGetSpecialServicesTemplateReturnsNullInsuranceValue(): void
+    {
+        $service = $this->createMock(DeliveryService::class);
+        $service->method('getAdditionalServices')->willReturn([
+            'insurance' => 1,
+            'cod' => 1
+        ]);
+
+        $this->deliveryServiceRepository->method('getById')->with(5)->willReturn($service);
+
+        $result = $this->templateManager->getSpecialServicesTemplate(5);
+
+        $this->assertIsArray($result);
+        $this->assertTrue($result['insurance']);
+        $this->assertNull($result['insuranceValue']);
+        $this->assertTrue($result['cod']);
+        $this->assertNull($result['codAmount']);
+    }
 }

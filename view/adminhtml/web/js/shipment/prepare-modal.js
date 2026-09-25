@@ -376,19 +376,19 @@ define([
             },
             recipient: recipientObj,
             specialServices: {
-                insurance: ko.observable(isTruthy(ss.insurance || ss.service_UBEZP)),
-                insuranceValue: ko.observable(ss.insuranceValue !== undefined ? ss.insuranceValue : (ss.serviceValueUbez !== undefined ? ss.serviceValueUbez : '')),
-                cod: ko.observable(isTruthy(ss.cod || ss.service_COD)),
-                codAmount: ko.observable(ss.codAmount !== undefined ? ss.codAmount : (ss.serviceValueCOD !== undefined ? ss.serviceValueCOD : '')),
-                eveningDelivery: ko.observable(ss.deliveryHours === '1722' || isTruthy(ss.eveningDelivery || ss.service_1722)),
-                saturdayDelivery: ko.observable(isTruthy(ss.saturdayDelivery || ss.service_SOBOTA)),
-                saturdayDispatch: ko.observable(isTruthy(ss.saturdayDispatch || ss.pickupOnSaturday || ss.service_NAD_SOBOTA)),
-                pdi: ko.observable(isTruthy(ss.pdi || ss.predeliveryInformation || ss.service_PDI)),
-                rod: ko.observable(isTruthy(ss.rod || ss.returnOnDelivery || ss.service_ROD)),
-                rodDocumentText: ko.observable(ss.rodDocumentText !== undefined ? ss.rodDocumentText : (ss.textInstruction !== undefined ? ss.textInstruction : '')),
-                pod: ko.observable(isTruthy(ss.pod || ss.proofOfDelivery || ss.service_POD)),
-                agever: ko.observable(isTruthy(ss.agever || ss.service_AGEVER)),
-                odb: ko.observable(isTruthy(ss.odb || ss.service_ODB))
+                insurance: ko.observable(isTruthy(ss.insurance)),
+                insuranceValue: ko.observable((ss.insuranceValue !== undefined && ss.insuranceValue !== null) ? ss.insuranceValue : ''),
+                cod: ko.observable(isTruthy(ss.cod)),
+                codAmount: ko.observable((ss.codAmount !== undefined && ss.codAmount !== null) ? ss.codAmount : ''),
+                eveningDelivery: ko.observable(ss.deliveryHours === '1722' || isTruthy(ss.eveningDelivery)),
+                saturdayDelivery: ko.observable(isTruthy(ss.saturdayDelivery)),
+                saturdayDispatch: ko.observable(isTruthy(ss.saturdayDispatch || ss.pickupOnSaturday)),
+                pdi: ko.observable(isTruthy(ss.pdi || ss.predeliveryInformation)),
+                rod: ko.observable(isTruthy(ss.rod || ss.returnOnDelivery)),
+                rodDocumentText: ko.observable((ss.rodDocumentText !== undefined && ss.rodDocumentText !== null) ? ss.rodDocumentText : ''),
+                pod: ko.observable(isTruthy(ss.pod || ss.proofOfDelivery)),
+                agever: ko.observable(isTruthy(ss.agever)),
+                odb: ko.observable(isTruthy(ss.odb))
             },
             shipmentSettings: shipmentSettingsObj,
             customs: createCustomsData(data.customs || {})
@@ -890,19 +890,13 @@ define([
                     if (specialServices && self.draft().specialServices) {
                         var currentSS = self.draft().specialServices;
                         if (specialServices.insuranceValue !== undefined && typeof currentSS.insuranceValue === 'function') {
-                            currentSS.insuranceValue(specialServices.insuranceValue);
-                        } else if (specialServices.serviceValueUbez !== undefined && typeof currentSS.insuranceValue === 'function') {
-                            currentSS.insuranceValue(specialServices.serviceValueUbez);
+                            currentSS.insuranceValue((specialServices.insuranceValue !== null && specialServices.insuranceValue !== undefined) ? specialServices.insuranceValue : '');
                         }
                         if (specialServices.codAmount !== undefined && typeof currentSS.codAmount === 'function') {
-                            currentSS.codAmount(specialServices.codAmount);
-                        } else if (specialServices.serviceValueCOD !== undefined && typeof currentSS.codAmount === 'function') {
-                            currentSS.codAmount(specialServices.serviceValueCOD);
+                            currentSS.codAmount((specialServices.codAmount !== null && specialServices.codAmount !== undefined) ? specialServices.codAmount : '');
                         }
                         if (specialServices.rodDocumentText !== undefined && typeof currentSS.rodDocumentText === 'function') {
-                            currentSS.rodDocumentText(specialServices.rodDocumentText);
-                        } else if (specialServices.textInstruction !== undefined && typeof currentSS.rodDocumentText === 'function') {
-                            currentSS.rodDocumentText(specialServices.textInstruction);
+                            currentSS.rodDocumentText(specialServices.rodDocumentText || '');
                         }
                         if (specialServices.proofOfDelivery !== undefined && typeof currentSS.pod === 'function') {
                             currentSS.pod(isTruthy(specialServices.proofOfDelivery));
