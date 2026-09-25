@@ -383,17 +383,6 @@
                 </imports>
             </settings>
         </field>
-        <field name="shipmentSettings[packageNumbers]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Package Number</label>
-                <dataScope>shipmentSettings.packageNumbers</dataScope>
-                <disabled>true</disabled>
-                <imports>
-                    <link name="visible">${$.provider}:data.shipmentSettings.packageNumbers</link>
-                </imports>
-            </settings>
-        </field>
         <field name="shipmentSettings[serviceType]" formElement="select">
             <settings>
                 <dataType>text</dataType>
