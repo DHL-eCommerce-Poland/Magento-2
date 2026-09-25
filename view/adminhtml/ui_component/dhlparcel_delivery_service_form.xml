@@ -699,9 +699,7 @@
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
                             <item name="fit" xsi:type="boolean">true</item>
-                            <item name="cols" xsi:type="number">5</item>
-                            <item name="size" xsi:type="number">5</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
                         </item>
                     </argument>
                     <settings>
@@ -714,9 +712,7 @@
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
                             <item name="fit" xsi:type="boolean">true</item>
-                            <item name="cols" xsi:type="number">5</item>
-                            <item name="size" xsi:type="number">5</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
                         </item>
                     </argument>
                     <settings>
@@ -729,9 +725,7 @@
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
                             <item name="fit" xsi:type="boolean">true</item>
-                            <item name="cols" xsi:type="number">5</item>
-                            <item name="size" xsi:type="number">5</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
                         </item>
                     </argument>
                     <settings>
@@ -744,9 +738,7 @@
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
                             <item name="fit" xsi:type="boolean">true</item>
-                            <item name="cols" xsi:type="number">5</item>
-                            <item name="size" xsi:type="number">5</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
                         </item>
                     </argument>
                     <settings>
@@ -804,7 +796,7 @@
                 <actionDelete name="actionDelete">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
-                            <item name="fit" xsi:type="boolean">false</item>
+                            <item name="fit" xsi:type="boolean">true</item>
                         </item>
                     </argument>
                     <settings>

@@ -369,7 +369,7 @@ Weight [kg],Waga [kg]
 Width [cm],Szerokość [cm]
 Length [cm],Długość [cm]
 Height [cm],Wysokość [cm]
-NST,Przesyłka niestandardowa
+NST,Przesyłka niest.
 Euro Return,Zwrot palet
 Actions,Akcje
 Non-standard package option,Opcja paczki niestandardowej
@@ -534,7 +534,7 @@ Courier Dispatch ID,Numer zlecenia kuriera
 Return Shipment ID,Numer przesyłki zwrotnej
 Package Numbers,Numery paczek
 Packages,Paczki
-Package Number (BLP),Numer przesyłki / paczki (BLP)
+Package Number (BLP),Numer paczki (BLP)
 Shipment Tracking History,Historia śledzenia przesyłki
 Print Labels,Pobierz etykiety
 Download Scans,Pobierz skan LP

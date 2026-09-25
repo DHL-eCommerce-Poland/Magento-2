@@ -936,8 +936,8 @@
                 <field name="packageNumber" formElement="input">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
-                            <item name="cols" xsi:type="number">18</item>
-                            <item name="size" xsi:type="number">18</item>
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
                         </item>
                     </argument>
                     <settings>
@@ -1074,17 +1074,10 @@
                         <item name="config" xsi:type="array">
                             <item name="default" xsi:type="number">1</item>
                             <item name="fit" xsi:type="boolean">true</item>
-                            <item name="cols" xsi:type="number">3</item>
-                            <item name="size" xsi:type="number">3</item>
                             <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
                         </item>
                     </argument>
                     <settings>
-                        <validation>
-                            <rule name="required-entry" xsi:type="boolean">true</rule>
-                            <rule name="validate-digits" xsi:type="boolean">true</rule>
-                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
-                        </validation>
                         <dataType>text</dataType>
                         <label translate="true">Qty</label>
                         <dataScope>quantity</dataScope>
@@ -1095,17 +1088,10 @@
                         <item name="config" xsi:type="array">
                             <item name="default" xsi:type="string">1.0000</item>
                             <item name="fit" xsi:type="boolean">true</item>
-                            <item name="cols" xsi:type="number">5</item>
-                            <item name="size" xsi:type="number">5</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
                         </item>
                     </argument>
                     <settings>
-                        <validation>
-                            <rule name="required-entry" xsi:type="boolean">true</rule>
-                            <rule name="validate-number" xsi:type="boolean">true</rule>
-                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
-                        </validation>
                         <dataType>text</dataType>
                         <label translate="true">Weight (kg)</label>
                         <dataScope>weight</dataScope>
@@ -1115,16 +1101,10 @@
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
                             <item name="fit" xsi:type="boolean">true</item>
-                            <item name="cols" xsi:type="number">5</item>
-                            <item name="size" xsi:type="number">5</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
                         </item>
                     </argument>
                     <settings>
-                        <validation>
-                            <rule name="validate-number" xsi:type="boolean">true</rule>
-                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
-                        </validation>
                         <dataType>text</dataType>
                         <label translate="true">Width (cm)</label>
                         <dataScope>width</dataScope>
@@ -1134,16 +1114,10 @@
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
                             <item name="fit" xsi:type="boolean">true</item>
-                            <item name="cols" xsi:type="number">5</item>
-                            <item name="size" xsi:type="number">5</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
                         </item>
                     </argument>
                     <settings>
-                        <validation>
-                            <rule name="validate-number" xsi:type="boolean">true</rule>
-                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
-                        </validation>
                         <dataType>text</dataType>
                         <label translate="true">Length (cm)</label>
                         <dataScope>length</dataScope>
@@ -1153,16 +1127,10 @@
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
                             <item name="fit" xsi:type="boolean">true</item>
-                            <item name="cols" xsi:type="number">5</item>
-                            <item name="size" xsi:type="number">5</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
                         </item>
                     </argument>
                     <settings>
-                        <validation>
-                            <rule name="validate-number" xsi:type="boolean">true</rule>
-                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
-                        </validation>
                         <dataType>text</dataType>
                         <label translate="true">Height (cm)</label>
                         <dataScope>height</dataScope>
@@ -1218,7 +1186,7 @@
                 <actionDelete name="actionDelete">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
-                            <item name="fit" xsi:type="boolean">false</item>
+                            <item name="fit" xsi:type="boolean">true</item>
                         </item>
                     </argument>
                     <settings>

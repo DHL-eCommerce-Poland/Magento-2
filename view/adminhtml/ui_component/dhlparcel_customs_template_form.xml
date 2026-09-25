@@ -431,6 +431,11 @@
                     </item>
                 </argument>
                 <field name="nameEn" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>text</dataType>
                         <label translate="true">English Name</label>
@@ -438,6 +443,11 @@
                     </settings>
                 </field>
                 <field name="namePl" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>text</dataType>
                         <label translate="true">Polish Name</label>
@@ -445,6 +455,12 @@
                     </settings>
                 </field>
                 <field name="quantity" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>number</dataType>
                         <label translate="true">Quantity</label>
@@ -452,6 +468,12 @@
                     </settings>
                 </field>
                 <field name="weight" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>number</dataType>
                         <label translate="true">Weight (kg)</label>
@@ -459,6 +481,12 @@
                     </settings>
                 </field>
                 <field name="value" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>number</dataType>
                         <label translate="true">Value</label>
@@ -466,6 +494,12 @@
                     </settings>
                 </field>
                 <field name="tariffCode" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>text</dataType>
                         <label translate="true">Customs Tariff Code</label>
@@ -473,6 +507,12 @@
                     </settings>
                 </field>
                 <field name="countryOfOrigin" formElement="select">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
                     <settings>
                         <dataType>text</dataType>
                         <label translate="true">Country Of Origin</label>
@@ -489,7 +529,7 @@
                 <actionDelete template="Magento_Backend/dynamic-rows/cells/action-delete">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
-                            <item name="fit" xsi:type="boolean">false</item>
+                            <item name="fit" xsi:type="boolean">true</item>
                         </item>
                     </argument>
                     <settings>
