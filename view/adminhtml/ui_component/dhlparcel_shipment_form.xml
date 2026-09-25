@@ -521,6 +521,10 @@
         </field>
         <field name="shipmentSettings[returnLabelExpDays]" formElement="input">
             <settings>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                </validation>
                 <dataType>text</dataType>
                 <label translate="true">Return Label Expiration Days</label>
                 <dataScope>shipmentSettings.returnLabelExpDays</dataScope>
@@ -607,6 +611,10 @@
         </field>
         <field name="specialServices[insuranceValue]" formElement="input">
             <settings>
+                <validation>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                </validation>
                 <dataType>text</dataType>
                 <label translate="true">Insurance Value</label>
                 <dataScope>specialServices.insuranceValue</dataScope>
@@ -663,6 +671,10 @@
         </field>
         <field name="specialServices[codAmount]" formElement="input">
             <settings>
+                <validation>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                </validation>
                 <dataType>text</dataType>
                 <label translate="true">COD Amount</label>
                 <dataScope>specialServices.codAmount</dataScope>
@@ -1068,6 +1080,11 @@
                         </item>
                     </argument>
                     <settings>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                            <rule name="validate-digits" xsi:type="boolean">true</rule>
+                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                        </validation>
                         <dataType>text</dataType>
                         <label translate="true">Qty</label>
                         <dataScope>quantity</dataScope>
@@ -1084,6 +1101,11 @@
                         </item>
                     </argument>
                     <settings>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                            <rule name="validate-number" xsi:type="boolean">true</rule>
+                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                        </validation>
                         <dataType>text</dataType>
                         <label translate="true">Weight (kg)</label>
                         <dataScope>weight</dataScope>
@@ -1099,6 +1121,10 @@
                         </item>
                     </argument>
                     <settings>
+                        <validation>
+                            <rule name="validate-number" xsi:type="boolean">true</rule>
+                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                        </validation>
                         <dataType>text</dataType>
                         <label translate="true">Width (cm)</label>
                         <dataScope>width</dataScope>
@@ -1114,6 +1140,10 @@
                         </item>
                     </argument>
                     <settings>
+                        <validation>
+                            <rule name="validate-number" xsi:type="boolean">true</rule>
+                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                        </validation>
                         <dataType>text</dataType>
                         <label translate="true">Length (cm)</label>
                         <dataScope>length</dataScope>
@@ -1129,6 +1159,10 @@
                         </item>
                     </argument>
                     <settings>
+                        <validation>
+                            <rule name="validate-number" xsi:type="boolean">true</rule>
+                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                        </validation>
                         <dataType>text</dataType>
                         <label translate="true">Height (cm)</label>
                         <dataScope>height</dataScope>
