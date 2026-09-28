@@ -104,27 +104,26 @@ class ShipmentDataService
      * Prepare initial DhlShipmentData object for given order ID.
      *
      * @param int $orderId
-     * @param int|null $presetSenderId
-     * @param int|null $presetShipmentId
-     *
+     * @param int|null $dropOffPointTemplateId
+     * @param int|null $deliveryServiceTemplateId
      * @return DhlShipmentData
      * @throws LocalizedException
      */
     public function prepareShipmentData(
         int $orderId,
-        ?int $presetSenderId = null,
-        ?int $presetShipmentId = null
+        ?int $dropOffPointTemplateId = null,
+        ?int $deliveryServiceTemplateId = null
     ): DhlShipmentData {
         $order = $this->orderRepository->get($orderId);
 
         // 1. Sender defaults from DropOffPoint preset
         $senderDefaults = [];
-        if ($presetSenderId) {
+        if ($dropOffPointTemplateId) {
             try {
-                $senderEntity = $this->dropOffPointRepository->getById($presetSenderId);
+                $senderEntity = $this->dropOffPointRepository->getById($dropOffPointTemplateId);
                 $senderDefaults = $senderEntity->getData();
             } catch (NoSuchEntityException $e) {
-                $this->logger?->warning('Specified sender preset not found: ' . $presetSenderId, ['exception' => $e]);
+                $this->logger?->warning('Specified sender preset not found: ' . $dropOffPointTemplateId, ['exception' => $e]);
             }
         }
         if (empty($senderDefaults)) {
@@ -136,9 +135,9 @@ class ShipmentDataService
 
         // 2. Shipment defaults from DeliveryService preset
         $shipmentDefaults = [];
-        if ($presetShipmentId) {
+        if ($deliveryServiceTemplateId) {
             try {
-                $serviceEntity = $this->deliveryServiceRepository->getById($presetShipmentId);
+                $serviceEntity = $this->deliveryServiceRepository->getById($deliveryServiceTemplateId);
                 $shipmentDefaults = $serviceEntity->getData();
                 $servicesArr = $this->decodeAdditionalServices($shipmentDefaults['additional_services'] ?? null);
                 if ($servicesArr !== null) {
@@ -147,7 +146,7 @@ class ShipmentDataService
                 $shipmentDefaults['packages'] = $serviceEntity->getPackages();
             } catch (NoSuchEntityException $e) {
                 $this->logger?->warning(
-                    'Specified shipment preset not found: ' . $presetShipmentId,
+                    'Specified shipment preset not found: ' . $deliveryServiceTemplateId,
                     ['exception' => $e]
                 );
             }
@@ -191,12 +190,13 @@ class ShipmentDataService
     public function saveShipmentDataWithStatus(
         DhlShipmentData $shipmentData,
         string $status = ShipmentDataInterface::DEFAULT_STATUS,
-        ?string $presetSenderId = null,
-        ?string $presetShipmentId = null,
+        ?string $dropOffPointTemplateId = null,
+        ?string $deliveryServiceTemplateId = null,
         ?string $shipmentId = null,
         ?string $returnShipmentId = null,
         ?array $packageNumbers = null,
-        ?int $magentoShipmentId = null
+        ?int $magentoShipmentId = null,
+        ?string $customsTemplateId = null
     ): ShipmentDataInterface {
         $this->validator->validate($shipmentData);
 
@@ -227,8 +227,9 @@ class ShipmentDataService
         if ($returnShipmentId !== null && trim($returnShipmentId) !== '') {
             $entity->setReturnShipmentId($returnShipmentId);
         }
-        $entity->setPresetSenderId($presetSenderId);
-        $entity->setPresetShipmentId($presetShipmentId);
+        $entity->setDropOffPointTemplateId($dropOffPointTemplateId);
+        $entity->setDeliveryServiceTemplateId($deliveryServiceTemplateId);
+        $entity->setCustomsTemplateId($customsTemplateId);
         $entity->setShipmentData($this->serializer->serialize($payloadArr));
 
         return $this->shipmentDataRepository->save($entity);

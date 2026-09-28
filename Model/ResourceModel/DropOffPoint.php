@@ -17,7 +17,7 @@ class DropOffPoint extends AbstractDb
      */
     protected function _construct(): void
     {
-        $this->_init('dhlparcel_drop_off_point', 'entity_id');
+        $this->_init('dhlparcel_drop_off_point_template', 'entity_id');
     }
 
     /**

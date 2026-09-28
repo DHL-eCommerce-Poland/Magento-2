@@ -381,7 +381,7 @@ class ShipmentDataServiceTest extends TestCase
         $this->assertNotNull($capturedJson);
         $decoded = json_decode($capturedJson, true);
 
-        $this->assertNull($decoded['packages'][0]['returnShipmentId']);
-        $this->assertNull($decoded['packages'][0]['packagesTrackingNumbers']);
+        $this->assertNull($decoded['shipmentSettings']['packages'][0]['returnShipmentId']);
+        $this->assertNull($decoded['shipmentSettings']['packages'][0]['packagesTrackingNumbers']);
     }
 }

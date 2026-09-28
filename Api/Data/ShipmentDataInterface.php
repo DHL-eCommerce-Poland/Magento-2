@@ -14,8 +14,9 @@ interface ShipmentDataInterface
     public const PACKAGE_NUMBERS = 'package_numbers';
     public const DISPATCH_NUMBER = 'dispatch_number';
     public const STATUS = 'status';
-    public const PRESET_SENDER_ID = 'preset_sender_id';
-    public const PRESET_SHIPMENT_ID = 'preset_shipment_id';
+    public const DROP_OFF_POINT_TEMPLATE_ID = 'drop_off_point_template_id';
+    public const DELIVERY_SERVICE_TEMPLATE_ID = 'delivery_service_template_id';
+    public const CUSTOMS_TEMPLATE_ID = 'customs_template_id';
     public const SHIPMENT_DATA = 'shipment_data';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
@@ -151,46 +152,62 @@ interface ShipmentDataInterface
     public function setStatus(string $status): static;
 
     /**
-     * Get selected sender preset ID.
+     * Get selected drop-off point template ID.
      *
      * @return string|null
      */
-    public function getPresetSenderId(): ?string;
+    public function getDropOffPointTemplateId(): ?string;
 
     /**
-     * Set selected sender preset ID.
+     * Set selected drop-off point template ID.
      *
-     * @param string|null $presetSenderId
+     * @param string|null $dropOffPointTemplateId
      *
      * @return $this
      */
-    public function setPresetSenderId(?string $presetSenderId): static;
+    public function setDropOffPointTemplateId(?string $dropOffPointTemplateId): static;
 
     /**
-     * Get selected shipment preset ID.
+     * Get selected delivery service template ID.
      *
      * @return string|null
      */
-    public function getPresetShipmentId(): ?string;
+    public function getDeliveryServiceTemplateId(): ?string;
 
     /**
-     * Set selected shipment preset ID.
+     * Set selected delivery service template ID.
      *
-     * @param string|null $presetShipmentId
+     * @param string|null $deliveryServiceTemplateId
      *
      * @return $this
      */
-    public function setPresetShipmentId(?string $presetShipmentId): static;
+    public function setDeliveryServiceTemplateId(?string $deliveryServiceTemplateId): static;
 
     /**
-     * Get shipment JSON payload.
+     * Get selected customs template ID.
+     *
+     * @return string|null
+     */
+    public function getCustomsTemplateId(): ?string;
+
+    /**
+     * Set selected customs template ID.
+     *
+     * @param string|null $customsTemplateId
+     *
+     * @return $this
+     */
+    public function setCustomsTemplateId(?string $customsTemplateId): static;
+
+    /**
+     * Get serialized shipment JSON data.
      *
      * @return string|null
      */
     public function getShipmentData(): ?string;
 
     /**
-     * Set shipment JSON payload.
+     * Set serialized shipment JSON data.
      *
      * @param string|null $shipmentData
      *

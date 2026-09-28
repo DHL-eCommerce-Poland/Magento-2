@@ -66,17 +66,17 @@ class Prepare extends Action
 
         try {
             $order = $this->orderRepository->get($orderId);
-            $presetSenderId = $this->getRequest()->getParam('preset_sender_id')
-                ? (int)$this->getRequest()->getParam('preset_sender_id')
+            $dropOffPointTemplateId = $this->getRequest()->getParam('drop_off_point_template_id')
+                ? (int)$this->getRequest()->getParam('drop_off_point_template_id')
                 : null;
-            $presetShipmentId = $this->getRequest()->getParam('preset_shipment_id')
-                ? (int)$this->getRequest()->getParam('preset_shipment_id')
+            $deliveryServiceTemplateId = $this->getRequest()->getParam('delivery_service_template_id')
+                ? (int)$this->getRequest()->getParam('delivery_service_template_id')
                 : null;
 
             $shipmentData = $this->shipmentDataService->prepareShipmentData(
                 $orderId,
-                $presetSenderId,
-                $presetShipmentId
+                $dropOffPointTemplateId,
+                $deliveryServiceTemplateId
             );
 
             $shippingMethod = (string)($order->getShippingMethod() ?? '');

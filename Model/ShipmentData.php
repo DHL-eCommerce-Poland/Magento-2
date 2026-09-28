@@ -113,7 +113,7 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
     }
 
     /**
-     * Get DHL return shipment ID / waybill (derived from package dynamic rows in shipment_data JSON).
+     * Get DHL return shipment ID / waybill (derived from package dynamic rows in payload JSON).
      *
      * @return string|null
      */
@@ -162,7 +162,7 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
     }
 
     /**
-     * Get DHL package numbers (derived from column or package dynamic rows in shipment_data JSON).
+     * Get DHL package numbers (derived from column or package dynamic rows in payload JSON).
      *
      * @return string|null
      */
@@ -266,53 +266,76 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
     }
 
     /**
-     * Get preset sender ID.
+     * Get selected drop-off point template ID.
      *
      * @return string|null
      */
-    public function getPresetSenderId(): ?string
+    public function getDropOffPointTemplateId(): ?string
     {
-        $val = $this->getData(self::PRESET_SENDER_ID);
+        $val = $this->getData(self::DROP_OFF_POINT_TEMPLATE_ID);
         return $val !== null ? (string)$val : null;
     }
 
     /**
-     * Set preset sender ID.
+     * Set selected drop-off point template ID.
      *
-     * @param string|null $presetSenderId
+     * @param string|null $dropOffPointTemplateId
      *
      * @return $this
      */
-    public function setPresetSenderId(?string $presetSenderId): static
+    public function setDropOffPointTemplateId(?string $dropOffPointTemplateId): static
     {
-        return $this->setData(self::PRESET_SENDER_ID, $presetSenderId);
+        return $this->setData(self::DROP_OFF_POINT_TEMPLATE_ID, $dropOffPointTemplateId);
     }
 
     /**
-     * Get preset shipment ID.
+     * Get selected delivery service template ID.
      *
      * @return string|null
      */
-    public function getPresetShipmentId(): ?string
+    public function getDeliveryServiceTemplateId(): ?string
     {
-        $val = $this->getData(self::PRESET_SHIPMENT_ID);
+        $val = $this->getData(self::DELIVERY_SERVICE_TEMPLATE_ID);
         return $val !== null ? (string)$val : null;
     }
 
     /**
-     * Set preset shipment ID.
+     * Set selected delivery service template ID.
      *
-     * @param string|null $presetShipmentId
+     * @param string|null $deliveryServiceTemplateId
      *
      * @return $this
      */
-    public function setPresetShipmentId(?string $presetShipmentId): static
+    public function setDeliveryServiceTemplateId(?string $deliveryServiceTemplateId): static
     {
-        return $this->setData(self::PRESET_SHIPMENT_ID, $presetShipmentId);
+        return $this->setData(self::DELIVERY_SERVICE_TEMPLATE_ID, $deliveryServiceTemplateId);
     }
 
     /**
-     * Get shipment payload JSON.
+     * Get selected customs template ID.
+     *
+     * @return string|null
+     */
+    public function getCustomsTemplateId(): ?string
+    {
+        $val = $this->getData(self::CUSTOMS_TEMPLATE_ID);
+        return $val !== null ? (string)$val : null;
+    }
+
+    /**
+     * Set selected customs template ID.
+     *
+     * @param string|null $customsTemplateId
+     *
+     * @return $this
+     */
+    public function setCustomsTemplateId(?string $customsTemplateId): static
+    {
+        return $this->setData(self::CUSTOMS_TEMPLATE_ID, $customsTemplateId);
+    }
+
+    /**
+     * Get serialized shipment JSON data.
      *
      * @return string|null
      */
@@ -322,7 +345,7 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
     }
 
     /**
-     * Set shipment payload JSON.
+     * Set serialized shipment JSON data.
      *
      * @param string|null $shipmentData
      *

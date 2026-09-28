@@ -1123,16 +1123,17 @@ define([
                                     }
                                     $('body').trigger('processStart');
 
-                                    var senderPresetId = (draftJs.sender && draftJs.sender.selectedDropOffPointId) ? draftJs.sender.selectedDropOffPointId : null;
-                                    var shipmentPresetId = (draftJs.shipmentSettings && draftJs.shipmentSettings.selectedDeliveryServiceId) ? draftJs.shipmentSettings.selectedDeliveryServiceId : null;
-                                    var customsPresetId = (draftJs.customs && draftJs.customs.selectedCustomsTemplateId) ? draftJs.customs.selectedCustomsTemplateId : null;
+                                    var senderTemplateId = (draftJs.sender && draftJs.sender.selectedDropOffPointId) ? draftJs.sender.selectedDropOffPointId : null;
+                                    var shipmentTemplateId = (draftJs.shipmentSettings && draftJs.shipmentSettings.selectedDeliveryServiceId) ? draftJs.shipmentSettings.selectedDeliveryServiceId : null;
+                                    var customsTemplateId = (draftJs.customs && draftJs.customs.selectedCustomsTemplateId) ? draftJs.customs.selectedCustomsTemplateId : null;
 
                                     $.post(self.saveUrl, {
+                                        payload: JSON.stringify(draftJs),
                                         shipment_data: JSON.stringify(draftJs),
                                         draft: JSON.stringify(draftJs),
-                                        preset_sender_id: senderPresetId,
-                                        preset_shipment_id: shipmentPresetId,
-                                        preset_customs_id: customsPresetId
+                                        drop_off_point_template_id: senderTemplateId,
+                                        delivery_service_template_id: shipmentTemplateId,
+                                        customs_template_id: customsTemplateId
                                     }).done(function (saveRes) {
                                         if (saveRes.success) {
                                             selfModal.closeModal();

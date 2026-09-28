@@ -15,6 +15,6 @@ class ShipmentData extends AbstractDb
      */
     protected function _construct(): void
     {
-        $this->_init('dhlparcel_shipment_data', 'entity_id');
+        $this->_init('dhlparcel_shipment', 'entity_id');
     }
 }

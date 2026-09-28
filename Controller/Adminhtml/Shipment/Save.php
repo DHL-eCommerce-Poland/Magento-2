@@ -151,22 +151,22 @@ class Save extends Action implements HttpPostActionInterface
         try {
             $shipmentData = DhlShipmentData::fromArray($payload);
 
-            // Extract preset/template IDs from request or nested draft payload
-            $rawSenderId = $this->getRequest()->getParam('preset_sender_id')
-                ?? ($payload['sender']['selectedDropOffPointId'] ?? $payload['preset_sender_id'] ?? null);
-            $rawShipmentId = $this->getRequest()->getParam('preset_shipment_id')
+            // Extract template IDs from request or nested draft payload
+            $rawSenderId = $this->getRequest()->getParam('drop_off_point_template_id')
+                ?? ($payload['sender']['selectedDropOffPointId'] ?? $payload['drop_off_point_template_id'] ?? null);
+            $rawShipmentId = $this->getRequest()->getParam('delivery_service_template_id')
                 ?? ($payload['shipmentSettings']['selectedDeliveryServiceId']
-                    ?? $payload['preset_shipment_id'] ?? null);
-            $rawCustomsId = $this->getRequest()->getParam('preset_customs_id')
-                ?? ($payload['customs']['selectedCustomsTemplateId'] ?? $payload['preset_customs_id'] ?? null);
+                    ?? $payload['delivery_service_template_id'] ?? null);
+            $rawCustomsId = $this->getRequest()->getParam('customs_template_id')
+                ?? ($payload['customs']['selectedCustomsTemplateId'] ?? $payload['customs_template_id'] ?? null);
 
-            $presetSenderId = (!empty($rawSenderId) && trim((string)$rawSenderId) !== '')
+            $dropOffPointTemplateId = (!empty($rawSenderId) && trim((string)$rawSenderId) !== '')
                 ? (string)$rawSenderId
                 : null;
-            $presetShipmentId = (!empty($rawShipmentId) && trim((string)$rawShipmentId) !== '')
+            $deliveryServiceTemplateId = (!empty($rawShipmentId) && trim((string)$rawShipmentId) !== '')
                 ? (string)$rawShipmentId
                 : null;
-            $presetCustomsId = (!empty($rawCustomsId) && trim((string)$rawCustomsId) !== '')
+            $customsTemplateId = (!empty($rawCustomsId) && trim((string)$rawCustomsId) !== '')
                 ? (string)$rawCustomsId
                 : null;
 
@@ -184,8 +184,9 @@ class Save extends Action implements HttpPostActionInterface
                 $dispatchResult = $this->shipmentCreationService->createShipment(
                     $shipmentData,
                     $environment,
-                    $presetSenderId,
-                    $presetShipmentId
+                    $dropOffPointTemplateId,
+                    $deliveryServiceTemplateId,
+                    $customsTemplateId
                 );
             }
 

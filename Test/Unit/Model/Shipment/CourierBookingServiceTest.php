@@ -139,7 +139,7 @@ class CourierBookingServiceTest extends TestCase
             ->with(
                 $this->anything(),
                 ['1234567890'],
-                '2026-09-26',
+                '2028-09-26',
                 '10:00',
                 '14:00',
                 $this->anything()
@@ -154,7 +154,7 @@ class CourierBookingServiceTest extends TestCase
             new ShipmentDateSanitizer($this->timezoneMock)
         );
 
-        $result = $service->bookCourier([10], '2026-09-26', '10:00', '14:00');
+        $result = $service->bookCourier([10], '2028-09-26', '10:00', '14:00');
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('ORDER_FUTURE', $result->getCourierOrderId());
     }

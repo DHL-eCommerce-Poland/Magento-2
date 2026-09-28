@@ -61,7 +61,7 @@
         <column xsi:type="varchar" name="dhl_postnummer" length="64" nullable="true" comment="DHL Postnummer (DE Customer ID)"/>
     </table>
 
-    <table name="dhlparcel_drop_off_point" resource="default" engine="innodb" comment="DHL Drop-Off Points">
+    <table name="dhlparcel_drop_off_point_template" resource="default" engine="innodb" comment="DHL Drop-Off Point Templates">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="template_name" length="255" nullable="false" comment="Profile Template Name"/>
         <column xsi:type="varchar" name="sender_name" length="255" nullable="false" comment="Sender Name"/>
@@ -81,7 +81,7 @@
             <column name="entity_id"/>
         </constraint>
     </table>
-    <table name="dhlparcel_delivery_service" resource="default" engine="innodb" comment="DHL Delivery Services">
+    <table name="dhlparcel_delivery_service_template" resource="default" engine="innodb" comment="DHL Delivery Service Templates">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="template_name" length="255" nullable="false" comment="Template Name"/>
         <column xsi:type="varchar" name="method_code" length="1024" nullable="true" comment="Magento Shipping Method Code"/>
@@ -101,7 +101,7 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <index referenceId="IDX_DHLPARCEL_DELIVERY_SERVICE_METHOD" indexType="btree">
+        <index referenceId="IDX_DHLPARCEL_DELIVERY_SERVICE_TEMPLATE_METHOD" indexType="btree">
             <column name="method_code"/>
         </index>
     </table>
@@ -137,7 +137,7 @@
             <column name="is_default"/>
         </index>
     </table>
-    <table name="dhlparcel_shipment_data" resource="default" engine="innodb" comment="DHL Shipment Data Entities">
+    <table name="dhlparcel_shipment" resource="default" engine="innodb" comment="DHL Shipment Entities">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Magento Order ID"/>
         <column xsi:type="int" name="magento_shipment_id" unsigned="true" nullable="true" comment="Magento Sales Shipment ID"/>
@@ -145,25 +145,26 @@
         <column xsi:type="varchar" name="return_shipment_id" length="1024" nullable="true" comment="DHL Return Shipment ID"/>
         <column xsi:type="varchar" name="package_numbers" length="1024" nullable="true" comment="DHL Package Numbers"/>
         <column xsi:type="varchar" name="dispatch_number" length="64" nullable="true" comment="DHL Courier Order / Dispatch Number"/>
-        <column xsi:type="varchar" name="status" length="64" nullable="false" default="pending" comment="Shipment Data Status"/>
-        <column xsi:type="varchar" name="preset_sender_id" length="64" nullable="true" comment="Selected Sender Preset ID"/>
-        <column xsi:type="varchar" name="preset_shipment_id" length="64" nullable="true" comment="Selected Shipment Preset ID"/>
+        <column xsi:type="varchar" name="status" length="64" nullable="false" default="pending" comment="Shipment Status"/>
+        <column xsi:type="varchar" name="drop_off_point_template_id" length="64" nullable="true" comment="Selected Drop-Off Point Template ID"/>
+        <column xsi:type="varchar" name="delivery_service_template_id" length="64" nullable="true" comment="Selected Delivery Service Template ID"/>
+        <column xsi:type="varchar" name="customs_template_id" length="64" nullable="true" comment="Selected Customs Template ID"/>
         <column xsi:type="text" name="shipment_data" nullable="true" comment="Serialized DhlShipmentData JSON"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Update Time"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <index referenceId="IDX_DHLPARCEL_SHIPMENT_DATA_ORDER_ID" indexType="btree">
+        <index referenceId="IDX_DHLPARCEL_SHIPMENT_ORDER_ID" indexType="btree">
             <column name="order_id"/>
         </index>
-        <index referenceId="IDX_DHLPARCEL_SHIPMENT_DATA_MAGENTO_SHIPMENT_ID" indexType="btree">
+        <index referenceId="IDX_DHLPARCEL_SHIPMENT_MAGENTO_SHIPMENT_ID" indexType="btree">
             <column name="magento_shipment_id"/>
         </index>
-        <index referenceId="IDX_DHLPARCEL_SHIPMENT_DATA_SHIPMENT_ID" indexType="btree">
+        <index referenceId="IDX_DHLPARCEL_SHIPMENT_SHIPMENT_ID" indexType="btree">
             <column name="shipment_id"/>
         </index>
-        <index referenceId="IDX_DHLPARCEL_SHIPMENT_DATA_STATUS" indexType="btree">
+        <index referenceId="IDX_DHLPARCEL_SHIPMENT_STATUS" indexType="btree">
             <column name="status"/>
         </index>
     </table>

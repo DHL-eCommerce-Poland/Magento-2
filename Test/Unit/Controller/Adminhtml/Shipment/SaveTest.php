@@ -164,10 +164,10 @@ class SaveTest extends TestCase
                 if ($param === 'draft') {
                     return json_encode($payloadData);
                 }
-                if ($param === 'preset_sender_id') {
+                if ($param === 'drop_off_point_template_id') {
                     return '1';
                 }
-                if ($param === 'preset_shipment_id') {
+                if ($param === 'delivery_service_template_id') {
                     return '2';
                 }
                 return null;
@@ -181,7 +181,7 @@ class SaveTest extends TestCase
         $apiResult = new CreateShipmentsResult(true, false, '90039521201');
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('createShipment')
-            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'sandbox', '1', '2')
+            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'sandbox', '1', '2', null)
             ->willReturn($apiResult);
 
         $this->jsonResultMock->expects(self::once())
@@ -229,7 +229,7 @@ class SaveTest extends TestCase
         $apiResult = new CreateShipmentsResult(false, false, null, null, [], 'ERR_01', 'Nieprawidłowy kod pocztowy');
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('createShipment')
-            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'production', null, null)
+            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'production', null, null, null)
             ->willReturn($apiResult);
 
         $this->jsonResultMock->expects(self::once())

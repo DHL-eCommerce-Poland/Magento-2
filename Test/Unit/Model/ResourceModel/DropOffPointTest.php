@@ -30,7 +30,7 @@ class DropOffPointTest extends TestCase
         $mainTableProperty = $reflection->getProperty('_mainTable');
         $idFieldNameProperty = $reflection->getProperty('_idFieldName');
 
-        $this->assertEquals('dhlparcel_drop_off_point', $mainTableProperty->getValue($resource));
+        $this->assertEquals('dhlparcel_drop_off_point_template', $mainTableProperty->getValue($resource));
         $this->assertEquals('entity_id', $idFieldNameProperty->getValue($resource));
     }
 }

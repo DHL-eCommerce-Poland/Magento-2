@@ -342,9 +342,10 @@ class ShipmentCreationServiceTest extends TestCase
             );
 
         $serializer = $this->createStub(\Magento\Framework\Serialize\SerializerInterface::class);
+        $magentoSyncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
         $serviceWithReturn = new ShipmentCreationService(
             $this->shipmentDataServiceMock,
-            $this->validatorMock,
+            $this->validatorStub,
             $this->mapperStub,
             $this->credentialsProviderStub,
             $this->clientStub,
@@ -353,7 +354,7 @@ class ShipmentCreationServiceTest extends TestCase
             $serializer,
             $returnBuilderMock,
             $returnCreationServiceMock,
-            null,
+            $magentoSyncServiceMock,
             $this->nearestPointResolverMock
         );
 

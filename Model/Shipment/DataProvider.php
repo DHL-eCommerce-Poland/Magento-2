@@ -70,7 +70,7 @@ class DataProvider extends AbstractDataProvider
                 } catch (Throwable $e) {
                     $payload = null;
                     $this->logger?->error(sprintf(
-                        '[DataProvider] Failed to unserialize shipment_data payload for shipment entity #%s: %s',
+                        '[DataProvider] Failed to unserialize payload for shipment entity #%s: %s',
                         $item->getId(),
                         $e->getMessage()
                     ));
@@ -81,7 +81,7 @@ class DataProvider extends AbstractDataProvider
                         $data['sender'] = $payload['sender'];
                     }
                     if (isset($data['sender']) && is_array($data['sender'])) {
-                        $presetId = $item->getData('preset_sender_id');
+                        $presetId = $item->getDropOffPointTemplateId();
                         $hasPreset = !isset($data['sender']['presetSenderId'])
                             && !empty($presetId)
                             && is_scalar($presetId);
