@@ -75,7 +75,7 @@ class ShipmentFullDataMapperTest extends TestCase
             cod: true,
             codAmount: 150.0,
             codCurrency: 'PLN',
-            codPaymentMethod: 'CASH'
+            codPaymentMethod: 'BANK_TRANSFER'
         );
 
         $packages = [

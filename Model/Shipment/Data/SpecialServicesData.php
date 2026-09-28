@@ -38,7 +38,7 @@ class SpecialServicesData
         private bool $cod = false,
         private ?float $codAmount = null,
         private string $codCurrency = 'PLN',
-        private string $codPaymentMethod = 'CASH',
+        private string $codPaymentMethod = 'BANK_TRANSFER',
         private bool $pdi = false,
         private bool $rod = false,
         private string $rodDocumentText = '',
@@ -141,7 +141,7 @@ class SpecialServicesData
     }
 
     /**
-     * Get COD payment method (e.g. CASH).
+     * Get COD payment method (e.g. BANK_TRANSFER).
      *
      * @return string
      */
@@ -293,7 +293,7 @@ class SpecialServicesData
             $cod,
             $codAmount,
             (string)($data['codCurrency'] ?? 'PLN'),
-            (string)($data['codPaymentMethod'] ?? 'CASH'),
+            (string)($data['codPaymentMethod'] ?? 'BANK_TRANSFER'),
             filter_var($data['pdi'] ?? $data['predeliveryInformation'] ?? false, FILTER_VALIDATE_BOOLEAN),
             $rod,
             $rodDocumentText,

@@ -26,7 +26,7 @@ class SpecialServicesDataTest extends TestCase
             cod: true,
             codAmount: 150.0,
             codCurrency: 'PLN',
-            codPaymentMethod: 'CASH',
+            codPaymentMethod: 'BANK_TRANSFER',
             pdi: true,
             rod: true,
             rodDocumentText: 'FV/123/2026',
@@ -44,7 +44,7 @@ class SpecialServicesDataTest extends TestCase
         $this->assertTrue($services->isCod());
         $this->assertEquals(150.0, $services->getCodAmount());
         $this->assertEquals('PLN', $services->getCodCurrency());
-        $this->assertEquals('CASH', $services->getCodPaymentMethod());
+        $this->assertEquals('BANK_TRANSFER', $services->getCodPaymentMethod());
         $this->assertTrue($services->isPdi());
         $this->assertTrue($services->isRod());
         $this->assertEquals('FV/123/2026', $services->getRodDocumentText());
@@ -67,6 +67,7 @@ class SpecialServicesDataTest extends TestCase
         $this->assertFalse($services->isInsurance());
         $this->assertFalse($services->isCod());
         $this->assertNull($services->getCodAmount());
+        $this->assertEquals('BANK_TRANSFER', $services->getCodPaymentMethod());
     }
 
     /**
@@ -86,7 +87,7 @@ class SpecialServicesDataTest extends TestCase
             'cod' => true,
             'codAmount' => 299.99,
             'codCurrency' => 'PLN',
-            'codPaymentMethod' => 'CASH',
+            'codPaymentMethod' => 'BANK_TRANSFER',
             'pdi' => false,
             'rod' => false,
             'rodDocumentText' => '',
