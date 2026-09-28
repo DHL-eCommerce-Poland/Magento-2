@@ -31,7 +31,7 @@ class Collection extends SearchResult
         LoggerInterface $logger,
         FetchStrategyInterface $fetchStrategy,
         ManagerInterface $eventManager,
-        $mainTable = 'dhlparcel_customs_template',
+        $mainTable = 'dhlpoland_customs_template',
         $resourceModel = CustomsTemplate::class,
         $identifierName = null,
         $connectionName = null

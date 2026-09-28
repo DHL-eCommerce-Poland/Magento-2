@@ -74,7 +74,7 @@ Wtyczkę można zainstalować na dwa sposoby: za pomocą menedżera pakietów **
 
 Po pomyślnej instalacji przejdź do panelu administracyjnego Magento 2:
 
-1. Przejdź do: **Sklepy (Stores)** &rarr; **Konfiguracja (Configuration)** &rarr; **Sprzedaż (Sales)** &rarr; **Metody dostawy (Delivery Methods / Shipping Methods)** &rarr; sekcja **DHL Parcel** (lub bezpośrednio przez menu: **Sprzedaż (Sales)** &rarr; **DHL Parcel** &rarr; **Configuration**).
+1. Przejdź do: **Sklepy (Stores)** &rarr; **Konfiguracja (Configuration)** &rarr; **Sprzedaż (Sales)** &rarr; **Metody dostawy (Delivery Methods / Shipping Methods)** &rarr; sekcja **DHL eCommerce Poland** (lub bezpośrednio przez menu: **Sprzedaż (Sales)** &rarr; **DHL eCommerce Poland** &rarr; **Configuration**).
 2. Wprowadź dane uwierzytelniające API DHL oraz dostosuj parametry usług (dostawy kurierskie, punkty odbioru POP/automaty paczkowe, ubezpieczenia, gabaryty przesyłek).
 3. Zapisz konfigurację i odśwież pamięć podręczną (Cache).
 

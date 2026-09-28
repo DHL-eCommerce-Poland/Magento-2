@@ -33,7 +33,7 @@ class TableRateResolver
         float $value
     ): ?float {
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('dhlparcel_tablerate');
+        $tableName = $this->resourceConnection->getTableName('dhlpoland_tablerate');
 
         $select = $connection->select()
             ->from($tableName, ['price'])
@@ -65,7 +65,7 @@ class TableRateResolver
     public function getRatesForExport(int $websiteId, bool $fallbackToDefault = true): array
     {
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('dhlparcel_tablerate');
+        $tableName = $this->resourceConnection->getTableName('dhlpoland_tablerate');
 
         $select = $connection->select()
             ->from($tableName, [

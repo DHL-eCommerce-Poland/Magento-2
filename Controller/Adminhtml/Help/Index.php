@@ -34,7 +34,7 @@ class Index extends Action implements HttpGetActionInterface
     {
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('Ideo_Dhl::help');
-        $resultPage->getConfig()->getTitle()->prepend(__('DHL Parcel - Help & Support'));
+        $resultPage->getConfig()->getTitle()->prepend(__('DHL eCommerce Poland - Help & Support'));
 
         return $resultPage;
     }

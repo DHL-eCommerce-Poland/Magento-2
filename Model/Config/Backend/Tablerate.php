@@ -227,7 +227,7 @@ class Tablerate extends File
     public function saveTableRates(array $rows, ?int $websiteId = null): void
     {
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('dhlparcel_tablerate');
+        $tableName = $this->resourceConnection->getTableName('dhlpoland_tablerate');
 
         $affectedWebsiteIds = $websiteId !== null
             ? [$websiteId]

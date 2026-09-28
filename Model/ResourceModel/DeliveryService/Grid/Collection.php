@@ -31,7 +31,7 @@ class Collection extends SearchResult
         LoggerInterface $logger,
         FetchStrategyInterface $fetchStrategy,
         ManagerInterface $eventManager,
-        $mainTable = 'dhlparcel_delivery_service_template',
+        $mainTable = 'dhlpoland_delivery_service_template',
         $resourceModel = DeliveryService::class,
         $identifierName = null,
         $connectionName = null

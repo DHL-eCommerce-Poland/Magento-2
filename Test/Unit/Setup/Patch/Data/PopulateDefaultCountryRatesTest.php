@@ -33,7 +33,7 @@ class PopulateDefaultCountryRatesTest extends TestCase
 
         $resourceConnectionStub
             ->method('getTableName')
-            ->willReturn('dhlparcel_country_rate');
+            ->willReturn('dhlpoland_country_rate');
 
         $moduleDirReaderMock
             ->expects($this->once())
@@ -117,7 +117,7 @@ class PopulateDefaultCountryRatesTest extends TestCase
 
         $resourceConnectionStub
             ->method('getTableName')
-            ->willReturn('dhlparcel_country_rate');
+            ->willReturn('dhlpoland_country_rate');
 
         $connectionMock
             ->expects($this->once())
@@ -153,12 +153,12 @@ class PopulateDefaultCountryRatesTest extends TestCase
 
         $resourceConnectionStub
             ->method('getTableName')
-            ->willReturn('dhlparcel_country_rate');
+            ->willReturn('dhlpoland_country_rate');
 
         $connectionMock
             ->expects($this->once())
             ->method('delete')
-            ->with('dhlparcel_country_rate');
+            ->with('dhlpoland_country_rate');
 
         $patch = new PopulateDefaultCountryRates(
             $moduleDirReaderStub,

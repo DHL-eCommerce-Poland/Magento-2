@@ -286,7 +286,7 @@ class CountryRate extends File
     public function saveCountryRates(int $websiteId, array $rows): void
     {
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('dhlparcel_country_rate');
+        $tableName = $this->resourceConnection->getTableName('dhlpoland_country_rate');
 
         $affectedMethods = array_values(array_unique(array_column($rows, 'method_code')));
 

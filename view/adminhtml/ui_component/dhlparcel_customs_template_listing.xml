@@ -11,7 +11,7 @@
             <button name="add">
                 <url path="*/*/new"/>
                 <class>primary</class>
-                <label translate="true">Add New Customs Clearance</label>
+                <label translate="true">Add New Customs Clearance Template</label>
             </button>
         </buttons>
         <spinner>dhlparcel_customs_template_columns</spinner>

@@ -275,7 +275,7 @@ class MagentoShipmentSyncService
         foreach ($trackingNumbers as $number) {
             $track = $this->trackFactory->create();
             $track->setCarrierCode(Carrier::CODE);
-            $track->setTitle('DHL Parcel');
+            $track->setTitle('DHL eCommerce Poland');
             $track->setNumber((string)$number);
             $shipment->addTrack($track);
         }

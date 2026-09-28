@@ -14,7 +14,7 @@ class DropOffPoint extends AbstractModel implements DropOffPointInterface
     /**
      * Cache tag.
      */
-    public const CACHE_TAG = 'dhlparcel_drop_off_point';
+    public const CACHE_TAG = 'dhlpoland_drop_off_point';
 
     /**
      * @var string

@@ -44,7 +44,7 @@ class Edit extends Action implements HttpGetActionInterface
         if ($id) {
             try {
                 $dropOffPoint = $this->dropOffPointRepository->getById($id);
-                $title = __('Edit Drop-Off Point "%1"', $dropOffPoint->getTemplateName());
+                $title = __('Edit Drop-Off Point Template "%1"', $dropOffPoint->getTemplateName());
                 $resultPage->getConfig()->getTitle()->prepend($title);
             } catch (NoSuchEntityException) {
                 $this->messageManager->addErrorMessage(__('This drop-off point no longer exists.'));
@@ -52,7 +52,7 @@ class Edit extends Action implements HttpGetActionInterface
                 return $resultRedirect->setPath('*/*/index');
             }
         } else {
-            $resultPage->getConfig()->getTitle()->prepend(__('New Drop-Off Point'));
+            $resultPage->getConfig()->getTitle()->prepend(__('New Drop-Off Point Template'));
         }
 
         return $resultPage;

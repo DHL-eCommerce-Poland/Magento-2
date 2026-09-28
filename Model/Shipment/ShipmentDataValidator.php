@@ -211,7 +211,7 @@ class ShipmentDataValidator
         $st = $payload['shipmentSettings'] ?? [];
         if (is_array($st)) {
             if (isset($st['returnLabelExpDays']) && is_string($st['returnLabelExpDays']) && str_contains($st['returnLabelExpDays'], ',')) {
-                $errors[] = __('Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.', __('Return Label Expiration Days'))->render();
+                $errors[] = __('Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.', __('Return Label Expiration (7-183 Days)'))->render();
             }
         }
 

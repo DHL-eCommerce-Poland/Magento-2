@@ -44,7 +44,7 @@ class Edit extends Action implements HttpGetActionInterface
         if ($id) {
             try {
                 $template = $this->repository->getById($id);
-                $title = __('Edit Customs Clearance "%1"', $template->getTemplateName());
+                $title = __('Edit Customs Clearance Template "%1"', $template->getTemplateName());
                 $resultPage->getConfig()->getTitle()->prepend($title);
             } catch (NoSuchEntityException) {
                 $this->messageManager->addErrorMessage(__('This customs clearance no longer exists.'));
@@ -52,7 +52,7 @@ class Edit extends Action implements HttpGetActionInterface
                 return $resultRedirect->setPath('*/*/index');
             }
         } else {
-            $resultPage->getConfig()->getTitle()->prepend(__('New Customs Clearance'));
+            $resultPage->getConfig()->getTitle()->prepend(__('New Customs Clearance Template'));
         }
 
         return $resultPage;

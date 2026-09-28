@@ -34,7 +34,7 @@ class Index extends Action implements HttpGetActionInterface
     {
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('Ideo_Dhl::customs_template');
-        $resultPage->getConfig()->getTitle()->prepend(__('DHL Customs Clearance'));
+        $resultPage->getConfig()->getTitle()->prepend(__('Customs Clearance Templates'));
 
         return $resultPage;
     }

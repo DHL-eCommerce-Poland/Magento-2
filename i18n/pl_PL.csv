@@ -29,9 +29,9 @@ Test Connection (Production),Testuj połączenie (Produkcja)
 Test Connection (Sandbox),Testuj połączenie (Sandbox)
 You deleted the Customs Clearance.,Usunięto odprawę celną.
 We can not find a Customs Clearance to delete.,Nie znaleziono odprawy celnej do usunięcia.
-"Edit Customs Clearance ""%1""","Edytuj odprawę celną ""%1"""
+"Edit Customs Clearance Template ""%1""","Edytuj szablon odprawy celnej ""%1"""
 This customs clearance no longer exists.,Ta odprawa celna już nie istnieje.
-New Customs Clearance,Nowa odprawa celna
+New Customs Clearance Template,Nowy szablon odprawy celnej
 DHL Customs Clearance,Odprawa celna DHL
 A total of %1 record(s) have been deleted.,Usunięto łącznie %1 rekord(ów).
 You saved the Customs Clearance.,Zapisano odprawę celną.
@@ -39,22 +39,22 @@ Something went wrong while saving the Customs Clearance.,Wystąpił błąd podcz
 File cannot be saved.,Plik nie może zostać zapisany.
 You deleted the delivery service.,Usunięto usługę dostawy.
 Error deleting delivery service: %1,Błąd podczas usuwania usługi dostawy: %1
-"Edit Delivery Service ""%1""","Edytuj usługę dostawy ""%1"""
+"Edit Delivery Service Template ""%1""","Edytuj szablon usługi dostawy ""%1"""
 This delivery service no longer exists.,Ta usługa dostawy już nie istnieje.
-New Delivery Service,Nowa usługa dostawy
-Delivery Services,Usługi dostawy
+New Delivery Service Template,Nowy szablon usługi dostawy
+Delivery Services,Szablony usług dostawy
 Error during mass delete: %1,Błąd podczas masowego usuwania: %1
 You saved the delivery service.,Zapisano usługę dostawy.
 Error saving delivery service: %1,Błąd podczas zapisywania usługi dostawy: %1
 You deleted the drop-off point.,Usunięto punkt nadania.
 Error deleting drop-off point: %1,Błąd podczas usuwania punktu nadania: %1
-"Edit Drop-Off Point ""%1""","Edytuj punkt nadania ""%1"""
+"Edit Drop-Off Point Template ""%1""","Edytuj szablon punktu nadania ""%1"""
 This drop-off point no longer exists.,Ten punkt nadania już nie istnieje.
-New Drop-Off Point,Nowy punkt nadania
-Drop-Off Points,Punkty nadania
+New Drop-Off Point Template,Nowy szablon punktu nadania
+Drop-Off Points,Szablony punktów nadania
 You saved the drop-off point.,Zapisano punkt nadania.
 Error saving drop-off point: %1,Błąd podczas zapisywania punktu nadania: %1
-DHL Parcel - Help & Support,DHL Parcel - Pomoc i wsparcie
+DHL eCommerce Poland - Help & Support,DHL eCommerce Poland - Pomoc i wsparcie
 Please select at least one shipment for courier booking.,Prosimy wybrać co najmniej jedną przesyłkę do zamówienia kuriera.
 Pickup date and time window (From - To) must be specified.,Data odbioru oraz przedział godzinowy (Od - Do) muszą zostać określone.
 Courier booked successfully. Confirmation / Order ID: %1,Kurier został pomyślnie zamówiony. Potwierdzenie / Numer zamówienia: %1
@@ -346,7 +346,7 @@ MPK,MPK
 Generate return label automatically when creating shipment,Generuj etykietę zwrotną od razu przy generowaniu przesyłki
 Return Label Format,Format etykiety zwrotnej
 Return QR Code Type,Typ kodu QR zwrotu
-Return Label Expiration Days,Ważność etykiety zwrotnej (w dniach)
+Return Label Expiration Days,Ważność etykiety zwrotnej (7-183 dni)
 Return Dispatch Method,Sposób nadania zwrotu
 Additional Services,Usługi dodatkowe
 Services,Usługi
@@ -407,7 +407,7 @@ Create DHL Shipment,Utwórz przesyłkę DHL
 Error creating DHL shipment.,Błąd podczas tworzenia przesyłki DHL.
 Error preparing DHL shipment.,Błąd podczas przygotowywania przesyłki DHL.
 Select DHL Pickup Point,Wybierz punkt odbioru DHL
-DHL Parcel,DHL Parcel
+DHL Parcel,DHL eCommerce Poland
 General Configuration,Konfiguracja ogólna
 Enabled for Checkout,Włączone w procesie zakupowym
 Sandbox,Sandbox (Środowisko testowe)
@@ -446,7 +446,7 @@ DHL Parcel Connect Parcelshop,DHL Parcel Connect Parcelshop
 DHL Parcel Connect Packstation,DHL Parcel Connect Packstation
 DHL Parcel Connect Plus,DHL Parcel Connect Plus
 DHL Parcel Connect Pallet - Paleta,DHL Parcel Connect Pallet - Paleta
-Customs Clearance Information,Informacje o odprawie celnej
+Customs Clearance Template Details,Szczegóły szablonu odprawy celnej
 Basic Information,Informacje podstawowe
 Template Name,Nazwa szablonu
 Set as Default Template,Ustaw jako szablon domyślny
@@ -486,7 +486,7 @@ Weight (kg),Waga (kg)
 Value,Wartość
 HS Tariff Code,Kod taryfy HS
 Country Of Origin,Kraj pochodzenia
-Add New Customs Clearance,Dodaj nową odprawę celną
+Add New Customs Clearance Template,Dodaj nowy szablon odprawy celnej
 Are you sure you want to delete the selected customs clearances?,Czy na pewno chcesz usunąć wybrane odprawy celne?
 Delete customs clearances,Usuń odprawy celne
 ID,ID
@@ -494,7 +494,7 @@ Customs Type,Typ odprawy celnej
 Currency,Waluta
 Default HS Tariff Code,Domyślny kod taryfy HS
 Is Default,Czy domyślny?
-Delivery Service Details,Szczegóły usługi dostawy
+Delivery Service Template Details,Szczegóły szablonu usługi dostawy
 Service,Usługa
 Default Drop-Off Point,Domyślny punkt nadania
 Default Drop-Off Point is loaded from the DHL Drop-Off Points grid.,Domyślny punkt nadania jest ładowany z siatki punktów nadania DHL.
@@ -503,7 +503,7 @@ Select DHL methods for this template.,Wybierz metody DHL dla tego szablonu.
 Shipment Label Format,Format etykiety przesyłki
 "Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}","Dostępne tagi: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}"
 "Cost center code. Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}","Kod MPK (miejsce powstawania kosztów). Dostępne tagi: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}"
-Return Label Expiration (Days),Ważność etykiety zwrotnej (dni)
+Return Label Expiration (Days),Ważność etykiety zwrotnej (7-183 dni)
 Package Dimensions,Wymiary paczki
 Shipment Type,Typ przesyłki
 Dimensions are not required for envelope shipments,Wymiary nie są wymagane dla przesyłek kopertowych
@@ -512,12 +512,12 @@ Length (cm),Długość (cm)
 Height (cm),Wysokość (cm)
 NST - Non-Standard Package,NST - Paczka niestandardowa
 EURO RETURN - Pallet Return,EURO RETURN - Zwrot palety
-Add New Delivery Service,Dodaj nową usługę dostawy
+Add New Delivery Service Template,Dodaj nowy szablon usługi dostawy
 Are you sure you want to delete the selected delivery services?,Czy na pewno chcesz usunąć wybrane usługi dostawy?
 Delete delivery services,Usuń usługi dostawy
 Service Code,Kod usługi
 Auto Return,Automatyczny zwrot
-Drop-Off Point Details,Szczegóły punktu nadania
+Drop-Off Point Template Details,Szczegóły szablonu punktu nadania
 General Information,Informacje ogólne
 House Number,Numer domu
 Country,Kraj
@@ -525,7 +525,7 @@ Phone Number,Numer telefonu
 Shipment Time Information,Informacja o czasie nadania przesyłki
 Courier Pickup Time [From],Godzina odbioru przez kuriera [Od]
 Courier Pickup Time [To],Godzina odbioru przez kuriera [Do]
-Add New Drop-Off Point,Dodaj nowy punkt nadania
+Add New Drop-Off Point Template,Dodaj nowy szablon punktu nadania
 Are you sure you want to delete the selected drop-off points?,Czy na pewno chcesz usunąć wybrane punkty nadania?
 Delete drop-off points,Usuń punkty nadania
 General,Ogólne
@@ -544,7 +544,7 @@ Are you sure you want to delete the selected shipments? They will be cancelled i
 Delete Shipments,Usuń przesyłki
 Created At,Utworzono
 Updated At,Zaktualizowano
-Customs Clearance,Odprawa celna
+Customs Clearance,Szablony odprawy celnej
 Configuration,Konfiguracja
 Help,Pomoc
 "This list is automatically synchronized from the CSV country rates import.","Lista jest automatycznie synchronizowana na podstawie importu stawek krajów z pliku CSV."
@@ -607,4 +607,10 @@ Help,Pomoc
 "Commas are not allowed in numeric fields. Please use a dot (.) as decimal separator.","Przecinki nie są dozwolone w polach liczbowych. Użyj kropki (.) jako separatora dziesiętnego."
 "Please use a dot (.) instead of a comma (,) as decimal separator.","Użyj kropki (.) zamiast przecinka (,) jako separatora dziesiętnego."
 "Field ""%1"" cannot contain a comma. Please use a dot (.) as decimal separator.","Pole ""%1"" nie może zawierać przecinka. Użyj kropki (.) jako separatora dziesiętnego."
+"Return Label Expiration (7-183 Days)","Ważność etykiety zwrotnej (7-183 dni)"
+"Applies to domestic returns only. Foreign shipping is only possible at a service point.","Dotyczy tylko zwrotów krajowych. Nadanie zagraniczne możliwe tylko w punkcie."
+"DHL eCommerce Poland","DHL eCommerce Poland"
+"Drop-Off Point Templates","Szablony punktów nadania"
+"Delivery Service Templates","Szablony usług dostawy"
+"Customs Clearance Templates","Szablony odprawy celnej"
 

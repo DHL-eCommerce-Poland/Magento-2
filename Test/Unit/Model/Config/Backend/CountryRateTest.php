@@ -67,7 +67,7 @@ class CountryRateTest extends TestCase
         $connectionStub = $this->createStub(AdapterInterface::class);
         $this->resourceConnectionStub = $this->createStub(ResourceConnection::class);
         $this->resourceConnectionStub->method('getConnection')->willReturn($connectionStub);
-        $this->resourceConnectionStub->method('getTableName')->willReturn('dhlparcel_country_rate');
+        $this->resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_country_rate');
 
         $this->configWriterStub = $this->createStub(WriterInterface::class);
         $this->cacheTypeListStub = $this->createStub(TypeListInterface::class);
@@ -227,7 +227,7 @@ class CountryRateTest extends TestCase
         $connectionMock = $this->createMock(AdapterInterface::class);
         $resourceConnectionStub = $this->createStub(ResourceConnection::class);
         $resourceConnectionStub->method('getConnection')->willReturn($connectionMock);
-        $resourceConnectionStub->method('getTableName')->willReturn('dhlparcel_country_rate');
+        $resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_country_rate');
 
         $connectionMock->expects($this->once())->method('beginTransaction');
         $connectionMock->expects($this->once())->method('commit');
@@ -235,7 +235,7 @@ class CountryRateTest extends TestCase
         $connectionMock->expects($this->once())
             ->method('delete')
             ->with(
-                'dhlparcel_country_rate',
+                'dhlpoland_country_rate',
                 [
                     'website_id = ?' => 0,
                     'method_code IN (?)' => ['connect', 'connect_pallet'],
@@ -245,7 +245,7 @@ class CountryRateTest extends TestCase
         $connectionMock->expects($this->once())
             ->method('insertMultiple')
             ->with(
-                'dhlparcel_country_rate',
+                'dhlpoland_country_rate',
                 [
                     ['website_id' => 0, 'method_code' => 'connect', 'country_id' => 'DE', 'price' => 35.0],
                     ['website_id' => 0, 'method_code' => 'connect', 'country_id' => 'CZ', 'price' => 25.0],

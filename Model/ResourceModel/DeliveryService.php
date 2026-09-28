@@ -15,6 +15,6 @@ class DeliveryService extends AbstractDb
      */
     protected function _construct(): void
     {
-        $this->_init('dhlparcel_delivery_service_template', 'entity_id');
+        $this->_init('dhlpoland_delivery_service_template', 'entity_id');
     }
 }

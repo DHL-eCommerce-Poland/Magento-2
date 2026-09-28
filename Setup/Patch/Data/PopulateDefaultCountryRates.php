@@ -37,7 +37,7 @@ class PopulateDefaultCountryRates implements DataPatchInterface, PatchRevertable
     public function apply(): self
     {
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('dhlparcel_country_rate');
+        $tableName = $this->resourceConnection->getTableName('dhlpoland_country_rate');
 
         $count = (int)$connection->fetchOne($connection->select()->from($tableName, ['COUNT(*)']));
         if ($count > 0) {
@@ -78,7 +78,7 @@ class PopulateDefaultCountryRates implements DataPatchInterface, PatchRevertable
     public function revert(): void
     {
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('dhlparcel_country_rate');
+        $tableName = $this->resourceConnection->getTableName('dhlpoland_country_rate');
         $connection->delete($tableName);
     }
 

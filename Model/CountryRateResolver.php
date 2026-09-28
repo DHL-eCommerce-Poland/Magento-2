@@ -28,7 +28,7 @@ class CountryRateResolver
     public function resolveRate(int $websiteId, string $methodCode, string $countryId): ?float
     {
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('dhlparcel_country_rate');
+        $tableName = $this->resourceConnection->getTableName('dhlpoland_country_rate');
 
         $select = $connection->select()
             ->from($tableName, ['price'])
@@ -58,7 +58,7 @@ class CountryRateResolver
     public function getRatesForExport(int $websiteId, bool $fallbackToDefault = true): array
     {
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('dhlparcel_country_rate');
+        $tableName = $this->resourceConnection->getTableName('dhlpoland_country_rate');
 
         $select = $connection->select()
             ->from($tableName, [

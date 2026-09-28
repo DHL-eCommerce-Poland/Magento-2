@@ -10,7 +10,7 @@ use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 class CustomsTemplate extends AbstractDb
 {
-    public const TABLE_NAME = 'dhlparcel_customs_template';
+    public const TABLE_NAME = 'dhlpoland_customs_template';
 
     /**
      * Initialize resource model.

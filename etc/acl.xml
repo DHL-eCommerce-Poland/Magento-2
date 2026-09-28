@@ -5,11 +5,11 @@
         <resources>
             <resource id="Magento_Backend::admin">
                 <resource id="Magento_Sales::sales">
-                    <resource id="Ideo_Dhl::main" title="DHL Parcel" sortOrder="100">
+                    <resource id="Ideo_Dhl::main" title="DHL eCommerce Poland" sortOrder="100">
                         <resource id="Ideo_Dhl::shipment" title="Shipments" sortOrder="5" />
-                        <resource id="Ideo_Dhl::drop_off_point" title="Drop-Off Points" sortOrder="10" />
-                        <resource id="Ideo_Dhl::delivery_service" title="Delivery Services" sortOrder="20" />
-                        <resource id="Ideo_Dhl::customs_template" title="Customs Clearance" sortOrder="25" />
+                        <resource id="Ideo_Dhl::drop_off_point" title="Drop-Off Point Templates" sortOrder="10" />
+                        <resource id="Ideo_Dhl::delivery_service" title="Delivery Service Templates" sortOrder="20" />
+                        <resource id="Ideo_Dhl::customs_template" title="Customs Clearance Templates" sortOrder="25" />
                         <resource id="Ideo_Dhl::config" title="Configuration" sortOrder="30" />
                         <resource id="Ideo_Dhl::help" title="Help" sortOrder="40" />
                     </resource>

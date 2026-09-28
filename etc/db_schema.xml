@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
-    <table name="dhlparcel_tablerate" resource="default" engine="innodb" comment="DHL Parcel Shipping Table Rates">
+    <table name="dhlpoland_tablerate" resource="default" engine="innodb" comment="DHL eCommerce Poland Shipping Table Rates">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="smallint" name="website_id" unsigned="true" nullable="false" default="0" comment="Website ID"/>
         <column xsi:type="varchar" name="method_code" length="32" nullable="false" comment="Shipping Method Code"/>
@@ -12,20 +12,20 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <constraint xsi:type="unique" referenceId="UNQ_DHLPARCEL_TABLERATE_LOOKUP">
+        <constraint xsi:type="unique" referenceId="UNQ_DHLPOLAND_TABLERATE_LOOKUP">
             <column name="website_id"/>
             <column name="method_code"/>
             <column name="condition_type"/>
             <column name="condition_from"/>
             <column name="condition_to"/>
         </constraint>
-        <index referenceId="IDX_DHLPARCEL_TABLERATE_MATCH" indexType="btree">
+        <index referenceId="IDX_DHLPOLAND_TABLERATE_MATCH" indexType="btree">
             <column name="website_id"/>
             <column name="method_code"/>
             <column name="condition_type"/>
         </index>
     </table>
-    <table name="dhlparcel_country_rate" resource="default" engine="innodb" comment="DHL Parcel International Country Rates">
+    <table name="dhlpoland_country_rate" resource="default" engine="innodb" comment="DHL eCommerce Poland International Country Rates">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="smallint" name="website_id" unsigned="true" nullable="false" default="0" comment="Website ID"/>
         <column xsi:type="varchar" name="method_code" length="32" nullable="false" default="connect" comment="Shipping Method Code"/>
@@ -34,7 +34,7 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <constraint xsi:type="unique" referenceId="UNQ_DHLPARCEL_COUNTRY_RATE_LOOKUP">
+        <constraint xsi:type="unique" referenceId="UNQ_DHLPOLAND_COUNTRY_RATE_LOOKUP">
             <column name="website_id"/>
             <column name="method_code"/>
             <column name="country_id"/>
@@ -61,7 +61,7 @@
         <column xsi:type="varchar" name="dhl_postnummer" length="64" nullable="true" comment="DHL Postnummer (DE Customer ID)"/>
     </table>
 
-    <table name="dhlparcel_drop_off_point_template" resource="default" engine="innodb" comment="DHL Drop-Off Point Templates">
+    <table name="dhlpoland_drop_off_point_template" resource="default" engine="innodb" comment="DHL Drop-Off Point Templates">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="template_name" length="255" nullable="false" comment="Profile Template Name"/>
         <column xsi:type="varchar" name="sender_name" length="255" nullable="false" comment="Sender Name"/>
@@ -81,7 +81,7 @@
             <column name="entity_id"/>
         </constraint>
     </table>
-    <table name="dhlparcel_delivery_service_template" resource="default" engine="innodb" comment="DHL Delivery Service Templates">
+    <table name="dhlpoland_delivery_service_template" resource="default" engine="innodb" comment="DHL Delivery Service Templates">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="template_name" length="255" nullable="false" comment="Template Name"/>
         <column xsi:type="varchar" name="method_code" length="1024" nullable="true" comment="Magento Shipping Method Code"/>
@@ -101,11 +101,11 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <index referenceId="IDX_DHLPARCEL_DELIVERY_SERVICE_TEMPLATE_METHOD" indexType="btree">
+        <index referenceId="IDX_DHLPOLAND_DELIVERY_SERVICE_TEMPLATE_METHOD" indexType="btree">
             <column name="method_code"/>
         </index>
     </table>
-    <table name="dhlparcel_customs_template" resource="default" engine="innodb" comment="DHL Customs Clearance Templates">
+    <table name="dhlpoland_customs_template" resource="default" engine="innodb" comment="DHL Customs Clearance Templates">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="template_name" length="255" nullable="false" comment="Template Name"/>
         <column xsi:type="varchar" name="customs_type" length="1" nullable="false" default="U" comment="Customs Type (U-Simplified, I-Individual, S-Short)"/>
@@ -133,11 +133,11 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <index referenceId="IDX_DHLPARCEL_CUSTOMS_TEMPLATE_DEFAULT" indexType="btree">
+        <index referenceId="IDX_DHLPOLAND_CUSTOMS_TEMPLATE_DEFAULT" indexType="btree">
             <column name="is_default"/>
         </index>
     </table>
-    <table name="dhlparcel_shipment" resource="default" engine="innodb" comment="DHL Shipment Entities">
+    <table name="dhlpoland_shipment" resource="default" engine="innodb" comment="DHL Shipment Entities">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Magento Order ID"/>
         <column xsi:type="int" name="magento_shipment_id" unsigned="true" nullable="true" comment="Magento Sales Shipment ID"/>
@@ -155,16 +155,16 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <index referenceId="IDX_DHLPARCEL_SHIPMENT_ORDER_ID" indexType="btree">
+        <index referenceId="IDX_DHLPOLAND_SHIPMENT_ORDER_ID" indexType="btree">
             <column name="order_id"/>
         </index>
-        <index referenceId="IDX_DHLPARCEL_SHIPMENT_MAGENTO_SHIPMENT_ID" indexType="btree">
+        <index referenceId="IDX_DHLPOLAND_SHIPMENT_MAGENTO_SHIPMENT_ID" indexType="btree">
             <column name="magento_shipment_id"/>
         </index>
-        <index referenceId="IDX_DHLPARCEL_SHIPMENT_SHIPMENT_ID" indexType="btree">
+        <index referenceId="IDX_DHLPOLAND_SHIPMENT_SHIPMENT_ID" indexType="btree">
             <column name="shipment_id"/>
         </index>
-        <index referenceId="IDX_DHLPARCEL_SHIPMENT_STATUS" indexType="btree">
+        <index referenceId="IDX_DHLPOLAND_SHIPMENT_STATUS" indexType="btree">
             <column name="status"/>
         </index>
     </table>

@@ -14,7 +14,6 @@ use Magento\Shipping\Model\Rate\Result;
 use Magento\Shipping\Model\Rate\ResultFactory;
 use Magento\Shipping\Model\Tracking\Result\Status;
 use Magento\Shipping\Model\Tracking\Result\StatusFactory as TrackStatusFactory;
-use Magento\Shipping\Model\Tracking\ResultFactory as TrackResultFactory;
 use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 
@@ -43,7 +42,6 @@ class Carrier extends AbstractCarrier implements CarrierInterface
      * @param RateMethodFactory $rateMethodFactory
      * @param MethodCatalog $methodCatalog
      * @param RateCalculator $rateCalculator
-     * @param TrackResultFactory $trackResultFactory
      * @param TrackStatusFactory $trackStatusFactory
      * @param TrackingUrlResolver $trackingUrlResolver
      * @param array $data
@@ -56,7 +54,6 @@ class Carrier extends AbstractCarrier implements CarrierInterface
         private readonly RateMethodFactory $rateMethodFactory,
         private readonly MethodCatalog $methodCatalog,
         private readonly RateCalculator $rateCalculator,
-        private readonly TrackResultFactory $trackResultFactory,
         private readonly TrackStatusFactory $trackStatusFactory,
         private readonly TrackingUrlResolver $trackingUrlResolver,
         array $data = []
@@ -65,7 +62,7 @@ class Carrier extends AbstractCarrier implements CarrierInterface
     }
 
     /**
-     * Collect configured DHL Parcel rates without contacting the DHL API.
+     * Collect configured DHL eCommerce Poland rates without contacting the DHL API.
      *
      * @param RateRequest $request Magento shipping rate request.
      *
@@ -98,7 +95,7 @@ class Carrier extends AbstractCarrier implements CarrierInterface
                 if ($this->getConfigFlag('method_' . $code . '_showmethod')) {
                     $error = $this->_rateErrorFactory->create();
                     $error->setCarrier(self::CODE);
-                    $error->setCarrierTitle('DHL Parcel');
+                    $error->setCarrierTitle('DHL eCommerce Poland');
                     $error->setMethod($code);
                     $errMsg = $this->getConfigData('method_' . $code . '_specificerrmsg')
                         ?: __('This shipping method is currently unavailable.');
@@ -137,7 +134,7 @@ class Carrier extends AbstractCarrier implements CarrierInterface
             $rate = $this->rateMethodFactory->create();
             $rate->setCarrier(self::CODE);
             $carrierTitle = $this->getConfigData('method_' . $code . '_title')
-                ?: ($this->getConfigData('title') ?: 'DHL Parcel');
+                ?: ($this->getConfigData('title') ?: 'DHL eCommerce Poland');
             $rate->setCarrierTitle((string)$carrierTitle);
             $rate->setMethod($code);
             $methodTitle = $this->getConfigData('method_' . $code . '_method_name')
@@ -216,7 +213,7 @@ class Carrier extends AbstractCarrier implements CarrierInterface
 
         $status = $this->trackStatusFactory->create();
         $status->setCarrier(self::CODE);
-        $carrierTitle = $this->getConfigData('title') ?: 'DHL Parcel';
+        $carrierTitle = $this->getConfigData('title') ?: 'DHL eCommerce Poland';
         $status->setCarrierTitle((string)$carrierTitle);
         $status->setTracking($trackingNumber);
         $status->setUrl($this->trackingUrlResolver->getUrl($trackingNumber));

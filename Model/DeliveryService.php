@@ -21,7 +21,7 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     /**
      * Cache tag.
      */
-    public const CACHE_TAG = 'dhlparcel_delivery_service';
+    public const CACHE_TAG = 'dhlpoland_delivery_service';
 
     /**
      * @var string

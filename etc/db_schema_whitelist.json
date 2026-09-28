@@ -23,7 +23,7 @@
             "dhl_postnummer": true
         }
     },
-    "dhlparcel_tablerate": {
+    "dhlpoland_tablerate": {
         "column": {
             "entity_id": true,
             "website_id": true,
@@ -34,14 +34,14 @@
             "price": true
         },
         "index": {
-            "DHLPARCEL_TABLERATE_WEBSITE_ID_METHOD_CODE_CONDITION_TYPE": true
+            "DHLPOLAND_TABLERATE_WEBSITE_ID_METHOD_CODE_CONDITION_TYPE": true
         },
         "constraint": {
             "PRIMARY": true,
             "UNQ_F5F03F8FE6902A90B58D330ACDD2E21D": true
         }
     },
-    "dhlparcel_drop_off_point_template": {
+    "dhlpoland_drop_off_point_template": {
         "column": {
             "entity_id": true,
             "template_name": true,
@@ -63,7 +63,7 @@
             "PRIMARY": true
         }
     },
-    "dhlparcel_delivery_service_template": {
+    "dhlpoland_delivery_service_template": {
         "column": {
             "entity_id": true,
             "template_name": true,
@@ -83,13 +83,13 @@
             "return_book_courier": true
         },
         "index": {
-            "IDX_DHLPARCEL_DELIVERY_SERVICE_TEMPLATE_METHOD": true
+            "IDX_DHLPOLAND_DELIVERY_SERVICE_TEMPLATE_METHOD": true
         },
         "constraint": {
             "PRIMARY": true
         }
     },
-    "dhlparcel_shipment": {
+    "dhlpoland_shipment": {
         "column": {
             "entity_id": true,
             "order_id": true,
@@ -107,16 +107,16 @@
             "magento_shipment_id": true
         },
         "index": {
-            "IDX_DHLPARCEL_SHIPMENT_ORDER_ID": true,
-            "IDX_DHLPARCEL_SHIPMENT_SHIPMENT_ID": true,
-            "IDX_DHLPARCEL_SHIPMENT_STATUS": true,
-            "IDX_DHLPARCEL_SHIPMENT_MAGENTO_SHIPMENT_ID": true
+            "IDX_DHLPOLAND_SHIPMENT_ORDER_ID": true,
+            "IDX_DHLPOLAND_SHIPMENT_SHIPMENT_ID": true,
+            "IDX_DHLPOLAND_SHIPMENT_STATUS": true,
+            "IDX_DHLPOLAND_SHIPMENT_MAGENTO_SHIPMENT_ID": true
         },
         "constraint": {
             "PRIMARY": true
         }
     },
-    "dhlparcel_country_rate": {
+    "dhlpoland_country_rate": {
         "column": {
             "entity_id": true,
             "website_id": true,
@@ -126,10 +126,10 @@
         },
         "constraint": {
             "PRIMARY": true,
-            "DHLPARCEL_COUNTRY_RATE_WEBSITE_ID_METHOD_CODE_COUNTRY_ID": true
+            "DHLPOLAND_COUNTRY_RATE_WEBSITE_ID_METHOD_CODE_COUNTRY_ID": true
         }
     },
-    "dhlparcel_customs_template": {
+    "dhlpoland_customs_template": {
         "column": {
             "entity_id": true,
             "template_name": true,
@@ -157,7 +157,7 @@
             "updated_at": true
         },
         "index": {
-            "IDX_DHLPARCEL_CUSTOMS_TEMPLATE_DEFAULT": true
+            "IDX_DHLPOLAND_CUSTOMS_TEMPLATE_DEFAULT": true
         },
         "constraint": {
             "PRIMARY": true

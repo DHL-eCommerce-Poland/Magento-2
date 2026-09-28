@@ -11,7 +11,7 @@
             <button name="add">
                 <url path="*/*/new"/>
                 <class>primary</class>
-                <label translate="true">Add New Drop-Off Point</label>
+                <label translate="true">Add New Drop-Off Point Template</label>
             </button>
         </buttons>
         <spinner>dhlparcel_drop_off_point_columns</spinner>

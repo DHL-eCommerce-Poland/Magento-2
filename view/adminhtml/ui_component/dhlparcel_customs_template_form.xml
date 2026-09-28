@@ -5,7 +5,7 @@
         <item name="js_config" xsi:type="array">
             <item name="provider" xsi:type="string">dhlparcel_customs_template_form.dhlparcel_customs_template_form_data_source</item>
         </item>
-        <item name="label" xsi:type="string" translate="true">Customs Clearance Information</item>
+        <item name="label" xsi:type="string" translate="true">Customs Clearance Template Details</item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
     </argument>
     <settings>

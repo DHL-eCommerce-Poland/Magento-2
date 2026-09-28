@@ -31,7 +31,7 @@ class Collection extends SearchResult
         LoggerInterface $logger,
         FetchStrategyInterface $fetchStrategy,
         ManagerInterface $eventManager,
-        $mainTable = 'dhlparcel_drop_off_point_template',
+        $mainTable = 'dhlpoland_drop_off_point_template',
         $resourceModel = DropOffPoint::class,
         $identifierName = null,
         $connectionName = null

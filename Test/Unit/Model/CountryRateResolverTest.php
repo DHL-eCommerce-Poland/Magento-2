@@ -29,7 +29,7 @@ class CountryRateResolverTest extends TestCase
 
         $resourceConnectionStub = $this->createStub(ResourceConnection::class);
         $resourceConnectionStub->method('getConnection')->willReturn($connectionMock);
-        $resourceConnectionStub->method('getTableName')->willReturn('dhlparcel_country_rate');
+        $resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_country_rate');
 
         $resolver = new CountryRateResolver($resourceConnectionStub);
         $result = $resolver->resolveRate(1, 'connect', 'DE');
@@ -54,7 +54,7 @@ class CountryRateResolverTest extends TestCase
 
         $resourceConnectionStub = $this->createStub(ResourceConnection::class);
         $resourceConnectionStub->method('getConnection')->willReturn($connectionMock);
-        $resourceConnectionStub->method('getTableName')->willReturn('dhlparcel_country_rate');
+        $resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_country_rate');
 
         $resolver = new CountryRateResolver($resourceConnectionStub);
         $result = $resolver->resolveRate(1, 'connect', 'ES');
@@ -81,7 +81,7 @@ class CountryRateResolverTest extends TestCase
 
         $resourceConnectionStub = $this->createStub(ResourceConnection::class);
         $resourceConnectionStub->method('getConnection')->willReturn($connectionMock);
-        $resourceConnectionStub->method('getTableName')->willReturn('dhlparcel_country_rate');
+        $resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_country_rate');
 
         $resolver = new CountryRateResolver($resourceConnectionStub);
         $result = $resolver->resolveRate(1, 'connect', 'fr');
@@ -112,7 +112,7 @@ class CountryRateResolverTest extends TestCase
 
         $resourceConnectionStub = $this->createStub(ResourceConnection::class);
         $resourceConnectionStub->method('getConnection')->willReturn($connectionMock);
-        $resourceConnectionStub->method('getTableName')->willReturn('dhlparcel_country_rate');
+        $resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_country_rate');
 
         $resolver = new CountryRateResolver($resourceConnectionStub);
         $rows = $resolver->getRatesForExport(1);
@@ -151,7 +151,7 @@ class CountryRateResolverTest extends TestCase
 
         $resourceConnectionStub = $this->createStub(ResourceConnection::class);
         $resourceConnectionStub->method('getConnection')->willReturn($connectionMock);
-        $resourceConnectionStub->method('getTableName')->willReturn('dhlparcel_country_rate');
+        $resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_country_rate');
 
         $resolver = new CountryRateResolver($resourceConnectionStub);
         $rows = $resolver->getRatesForExport(2, true);
@@ -177,7 +177,7 @@ class CountryRateResolverTest extends TestCase
 
         $resourceConnectionStub = $this->createStub(ResourceConnection::class);
         $resourceConnectionStub->method('getConnection')->willReturn($connectionMock);
-        $resourceConnectionStub->method('getTableName')->willReturn('dhlparcel_country_rate');
+        $resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_country_rate');
 
         $resolver = new CountryRateResolver($resourceConnectionStub);
         $rows = $resolver->getRatesForExport(2, false);

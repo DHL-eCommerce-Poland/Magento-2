@@ -15,7 +15,7 @@ use Magento\Framework\Serialize\SerializerInterface;
 
 class CustomsTemplate extends AbstractModel
 {
-    public const CACHE_TAG = 'dhlparcel_customs_template';
+    public const CACHE_TAG = 'dhlpoland_customs_template';
 
     public const TEMPLATE_NAME = 'template_name';
     public const CUSTOMS_TYPE = 'customs_type';

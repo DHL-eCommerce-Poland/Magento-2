@@ -17,7 +17,6 @@ use Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
 use Magento\Shipping\Model\Rate\Result;
 use Magento\Shipping\Model\Rate\ResultFactory;
-use Magento\Shipping\Model\Tracking\ResultFactory as TrackResultFactory;
 use Magento\Shipping\Model\Tracking\Result\Status;
 use Magento\Shipping\Model\Tracking\Result\StatusFactory as TrackStatusFactory;
 use PHPUnit\Framework\TestCase;
@@ -66,7 +65,7 @@ class CarrierTest extends TestCase
      */
     public function testEveryCatalogMethodCanBeEnabledIndependently(): void
     {
-        $config = ['active' => '1', 'title' => 'DHL Parcel'];
+        $config = ['active' => '1', 'title' => 'DHL eCommerce Poland'];
         foreach ((new MethodCatalog())->getMethods() as $method) {
             $config['method_' . $method['code'] . '_active'] = '1';
             $config['method_' . $method['code'] . '_price'] = '3.25';
@@ -87,7 +86,7 @@ class CarrierTest extends TestCase
     {
         $config = [
             'active' => '1',
-            'title' => 'DHL Parcel',
+            'title' => 'DHL eCommerce Poland',
             'method_parcel_polska_active' => '1',
             'method_parcel_polska_title' => 'DHL Parcel Polska',
             'method_parcel_polska_price' => '10.00',
@@ -336,10 +335,6 @@ class CarrierTest extends TestCase
         $errorFactory = $this->createStub(ErrorFactory::class);
         $errorFactory->method('create')->willReturnCallback(static fn (): DataObject => new DataObject());
 
-        $trackResult = $this->createStub(\Magento\Shipping\Model\Tracking\Result::class);
-        $trackResultFactory = $this->createStub(TrackResultFactory::class);
-        $trackResultFactory->method('create')->willReturn($trackResult);
-
         $trackStatusFactory = $this->createStub(TrackStatusFactory::class);
         $trackStatusFactory->method('create')->willReturnCallback(static fn (): Status => new Status());
 
@@ -355,7 +350,6 @@ class CarrierTest extends TestCase
             $methodFactory,
             new MethodCatalog(),
             $rateCalculator,
-            $trackResultFactory,
             $trackStatusFactory,
             new TrackingUrlResolver()
         );

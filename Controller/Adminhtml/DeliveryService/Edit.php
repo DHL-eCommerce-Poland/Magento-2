@@ -44,7 +44,7 @@ class Edit extends Action implements HttpGetActionInterface
         if ($id) {
             try {
                 $service = $this->deliveryServiceRepository->getById($id);
-                $title = __('Edit Delivery Service "%1"', $service->getTemplateName());
+                $title = __('Edit Delivery Service Template "%1"', $service->getTemplateName());
                 $resultPage->getConfig()->getTitle()->prepend($title);
             } catch (NoSuchEntityException) {
                 $this->messageManager->addErrorMessage(__('This delivery service no longer exists.'));
@@ -52,7 +52,7 @@ class Edit extends Action implements HttpGetActionInterface
                 return $resultRedirect->setPath('*/*/index');
             }
         } else {
-            $resultPage->getConfig()->getTitle()->prepend(__('New Delivery Service'));
+            $resultPage->getConfig()->getTitle()->prepend(__('New Delivery Service Template'));
         }
 
         return $resultPage;

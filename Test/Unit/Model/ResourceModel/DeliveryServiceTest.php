@@ -30,7 +30,7 @@ class DeliveryServiceTest extends TestCase
         $mainTableProperty = $reflection->getProperty('_mainTable');
         $idFieldNameProperty = $reflection->getProperty('_idFieldName');
 
-        $this->assertEquals('dhlparcel_delivery_service_template', $mainTableProperty->getValue($resource));
+        $this->assertEquals('dhlpoland_delivery_service_template', $mainTableProperty->getValue($resource));
         $this->assertEquals('entity_id', $idFieldNameProperty->getValue($resource));
     }
 }
