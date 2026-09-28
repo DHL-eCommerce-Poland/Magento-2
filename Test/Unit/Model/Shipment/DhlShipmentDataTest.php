@@ -30,10 +30,12 @@ class DhlShipmentDataTest extends TestCase
             sender: $sender,
             recipient: $recipient,
             specialServices: $services,
-            shipmentSettings: $settings
+            shipmentSettings: $settings,
+            orderGrandTotal: 150.00
         );
 
         $this->assertEquals(101, $shipmentData->getOrderId());
+        $this->assertEquals(150.00, $shipmentData->getOrderGrandTotal());
         $this->assertEquals('Sender Company', $shipmentData->getSender()->getName());
         $this->assertEquals('Recipient Company', $shipmentData->getRecipient()->getName());
         $this->assertTrue($shipmentData->getSpecialServices()->isCod());
@@ -49,6 +51,7 @@ class DhlShipmentDataTest extends TestCase
     {
         $data = [
             'orderId' => 202,
+            'orderGrandTotal' => 250.50,
             'itemsQty' => [],
             'sender' => (new SenderData(name: 'Sender Inc'))->toArray(),
             'recipient' => (new RecipientData(name: 'Recipient Ltd'))->toArray(),
@@ -59,6 +62,7 @@ class DhlShipmentDataTest extends TestCase
 
         $shipmentData = DhlShipmentData::fromArray($data);
         $this->assertEquals(202, $shipmentData->getOrderId());
+        $this->assertEquals(250.50, $shipmentData->getOrderGrandTotal());
         $this->assertEquals('Sender Inc', $shipmentData->getSender()->getName());
         $this->assertEquals('09', $shipmentData->getShipmentSettings()->getServiceType());
         $this->assertNull($shipmentData->getCustoms());

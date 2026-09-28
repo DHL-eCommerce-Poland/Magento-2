@@ -116,6 +116,13 @@ define([
         return isNaN(num) ? '' : num.toFixed(4);
     }
 
+    function formatMoney(val) {
+        if (val === null || val === undefined || val === '') return '';
+        var str = String(val).replace(',', '.');
+        var num = parseFloat(str);
+        return isNaN(num) ? '' : num.toFixed(2);
+    }
+
     function isTruthy(val) {
         if (typeof val === 'boolean') return val;
         if (typeof val === 'number') return val > 0;
@@ -355,8 +362,45 @@ define([
             shipmentSettingsObj.packages.splice(index, 1);
         };
 
+        var orderGrandTotalVal = (data.orderGrandTotal !== undefined && data.orderGrandTotal !== null && data.orderGrandTotal !== '')
+            ? formatMoney(data.orderGrandTotal)
+            : '';
+        var orderGrandTotalObs = ko.observable(orderGrandTotalVal);
+
+        var initialInsurance = isTruthy(ss.insurance);
+        var initialInsuranceValue = (ss.insuranceValue !== undefined && ss.insuranceValue !== null && ss.insuranceValue !== '')
+            ? formatMoney(ss.insuranceValue)
+            : (initialInsurance ? orderGrandTotalVal : '');
+
+        var initialCod = isTruthy(ss.cod);
+        var initialCodAmount = (ss.codAmount !== undefined && ss.codAmount !== null && ss.codAmount !== '')
+            ? formatMoney(ss.codAmount)
+            : (initialCod ? orderGrandTotalVal : '');
+
+        var insuranceObs = ko.observable(initialInsurance);
+        var insuranceValueObs = ko.observable(initialInsuranceValue);
+        var codObs = ko.observable(initialCod);
+        var codAmountObs = ko.observable(initialCodAmount);
+
+        insuranceObs.subscribe(function (checked) {
+            if (checked) {
+                if (!insuranceValueObs() || String(insuranceValueObs()).trim() === '') {
+                    insuranceValueObs(orderGrandTotalObs() || '');
+                }
+            }
+        });
+
+        codObs.subscribe(function (checked) {
+            if (checked) {
+                if (!codAmountObs() || String(codAmountObs()).trim() === '') {
+                    codAmountObs(orderGrandTotalObs() || '');
+                }
+            }
+        });
+
         return {
             orderId: data.orderId || null,
+            orderGrandTotal: orderGrandTotalObs,
             sender: {
                 selectedDropOffPointId: ko.observable(defaultPointId),
                 sapNumber: ko.observable(s.sapNumber || ''),
@@ -376,10 +420,10 @@ define([
             },
             recipient: recipientObj,
             specialServices: {
-                insurance: ko.observable(isTruthy(ss.insurance)),
-                insuranceValue: ko.observable((ss.insuranceValue !== undefined && ss.insuranceValue !== null) ? ss.insuranceValue : ''),
-                cod: ko.observable(isTruthy(ss.cod)),
-                codAmount: ko.observable((ss.codAmount !== undefined && ss.codAmount !== null) ? ss.codAmount : ''),
+                insurance: insuranceObs,
+                insuranceValue: insuranceValueObs,
+                cod: codObs,
+                codAmount: codAmountObs,
                 eveningDelivery: ko.observable(ss.deliveryHours === '1722' || isTruthy(ss.eveningDelivery)),
                 saturdayDelivery: ko.observable(isTruthy(ss.saturdayDelivery)),
                 saturdayDispatch: ko.observable(isTruthy(ss.saturdayDispatch || ss.pickupOnSaturday)),
@@ -889,11 +933,28 @@ define([
 
                     if (specialServices && self.draft().specialServices) {
                         var currentSS = self.draft().specialServices;
-                        if (specialServices.insuranceValue !== undefined && typeof currentSS.insuranceValue === 'function') {
-                            currentSS.insuranceValue((specialServices.insuranceValue !== null && specialServices.insuranceValue !== undefined) ? specialServices.insuranceValue : '');
+                        var resOrderTotal = (res.data && res.data.orderGrandTotal !== undefined && res.data.orderGrandTotal !== null && res.data.orderGrandTotal !== '')
+                            ? formatMoney(res.data.orderGrandTotal)
+                            : null;
+
+                        if (resOrderTotal && typeof self.draft().orderGrandTotal === 'function') {
+                            self.draft().orderGrandTotal(resOrderTotal);
                         }
-                        if (specialServices.codAmount !== undefined && typeof currentSS.codAmount === 'function') {
-                            currentSS.codAmount((specialServices.codAmount !== null && specialServices.codAmount !== undefined) ? specialServices.codAmount : '');
+
+                        var orderTotal = (typeof self.draft().orderGrandTotal === 'function' ? self.draft().orderGrandTotal() : self.draft().orderGrandTotal) || resOrderTotal || '';
+
+                        var tplInsuranceVal = (specialServices.insuranceValue !== null && specialServices.insuranceValue !== undefined && specialServices.insuranceValue !== '')
+                            ? formatMoney(specialServices.insuranceValue)
+                            : '';
+                        var tplCodAmt = (specialServices.codAmount !== null && specialServices.codAmount !== undefined && specialServices.codAmount !== '')
+                            ? formatMoney(specialServices.codAmount)
+                            : '';
+
+                        if (typeof currentSS.insuranceValue === 'function') {
+                            currentSS.insuranceValue(tplInsuranceVal);
+                        }
+                        if (typeof currentSS.codAmount === 'function') {
+                            currentSS.codAmount(tplCodAmt);
                         }
                         if (specialServices.rodDocumentText !== undefined && typeof currentSS.rodDocumentText === 'function') {
                             currentSS.rodDocumentText(specialServices.rodDocumentText || '');
@@ -916,6 +977,13 @@ define([
                                 currentSS[key](isTruthy(val));
                             }
                         });
+
+                        if (currentSS.insurance() && (!currentSS.insuranceValue() || String(currentSS.insuranceValue()).trim() === '')) {
+                            currentSS.insuranceValue(orderTotal);
+                        }
+                        if (currentSS.cod() && (!currentSS.codAmount() || String(currentSS.codAmount()).trim() === '')) {
+                            currentSS.codAmount(orderTotal);
+                        }
                     }
 
                     // Dynamically update recipient.type based on template addressType

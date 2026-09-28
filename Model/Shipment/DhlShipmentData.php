@@ -20,6 +20,7 @@ class DhlShipmentData
      * @param ShipmentSettingsData|null $shipmentSettings
      * @param array $itemsQty
      * @param CustomsData|null $customs
+     * @param float|null $orderGrandTotal
      */
     public function __construct(
         private readonly ?int $orderId = null,
@@ -28,7 +29,8 @@ class DhlShipmentData
         private ?SpecialServicesData $specialServices = null,
         private ?ShipmentSettingsData $shipmentSettings = null,
         private array $itemsQty = [],
-        private ?CustomsData $customs = null
+        private ?CustomsData $customs = null,
+        private readonly ?float $orderGrandTotal = null
     ) {
         $this->sender = $sender ?? new SenderData();
         $this->recipient = $recipient ?? new RecipientData();
@@ -133,6 +135,16 @@ class DhlShipmentData
     }
 
     /**
+     * Get order grand total amount.
+     *
+     * @return float|null
+     */
+    public function getOrderGrandTotal(): ?float
+    {
+        return $this->orderGrandTotal;
+    }
+
+    /**
      * Convert DTO structure to array representation.
      *
      * @return array
@@ -141,6 +153,7 @@ class DhlShipmentData
     {
         return [
             'orderId' => $this->orderId,
+            'orderGrandTotal' => $this->orderGrandTotal,
             'itemsQty' => $this->itemsQty,
             'sender' => $this->sender->toArray(),
             'recipient' => $this->recipient->toArray(),
@@ -183,7 +196,8 @@ class DhlShipmentData
             SpecialServicesData::fromArray($data['specialServices'] ?? []),
             ShipmentSettingsData::fromArray($shipmentSettings),
             is_array($data['itemsQty'] ?? null) ? $data['itemsQty'] : [],
-            $customs
+            $customs,
+            is_numeric($data['orderGrandTotal'] ?? null) ? (float)$data['orderGrandTotal'] : null
         );
     }
 }

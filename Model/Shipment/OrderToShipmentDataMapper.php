@@ -46,8 +46,6 @@ class OrderToShipmentDataMapper
     ) {
     }
 
-
-
     /**
      * Map Magento Order into a DhlShipmentData object.
      *
@@ -207,9 +205,11 @@ class OrderToShipmentDataMapper
         $isCod = false;
         $codAmount = null;
         $shippingMethod = (string)($order->getShippingMethod() ?? '');
+        $grandTotal = (float)($order->getGrandTotal() ?? 0.0);
+
         if ($this->methodCatalog->isCodMethod($shippingMethod)) {
             $isCod = true;
-            $codAmount = (float)$order->getGrandTotal();
+            $codAmount = $grandTotal;
         }
 
         $presetSS = $defaultShipmentDefaults['specialServices'] ?? [];
@@ -226,9 +226,9 @@ class OrderToShipmentDataMapper
         }
 
         $isInsurance = !empty($presetSS['insurance']);
-        $insuranceValue = isset($presetSS['insuranceValue'])
+        $insuranceValue = isset($presetSS['insuranceValue']) && $presetSS['insuranceValue'] !== null && $presetSS['insuranceValue'] !== ''
             ? (float)$presetSS['insuranceValue']
-            : null;
+            : ($isInsurance ? $grandTotal : null);
         $isEvening = !empty($presetSS['eveningDelivery'])
             || !empty($presetSS['deliveryHours']);
         $isSaturdayDelivery = !empty($presetSS['saturdayDelivery']);
@@ -244,9 +244,11 @@ class OrderToShipmentDataMapper
         $isAgever = !empty($presetSS['agever']);
         $isOdb = !empty($presetSS['odb']);
 
-        $presetCodAmount = isset($presetSS['codAmount'])
+        $presetCodAmount = isset($presetSS['codAmount']) && $presetSS['codAmount'] !== null && $presetSS['codAmount'] !== ''
             ? (float)$presetSS['codAmount']
-            : null;
+            : $grandTotal;
+
+        $hasCod = $isCod || !empty($presetSS['cod']);
 
         $specialServices = new SpecialServicesData(
             deliveryHours: $isEvening ? '1722' : null,
@@ -254,8 +256,8 @@ class OrderToShipmentDataMapper
             saturdayDispatch: $isSaturdayDispatch,
             insurance: $isInsurance,
             insuranceValue: $insuranceValue,
-            cod: $isCod || !empty($presetSS['cod']),
-            codAmount: $isCod ? $codAmount : $presetCodAmount,
+            cod: $hasCod,
+            codAmount: $hasCod ? ($codAmount ?? $presetCodAmount) : null,
             codCurrency: (string)($order->getOrderCurrencyCode() ?? 'PLN'),
             pdi: $isPdi,
             rod: $isRod,
@@ -354,7 +356,8 @@ class OrderToShipmentDataMapper
             sender: $senderData,
             recipient: $recipientData,
             specialServices: $specialServices,
-            shipmentSettings: $shipmentSettings
+            shipmentSettings: $shipmentSettings,
+            orderGrandTotal: $grandTotal
         );
     }
 }

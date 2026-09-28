@@ -114,10 +114,12 @@ class LoadTemplate extends Action
                 $resolvedMpk = (string)($serviceData['mpk'] ?? '');
 
                 $shippingMethod = null;
+                $grandTotal = null;
                 if ($orderId) {
                     try {
                         $order = $this->orderRepository->get($orderId);
                         $shippingMethod = (string)($order->getShippingMethod() ?? '');
+                        $grandTotal = (float)($order->getGrandTotal() ?? 0.0);
                         $resolvedContent = $resolvedContent !== ''
                             ? $this->variableResolver->resolve($resolvedContent, $order)
                             : '';
@@ -135,6 +137,24 @@ class LoadTemplate extends Action
                             'Could not resolve order content for template: ' . $e->getMessage(),
                             ['exception' => $e]
                         );
+                    }
+                }
+
+                if ($grandTotal !== null) {
+                    if (!empty($additionalServices['insurance'])
+                        && (!isset($additionalServices['insuranceValue'])
+                            || $additionalServices['insuranceValue'] === null
+                            || $additionalServices['insuranceValue'] === '')
+                    ) {
+                        $additionalServices['insuranceValue'] = $grandTotal;
+                    }
+
+                    if (!empty($additionalServices['cod'])
+                        && (!isset($additionalServices['codAmount'])
+                            || $additionalServices['codAmount'] === null
+                            || $additionalServices['codAmount'] === '')
+                    ) {
+                        $additionalServices['codAmount'] = $grandTotal;
                     }
                 }
 
@@ -167,6 +187,7 @@ class LoadTemplate extends Action
                         'packages' => $cleanPackages,
                         'addressType' => $serviceData['address_type'] ?? 'N',
                         'specialServices' => $additionalServices,
+                        'orderGrandTotal' => $grandTotal,
                     ]
                 ]);
             }
@@ -216,7 +237,9 @@ class LoadTemplate extends Action
                     return [
                         'namePl' => (string)($item['namePl'] ?? ''),
                         'nameEn' => (string)($item['nameEn'] ?? ''),
-                        'quantity' => isset($item['quantity']) ? (int)str_replace(',', '.', (string)$item['quantity']) : 1,
+                        'quantity' => isset($item['quantity'])
+                            ? (int)str_replace(',', '.', (string)$item['quantity'])
+                            : 1,
                         'weight' => isset($item['weight']) ? ($toFloat($item['weight']) ?? 0.0) : 0.0,
                         'value' => isset($item['value']) ? ($toFloat($item['value']) ?? 0.0) : 0.0,
                         'tariffCode' => (string)(!empty($item['tariffCode']) ? $item['tariffCode'] : $defaultTariff),

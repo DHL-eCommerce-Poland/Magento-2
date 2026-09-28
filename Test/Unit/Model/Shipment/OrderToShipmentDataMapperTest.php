@@ -303,4 +303,40 @@ class OrderToShipmentDataMapperTest extends TestCase
 
         $this->assertCount(0, $packages);
     }
+
+    /**
+     * Test mapping order when template has insurance enabled without explicit insurance value.
+     *
+     * @return void
+     */
+    public function testMapInsuranceDefaultValuePopulatedWithGrandTotal(): void
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getStreet')->willReturn(['Main St 1']);
+        $address->method('getCity')->willReturn('Warszawa');
+        $address->method('getPostcode')->willReturn('00-001');
+
+        $payment = $this->createStub(Payment::class);
+        $payment->method('getMethod')->willReturn('checkmo');
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getEntityId')->willReturn(108);
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getPayment')->willReturn($payment);
+        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska');
+        $order->method('getGrandTotal')->willReturn(350.75);
+
+        $shipmentDefaults = [
+            'specialServices' => [
+                'insurance' => true,
+            ]
+        ];
+
+        $shipmentData = $this->mapper->map($order, [], $shipmentDefaults);
+
+        $this->assertEquals(350.75, $shipmentData->getOrderGrandTotal());
+        $this->assertTrue($shipmentData->getSpecialServices()->isInsurance());
+        $this->assertEquals(350.75, $shipmentData->getSpecialServices()->getInsuranceValue());
+    }
 }
