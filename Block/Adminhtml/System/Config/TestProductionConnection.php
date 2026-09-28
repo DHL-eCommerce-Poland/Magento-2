@@ -29,6 +29,11 @@ class TestProductionConnection extends Field
             'onclick' => 'javascript:testDhlConnection("production", "' . $url . '"); return false;',
         ]);
 
+        $titleSuccess = json_encode((string) __('Success'));
+        $titleConnectionError = json_encode((string) __('Connection Error'));
+        $titleError = json_encode((string) __('Error'));
+        $contentError = json_encode((string) __('An error occurred while testing connection to DHL.'));
+
         $html = $button->toHtml();
 
         $html .= <<<HTML
@@ -67,12 +72,12 @@ require(['jquery', 'Magento_Ui/js/modal/alert'], function($, alert) {
                 $('body').trigger('processStop');
                 if (response.success) {
                     alert({
-                        title: 'Success',
+                        title: {$titleSuccess},
                         content: response.message
                     });
                 } else {
                     alert({
-                        title: 'Connection Error',
+                        title: {$titleConnectionError},
                         content: response.message
                     });
                 }
@@ -80,8 +85,8 @@ require(['jquery', 'Magento_Ui/js/modal/alert'], function($, alert) {
             error: function() {
                 $('body').trigger('processStop');
                 alert({
-                    title: 'Error',
-                    content: 'An error occurred while testing connection to DHL.'
+                    title: {$titleError},
+                    content: {$contentError}
                 });
             }
         });

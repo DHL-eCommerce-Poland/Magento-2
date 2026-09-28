@@ -23,6 +23,28 @@ class TestSoapClient extends SoapClient
     }
 
     /**
+     * Dummy getInternationalParams2 method for SoapClient mocking.
+     *
+     * @param mixed $args
+     * @return mixed
+     * @throws SoapFault
+     */
+    public function getInternationalParams2(mixed $args): mixed
+    {
+        if ($this->shouldThrowFault) {
+            throw new SoapFault('AUTH_ERR', 'Invalid credentials');
+        }
+
+        return (object) [
+            'getInternationalParams2Result' => (object) [
+                'params' => (object) [
+                    'item' => [],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * Dummy getPostalCodeServices method for SoapClient mocking.
      *
      * @param mixed $args

@@ -610,4 +610,10 @@ Help,Help
 "Drop-Off Point Templates","Drop-Off Point Templates"
 "Delivery Service Templates","Delivery Service Templates"
 "Customs Clearance Templates","Customs Clearance Templates"
+"Connection to DHL WebAPI2 succeeded. Authentication valid.","Connection to DHL WebAPI2 succeeded. Authentication valid."
+"Connection Error","Connection Error"
+"An error occurred while testing connection to DHL.","An error occurred while testing connection to DHL."
+"DHL connection error: %1","DHL connection error: %1"
+"An error occurred while connecting to DHL: %1","An error occurred while connecting to DHL: %1"
+"Success","Success"
 

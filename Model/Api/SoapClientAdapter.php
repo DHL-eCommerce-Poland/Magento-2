@@ -7,7 +7,6 @@ namespace Ideo\Dhl\Model\Api;
 use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Filesystem\Driver\File as FileDriver;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Psr\Log\LoggerInterface;
 use SoapClient;
 use SoapFault;
@@ -23,21 +22,19 @@ class SoapClientAdapter implements ClientInterface
     /**
      * @param LoggerInterface $logger
      * @param ScopeConfigInterface $scopeConfig
-     * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
-     * @param FileDriver|null $fileDriver
+     * @param FileDriver $fileDriver
      */
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
-        private readonly ?FileDriver $fileDriver = null
+        private readonly FileDriver $fileDriver
     ) {
     }
 
     /**
-     * Test API connection and credentials using getPostalCodeServices operation.
+     * Test API connection and credentials using getInternationalParams2 operation.
      *
      * @param Credentials $credentials
      *
@@ -45,27 +42,12 @@ class SoapClientAdapter implements ClientInterface
      */
     public function testConnection(Credentials $credentials): TestConnectionResult
     {
-        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
-
         try {
-            $client = $this->createSoapClient($wsdlUrl);
-
-            $params = [
-                'authData' => [
-                    'username' => $this->ensureUtf8($credentials->getUsername()),
-                    'password' => $this->ensureUtf8($credentials->getPassword()),
-                ],
-                'postCode' => '00001',
-                'pickupDate' => $this->timezone->scopeDate()->format('Y-m-d'),
-            ];
-
-            $client->getPostalCodeServices($params);
-
-            $this->logSoapCommunication($client, 'getPostalCodeServices');
+            $this->getInternationalParams2($credentials);
 
             return new TestConnectionResult(
                 true,
-                'Connection to DHL WebAPI2 succeeded. Authentication valid.'
+                (string) __('Connection to DHL WebAPI2 succeeded. Authentication valid.')
             );
         } catch (SoapFault $fault) {
             $this->logger->error(sprintf(
@@ -76,7 +58,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new TestConnectionResult(
                 false,
-                'DHL connection error: ' . $fault->getMessage(),
+                (string) __('DHL connection error: %1', $fault->getMessage()),
                 $fault->faultcode ?? 'SOAP_FAULT'
             );
         } catch (Throwable $e) {
@@ -87,10 +69,36 @@ class SoapClientAdapter implements ClientInterface
 
             return new TestConnectionResult(
                 false,
-                'An error occurred while connecting to DHL: ' . $e->getMessage(),
+                (string) __('An error occurred while connecting to DHL: %1', $e->getMessage()),
                 'CONNECTION_ERROR'
             );
         }
+    }
+
+    /**
+     * Get international shipment parameters via DHL WebAPI2 getInternationalParams2 operation.
+     *
+     * @param Credentials $credentials
+     *
+     * @return array
+     * @throws SoapFault|Throwable
+     */
+    public function getInternationalParams2(Credentials $credentials): array
+    {
+        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = $this->createSoapClient($wsdlUrl);
+
+        $params = [
+            'authData' => [
+                'username' => $this->ensureUtf8($credentials->getUsername()),
+                'password' => $this->ensureUtf8($credentials->getPassword()),
+            ],
+        ];
+
+        $response = $client->getInternationalParams2($params);
+        $this->logSoapCommunication($client, 'getInternationalParams2', true);
+
+        return (array) ($response->getInternationalParams2Result ?? []);
     }
 
     /**
@@ -1141,8 +1149,7 @@ class SoapClientAdapter implements ClientInterface
         $isWritable = false;
 
         try {
-            $driver = $this->fileDriver ?? new FileDriver();
-            $isWritable = $driver->isWritable($tempDir);
+            $isWritable = $this->fileDriver->isWritable($tempDir);
         } catch (Throwable) {
             $isWritable = false;
         }
@@ -1243,11 +1250,15 @@ class SoapClientAdapter implements ClientInterface
      *
      * @param SoapClient|null $client
      * @param string $action
+     * @param bool $skipResponseBody Option to skip logging response body (e.g. for connection test endpoints)
      *
      * @return void
      */
-    private function logSoapCommunication(?SoapClient $client, string $action): void
-    {
+    private function logSoapCommunication(
+        ?SoapClient $client,
+        string $action,
+        bool $skipResponseBody = false
+    ): void {
         if ($client === null) {
             return;
         }
@@ -1281,8 +1292,12 @@ class SoapClientAdapter implements ClientInterface
 
             $lastResponse = (string) $client->__getLastResponse();
             if (!empty($lastResponse)) {
-                $responseXml = $this->sanitizeXml($lastResponse);
-                $this->logger->info(sprintf('[DHL SOAP Response - %s] %s', $action, $responseXml));
+                if ($skipResponseBody) {
+                    $this->logger->info(sprintf('[DHL SOAP Response - %s] [RESPONSE_BODY_OMITTED]', $action));
+                } else {
+                    $responseXml = $this->sanitizeXml($lastResponse);
+                    $this->logger->info(sprintf('[DHL SOAP Response - %s] %s', $action, $responseXml));
+                }
             }
         } catch (Throwable $e) {
             $this->logger->warning('Failed to log SOAP communication: ' . $e->getMessage());

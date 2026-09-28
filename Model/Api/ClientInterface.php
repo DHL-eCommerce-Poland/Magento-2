@@ -16,6 +16,15 @@ interface ClientInterface
     public function testConnection(Credentials $credentials): TestConnectionResult;
 
     /**
+     * Get international shipment parameters via DHL WebAPI2 getInternationalParams2 operation.
+     *
+     * @param Credentials $credentials
+     *
+     * @return array
+     */
+    public function getInternationalParams2(Credentials $credentials): array;
+
+    /**
      * Create shipments via DHL WebAPI2 API.
      *
      * @param Credentials $credentials

@@ -41,6 +41,11 @@ class SoapClientAdapterTest extends TestCase
     private $dateSanitizer;
 
     /**
+     * @var \Magento\Framework\Filesystem\Driver\File|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $fileDriverStub;
+
+    /**
      * Set up test dependencies.
      *
      * @return void
@@ -54,12 +59,13 @@ class SoapClientAdapterTest extends TestCase
             ->willReturn(new \DateTime('2026-09-02'));
 
         $this->dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($this->timezoneMock);
+        $this->fileDriverStub = $this->createStub(\Magento\Framework\Filesystem\Driver\File::class);
 
         $this->adapter = new SoapClientAdapter(
             $this->loggerStub,
             $this->scopeConfigStub,
-            $this->timezoneMock,
-            $this->dateSanitizer
+            $this->dateSanitizer,
+            $this->fileDriverStub
         );
     }
 
@@ -149,7 +155,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -165,6 +171,30 @@ class SoapClientAdapterTest extends TestCase
     }
 
     /**
+     * Test direct getInternationalParams2 call via mocked SoapClient.
+     *
+     * @return void
+     */
+    public function testGetInternationalParams2Success(): void
+    {
+        $soapClientStub = new TestSoapClient(false);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->getInternationalParams2($credentials);
+
+        $this->assertIsArray($result);
+    }
+
+    /**
      * Test testConnection with SoapFault failure.
      *
      * @return void
@@ -174,7 +204,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -200,7 +230,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -227,7 +257,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -253,7 +283,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -278,7 +308,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -303,7 +333,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -330,7 +360,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -355,7 +385,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -380,7 +410,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -408,7 +438,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -434,7 +464,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient();
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -461,7 +491,7 @@ class SoapClientAdapterTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->timezoneMock, $this->dateSanitizer])
+            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 

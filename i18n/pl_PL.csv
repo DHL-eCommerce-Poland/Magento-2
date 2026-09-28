@@ -610,4 +610,10 @@ Help,Pomoc
 "Drop-Off Point Templates","Szablony punktów nadania"
 "Delivery Service Templates","Szablony usług dostawy"
 "Customs Clearance Templates","Szablony odprawy celnej"
+"Connection to DHL WebAPI2 succeeded. Authentication valid.","Połączenie z DHL WebAPI2 powiodło się. Autoryzacja prawidłowa."
+"Connection Error","Błąd połączenia"
+"An error occurred while testing connection to DHL.","Wystąpił błąd podczas testowania połączenia z DHL."
+"DHL connection error: %1","Błąd połączenia z DHL: %1"
+"An error occurred while connecting to DHL: %1","Wystąpił błąd podczas połączenia z DHL: %1"
+"Success","Sukces"
 

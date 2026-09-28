@@ -19,6 +19,7 @@ class SoapClientAdapterGetPieceIdTest extends TestCase
     private mixed $scopeConfigStub;
     private mixed $timezoneStub;
     private ShipmentDateSanitizer $dateSanitizer;
+    private mixed $fileDriverStub;
 
     protected function setUp(): void
     {
@@ -26,6 +27,7 @@ class SoapClientAdapterGetPieceIdTest extends TestCase
         $this->scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $this->timezoneStub = $this->createStub(TimezoneInterface::class);
         $this->dateSanitizer = new ShipmentDateSanitizer($this->timezoneStub);
+        $this->fileDriverStub = $this->createStub(\Magento\Framework\Filesystem\Driver\File::class);
     }
 
     public function testGetPieceIdReturnsEmptyOnEmptyShipmentId(): void
@@ -33,8 +35,8 @@ class SoapClientAdapterGetPieceIdTest extends TestCase
         $adapter = new SoapClientAdapter(
             $this->loggerStub,
             $this->scopeConfigStub,
-            $this->timezoneStub,
-            $this->dateSanitizer
+            $this->dateSanitizer,
+            $this->fileDriverStub
         );
 
         $credentials = new Credentials('user', 'pass', true);
@@ -80,8 +82,8 @@ class SoapClientAdapterGetPieceIdTest extends TestCase
             ->setConstructorArgs([
                 $this->loggerStub,
                 $this->scopeConfigStub,
-                $this->timezoneStub,
-                $this->dateSanitizer
+                $this->dateSanitizer,
+                $this->fileDriverStub
             ])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
@@ -139,8 +141,8 @@ class SoapClientAdapterGetPieceIdTest extends TestCase
             ->setConstructorArgs([
                 $this->loggerStub,
                 $this->scopeConfigStub,
-                $this->timezoneStub,
-                $this->dateSanitizer
+                $this->dateSanitizer,
+                $this->fileDriverStub
             ])
             ->onlyMethods(['createSoapClient'])
             ->getMock();

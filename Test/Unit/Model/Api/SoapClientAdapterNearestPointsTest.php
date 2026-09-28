@@ -21,6 +21,7 @@ class SoapClientAdapterNearestPointsTest extends TestCase
     private ScopeConfigInterface $scopeConfigMock;
     private TimezoneInterface $timezoneMock;
     private ShipmentDateSanitizer $sanitizer;
+    private \Magento\Framework\Filesystem\Driver\File $fileDriverMock;
 
     protected function setUp(): void
     {
@@ -29,6 +30,7 @@ class SoapClientAdapterNearestPointsTest extends TestCase
         $this->scopeConfigMock = $this->createStub(ScopeConfigInterface::class);
         $this->timezoneMock = $this->createStub(TimezoneInterface::class);
         $this->sanitizer = new ShipmentDateSanitizer($this->timezoneMock);
+        $this->fileDriverMock = $this->createStub(\Magento\Framework\Filesystem\Driver\File::class);
     }
 
     public function testGetNearestServicepointsReturnsSuccessWithPoints(): void
@@ -38,18 +40,18 @@ class SoapClientAdapterNearestPointsTest extends TestCase
         $adapter = new class(
             $this->loggerMock,
             $this->scopeConfigMock,
-            $this->timezoneMock,
             $this->sanitizer,
+            $this->fileDriverMock,
             $testSoapClient
         ) extends SoapClientAdapter {
             public function __construct(
                 LoggerInterface $logger,
                 ScopeConfigInterface $scopeConfig,
-                TimezoneInterface $timezone,
                 ShipmentDateSanitizer $dateSanitizer,
+                \Magento\Framework\Filesystem\Driver\File $fileDriver,
                 private readonly TestSoapClient $testSoapClient
             ) {
-                parent::__construct($logger, $scopeConfig, $timezone, $dateSanitizer);
+                parent::__construct($logger, $scopeConfig, $dateSanitizer, $fileDriver);
             }
 
             protected function createSoapClient(string $wsdlUrl): \SoapClient
@@ -74,18 +76,18 @@ class SoapClientAdapterNearestPointsTest extends TestCase
         $adapter = new class(
             $this->loggerMock,
             $this->scopeConfigMock,
-            $this->timezoneMock,
             $this->sanitizer,
+            $this->fileDriverMock,
             $testSoapClient
         ) extends SoapClientAdapter {
             public function __construct(
                 LoggerInterface $logger,
                 ScopeConfigInterface $scopeConfig,
-                TimezoneInterface $timezone,
                 ShipmentDateSanitizer $dateSanitizer,
+                \Magento\Framework\Filesystem\Driver\File $fileDriver,
                 private readonly TestSoapClient $testSoapClient
             ) {
-                parent::__construct($logger, $scopeConfig, $timezone, $dateSanitizer);
+                parent::__construct($logger, $scopeConfig, $dateSanitizer, $fileDriver);
             }
 
             protected function createSoapClient(string $wsdlUrl): \SoapClient
