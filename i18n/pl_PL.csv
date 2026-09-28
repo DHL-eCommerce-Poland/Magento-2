@@ -252,9 +252,6 @@ Package #%1 length must be greater than zero.,Długość paczki #%1 musi być wi
 Package #%1 height must be greater than zero.,Wysokość paczki #%1 musi być większa niż zero.
 Both Courier Pickup Time [From] and [To] must be specified.,Zarówno godzina odbioru przez kuriera [Od] jak i [Do] muszą być określone.
 Courier Pickup Time [From] must be earlier than Pickup Time [To].,Godzina odbioru przez kuriera [Od] musi być wcześniejsza niż godzina odbioru [Do].
-COD Amount must be greater than zero when Cash On Delivery is selected.,"Kwota pobrania musi być większa niż zero, gdy wybrano płatność przy odbiorze (COD)."
-Insurance Value must be greater than zero when Insurance is selected.,"Wartość ubezpieczenia musi być większa niż zero, gdy wybrana jest opcja ubezpieczenia."
-ROD Document Name is required when ROD is selected.,"Nazwa dokumentu ROD jest wymagana, gdy wybrana jest usługa zwrotu dokumentów (ROD)."
 DHL API returned an error during deletion.,API DHL zwróciło błąd podczas usuwania.
 Failed to delete shipment in DHL: %1,Nie udało się usunąć przesyłki w DHL: %1
 No DHL shipment ID available for this shipment entity.,Brak numeru przesyłki DHL dla tej encji przesyłki.

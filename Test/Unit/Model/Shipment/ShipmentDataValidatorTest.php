@@ -176,11 +176,11 @@ class ShipmentDataValidatorTest extends TestCase
     }
 
     /**
-     * Test validate throws LocalizedException when insurance is selected without valid value.
+     * Test validate passes without exception when special services (insurance, ROD, COD) are selected without values.
      *
      * @return void
      */
-    public function testValidateInsuranceValueRequiredWhenSelected(): void
+    public function testValidateSpecialServicesWithoutValuesPasses(): void
     {
         $sender = new SenderData(name: 'S', street: 'St', houseNumber: '1', postalCode: '00-000', city: 'C');
         $recipient = new RecipientData(
@@ -193,7 +193,14 @@ class ShipmentDataValidatorTest extends TestCase
         );
         $packages = [new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 1.0)];
         $settings = new ShipmentSettingsData(serviceType: 'AH', content: 'Test', packages: $packages);
-        $specialServices = new \Ideo\Dhl\Model\Shipment\Data\SpecialServicesData(insurance: true, insuranceValue: 0.0);
+        $specialServices = new \Ideo\Dhl\Model\Shipment\Data\SpecialServicesData(
+            insurance: true,
+            insuranceValue: null,
+            cod: true,
+            codAmount: null,
+            rod: true,
+            rodDocumentText: ''
+        );
 
         $shipmentData = new DhlShipmentData(
             orderId: 1,
@@ -203,41 +210,7 @@ class ShipmentDataValidatorTest extends TestCase
             specialServices: $specialServices
         );
 
-        $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('Insurance Value must be greater than zero when Insurance is selected.');
-        $this->validator->validate($shipmentData);
-    }
-
-    /**
-     * Test validate throws LocalizedException when ROD is selected without document text.
-     *
-     * @return void
-     */
-    public function testValidateRodDocumentTextRequiredWhenSelected(): void
-    {
-        $sender = new SenderData(name: 'S', street: 'St', houseNumber: '1', postalCode: '00-000', city: 'C');
-        $recipient = new RecipientData(
-            firstName: 'Jan',
-            lastName: 'K',
-            street: 'St',
-            houseNumber: '2',
-            postalCode: '00-000',
-            city: 'C'
-        );
-        $packages = [new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 1.0)];
-        $settings = new ShipmentSettingsData(serviceType: 'AH', content: 'Test', packages: $packages);
-        $specialServices = new \Ideo\Dhl\Model\Shipment\Data\SpecialServicesData(rod: true, rodDocumentText: '');
-
-        $shipmentData = new DhlShipmentData(
-            orderId: 1,
-            sender: $sender,
-            recipient: $recipient,
-            shipmentSettings: $settings,
-            specialServices: $specialServices
-        );
-
-        $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('ROD Document Name is required when ROD is selected.');
+        $this->expectNotToPerformAssertions();
         $this->validator->validate($shipmentData);
     }
 

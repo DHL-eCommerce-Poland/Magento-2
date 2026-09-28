@@ -275,7 +275,7 @@ $dateFormat = $viewModel->getDateFormat();
                                     </label>
                                 </div>
                                 <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: insurance">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Insurance Value')) ?>" data-bind="value: insuranceValue, attr: {required: insurance() ? 'required' : null}" data-validate="{'required-entry': true, 'validate-number': true, 'greater-than-zero': true, 'validate-no-comma': true}" />
+                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Insurance Value')) ?>" data-bind="value: insuranceValue" data-validate="{'validate-no-comma': true}" />
                                 </div>
                                 <div class="admin__field admin__field-option">
                                     <input type="checkbox" class="admin__control-checkbox" id="service_cod" data-bind="checked: cod" />
@@ -284,7 +284,7 @@ $dateFormat = $viewModel->getDateFormat();
                                     </label>
                                 </div>
                                 <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: cod">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('COD Amount')) ?>" data-bind="value: codAmount, attr: {required: cod() ? 'required' : null}" data-validate="{'required-entry': true, 'validate-number': true, 'greater-than-zero': true, 'validate-no-comma': true}" />
+                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('COD Amount')) ?>" data-bind="value: codAmount" data-validate="{'validate-no-comma': true}" />
                                 </div>
                                 <div class="admin__field admin__field-option">
                                     <input type="checkbox" class="admin__control-checkbox" id="service_evening_delivery" data-bind="checked: eveningDelivery" />
@@ -317,7 +317,7 @@ $dateFormat = $viewModel->getDateFormat();
                                     </label>
                                 </div>
                                 <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: rod">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('ROD Document Name')) ?>" data-bind="value: rodDocumentText, attr: {required: rod() ? 'required' : null}" data-validate="{'required-entry': true}" />
+                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('ROD Document Name')) ?>" data-bind="value: rodDocumentText" />
                                 </div>
                                 <div class="admin__field admin__field-option">
                                     <input type="checkbox" class="admin__control-checkbox" id="service_pod" data-bind="checked: pod" />

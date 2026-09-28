@@ -134,24 +134,6 @@ class ShipmentDataValidator
             }
         }
 
-        // 5. Special services validation
-        $specialServices = $shipmentData->getSpecialServices();
-        if ($specialServices->isCod()) {
-            if ($specialServices->getCodAmount() === null || $specialServices->getCodAmount() <= 0) {
-                $errors[] = __('COD Amount must be greater than zero when Cash On Delivery is selected.')->render();
-            }
-        }
-        if ($specialServices->isInsurance()) {
-            if ($specialServices->getInsuranceValue() === null || $specialServices->getInsuranceValue() <= 0) {
-                $errors[] = __('Insurance Value must be greater than zero when Insurance is selected.')->render();
-            }
-        }
-        if ($specialServices->isRod()) {
-            if (empty(trim((string)$specialServices->getRodDocumentText()))) {
-                $errors[] = __('ROD Document Name is required when ROD is selected.')->render();
-            }
-        }
-
         if (!empty($errors)) {
             throw new LocalizedException(__(implode("\n", array_unique($errors))));
         }
@@ -254,4 +236,3 @@ class ShipmentDataValidator
         }
     }
 }
-
