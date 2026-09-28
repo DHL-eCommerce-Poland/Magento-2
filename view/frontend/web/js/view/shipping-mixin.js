@@ -250,8 +250,9 @@ define([
                             }
 
                             var curMethod = quote.shippingMethod();
-                            var curCode = curMethod ? ((curMethod.carrier_code || curMethod.carrierCode || '') + '_' + (curMethod.method_code || curMethod.methodCode || '')) : '';
-                            if (curCode !== fullCode && curCode !== methodCode) {
+                            var curCode = pointState.getMethodKey(curMethod);
+                            var targetCode = pointState.getMethodKey(methodObj);
+                            if (curCode !== targetCode) {
                                 if (typeof self.selectShippingMethod === 'function') {
                                     self.selectShippingMethod(methodObj);
                                 }
@@ -260,7 +261,7 @@ define([
 
                             registry.get('checkout.steps.shipping-step.shippingAddress.shippingAdditional.dhl-point-selector', function (pointSelector) {
                                 if (pointSelector && typeof pointSelector.openMapModal === 'function') {
-                                    pointSelector.openMapModal();
+                                    pointSelector.openMapModal(methodObj);
                                 }
                             });
                         }

@@ -113,4 +113,41 @@ class SaveServicePointToQuoteAddressTest extends TestCase
         $this->assertEquals('SAP999', $savedData['dhl_service_point_id']);
         $this->assertEquals('Żabka Fallback', $savedData['dhl_service_point_name']);
     }
+
+    public function testBeforeSaveAddressInformationClearsPointDataWhenExtAttributesHasNoPoint(): void
+    {
+        $validatorStub = $this->createStub(ServicePointValidator::class);
+        $plugin = new SaveServicePointToQuoteAddress($validatorStub);
+
+        $managementStub = $this->createStub(ShippingInformationManagementInterface::class);
+        $informationStub = $this->createStub(ShippingInformationInterface::class);
+        $addressMock = $this->createStub(Address::class);
+
+        $extAttributesStub = new DataObject([]);
+        $addressMock->method('getExtensionAttributes')->willReturn($extAttributesStub);
+
+        $savedData = [
+            'dhl_service_point_id' => 'OLD_SAP',
+            'dhl_service_point_name' => 'Old Point',
+        ];
+
+        $addressMock->method('setData')->willReturnCallback(
+            static function ($key, $value = null) use (&$savedData) {
+                if (is_string($key)) {
+                    $savedData[$key] = $value;
+                }
+                return null;
+            }
+        );
+
+        $informationStub->method('getShippingAddress')->willReturn($addressMock);
+        $informationStub->method('getShippingCarrierCode')->willReturn('dhlparcel');
+        $informationStub->method('getShippingMethodCode')->willReturn('courier');
+
+        $result = $plugin->beforeSaveAddressInformation($managementStub, 1, $informationStub);
+
+        $this->assertEquals([1, $informationStub], $result);
+        $this->assertNull($savedData['dhl_service_point_id']);
+        $this->assertNull($savedData['dhl_service_point_name']);
+    }
 }

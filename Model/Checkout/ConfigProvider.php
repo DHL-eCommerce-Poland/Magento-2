@@ -173,6 +173,7 @@ class ConfigProvider implements ConfigProviderInterface
             $isPackstation = (bool) $shippingAddress->getData('dhl_is_packstation');
             $isPostfiliale = (bool) $shippingAddress->getData('dhl_is_postfiliale');
             $postnummer = (string) $shippingAddress->getData('dhl_postnummer');
+            $shippingMethod = (string) $shippingAddress->getShippingMethod();
 
             return [
                 'sap' => $sap,
@@ -186,6 +187,7 @@ class ConfigProvider implements ConfigProviderInterface
                 'isPackstation' => $isPackstation,
                 'isPostfiliale' => $isPostfiliale,
                 'postnummer' => $postnummer,
+                'methodCode' => $shippingMethod,
             ];
         } catch (Throwable) {
             return null;

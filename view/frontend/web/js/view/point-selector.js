@@ -15,6 +15,8 @@ define([
             isModalOpen: false
         },
 
+        targetMethodObj: null,
+
         /**
          * Initialize component observables and message listeners.
          */
@@ -67,18 +69,16 @@ define([
         },
 
         /**
-         * Return method code of currently selected shipping method.
+         * Return method code of target or currently selected shipping method.
          *
          * @return {string} Carrier and method code string.
          */
         currentMethodCode: function () {
-            var method = quote.shippingMethod();
+            var method = this.targetMethodObj || quote.shippingMethod();
             if (!method) {
                 return '';
             }
-            var carrierCode = method.carrier_code || method.carrierCode || '';
-            var methodCode = method.method_code || method.methodCode || '';
-            return carrierCode + '_' + methodCode;
+            return pointState.getMethodKey(method) || '';
         },
 
         /**
@@ -128,10 +128,17 @@ define([
         },
 
         /**
-         * Open DHL map popup modal.
+         * Open DHL map popup modal for specified target method.
+         *
+         * @param {Object|null} [methodObj] Target shipping method object.
          */
-        openMapModal: function () {
+        openMapModal: function (methodObj) {
             var self = this;
+            if (methodObj) {
+                this.targetMethodObj = methodObj;
+            } else {
+                this.targetMethodObj = quote.shippingMethod();
+            }
             this.isModalOpen(true);
 
             setTimeout(function () {
@@ -149,6 +156,7 @@ define([
                     buttons: [],
                     closed: function () {
                         self.isModalOpen(false);
+                        self.targetMethodObj = null;
                     }
                 };
 
@@ -168,6 +176,7 @@ define([
                 modalContainer.modal('closeModal');
             }
             this.isModalOpen(false);
+            this.targetMethodObj = null;
         },
 
         /**
@@ -199,9 +208,9 @@ define([
                     var countryUpper = recipientCountry.toUpperCase();
                     var typeStr = (pointData.type || pointData.ptype || '').toLowerCase();
 
-                    var curMethod = quote.shippingMethod();
+                    var curMethod = self.targetMethodObj || quote.shippingMethod();
                     var mCode = curMethod ? (curMethod.method_code || curMethod.methodCode || '') : '';
-                    var fullMCode = curMethod ? ((curMethod.carrier_code || curMethod.carrierCode || '') + '_' + mCode) : '';
+                    var fullMCode = pointState.getMethodKey(curMethod) || mCode;
                     var isPackstationMethod = mCode === methodCodes.METHOD_CONNECT_PACKSTATION ||
                         mCode === methodCodes.METHOD_CONNECT_PACKSTATION_COD ||
                         fullMCode === methodCodes.FULL_CONNECT_PACKSTATION ||
@@ -216,8 +225,11 @@ define([
 
                     var isPostfiliale = recipientCountry.toUpperCase() === 'DE' && !isPackstation;
 
+                    var curMethodKey = pointState.getMethodKey(curMethod) || fullMCode;
+
                     var formattedPoint = {
                         quoteId: self.getQuoteId(),
+                        methodCode: curMethodKey,
                         sap: pointData.sap || '',
                         name: pointData.name || pointData.sap,
                         street: pointData.street || '',
@@ -233,7 +245,7 @@ define([
                         postnummer: pointData.postnummer || ''
                     };
 
-                    pointState.setSelectedPoint(formattedPoint);
+                    pointState.setSelectedPoint(formattedPoint, curMethodKey);
                     self.closeMapModal();
                 }
             };

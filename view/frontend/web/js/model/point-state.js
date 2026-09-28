@@ -7,7 +7,7 @@ define([
 ], function ($, ko, quote, methodCodes, $t) {
     'use strict';
 
-    var STORAGE_KEY = 'dhl_selected_service_point';
+    var STORAGE_KEY = 'dhl_selected_service_points';
 
     var selectedPoint = ko.observable(null);
     var pointErrorMessage = ko.observable('');
@@ -23,14 +23,46 @@ define([
     }
 
     /**
-     * Persist point data to sessionStorage.
+     * Helper to get full normalized method key string (e.g. 'dhlparcel_economy_all_cod').
      *
-     * @param {Object|null} point Selected point data.
+     * @param {Object|string|null} method Shipping method object or code.
+     *
+     * @return {string|null} Normalized method key.
      */
-    function saveToStorage(point) {
+    function getMethodKey(method) {
+        if (!method) {
+            return null;
+        }
+        var carrierCode = methodCodes.CARRIER_CODE;
+        var mCode = '';
+        if (typeof method === 'string') {
+            mCode = method;
+        } else {
+            carrierCode = method.carrier_code || method.carrierCode || methodCodes.CARRIER_CODE;
+            mCode = method.method_code || method.methodCode || '';
+        }
+        if (!mCode) {
+            return null;
+        }
+        if (mCode.indexOf(carrierCode + '_') === 0) {
+            return mCode;
+        }
+        return carrierCode + '_' + mCode;
+    }
+
+    /**
+     * Persist map of points to sessionStorage.
+     *
+     * @param {Object} pointsMap Map of methodCode -> point object.
+     */
+    function saveToStorage(pointsMap) {
         try {
-            if (point) {
-                window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(point));
+            if (pointsMap && Object.keys(pointsMap).length > 0) {
+                var payload = {
+                    quoteId: getQuoteId(),
+                    points: pointsMap
+                };
+                window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
             } else {
                 window.sessionStorage.removeItem(STORAGE_KEY);
             }
@@ -40,29 +72,33 @@ define([
     }
 
     /**
-     * Load point data from sessionStorage if valid for current quote.
+     * Load points map from sessionStorage if valid for current quote.
      *
-     * @return {Object|null} Stored point or null.
+     * @return {Object} Stored points map or empty object.
      */
     function loadFromStorage() {
         try {
             var saved = window.sessionStorage.getItem(STORAGE_KEY);
             if (saved) {
-                var point = JSON.parse(saved);
-                if (point && typeof point === 'object' && point.sap) {
+                var parsed = JSON.parse(saved);
+                if (parsed && typeof parsed === 'object') {
                     var currentQuoteId = getQuoteId();
-                    if (point.quoteId && currentQuoteId && String(point.quoteId) !== String(currentQuoteId)) {
-                        saveToStorage(null);
-                        return null;
+                    if (parsed.quoteId && currentQuoteId && String(parsed.quoteId) !== String(currentQuoteId)) {
+                        saveToStorage({});
+                        return {};
                     }
-                    return point;
+                    if (parsed.points && typeof parsed.points === 'object') {
+                        return parsed.points;
+                    }
                 }
             }
         } catch (e) {
             console.warn('DHL Point State: Storage load error', e);
         }
-        return null;
+        return {};
     }
+
+    var pointsMap = loadFromStorage();
 
     /**
      * Sync selected point details to shipping address extension attributes.
@@ -106,46 +142,6 @@ define([
     }
 
     /**
-     * Set active selected point and clear validation errors.
-     *
-     * @param {Object|null} point Point data.
-     */
-    function setSelectedPoint(point) {
-        if (point) {
-            point.quoteId = getQuoteId();
-        }
-        selectedPoint(point);
-        pointErrorMessage('');
-        postnummerErrorMessage('');
-        saveToStorage(point);
-        updateQuoteExtensionAttributes(point);
-    }
-
-    /**
-     * Clear selected point state and storage.
-     */
-    function clearPoint() {
-        selectedPoint(null);
-        pointErrorMessage('');
-        postnummerErrorMessage('');
-        saveToStorage(null);
-        updateQuoteExtensionAttributes(null);
-    }
-
-    /**
-     * Update postnummer for currently selected point.
-     *
-     * @param {string} postnummer Customer postnummer string.
-     */
-    function setPostnummer(postnummer) {
-        var point = selectedPoint();
-        if (point) {
-            point.postnummer = postnummer;
-            setSelectedPoint(point);
-        }
-    }
-
-    /**
      * Check if a given shipping method requires DHL point selection.
      *
      * @param {Object|null} method Shipping method object.
@@ -156,9 +152,11 @@ define([
         if (!method) {
             return false;
         }
-        var carrierCode = method.carrier_code || method.carrierCode || '';
-        var methodCode = method.method_code || method.methodCode || '';
-        var fullCode = carrierCode + '_' + methodCode;
+        var fullCode = getMethodKey(method);
+        if (!fullCode) {
+            return false;
+        }
+
         var config = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) || {};
         var pointMethods = config.pointMethods || [
             methodCodes.FULL_ECONOMY_ALL,
@@ -173,31 +171,158 @@ define([
             methodCodes.FULL_CONNECT_PACKSTATION_COD
         ];
 
-        return pointMethods.indexOf(fullCode) !== -1 || pointMethods.indexOf(methodCode) !== -1 ||
-            (carrierCode === methodCodes.CARRIER_CODE && [
-                methodCodes.METHOD_ECONOMY_ALL,
-                methodCodes.METHOD_ECONOMY_ALL_COD,
-                methodCodes.METHOD_ECONOMY_POP,
-                methodCodes.METHOD_ECONOMY_POP_COD,
-                methodCodes.METHOD_ECONOMY_BOX,
-                methodCodes.METHOD_ECONOMY_BOX_COD,
-                methodCodes.METHOD_CONNECT_PARCELSHOP,
-                methodCodes.METHOD_CONNECT_PARCELSHOP_COD,
-                methodCodes.METHOD_CONNECT_PACKSTATION,
-                methodCodes.METHOD_CONNECT_PACKSTATION_COD
-            ].indexOf(methodCode) !== -1);
+        if (pointMethods.indexOf(fullCode) !== -1) {
+            return true;
+        }
+        var shortCode = fullCode.indexOf(methodCodes.CARRIER_CODE + '_') === 0 ?
+            fullCode.substring(methodCodes.CARRIER_CODE.length + 1) : fullCode;
+
+        return pointMethods.indexOf(shortCode) !== -1;
     }
 
-    // Initialize initial point state from checkoutConfig or storage
-    var initialPoint = null;
+    /**
+     * Lookup point for a given method key in pointsMap.
+     *
+     * @param {string|null} mKey Method key.
+     *
+     * @return {Object|null} Point object or null.
+     */
+    function getPointForMethodKey(mKey) {
+        var key = getMethodKey(mKey);
+        if (!key) {
+            return null;
+        }
+        if (pointsMap[key]) {
+            return pointsMap[key];
+        }
+        var shortCode = key.indexOf(methodCodes.CARRIER_CODE + '_') === 0 ?
+            key.substring(methodCodes.CARRIER_CODE.length + 1) : key;
+        if (pointsMap[shortCode]) {
+            return pointsMap[shortCode];
+        }
+        return null;
+    }
+
+    /**
+     * Update active selected point observable based on specified method or currently active quote shipping method.
+     *
+     * @param {Object|null} method Shipping method object.
+     */
+    function updateActivePointForMethod(method) {
+        pointErrorMessage('');
+        postnummerErrorMessage('');
+
+        if (!method || !isDhlPointMethod(method)) {
+            selectedPoint(null);
+            updateQuoteExtensionAttributes(null);
+            return;
+        }
+
+        var mKey = getMethodKey(method);
+        var pt = getPointForMethodKey(mKey);
+
+        if (pt && pt.sap) {
+            selectedPoint(pt);
+            updateQuoteExtensionAttributes(pt);
+        } else {
+            selectedPoint(null);
+            updateQuoteExtensionAttributes(null);
+        }
+    }
+
+    /**
+     * Set selected point for target method or currently selected shipping method.
+     *
+     * @param {Object|null} point Point data.
+     * @param {Object|string|null} [targetMethod] Target method object or method code string.
+     */
+    function setSelectedPoint(point, targetMethod) {
+        var mKey = getMethodKey(targetMethod) || getMethodKey(quote.shippingMethod());
+        if (point && mKey) {
+            point.quoteId = getQuoteId();
+            point.methodCode = mKey;
+            pointsMap[mKey] = point;
+            saveToStorage(pointsMap);
+
+            var activeKey = getMethodKey(quote.shippingMethod());
+            if (activeKey === mKey) {
+                selectedPoint(point);
+                pointErrorMessage('');
+                postnummerErrorMessage('');
+                updateQuoteExtensionAttributes(point);
+            }
+        } else if (!point && mKey) {
+            delete pointsMap[mKey];
+            var shortCode = mKey.indexOf(methodCodes.CARRIER_CODE + '_') === 0 ?
+                mKey.substring(methodCodes.CARRIER_CODE.length + 1) : mKey;
+            delete pointsMap[shortCode];
+
+            saveToStorage(pointsMap);
+
+            var activeKey = getMethodKey(quote.shippingMethod());
+            if (activeKey === mKey || activeKey === shortCode) {
+                selectedPoint(null);
+                pointErrorMessage('');
+                postnummerErrorMessage('');
+                updateQuoteExtensionAttributes(null);
+            }
+        } else if (!point && !targetMethod) {
+            pointsMap = {};
+            saveToStorage({});
+            selectedPoint(null);
+            pointErrorMessage('');
+            postnummerErrorMessage('');
+            updateQuoteExtensionAttributes(null);
+        }
+    }
+
+    /**
+     * Clear all points or points for specified method.
+     *
+     * @param {Object|string|null} [targetMethod] Target method object or code.
+     */
+    function clearPoint(targetMethod) {
+        if (targetMethod) {
+            setSelectedPoint(null, targetMethod);
+        } else {
+            pointsMap = {};
+            saveToStorage({});
+            selectedPoint(null);
+            pointErrorMessage('');
+            postnummerErrorMessage('');
+            updateQuoteExtensionAttributes(null);
+        }
+    }
+
+    /**
+     * Update postnummer for currently selected point.
+     *
+     * @param {string} postnummer Customer postnummer string.
+     */
+    function setPostnummer(postnummer) {
+        var point = selectedPoint();
+        if (point) {
+            point.postnummer = postnummer;
+            setSelectedPoint(point, quote.shippingMethod());
+        }
+    }
+
+    // Initialize initial point state from checkoutConfig
     if (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel && window.checkoutConfig.shipping.dhlparcel.selectedPoint) {
-        initialPoint = window.checkoutConfig.shipping.dhlparcel.selectedPoint;
-    } else {
-        initialPoint = loadFromStorage();
+        var initPoint = window.checkoutConfig.shipping.dhlparcel.selectedPoint;
+        if (initPoint && initPoint.sap) {
+            var initKey = initPoint.methodCode || getMethodKey(quote.shippingMethod());
+            if (initKey) {
+                initPoint.methodCode = initKey;
+                initPoint.quoteId = getQuoteId();
+                pointsMap[initKey] = initPoint;
+                saveToStorage(pointsMap);
+            }
+        }
     }
-    if (initialPoint && initialPoint.sap) {
-        setSelectedPoint(initialPoint);
-    }
+
+    // Activate initial point for currently selected shipping method
+    updateActivePointForMethod(quote.shippingMethod());
 
     // Subscribe to shippingAddress updates to keep extension_attributes attached when address updates
     quote.shippingAddress.subscribe(function (newAddress) {
@@ -206,19 +331,9 @@ define([
         }
     });
 
-    // Subscribe to shippingMethod updates to clear point only when switching away from DHL point methods
-    var lastMethodCode = null;
+    // Subscribe to shippingMethod updates to switch active point per shipping method
     quote.shippingMethod.subscribe(function (newMethod) {
-        if (!newMethod) {
-            return;
-        }
-        var currentCode = (newMethod.carrier_code || newMethod.carrierCode || '') + '_' + (newMethod.method_code || newMethod.methodCode || '');
-        if (lastMethodCode !== null && lastMethodCode !== currentCode) {
-            if (!isDhlPointMethod(newMethod)) {
-                clearPoint();
-            }
-        }
-        lastMethodCode = currentCode;
+        updateActivePointForMethod(newMethod);
     });
 
     return {
@@ -230,6 +345,9 @@ define([
         setPostnummer: setPostnummer,
         getQuoteId: getQuoteId,
         updateQuoteExtensionAttributes: updateQuoteExtensionAttributes,
+        getMethodKey: getMethodKey,
+        getPointForMethodKey: getPointForMethodKey,
+        updateActivePointForMethod: updateActivePointForMethod,
 
         /**
          * Resolve destination country code for current quote/point.

@@ -139,7 +139,7 @@ class SaveServicePointToQuoteAddress
             $postnummer = $postnummerStr !== '' ? $postnummerStr : null;
         }
 
-        if (trim($id) === '' && $shippingAddress && is_object($shippingAddress) && method_exists($shippingAddress, 'getData')) {
+        if (trim($id) === '' && !$extAttributes && $shippingAddress && is_object($shippingAddress) && method_exists($shippingAddress, 'getData')) {
             $id = (string) ($shippingAddress->getData('dhl_service_point_id') ?? '');
             $name = (string) ($shippingAddress->getData('dhl_service_point_name') ?? '');
             $street = (string) ($shippingAddress->getData('dhl_service_point_street') ?? '');
