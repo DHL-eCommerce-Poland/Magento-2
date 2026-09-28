@@ -1,5 +1,5 @@
 <div class="dhl-carrier-wrapper">
-    <!-- ko if: isDhlPointMethod() -->
+    <!-- ko if: isDhlPointMethod() && $data.isMethodSelected && isMethodSelected() -->
         <!-- ko if: isNearestDeliveryMode() -->
         <div class="dhl-point-nearest-info">
             <strong data-bind="i18n: 'DHL Service Point Pickup'"></strong><br/>

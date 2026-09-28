@@ -159,23 +159,35 @@ define([
                     }
 
                     var rowViewModel = {
+                        name: 'Ideo_Dhl/shipping/method-item-addon',
                         isDhlPointMethod: function () {
                             return isPointMethod;
                         },
-                        isNearestDeliveryMode: function () {
+                        isMethodSelected: ko.computed(function () {
+                            var curMethod = quote.shippingMethod();
+                            if (!curMethod) {
+                                return false;
+                            }
+                            var curCarrier = curMethod.carrier_code || curMethod.carrierCode || '';
+                            var curCode = curMethod.method_code || curMethod.methodCode || '';
+                            var curFullCode = curCarrier + '_' + curCode;
+
+                            return curFullCode === fullCode || curCode === methodCode;
+                        }),
+                        isNearestDeliveryMode: ko.computed(function () {
                             return pointState.isNearestDeliveryMode(methodObj);
-                        },
-                        isPointSelected: function () {
+                        }),
+                        isPointSelected: ko.computed(function () {
                             var pt = pointState.selectedPoint();
                             var curMethod = quote.shippingMethod();
                             var curCode = curMethod ? ((curMethod.carrier_code || curMethod.carrierCode || '') + '_' + (curMethod.method_code || curMethod.methodCode || '')) : '';
                             return !!(pt && pt.sap && (curCode === fullCode || curCode === methodCode || !curCode));
-                        },
-                        selectedPointName: function () {
+                        }),
+                        selectedPointName: ko.computed(function () {
                             var pt = pointState.selectedPoint();
                             return pt ? (pt.name || pt.sap || '') : '';
-                        },
-                        selectedPointStreet: function () {
+                        }),
+                        selectedPointStreet: ko.computed(function () {
                             var pt = pointState.selectedPoint();
                             if (!pt) {
                                 return '';
@@ -186,8 +198,8 @@ define([
                                 st = (st ? st + ' ' : '') + hn;
                             }
                             return st;
-                        },
-                        selectedPointCityZip: function () {
+                        }),
+                        selectedPointCityZip: ko.computed(function () {
                             var pt = pointState.selectedPoint();
                             if (!pt) {
                                 return '';
@@ -195,13 +207,13 @@ define([
                             var zip = pt.zip || pt.postalCode || '';
                             var city = pt.city || '';
                             return (zip + ' ' + city).trim();
-                        },
-                        isDePackstationSelected: function () {
+                        }),
+                        isDePackstationSelected: ko.computed(function () {
                             return pointState.isDePackstationSelected();
-                        },
-                        isDePointSelected: function () {
+                        }),
+                        isDePointSelected: ko.computed(function () {
                             return pointState.isDePointSelected();
-                        },
+                        }),
                         postnummerInput: ko.computed({
                             read: function () {
                                 var pt = pointState.selectedPoint();
