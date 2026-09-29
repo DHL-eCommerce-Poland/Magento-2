@@ -211,6 +211,13 @@ class ShipmentCreationServiceTest extends TestCase
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
         $this->mapperStub->method('map')->willReturn(['content' => 'Test']);
 
+        $deleteResult = new \Ideo\Dhl\Model\Api\DeleteShipmentResult(true, 'OLD_123');
+        $this->clientStub->method('deleteShipment')->willReturn($deleteResult);
+
+        $this->shipmentDataServiceMock->expects($this->once())
+            ->method('clearShipmentId')
+            ->with($entityId);
+
         $apiResult = new CreateShipmentResult(true, false, '999888777');
         $this->clientStub->method('createShipment')->willReturn($apiResult);
 
@@ -218,6 +225,79 @@ class ShipmentCreationServiceTest extends TestCase
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('999888777', $result->getShipmentId());
+    }
+
+    /**
+     * Test recreateShipment clears old shipment ID when delete succeeds in DHL but createShipment fails.
+     *
+     * @return void
+     */
+    public function testRecreateShipmentClearsOldIdWhenDeleteSucceedsButCreateFails(): void
+    {
+        $entityId = 124;
+        $lockName = 'dhl_shipment_recreate_124';
+
+        $this->lockManagerMock->method('lock')->willReturn(true);
+
+        $shipmentData = $this->createStub(DhlShipmentData::class);
+        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub->method('getShipmentId')->willReturn('OLD_456');
+
+        $this->shipmentDataServiceMock->method('getShipmentEntity')->willReturn($entityStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+
+        $deleteResult = new \Ideo\Dhl\Model\Api\DeleteShipmentResult(true, 'OLD_456');
+        $this->clientStub->method('deleteShipment')->willReturn($deleteResult);
+
+        // Expect clearShipmentId to be called so old ID is removed from DB despite createShipment failing
+        $this->shipmentDataServiceMock->expects($this->once())
+            ->method('clearShipmentId')
+            ->with($entityId);
+
+        $failedCreateResult = new CreateShipmentResult(false, false, null, null, [], '106', 'Nie odnaleziono wybranego punktu Parelstation');
+        $this->clientStub->method('createShipment')->willReturn($failedCreateResult);
+
+        $result = $this->service->recreateShipment($entityId, $shipmentData, 'sandbox');
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertEquals('Nie odnaleziono wybranego punktu Parelstation', $result->getErrorMessage());
+    }
+
+    /**
+     * Test recreateShipment does not clear old ID when deleteShipment API call fails.
+     *
+     * @return void
+     */
+    public function testRecreateShipmentDoesNotClearIdWhenDeleteFails(): void
+    {
+        $entityId = 125;
+        $this->lockManagerMock->method('lock')->willReturn(true);
+
+        $shipmentData = $this->createStub(DhlShipmentData::class);
+        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub->method('getShipmentId')->willReturn('OLD_789');
+
+        $this->shipmentDataServiceMock->method('getShipmentEntity')->willReturn($entityStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+
+        $deleteResult = new \Ideo\Dhl\Model\Api\DeleteShipmentResult(false, 'OLD_789', 'ERR', 'Auth error');
+        $this->clientStub->method('deleteShipment')->willReturn($deleteResult);
+
+        // Expect clearShipmentId NEVER to be called when delete failed
+        $this->shipmentDataServiceMock->expects($this->never())
+            ->method('clearShipmentId');
+
+        $apiResult = new CreateShipmentResult(true, false, 'NEW_999');
+        $this->clientStub->method('createShipment')->willReturn($apiResult);
+
+        $result = $this->service->recreateShipment($entityId, $shipmentData, 'sandbox');
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals('NEW_999', $result->getShipmentId());
     }
 
     /**

@@ -184,4 +184,30 @@ class ShipmentDeletionServiceTest extends TestCase
         $result = $service->deleteShipment($entityId);
         $this->assertTrue($result);
     }
+
+    public function testDeleteShipmentWhenShipmentIdIsNullDeletesFromDbWithoutApiCall(): void
+    {
+        $entityId = 555;
+        $shipmentMock = $this->createMock(ShipmentDataInterface::class);
+        $shipmentMock->expects($this->once())
+            ->method('getShipmentId')
+            ->willReturn(null);
+
+        $this->repositoryMock->expects($this->once())
+            ->method('getById')
+            ->with($entityId)
+            ->willReturn($shipmentMock);
+
+        // Expect client deleteShipment NEVER to be called since shipmentId is null
+        $this->clientMock->expects($this->never())
+            ->method('deleteShipment');
+
+        $this->repositoryMock->expects($this->once())
+            ->method('delete')
+            ->with($shipmentMock)
+            ->willReturn(true);
+
+        $result = $this->deletionService->deleteShipment($entityId);
+        $this->assertTrue($result);
+    }
 }

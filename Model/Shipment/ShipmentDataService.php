@@ -377,6 +377,55 @@ class ShipmentDataService
     }
 
     /**
+     * Clear shipment ID, package tracking numbers, and return shipment ID from existing shipment entity.
+     *
+     * @param int $entityId
+     *
+     * @return ShipmentDataInterface
+     * @throws LocalizedException
+     */
+    public function clearShipmentId(int $entityId): ShipmentDataInterface
+    {
+        $entity = $this->shipmentDataRepository->getById($entityId);
+        $entity->setShipmentId(null);
+        $entity->setPackageNumbers(null);
+        $entity->setReturnShipmentId(null);
+
+        $rawPayload = $entity->getShipmentData();
+        if (!empty($rawPayload) && is_string($rawPayload)) {
+            try {
+                $payloadArr = (array) $this->serializer->unserialize($rawPayload);
+                unset($payloadArr['shipmentId'], $payloadArr['packageNumbers']);
+                if (isset($payloadArr['packages']) && is_array($payloadArr['packages'])) {
+                    foreach ($payloadArr['packages'] as $idx => &$pkg) {
+                        if (is_array($pkg)) {
+                            unset($pkg['packageNumber'], $pkg['returnShipmentId'], $pkg['packagesTrackingNumbers']);
+                        }
+                    }
+                    unset($pkg);
+                }
+                if (isset($payloadArr['shipmentSettings']['packages']) && is_array($payloadArr['shipmentSettings']['packages'])) {
+                    foreach ($payloadArr['shipmentSettings']['packages'] as $idx => &$pkg) {
+                        if (is_array($pkg)) {
+                            unset($pkg['packageNumber'], $pkg['returnShipmentId'], $pkg['packagesTrackingNumbers']);
+                        }
+                    }
+                    unset($pkg);
+                }
+                $entity->setShipmentData($this->serializer->serialize($payloadArr));
+            } catch (Throwable $e) {
+                $this->logger?->warning(sprintf(
+                    '[ShipmentDataService] Failed to clear payload tracking data for entity #%d: %s',
+                    $entityId,
+                    $e->getMessage()
+                ));
+            }
+        }
+
+        return $this->shipmentDataRepository->save($entity);
+    }
+
+    /**
      * Save DhlShipmentData object into database persistence.
      *
      * @param DhlShipmentData $shipmentData

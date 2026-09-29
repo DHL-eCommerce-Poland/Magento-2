@@ -228,7 +228,32 @@ class ShipmentCreationService
 
             if (!empty($oldShipmentId)) {
                 try {
-                    $this->client->deleteShipment($credentials, $oldShipmentId);
+                    $deleteResult = $this->client->deleteShipment($credentials, $oldShipmentId);
+                    if ($deleteResult->isSuccess()) {
+                        $this->shipmentDataService->clearShipmentId($entityId);
+
+                        $magentoShipmentId = $existingEntity->getMagentoShipmentId();
+                        if ($this->magentoShipmentSyncService && $magentoShipmentId) {
+                            try {
+                                $this->magentoShipmentSyncService->updateMagentoShipmentTracks(
+                                    (int)$magentoShipmentId,
+                                    []
+                                );
+                            } catch (Throwable $e) {
+                                $this->logger->warning(sprintf(
+                                    '[DHL Recreate] Failed to clear tracks on Magento shipment #%d: %s',
+                                    $magentoShipmentId,
+                                    $e->getMessage()
+                                ));
+                            }
+                        }
+                    } else {
+                        $this->logger->warning(sprintf(
+                            '[DHL Recreate] Delete old DHL shipment %s returned error: %s',
+                            $oldShipmentId,
+                            $deleteResult->getErrorMessage()
+                        ));
+                    }
                 } catch (Throwable $e) {
                     $this->logger->warning(sprintf(
                         '[DHL Recreate] Failed to delete old DHL shipment %s for entity #%d before recreation: %s',
