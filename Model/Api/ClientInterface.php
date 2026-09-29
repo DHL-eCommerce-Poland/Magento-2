@@ -25,19 +25,19 @@ interface ClientInterface
     public function getInternationalParams2(Credentials $credentials): array;
 
     /**
-     * Create shipments via DHL WebAPI2 API.
+     * Create shipment via DHL WebAPI2 API.
      *
      * @param Credentials $credentials
-     * @param array $shipmentsFullData
-     * @param int|null $orderId Optional Magento order ID for diagnostic logging context
+     * @param array $shipmentData
+     * @param int|null $orderId
      *
-     * @return CreateShipmentsResult
+     * @return CreateShipmentResult
      */
-    public function createShipments(
+    public function createShipment(
         Credentials $credentials,
-        array $shipmentsFullData,
+        array $shipmentData,
         ?int $orderId = null
-    ): CreateShipmentsResult;
+    ): CreateShipmentResult;
 
     /**
      * Delete shipment via DHL WebAPI2 API.

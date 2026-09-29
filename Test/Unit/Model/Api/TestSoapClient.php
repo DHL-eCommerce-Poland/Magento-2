@@ -114,30 +114,27 @@ class TestSoapClient extends SoapClient
     }
 
     /**
-     * Dummy createShipments method for SoapClient mocking.
+     * Dummy createShipment method for SoapClient mocking.
      *
      * @param mixed $args
      * @return mixed
      * @throws SoapFault
      */
-    public function createShipments(mixed $args): mixed
+    public function createShipment(mixed $args): mixed
     {
         if ($this->shouldThrowFault) {
             throw new SoapFault('CREATE_ERR', 'Error creating shipment');
         }
 
         return (object) [
-            'createShipmentsResult' => (object) [
-                'item' => [
-                    (object) [
-                        'shipmentId' => '1234567890',
-                        'orderStatus' => 'Nowa',
-                        'pieceList' => (object) [
-                            'item' => [
-                                (object) ['blpPieceId' => 'BLP1001'],
-                                (object) ['blpPieceId' => 'BLP1002'],
-                            ],
-                        ],
+            'createShipmentResult' => (object) [
+                'shipmentNotificationNumber' => '1234567890',
+                'shipmentId' => '1234567890',
+                'orderStatus' => 'Nowa',
+                'pieceList' => (object) [
+                    'item' => [
+                        (object) ['blpPieceId' => 'BLP1001'],
+                        (object) ['blpPieceId' => 'BLP1002'],
                     ],
                 ],
             ],

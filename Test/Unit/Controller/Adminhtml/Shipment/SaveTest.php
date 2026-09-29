@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
 use Ideo\Dhl\Controller\Adminhtml\Shipment\Save;
-use Ideo\Dhl\Model\Api\CreateShipmentsResult;
+use Ideo\Dhl\Model\Api\CreateShipmentResult;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Ideo\Dhl\Model\Shipment\ShipmentCreationService;
 use Ideo\Dhl\Model\Shipment\ShipmentDataService;
@@ -178,7 +178,7 @@ class SaveTest extends TestCase
             ->with('carriers/dhlparcel/sandbox')
             ->willReturn('1');
 
-        $apiResult = new CreateShipmentsResult(true, false, '90039521201');
+        $apiResult = new CreateShipmentResult(true, false, '90039521201');
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('createShipment')
             ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'sandbox', '1', '2', null)
@@ -226,7 +226,7 @@ class SaveTest extends TestCase
             ->with('carriers/dhlparcel/sandbox')
             ->willReturn('0');
 
-        $apiResult = new CreateShipmentsResult(false, false, null, null, [], 'ERR_01', 'Nieprawidłowy kod pocztowy');
+        $apiResult = new CreateShipmentResult(false, false, null, null, [], 'ERR_01', 'Nieprawidłowy kod pocztowy');
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('createShipment')
             ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'production', null, null, null)

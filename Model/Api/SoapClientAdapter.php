@@ -102,21 +102,25 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
-     * Create shipments via DHL WebAPI2 API.
+     * Create shipment via DHL WebAPI2 API.
      *
      * @param Credentials $credentials
-     * @param array $shipmentsFullData
-     * @param int|null $orderId Optional Magento order ID for diagnostic logging context
+     * @param array $shipmentData
+     * @param int|null $orderId
      *
-     * @return CreateShipmentsResult
+     * @return CreateShipmentResult
      */
-    public function createShipments(
+    public function createShipment(
         Credentials $credentials,
-        array $shipmentsFullData,
+        array $shipmentData,
         ?int $orderId = null
-    ): CreateShipmentsResult {
+    ): CreateShipmentResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
         $orderContext = $orderId !== null ? sprintf(' (Order #%d)', $orderId) : '';
+
+        if (!isset($shipmentData['shipmentInfo']['dropOffType'])) {
+            $shipmentData['shipmentInfo']['dropOffType'] = CreateShipmentResult::DROP_OFF_TYPE_REGULAR_PICKUP;
+        }
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -126,28 +130,38 @@ class SoapClientAdapter implements ClientInterface
                     'username' => $this->ensureUtf8($credentials->getUsername()),
                     'password' => $this->ensureUtf8($credentials->getPassword()),
                 ],
-                'shipments' => [
-                    'item' => $shipmentsFullData,
-                ],
+                'shipment' => $shipmentData,
             ];
 
-            $response = $client->createShipments($params);
-            $this->logSoapCommunication($client, 'createShipments' . $orderContext);
+            $response = $client->createShipment($params);
+            $this->logSoapCommunication($client, 'createShipment' . $orderContext);
 
-            $shipmentResult = $response->createShipmentsResult->item ?? $response->createShipmentsResult ?? null;
+            $shipmentResult = $response->createShipmentResult ?? $response->createShipmentResponse ?? $response ?? null;
             if (is_array($shipmentResult)) {
                 $shipmentResult = $shipmentResult[0] ?? null;
             }
 
-            if (is_object($shipmentResult) && !empty($shipmentResult->shipmentId)) {
+            $shipmentId = !empty($shipmentResult->shipmentNotificationNumber)
+                ? (string) $shipmentResult->shipmentNotificationNumber
+                : (!empty($shipmentResult->shipmentId) ? (string) $shipmentResult->shipmentId : null);
+
+            if (is_object($shipmentResult) && !empty($shipmentId)) {
                 $orderStatus = !empty($shipmentResult->orderStatus) ? (string) $shipmentResult->orderStatus : null;
-                $packageNumbers = $this->extractPackageNumbers($shipmentResult);
-                return new CreateShipmentsResult(
-                    true,
-                    false,
-                    (string) $shipmentResult->shipmentId,
-                    $orderStatus,
-                    $packageNumbers
+                $labelContent = !empty($shipmentResult->labelContent) ? (string) $shipmentResult->labelContent : null;
+                $labelFormat = !empty($shipmentResult->labelFormat) ? (string) $shipmentResult->labelFormat : null;
+                $labelType = !empty($shipmentResult->labelType) ? (string) $shipmentResult->labelType : null;
+
+                return new CreateShipmentResult(
+                    success: true,
+                    timeout: false,
+                    shipmentId: $shipmentId,
+                    orderStatus: $orderStatus,
+                    packageNumbers: [],
+                    errorCode: null,
+                    errorMessage: null,
+                    labelContent: $labelContent,
+                    labelFormat: $labelFormat,
+                    labelType: $labelType
                 );
             }
 
@@ -156,20 +170,20 @@ class SoapClientAdapter implements ClientInterface
                 : 'DHL API returned an invalid response structure.';
 
             $this->logger->error(sprintf(
-                '[DHL WebAPI2] createShipments failed%s: %s',
+                '[DHL WebAPI2] createShipment failed%s: %s',
                 $orderContext,
                 $errorMsg
             ));
 
-            return new CreateShipmentsResult(
+            return new CreateShipmentResult(
                 success: false,
                 errorCode: 'CREATE_SHIPMENT_ERROR',
                 errorMessage: $errorMsg
             );
         } catch (SoapFault $fault) {
-            $this->logSoapCommunication($client ?? null, 'createShipments' . $orderContext);
+            $this->logSoapCommunication($client ?? null, 'createShipment' . $orderContext);
             $this->logger->error(sprintf(
-                '[DHL WebAPI2] SoapFault during createShipments%s: [%s] %s',
+                '[DHL WebAPI2] SoapFault during createShipment%s: [%s] %s',
                 $orderContext,
                 $fault->faultcode ?? 'FAULT',
                 $fault->getMessage()
@@ -177,23 +191,23 @@ class SoapClientAdapter implements ClientInterface
 
             $isTimeout = $this->isTimeoutException($fault);
 
-            return new CreateShipmentsResult(
+            return new CreateShipmentResult(
                 success: false,
                 timeout: $isTimeout,
                 errorCode: $fault->faultcode ?? 'SOAP_FAULT',
                 errorMessage: 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
-            $this->logSoapCommunication($client ?? null, 'createShipments' . $orderContext);
+            $this->logSoapCommunication($client ?? null, 'createShipment' . $orderContext);
             $this->logger->error(sprintf(
-                '[DHL WebAPI2] Exception during createShipments%s: %s',
+                '[DHL WebAPI2] Exception during createShipment%s: %s',
                 $orderContext,
                 $e->getMessage()
             ));
 
             $isTimeout = $this->isTimeoutException($e);
 
-            return new CreateShipmentsResult(
+            return new CreateShipmentResult(
                 success: false,
                 timeout: $isTimeout,
                 errorCode: 'CONNECTION_ERROR',

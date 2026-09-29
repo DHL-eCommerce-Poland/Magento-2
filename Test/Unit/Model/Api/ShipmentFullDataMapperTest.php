@@ -112,39 +112,41 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $mapped = $this->mapper->map($shipmentData);
 
-        // Check pickup hours
-        $this->assertEquals('10:00', $mapped['shipmentStartHour']);
-        $this->assertEquals('14:00', $mapped['shipmentEndHour']);
+        // Check dropOffType constant inside shipmentInfo
+        $this->assertEquals('REGULAR_PICKUP', $mapped['shipmentInfo']['dropOffType']);
 
-        // Check shipper
-        $this->assertEquals('Moja Firma Sp. z o.o.', $mapped['shipper']['name']);
-        $this->assertEquals('Jan Kowalski', $mapped['shipper']['contactPerson']);
-        $this->assertEquals('00001', $mapped['shipper']['postalCode']); // Hyphen stripped
-        $this->assertEquals('Warszawa', $mapped['shipper']['city']);
-        $this->assertEquals('2', $mapped['shipper']['apartmentNumber']);
+        // Check pickup hours inside shipmentTime
+        $this->assertEquals('10:00', $mapped['shipmentInfo']['shipmentTime']['shipmentStartHour']);
+        $this->assertEquals('14:00', $mapped['shipmentInfo']['shipmentTime']['shipmentEndHour']);
 
-        // Check receiver
-        $this->assertEquals('B', $mapped['receiver']['addressType']); // B2B maps to 'B' in DHL WebAPI2
-        $this->assertEquals('Firma ABC', $mapped['receiver']['name']);
-        $this->assertEquals('30002', $mapped['receiver']['postalCode']);
-        $this->assertEquals('PL', $mapped['receiver']['country']);
+        // Check shipper inside ship
+        $this->assertEquals('Moja Firma Sp. z o.o.', $mapped['ship']['shipper']['address']['name']);
+        $this->assertEquals('Jan Kowalski', $mapped['ship']['shipper']['contact']['personName']);
+        $this->assertEquals('00001', $mapped['ship']['shipper']['address']['postalCode']); // Hyphen stripped
+        $this->assertEquals('Warszawa', $mapped['ship']['shipper']['address']['city']);
+        $this->assertEquals('2', $mapped['ship']['shipper']['address']['apartmentNumber']);
+
+        // Check receiver inside ship
+        $this->assertEquals('B', $mapped['ship']['receiver']['address']['addressType']); // B2B maps to 'B' in DHL WebAPI2
+        $this->assertEquals('Firma ABC', $mapped['ship']['receiver']['address']['name']);
+        $this->assertEquals('30002', $mapped['ship']['receiver']['address']['postalCode']);
+        $this->assertEquals('PL', $mapped['ship']['receiver']['address']['country']);
 
         // Check pieceList
         $this->assertCount(1, $mapped['pieceList']['item']);
         $this->assertEquals('PACKAGE', $mapped['pieceList']['item'][0]['type']);
         $this->assertEquals(5.5, $mapped['pieceList']['item'][0]['weight']);
 
-        // Check payment & service
-        $this->assertEquals('SHIPPER', $mapped['payment']['payerType']);
-        $this->assertEquals('1234567', $mapped['payment']['accountNumber']);
-        $this->assertEquals('MPK123', $mapped['payment']['costsCenter']);
-        $this->assertEquals('AH', $mapped['service']['product']);
-        $this->assertTrue($mapped['service']['collectOnDelivery']);
-        $this->assertEquals(150.0, $mapped['service']['collectOnDeliveryValue']);
+        // Check payment & service inside shipmentInfo
+        $this->assertEquals('SHIPPER', $mapped['shipmentInfo']['billing']['shippingPaymentType']);
+        $this->assertEquals('1234567', $mapped['shipmentInfo']['billing']['billingAccountNumber']);
+        $this->assertEquals('MPK123', $mapped['shipmentInfo']['billing']['costsCenter']);
+        $this->assertEquals('AH', $mapped['shipmentInfo']['serviceType']);
+        $this->assertTrue($mapped['shipmentInfo']['specialServices']['collectOnDelivery']);
+        $this->assertEquals(150.0, $mapped['shipmentInfo']['specialServices']['collectOnDeliveryValue']);
 
         // Check control character sanitization
-        $this->assertFalse($mapped['skipRestrictionCheck']);
-        $this->assertNull($mapped['servicePointAccountNumber']);
+        $this->assertNull($mapped['ship']['servicePointAccountNumber']);
         $this->assertStringNotContainsString("\x07", $mapped['content']);
         $this->assertStringNotContainsString("\x00", $mapped['comment']);
     }
@@ -176,8 +178,8 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $mapped = $this->mapper->map($shipmentData);
 
-        $this->assertEquals('4529508', $mapped['servicePointAccountNumber']);
-        $this->assertEquals('C', $mapped['receiver']['addressType']);
+        $this->assertEquals('4529508', $mapped['ship']['servicePointAccountNumber']);
+        $this->assertEquals('C', $mapped['ship']['receiver']['address']['addressType']);
     }
 
     /**
@@ -211,8 +213,8 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $mapped = $this->mapper->map($shipmentData);
 
-        $service = $mapped['service'];
-        $this->assertEquals('AH', $service['product']);
+        $service = $mapped['shipmentInfo']['specialServices'];
+        $this->assertEquals('AH', $mapped['shipmentInfo']['serviceType']);
         $this->assertTrue($service['deliveryEvening']);
         $this->assertTrue($service['deliveryOnSaturday']);
         $this->assertTrue($service['pickupOnSaturday']);
@@ -259,13 +261,13 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $mapped = $this->mapper->map($shipmentData);
 
-        $this->assertEquals('DE', $mapped['receiver']['country']);
-        $this->assertEquals('C', $mapped['receiver']['addressType']);
-        $this->assertTrue($mapped['receiver']['isPackstation']);
-        $this->assertArrayNotHasKey('isPostfiliale', $mapped['receiver']);
-        $this->assertEquals('987654321', $mapped['receiver']['postnummer']);
-        $this->assertEquals('49393', $mapped['receiver']['postalCode']);
-        $this->assertEquals('Lohne', $mapped['receiver']['city']);
+        $this->assertEquals('DE', $mapped['ship']['receiver']['address']['country']);
+        $this->assertEquals('C', $mapped['ship']['receiver']['address']['addressType']);
+        $this->assertTrue($mapped['ship']['receiver']['address']['isPackstation']);
+        $this->assertArrayNotHasKey('isPostfiliale', $mapped['ship']['receiver']['address']);
+        $this->assertEquals('987654321', $mapped['ship']['receiver']['address']['postnummer']);
+        $this->assertEquals('49393', $mapped['ship']['receiver']['address']['postalCode']);
+        $this->assertEquals('Lohne', $mapped['ship']['receiver']['address']['city']);
         $this->assertArrayNotHasKey('customs', $mapped);
     }
 
@@ -298,10 +300,10 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $mapped = $this->mapper->map($shipmentData);
 
-        $this->assertEquals('DE', $mapped['receiver']['country']);
-        $this->assertTrue($mapped['receiver']['isPostfiliale']);
-        $this->assertArrayNotHasKey('isPackstation', $mapped['receiver']);
-        $this->assertEquals('123456789', $mapped['receiver']['postnummer']);
+        $this->assertEquals('DE', $mapped['ship']['receiver']['address']['country']);
+        $this->assertTrue($mapped['ship']['receiver']['address']['isPostfiliale']);
+        $this->assertArrayNotHasKey('isPackstation', $mapped['ship']['receiver']['address']);
+        $this->assertEquals('123456789', $mapped['ship']['receiver']['address']['postnummer']);
     }
 
     /**
@@ -330,10 +332,10 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $mapped = $this->mapper->map($shipmentData);
 
-        $this->assertEquals('DE', $mapped['receiver']['country']);
-        $this->assertArrayNotHasKey('isPackstation', $mapped['receiver']);
-        $this->assertArrayNotHasKey('isPostfiliale', $mapped['receiver']);
-        $this->assertArrayNotHasKey('postnummer', $mapped['receiver']);
+        $this->assertEquals('DE', $mapped['ship']['receiver']['address']['country']);
+        $this->assertArrayNotHasKey('isPackstation', $mapped['ship']['receiver']['address']);
+        $this->assertArrayNotHasKey('isPostfiliale', $mapped['ship']['receiver']['address']);
+        $this->assertArrayNotHasKey('postnummer', $mapped['ship']['receiver']['address']);
     }
 
     public function testMapToShipmentFullDataWithCustomsWhenCountryIsNotPl(): void
@@ -485,8 +487,8 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $mapped = $this->mapper->map($shipmentData);
 
-        $this->assertSame('13/435', $mapped['shipper']['houseNumber']);
-        $this->assertSame('12A/4', $mapped['receiver']['houseNumber']);
+        $this->assertSame('13/435', $mapped['ship']['shipper']['address']['houseNumber']);
+        $this->assertSame('12A/4', $mapped['ship']['receiver']['address']['houseNumber']);
     }
 
     #[DataProvider('shipperNameAndContactPersonProvider')]
@@ -513,8 +515,8 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $mapped = $this->mapper->map($shipmentData);
 
-        $this->assertSame($expectedName, $mapped['shipper']['name']);
-        $this->assertSame($expectedContactPerson, $mapped['shipper']['contactPerson']);
+        $this->assertSame($expectedName, $mapped['ship']['shipper']['address']['name']);
+        $this->assertSame($expectedContactPerson, $mapped['ship']['shipper']['contact']['personName']);
     }
 
     public static function shipperNameAndContactPersonProvider(): array
@@ -572,10 +574,10 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $mapped = $this->mapper->map($shipmentData);
 
-        $this->assertEquals('PL', $mapped['receiver']['country']);
-        $this->assertArrayNotHasKey('isPostfiliale', $mapped['receiver']);
-        $this->assertArrayNotHasKey('isPackstation', $mapped['receiver']);
-        $this->assertArrayNotHasKey('postnummer', $mapped['receiver']);
+        $this->assertEquals('PL', $mapped['ship']['receiver']['address']['country']);
+        $this->assertArrayNotHasKey('isPostfiliale', $mapped['ship']['receiver']['address']);
+        $this->assertArrayNotHasKey('isPackstation', $mapped['ship']['receiver']['address']);
+        $this->assertArrayNotHasKey('postnummer', $mapped['ship']['receiver']['address']);
     }
 
     public static function postalCodeDataProvider(): array

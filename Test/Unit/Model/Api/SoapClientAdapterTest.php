@@ -221,11 +221,11 @@ class SoapClientAdapterTest extends TestCase
     }
 
     /**
-     * Test successful createShipments via mocked SoapClient.
+     * Test successful createShipment via mocked SoapClient.
      *
      * @return void
      */
-    public function testCreateShipmentsSuccess(): void
+    public function testCreateShipmentSuccess(): void
     {
         $soapClientStub = new TestSoapClient(false);
 
@@ -239,20 +239,20 @@ class SoapClientAdapterTest extends TestCase
             ->willReturn($soapClientStub);
 
         $credentials = new Credentials('user', 'pass', true);
-        $result = $adapter->createShipments($credentials, [['content' => 'Test']]);
+        $result = $adapter->createShipment($credentials, ['content' => 'Test']);
 
         $this->assertTrue($result->isSuccess());
         $this->assertFalse($result->isTimeout());
         $this->assertEquals('1234567890', $result->getShipmentId());
-        $this->assertEquals(['BLP1001', 'BLP1002'], $result->getPackageNumbers());
+        $this->assertEmpty($result->getPackageNumbers());
     }
 
     /**
-     * Test createShipments handling timeout exception.
+     * Test createShipment handling timeout exception.
      *
      * @return void
      */
-    public function testCreateShipmentsTimeout(): void
+    public function testCreateShipmentTimeout(): void
     {
         $soapClientStub = new TestSoapClient(true);
 
@@ -266,7 +266,7 @@ class SoapClientAdapterTest extends TestCase
             ->willReturn($soapClientStub);
 
         $credentials = new Credentials('user', 'pass', true);
-        $result = $adapter->createShipments($credentials, [['content' => 'Test']]);
+        $result = $adapter->createShipment($credentials, ['content' => 'Test']);
 
         $this->assertFalse($result->isSuccess());
         $this->assertNull($result->getShipmentId());

@@ -116,7 +116,22 @@ class ShipmentFullDataMapper
         $countryCode = strtoupper($recipient->getCountry() ?: 'PL');
         $senderCountryCode = strtoupper($sender->getCountry() ?: 'PL');
 
-        $receiver = [
+        $senderAddress = [
+            'name' => $this->sanitizeString($senderName),
+            'postalCode' => $this->sanitizePostalCode($sender->getPostalCode(), $senderCountryCode),
+            'city' => $this->sanitizeString($sender->getCity()),
+            'street' => $this->sanitizeString($sender->getStreet()),
+            'houseNumber' => $this->sanitizeString($sender->getHouseNumber()),
+            'apartmentNumber' => $this->sanitizeString($sender->getFlatNumber()),
+        ];
+
+        $senderContactInfo = [
+            'personName' => $this->sanitizeString($senderContact),
+            'phoneNumber' => $this->sanitizeString($sender->getPhone()),
+            'emailAddress' => $this->sanitizeString($sender->getEmail()),
+        ];
+
+        $receiverAddress = [
             'addressType' => $receiverAddressType,
             'country' => $countryCode,
             'name' => $this->sanitizeString($recipientName),
@@ -125,60 +140,74 @@ class ShipmentFullDataMapper
             'street' => $this->sanitizeString($recipient->getStreet()),
             'houseNumber' => $this->sanitizeString($recipient->getHouseNumber()),
             'apartmentNumber' => $this->sanitizeString($recipient->getFlatNumber()),
-            'contactPerson' => $this->sanitizeString($recipientContact),
-            'contactPhone' => $this->sanitizeString($recipient->getPhone()),
-            'contactEmail' => $this->sanitizeString($recipient->getEmail()),
         ];
 
         if ($countryCode === 'DE') {
             if ($recipient->isPackstation()) {
-                $receiver['isPackstation'] = true;
+                $receiverAddress['isPackstation'] = true;
             } elseif ($recipient->isPostfiliale()) {
-                $receiver['isPostfiliale'] = true;
+                $receiverAddress['isPostfiliale'] = true;
             }
 
             if ($recipient->getPostnummer() !== null && $recipient->getPostnummer() !== '') {
-                $receiver['postnummer'] = $this->sanitizeString($recipient->getPostnummer());
+                $receiverAddress['postnummer'] = $this->sanitizeString($recipient->getPostnummer());
             }
         }
 
-        $result = [
-            'shipper' => [
-                'name' => $this->sanitizeString($senderName),
-                'postalCode' => $this->sanitizePostalCode($sender->getPostalCode(), $senderCountryCode),
-                'city' => $this->sanitizeString($sender->getCity()),
-                'street' => $this->sanitizeString($sender->getStreet()),
-                'houseNumber' => $this->sanitizeString($sender->getHouseNumber()),
-                'apartmentNumber' => $this->sanitizeString($sender->getFlatNumber()),
-                'contactPerson' => $this->sanitizeString($senderContact),
-                'contactPhone' => $this->sanitizeString($sender->getPhone()),
-                'contactEmail' => $this->sanitizeString($sender->getEmail()),
-            ],
-            'receiver' => $receiver,
-            'pieceList' => [
-                'item' => $pieceItems,
-            ],
-            'payment' => [
-                'paymentMethod' => SpecialServicesData::PAYMENT_METHOD_BANK_TRANSFER,
-                'payerType' => $payerType,
-                'accountNumber' => $this->sanitizeString($sender->getSapNumber()),
+        $recipientContactInfo = [
+            'personName' => $this->sanitizeString($recipientContact),
+            'phoneNumber' => $this->sanitizeString($recipient->getPhone()),
+            'emailAddress' => $this->sanitizeString($recipient->getEmail()),
+        ];
+
+        $shipmentTime = [
+            'shipmentDate' => $settings->getShipmentDate(),
+        ];
+        if ($settings->getPickupHourFrom() !== null && $settings->getPickupHourFrom() !== '') {
+            $shipmentTime['shipmentStartHour'] = $settings->getPickupHourFrom();
+        }
+        if ($settings->getPickupHourTo() !== null && $settings->getPickupHourTo() !== '') {
+            $shipmentTime['shipmentEndHour'] = $settings->getPickupHourTo();
+        }
+
+        $shipInfo = [
+            'dropOffType' => CreateShipmentResult::DROP_OFF_TYPE_REGULAR_PICKUP,
+            'serviceType' => $product,
+            'billing' => [
+                'shippingPaymentType' => $payerType,
+                'billingAccountNumber' => $this->sanitizeString($sender->getSapNumber()),
+                'paymentType' => SpecialServicesData::PAYMENT_METHOD_BANK_TRANSFER,
                 'costsCenter' => $this->sanitizeString($settings->getMpk()),
             ],
-            'service' => $serviceDef,
-            'shipmentDate' => $settings->getShipmentDate(),
-            'skipRestrictionCheck' => false,
+            'specialServices' => $serviceDef,
+            'shipmentTime' => $shipmentTime,
+            'labelType' => $settings->getLabelType(),
+        ];
+
+        $ship = [
             'servicePointAccountNumber' => $servicePointAccountNumber,
+            'shipper' => [
+                'preaviso' => $senderContactInfo,
+                'contact' => $senderContactInfo,
+                'address' => $senderAddress,
+            ],
+            'receiver' => [
+                'preaviso' => $recipientContactInfo,
+                'contact' => $recipientContactInfo,
+                'address' => $receiverAddress,
+            ],
+        ];
+
+        $result = [
+            'shipmentInfo' => $shipInfo,
             'content' => $this->sanitizeString($settings->getContent()),
             'comment' => $this->sanitizeString($settings->getComment()),
             'reference' => $this->sanitizeString($settings->getReference()),
+            'ship' => $ship,
+            'pieceList' => [
+                'item' => $pieceItems,
+            ],
         ];
-
-        if ($settings->getPickupHourFrom() !== null && $settings->getPickupHourFrom() !== '') {
-            $result['shipmentStartHour'] = $settings->getPickupHourFrom();
-        }
-        if ($settings->getPickupHourTo() !== null && $settings->getPickupHourTo() !== '') {
-            $result['shipmentEndHour'] = $settings->getPickupHourTo();
-        }
 
         if ($countryCode !== 'PL'
             && $shipmentData->getCustoms() !== null

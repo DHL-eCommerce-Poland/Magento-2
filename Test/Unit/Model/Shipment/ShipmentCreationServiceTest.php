@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
 use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\CreateShipmentsResult;
+use Ideo\Dhl\Model\Api\CreateShipmentResult;
 use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
@@ -135,8 +135,8 @@ class ShipmentCreationServiceTest extends TestCase
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
         $this->mapperStub->method('map')->willReturn(['content' => 'Test']);
 
-        $apiResult = new CreateShipmentsResult(true, false, '90039521201', 'Nowa');
-        $this->clientStub->method('createShipments')->willReturn($apiResult);
+        $apiResult = new CreateShipmentResult(true, false, '90039521201', 'Nowa');
+        $this->clientStub->method('createShipment')->willReturn($apiResult);
 
         // Expect DB save with status Nowa
         $this->shipmentDataServiceMock->expects($this->once())
@@ -167,8 +167,8 @@ class ShipmentCreationServiceTest extends TestCase
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
         $this->mapperStub->method('map')->willReturn(['content' => 'Test']);
 
-        $apiResult = new CreateShipmentsResult(false, false, null, null, [], 'ERR_POSTCODE', 'Błędny kod pocztowy');
-        $this->clientStub->method('createShipments')->willReturn($apiResult);
+        $apiResult = new CreateShipmentResult(false, false, null, null, [], 'ERR_POSTCODE', 'Błędny kod pocztowy');
+        $this->clientStub->method('createShipment')->willReturn($apiResult);
 
         // Expect NO DB save on API error
         $this->shipmentDataServiceMock->expects($this->never())
@@ -211,8 +211,8 @@ class ShipmentCreationServiceTest extends TestCase
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
         $this->mapperStub->method('map')->willReturn(['content' => 'Test']);
 
-        $apiResult = new CreateShipmentsResult(true, false, '999888777');
-        $this->clientStub->method('createShipments')->willReturn($apiResult);
+        $apiResult = new CreateShipmentResult(true, false, '999888777');
+        $this->clientStub->method('createShipment')->willReturn($apiResult);
 
         $result = $this->service->recreateShipment($entityId, $shipmentData, 'sandbox');
 
@@ -242,8 +242,8 @@ class ShipmentCreationServiceTest extends TestCase
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
         $this->mapperStub->method('map')->willReturn(['content' => 'Test']);
 
-        $apiResult = new CreateShipmentsResult(true, false, '90039521201', 'Nowa');
-        $this->clientStub->method('createShipments')->willReturn($apiResult);
+        $apiResult = new CreateShipmentResult(true, false, '90039521201', 'Nowa');
+        $this->clientStub->method('createShipment')->willReturn($apiResult);
 
         $savedEntityMock = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
         $savedEntityMock->method('getEntityId')->willReturn(42);
@@ -319,8 +319,8 @@ class ShipmentCreationServiceTest extends TestCase
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
         $this->mapperStub->method('map')->willReturn(['content' => 'Test']);
 
-        $apiResult = new CreateShipmentsResult(true, false, '90039521202', 'Nowa');
-        $this->clientStub->method('createShipments')->willReturn($apiResult);
+        $apiResult = new CreateShipmentResult(true, false, '90039521202', 'Nowa');
+        $this->clientStub->method('createShipment')->willReturn($apiResult);
 
         $returnBuilderMock = $this->createMock(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
         $returnCreationServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
@@ -412,8 +412,8 @@ class ShipmentCreationServiceTest extends TestCase
             }))
             ->willReturn(['servicePointAccountNumber' => 'POP-WAW-777']);
 
-        $apiResult = new CreateShipmentsResult(true, false, '900999000');
-        $this->clientStub->method('createShipments')->willReturn($apiResult);
+        $apiResult = new CreateShipmentResult(true, false, '900999000');
+        $this->clientStub->method('createShipment')->willReturn($apiResult);
 
         $serializer = new \Magento\Framework\Serialize\Serializer\Json();
         $returnBuilderMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
@@ -461,7 +461,7 @@ class ShipmentCreationServiceTest extends TestCase
     }
 
     /**
-     * Test createShipment calls getPieceId when createShipments returns empty packageNumbers array.
+     * Test createShipment calls getPieceId when createShipment returns empty packageNumbers array.
      *
      * @return void
      */
@@ -475,10 +475,10 @@ class ShipmentCreationServiceTest extends TestCase
         $credentials = new Credentials('user', 'pass', true);
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
 
-        $apiResult = new CreateShipmentsResult(true, false, '90040027827', 'Utworzono', []);
+        $apiResult = new CreateShipmentResult(true, false, '90040027827', 'Utworzono', []);
         $clientMock = $this->createMock(ClientInterface::class);
         $clientMock->expects($this->once())
-            ->method('createShipments')
+            ->method('createShipment')
             ->willReturn($apiResult);
         $clientMock->expects($this->once())
             ->method('getPieceId')

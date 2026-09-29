@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Model\Api;
 
-use Ideo\Dhl\Model\Api\CreateShipmentsResult;
+use Ideo\Dhl\Model\Api\CreateShipmentResult;
 use PHPUnit\Framework\TestCase;
 
-class CreateShipmentsResultTest extends TestCase
+class CreateShipmentResultTest extends TestCase
 {
     /**
      * Test creating a successful result.
@@ -16,7 +16,7 @@ class CreateShipmentsResultTest extends TestCase
      */
     public function testSuccessfulResult(): void
     {
-        $result = new CreateShipmentsResult(true, false, '1234567890');
+        $result = new CreateShipmentResult(true, false, '1234567890');
 
         $this->assertTrue($result->isSuccess());
         $this->assertFalse($result->isTimeout());
@@ -27,19 +27,33 @@ class CreateShipmentsResultTest extends TestCase
     }
 
     /**
-     * Test result with package numbers.
+     * Test result with package numbers and label data.
      *
      * @return void
      */
-    public function testResultWithPackageNumbers(): void
+    public function testResultWithPackageNumbersAndLabel(): void
     {
         $packageNumbers = ['BLP1001', 'BLP1002'];
-        $result = new CreateShipmentsResult(true, false, '1234567890', 'Nowa', $packageNumbers);
+        $result = new CreateShipmentResult(
+            true,
+            false,
+            '1234567890',
+            'Nowa',
+            $packageNumbers,
+            null,
+            null,
+            'BASE64LABEL',
+            'application/pdf',
+            'BLP'
+        );
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('1234567890', $result->getShipmentId());
         $this->assertEquals('Nowa', $result->getOrderStatus());
         $this->assertEquals($packageNumbers, $result->getPackageNumbers());
+        $this->assertEquals('BASE64LABEL', $result->getLabelContent());
+        $this->assertEquals('application/pdf', $result->getLabelFormat());
+        $this->assertEquals('BLP', $result->getLabelType());
     }
 
     /**
@@ -49,7 +63,7 @@ class CreateShipmentsResultTest extends TestCase
      */
     public function testErrorResult(): void
     {
-        $result = new CreateShipmentsResult(false, false, null, null, [], 'ERR_POSTCODE', 'Invalid postal code');
+        $result = new CreateShipmentResult(false, false, null, null, [], 'ERR_POSTCODE', 'Invalid postal code');
 
         $this->assertFalse($result->isSuccess());
         $this->assertFalse($result->isTimeout());
@@ -65,7 +79,7 @@ class CreateShipmentsResultTest extends TestCase
      */
     public function testTimeoutResult(): void
     {
-        $result = new CreateShipmentsResult(false, true, null, null, [], 'TIMEOUT', 'Connection timed out');
+        $result = new CreateShipmentResult(false, true, null, null, [], 'TIMEOUT', 'Connection timed out');
 
         $this->assertFalse($result->isSuccess());
         $this->assertTrue($result->isTimeout());

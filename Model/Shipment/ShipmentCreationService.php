@@ -6,7 +6,7 @@ namespace Ideo\Dhl\Model\Shipment;
 
 use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\CreateShipmentsResult;
+use Ideo\Dhl\Model\Api\CreateShipmentResult;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
 use Ideo\Dhl\Model\MethodCatalog;
@@ -62,7 +62,7 @@ class ShipmentCreationService
      * @param string|null $deliveryServiceTemplateId
      * @param string|null $customsTemplateId
      *
-     * @return CreateShipmentsResult
+     * @return CreateShipmentResult
      * @throws LocalizedException
      */
     public function createShipment(
@@ -71,7 +71,7 @@ class ShipmentCreationService
         ?string $dropOffPointTemplateId = null,
         ?string $deliveryServiceTemplateId = null,
         ?string $customsTemplateId = null
-    ): CreateShipmentsResult {
+    ): CreateShipmentResult {
         $shipmentData = $this->ensureServicePointResolved($shipmentData, $environment);
 
         $orderId = $shipmentData->getOrderId();
@@ -98,8 +98,8 @@ class ShipmentCreationService
             $credentials = $this->credentialsProvider->getCredentials($environment);
             $mappedData = $this->mapper->map($shipmentData);
 
-            // 3. Dispatch directly to DHL WebAPI2 (createShipments)
-            $apiResult = $this->client->createShipments($credentials, [$mappedData], $orderId);
+            // 3. Dispatch directly to DHL WebAPI2 (createShipment)
+            $apiResult = $this->client->createShipment($credentials, $mappedData, $orderId);
 
             // 4. Handle Failure or Timeout scenario (do NOT save anything in DB)
             if ($apiResult->isTimeout() || !$apiResult->isSuccess()) {
@@ -201,14 +201,14 @@ class ShipmentCreationService
      * @param DhlShipmentData $shipmentData
      * @param string $environment ('sandbox' or 'production')
      *
-     * @return CreateShipmentsResult
+     * @return CreateShipmentResult
      * @throws LocalizedException
      */
     public function recreateShipment(
         int $entityId,
         DhlShipmentData $shipmentData,
         string $environment = 'sandbox'
-    ): CreateShipmentsResult {
+    ): CreateShipmentResult {
         $shipmentData = $this->ensureServicePointResolved($shipmentData, $environment);
 
         $lockName = 'dhl_shipment_recreate_' . $entityId;
@@ -240,7 +240,7 @@ class ShipmentCreationService
             }
 
             $mappedData = $this->mapper->map($shipmentData);
-            $apiResult = $this->client->createShipments($credentials, [$mappedData], $shipmentData->getOrderId());
+            $apiResult = $this->client->createShipment($credentials, $mappedData, $shipmentData->getOrderId());
 
             if ($apiResult->isTimeout() || !$apiResult->isSuccess()) {
                 return $apiResult;
