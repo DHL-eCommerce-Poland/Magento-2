@@ -543,7 +543,7 @@ $dateFormat = $viewModel->getDateFormat();
                         </div>
 
                         <!-- Customs Goods Items -->
-                        <div class="admin__field" style="margin-top: 15px;">
+                        <div class="admin__field required" style="margin-top: 15px;">
                             <label class="admin__field-label" style="width: 100%; max-width: 100%; float: none; margin-bottom: 6px;"><span><?= $escaper->escapeHtml(__('Customs Items (Goods)')) ?></span></label>
                             <div class="admin__field-control" style="width: 100%; max-width: 100%; float: none; overflow-x: auto; padding-right: 30px; box-sizing: border-box;">
                                 <table class="admin__control-table" style="width: 100%; border-collapse: collapse;">
@@ -568,7 +568,7 @@ $dateFormat = $viewModel->getDateFormat();
                                                 <input type="text" maxlength="35" class="admin__control-text" data-bind="value: namePl" style="width: 100%; box-sizing: border-box;" required />
                                             </td>
                                             <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="number" class="admin__control-text" min="1" data-bind="value: quantity" style="width: 100%; box-sizing: border-box;" required data-validate="{'required-entry': true, 'validate-no-comma': true}" />
+                                                <input type="text" class="admin__control-text" data-bind="value: quantity" style="width: 100%; box-sizing: border-box;" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true, 'validate-no-comma':true}" required />
                                             </td>
                                             <td style="padding: 6px 4px; vertical-align: top;">
                                                 <input type="text" class="admin__control-text" data-bind="value: weight" style="width: 100%; box-sizing: border-box;" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true, 'validate-no-comma': true}" />
