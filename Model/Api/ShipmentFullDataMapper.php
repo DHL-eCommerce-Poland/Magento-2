@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\Api;
 
 use Ideo\Dhl\Model\Config\Source\AddressType;
+use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 
 class ShipmentFullDataMapper
@@ -38,17 +39,21 @@ class ShipmentFullDataMapper
             ];
         }
 
+        $deliveryHours = $services->getDeliveryHours();
+        $isEvening = $services->isDeliveryEvening();
+        $product = ($deliveryHours !== null && $deliveryHours !== '1722') ? $deliveryHours : $settings->getServiceType();
+
         $serviceDef = [
-            'product' => $services->getDeliveryHours() ?? $settings->getServiceType(),
-            'deliveryEvening' => $services->getDeliveryHours() === '1722',
-            'pickupOnSaturday' => $services->isSaturdayDispatch(),
-            'deliveryOnSaturday' => $services->isSaturdayDelivery(),
+            'product' => $product,
+            'deliveryEvening' => $isEvening,
+            'pickupOnSaturday' => $services->isPickupOnSaturday(),
+            'deliveryOnSaturday' => $services->isDeliveryOnSaturday(),
         ];
 
-        if ($services->isCod()) {
+        if ($services->isCollectOnDelivery()) {
             $serviceDef['collectOnDelivery'] = true;
-            $serviceDef['collectOnDeliveryValue'] = $services->getCodAmount();
-            $serviceDef['collectOnDeliveryForm'] = $services->getCodPaymentMethod();
+            $serviceDef['collectOnDeliveryValue'] = $services->getCollectOnDeliveryValue();
+            $serviceDef['collectOnDeliveryForm'] = $services->getCollectOnDeliveryForm();
         }
 
         if ($services->isInsurance()) {
@@ -56,20 +61,27 @@ class ShipmentFullDataMapper
             $serviceDef['insuranceValue'] = $services->getInsuranceValue();
         }
 
-        if ($services->isPdi()) {
+        if ($services->isPredeliveryInformation()) {
             $serviceDef['predeliveryInformation'] = true;
-            $serviceDef['preaviso'] = true;
         }
 
-        if ($services->isRod()) {
+        if ($services->isReturnOnDelivery()) {
             $serviceDef['returnOnDelivery'] = true;
-            if ($services->getRodDocumentText() !== '') {
-                $serviceDef['returnOnDeliveryReference'] = $services->getRodDocumentText();
+            if ($services->getReturnOnDeliveryReference() !== '') {
+                $serviceDef['returnOnDeliveryReference'] = $services->getReturnOnDeliveryReference();
             }
         }
 
-        if ($services->isPod()) {
+        if ($services->isProofOfDelivery()) {
             $serviceDef['proofOfDelivery'] = true;
+        }
+
+        if ($services->isAgeVer()) {
+            $serviceDef['ageVer'] = true;
+        }
+
+        if ($services->isSelfCollect()) {
+            $serviceDef['selfCollect'] = true;
         }
 
         $senderCompanyName = trim($sender->getName());
@@ -147,7 +159,7 @@ class ShipmentFullDataMapper
                 'item' => $pieceItems,
             ],
             'payment' => [
-                'paymentMethod' => 'BANK_TRANSFER',
+                'paymentMethod' => SpecialServicesData::PAYMENT_METHOD_BANK_TRANSFER,
                 'payerType' => $payerType,
                 'accountNumber' => $this->sanitizeString($sender->getSapNumber()),
                 'costsCenter' => $this->sanitizeString($settings->getMpk()),

@@ -135,8 +135,8 @@ class OrderToShipmentDataMapperTest extends TestCase
         $this->assertSame('Firma ABC Sp. z o.o.', $shipmentData->getRecipient()->getName());
         $this->assertSame('B', $shipmentData->getRecipient()->getType());
         $this->assertSame('Adam Nowak', $shipmentData->getRecipient()->getContactPerson());
-        $this->assertTrue($shipmentData->getSpecialServices()->isCod());
-        $this->assertSame(299.99, $shipmentData->getSpecialServices()->getCodAmount());
+        $this->assertTrue($shipmentData->getSpecialServices()->isCollectOnDelivery());
+        $this->assertSame(299.99, $shipmentData->getSpecialServices()->getCollectOnDeliveryValue());
     }
 
     /**
@@ -192,8 +192,8 @@ class OrderToShipmentDataMapperTest extends TestCase
         $shipmentData = $this->mapper->map($order);
 
         $this->assertSame('AH', $shipmentData->getShipmentSettings()->getServiceType());
-        $this->assertTrue($shipmentData->getSpecialServices()->isCod());
-        $this->assertSame(450.50, $shipmentData->getSpecialServices()->getCodAmount());
+        $this->assertTrue($shipmentData->getSpecialServices()->isCollectOnDelivery());
+        $this->assertSame(450.50, $shipmentData->getSpecialServices()->getCollectOnDeliveryValue());
     }
 
     /**

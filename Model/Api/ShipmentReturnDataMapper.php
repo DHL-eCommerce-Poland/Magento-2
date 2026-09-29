@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\Api;
 
 use Ideo\Dhl\Model\Config\Source\ReturnBookCourier;
+use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
@@ -84,7 +85,7 @@ class ShipmentReturnDataMapper
         $billing = [
             'shippingPaymentType' => 'RECEIVER',
             'billingAccountNumber' => (int) preg_replace('/[^0-9]/', '', $billingAccount ?: '0'),
-            'paymentType' => 'BANK_TRANSFER',
+            'paymentType' => SpecialServicesData::PAYMENT_METHOD_BANK_TRANSFER,
         ];
 
         if ($settings->getMpk() !== '') {

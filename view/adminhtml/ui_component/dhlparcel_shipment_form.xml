@@ -649,7 +649,7 @@
                 </imports>
             </settings>
         </field>
-        <field name="specialServices[cod]" formElement="checkbox">
+        <field name="specialServices[collectOnDelivery]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -658,14 +658,14 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Cash On Delivery</label>
-                <dataScope>specialServices.cod</dataScope>
+                <dataScope>specialServices.collectOnDelivery</dataScope>
                 <switcherConfig>
                     <rules>
                         <rule name="0">
                             <value>0</value>
                             <actions>
                                 <action name="0">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[codAmount]</target>
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[collectOnDeliveryValue]</target>
                                     <callback>hide</callback>
                                 </action>
                             </actions>
@@ -674,7 +674,7 @@
                             <value>1</value>
                             <actions>
                                 <action name="0">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[codAmount]</target>
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[collectOnDeliveryValue]</target>
                                     <callback>show</callback>
                                 </action>
                             </actions>
@@ -695,7 +695,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[codAmount]" formElement="input">
+        <field name="specialServices[collectOnDeliveryValue]" formElement="input">
             <settings>
                 <validation>
                     <rule name="validate-number" xsi:type="boolean">true</rule>
@@ -703,13 +703,13 @@
                 </validation>
                 <dataType>text</dataType>
                 <label translate="true">COD Amount</label>
-                <dataScope>specialServices.codAmount</dataScope>
+                <dataScope>specialServices.collectOnDeliveryValue</dataScope>
                 <imports>
-                    <link name="visible">${$.provider}:data.specialServices.cod</link>
+                    <link name="visible">${$.provider}:data.specialServices.collectOnDelivery</link>
                 </imports>
             </settings>
         </field>
-        <field name="specialServices[eveningDelivery]" formElement="checkbox">
+        <field name="specialServices[deliveryEvening]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -718,7 +718,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Evening Delivery (18-22)</label>
-                <dataScope>specialServices.eveningDelivery</dataScope>
+                <dataScope>specialServices.deliveryEvening</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -732,7 +732,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[saturdayDelivery]" formElement="checkbox">
+        <field name="specialServices[deliveryOnSaturday]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -741,7 +741,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Saturday Delivery</label>
-                <dataScope>specialServices.saturdayDelivery</dataScope>
+                <dataScope>specialServices.deliveryOnSaturday</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -755,7 +755,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[saturdayDispatch]" formElement="checkbox">
+        <field name="specialServices[pickupOnSaturday]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -764,7 +764,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Saturday Pickup</label>
-                <dataScope>specialServices.saturdayDispatch</dataScope>
+                <dataScope>specialServices.pickupOnSaturday</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -778,7 +778,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[pdi]" formElement="checkbox">
+        <field name="specialServices[predeliveryInformation]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -787,7 +787,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Pre-delivery Information</label>
-                <dataScope>specialServices.pdi</dataScope>
+                <dataScope>specialServices.predeliveryInformation</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -801,7 +801,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[rod]" formElement="checkbox">
+        <field name="specialServices[returnOnDelivery]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -810,14 +810,14 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Return Confirmed Documents</label>
-                <dataScope>specialServices.rod</dataScope>
+                <dataScope>specialServices.returnOnDelivery</dataScope>
                 <switcherConfig>
                     <rules>
                         <rule name="0">
                             <value>0</value>
                             <actions>
                                 <action name="0">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[rodDocumentText]</target>
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[returnOnDeliveryReference]</target>
                                     <callback>hide</callback>
                                 </action>
                             </actions>
@@ -826,7 +826,7 @@
                             <value>1</value>
                             <actions>
                                 <action name="0">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[rodDocumentText]</target>
+                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[returnOnDeliveryReference]</target>
                                     <callback>show</callback>
                                 </action>
                             </actions>
@@ -847,17 +847,17 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[rodDocumentText]" formElement="input">
+        <field name="specialServices[returnOnDeliveryReference]" formElement="input">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">ROD Document Name</label>
-                <dataScope>specialServices.rodDocumentText</dataScope>
+                <dataScope>specialServices.returnOnDeliveryReference</dataScope>
                 <imports>
-                    <link name="visible">${$.provider}:data.specialServices.rod</link>
+                    <link name="visible">${$.provider}:data.specialServices.returnOnDelivery</link>
                 </imports>
             </settings>
         </field>
-        <field name="specialServices[pod]" formElement="checkbox">
+        <field name="specialServices[proofOfDelivery]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -866,7 +866,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Proof of Delivery</label>
-                <dataScope>specialServices.pod</dataScope>
+                <dataScope>specialServices.proofOfDelivery</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -880,7 +880,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[agever]" formElement="checkbox">
+        <field name="specialServices[ageVer]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -889,7 +889,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Adult Verification / Delivery</label>
-                <dataScope>specialServices.agever</dataScope>
+                <dataScope>specialServices.ageVer</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -903,7 +903,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[odb]" formElement="checkbox">
+        <field name="specialServices[selfCollect]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -912,7 +912,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Self Pickup</label>
-                <dataScope>specialServices.odb</dataScope>
+                <dataScope>specialServices.selfCollect</dataScope>
             </settings>
             <formElements>
                 <checkbox>

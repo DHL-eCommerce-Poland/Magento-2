@@ -278,62 +278,62 @@ $dateFormat = $viewModel->getDateFormat();
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Insurance Value')) ?>" data-bind="value: insuranceValue" data-validate="{'validate-no-comma': true}" />
                                 </div>
                                 <div class="admin__field admin__field-option">
-                                    <input type="checkbox" class="admin__control-checkbox" id="service_cod" data-bind="checked: cod" />
-                                    <label class="admin__field-label" for="service_cod">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_collect_on_delivery" data-bind="checked: collectOnDelivery" />
+                                    <label class="admin__field-label" for="service_collect_on_delivery">
                                         <span><?= $escaper->escapeHtml(__('Cash On Delivery')) ?></span>
                                     </label>
                                 </div>
-                                <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: cod">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('COD Amount')) ?>" data-bind="value: codAmount" data-validate="{'validate-no-comma': true}" />
+                                <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: collectOnDelivery">
+                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('COD Amount')) ?>" data-bind="value: collectOnDeliveryValue" data-validate="{'validate-no-comma': true}" />
                                 </div>
                                 <div class="admin__field admin__field-option">
-                                    <input type="checkbox" class="admin__control-checkbox" id="service_evening_delivery" data-bind="checked: eveningDelivery" />
-                                    <label class="admin__field-label" for="service_evening_delivery">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_delivery_evening" data-bind="checked: deliveryEvening" />
+                                    <label class="admin__field-label" for="service_delivery_evening">
                                         <span><?= $escaper->escapeHtml(__('Evening Delivery (18-22)')) ?></span>
                                     </label>
                                 </div>
                                 <div class="admin__field admin__field-option">
-                                    <input type="checkbox" class="admin__control-checkbox" id="service_saturday_delivery" data-bind="checked: saturdayDelivery" />
-                                    <label class="admin__field-label" for="service_saturday_delivery">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_delivery_on_saturday" data-bind="checked: deliveryOnSaturday" />
+                                    <label class="admin__field-label" for="service_delivery_on_saturday">
                                         <span><?= $escaper->escapeHtml(__('Saturday Delivery')) ?></span>
                                     </label>
                                 </div>
                                 <div class="admin__field admin__field-option">
-                                    <input type="checkbox" class="admin__control-checkbox" id="service_saturday_dispatch" data-bind="checked: saturdayDispatch" />
-                                    <label class="admin__field-label" for="service_saturday_dispatch">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_pickup_on_saturday" data-bind="checked: pickupOnSaturday" />
+                                    <label class="admin__field-label" for="service_pickup_on_saturday">
                                         <span><?= $escaper->escapeHtml(__('Saturday Pickup')) ?></span>
                                     </label>
                                 </div>
                                 <div class="admin__field admin__field-option">
-                                    <input type="checkbox" class="admin__control-checkbox" id="service_pdi" data-bind="checked: pdi" />
-                                    <label class="admin__field-label" for="service_pdi">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_predelivery_information" data-bind="checked: predeliveryInformation" />
+                                    <label class="admin__field-label" for="service_predelivery_information">
                                         <span><?= $escaper->escapeHtml(__('Pre-delivery Information')) ?></span>
                                     </label>
                                 </div>
                                 <div class="admin__field admin__field-option">
-                                    <input type="checkbox" class="admin__control-checkbox" id="service_rod" data-bind="checked: rod" />
-                                    <label class="admin__field-label" for="service_rod">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_return_on_delivery" data-bind="checked: returnOnDelivery" />
+                                    <label class="admin__field-label" for="service_return_on_delivery">
                                         <span><?= $escaper->escapeHtml(__('Return Confirmed Documents')) ?></span>
                                     </label>
                                 </div>
-                                <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: rod">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('ROD Document Name')) ?>" data-bind="value: rodDocumentText" />
+                                <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: returnOnDelivery">
+                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('ROD Document Name')) ?>" data-bind="value: returnOnDeliveryReference" />
                                 </div>
                                 <div class="admin__field admin__field-option">
-                                    <input type="checkbox" class="admin__control-checkbox" id="service_pod" data-bind="checked: pod" />
-                                    <label class="admin__field-label" for="service_pod">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_proof_of_delivery" data-bind="checked: proofOfDelivery" />
+                                    <label class="admin__field-label" for="service_proof_of_delivery">
                                         <span><?= $escaper->escapeHtml(__('Proof of Delivery')) ?></span>
                                     </label>
                                 </div>
                                 <div class="admin__field admin__field-option">
-                                    <input type="checkbox" class="admin__control-checkbox" id="service_agever" data-bind="checked: agever" />
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_agever" data-bind="checked: ageVer" />
                                     <label class="admin__field-label" for="service_agever">
                                         <span><?= $escaper->escapeHtml(__('Adult Verification / Delivery')) ?></span>
                                     </label>
                                 </div>
                                 <div class="admin__field admin__field-option">
-                                    <input type="checkbox" class="admin__control-checkbox" id="service_odb" data-bind="checked: odb" />
-                                    <label class="admin__field-label" for="service_odb">
+                                    <input type="checkbox" class="admin__control-checkbox" id="service_self_collect" data-bind="checked: selfCollect" />
+                                    <label class="admin__field-label" for="service_self_collect">
                                         <span><?= $escaper->escapeHtml(__('Self Pickup')) ?></span>
                                     </label>
                                 </div>

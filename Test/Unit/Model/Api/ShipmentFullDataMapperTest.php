@@ -67,15 +67,13 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $specialServices = new SpecialServicesData(
             deliveryHours: null,
-            saturdayDelivery: false,
-            saturdayDispatch: false,
+            deliveryOnSaturday: false,
+            pickupOnSaturday: false,
             insurance: true,
             insuranceValue: 200.0,
-            insuranceCurrency: 'PLN',
-            cod: true,
-            codAmount: 150.0,
-            codCurrency: 'PLN',
-            codPaymentMethod: 'BANK_TRANSFER'
+            collectOnDelivery: true,
+            collectOnDeliveryValue: 150.0,
+            collectOnDeliveryForm: 'BANK_TRANSFER'
         );
 
         $packages = [
@@ -177,8 +175,53 @@ class ShipmentFullDataMapperTest extends TestCase
         );
 
         $mapped = $this->mapper->map($shipmentData);
+
         $this->assertEquals('4529508', $mapped['servicePointAccountNumber']);
         $this->assertEquals('C', $mapped['receiver']['addressType']);
+    }
+
+    /**
+     * Test mapping of ageVer, selfCollect, and special services in service definition.
+     *
+     * @return void
+     */
+    public function testMapIncludesAgeVerAndSelfCollectAndSpecialServicesInServiceDef(): void
+    {
+        $sender = new SenderData();
+        $recipient = new RecipientData(name: 'Test Recipient');
+        $specialServices = new SpecialServicesData(
+            deliveryHours: '1722',
+            deliveryOnSaturday: true,
+            pickupOnSaturday: true,
+            predeliveryInformation: true,
+            returnOnDelivery: true,
+            returnOnDeliveryReference: 'REF123',
+            proofOfDelivery: true,
+            ageVer: true,
+            selfCollect: true
+        );
+        $settings = new ShipmentSettingsData(serviceType: 'AH', packages: [new PackageData()]);
+
+        $shipmentData = new DhlShipmentData(
+            sender: $sender,
+            recipient: $recipient,
+            specialServices: $specialServices,
+            shipmentSettings: $settings
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $service = $mapped['service'];
+        $this->assertEquals('AH', $service['product']);
+        $this->assertTrue($service['deliveryEvening']);
+        $this->assertTrue($service['deliveryOnSaturday']);
+        $this->assertTrue($service['pickupOnSaturday']);
+        $this->assertTrue($service['predeliveryInformation']);
+        $this->assertTrue($service['returnOnDelivery']);
+        $this->assertEquals('REF123', $service['returnOnDeliveryReference']);
+        $this->assertTrue($service['proofOfDelivery']);
+        $this->assertTrue($service['ageVer']);
+        $this->assertTrue($service['selfCollect']);
     }
 
     /**

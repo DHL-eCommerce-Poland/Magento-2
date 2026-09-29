@@ -178,23 +178,23 @@ class DataProvider extends AbstractDataProvider
     private function normalizeSpecialServices(array $ss): array
     {
         $dto = SpecialServicesData::fromArray($ss);
-        $isEvening = !empty($ss['eveningDelivery'])
-            || ($dto->getDeliveryHours() !== null && (string)$dto->getDeliveryHours() === '1722');
+        $isEvening = $dto->isDeliveryEvening();
 
         return [
             'insurance' => $dto->isInsurance() ? '1' : '0',
             'insuranceValue' => $dto->isInsurance() ? $dto->getInsuranceValue() : null,
-            'cod' => $dto->isCod() ? '1' : '0',
-            'codAmount' => $dto->isCod() ? $dto->getCodAmount() : null,
-            'eveningDelivery' => $isEvening ? '1' : '0',
-            'saturdayDelivery' => $dto->isSaturdayDelivery() ? '1' : '0',
-            'saturdayDispatch' => $dto->isSaturdayDispatch() ? '1' : '0',
-            'pdi' => $dto->isPdi() ? '1' : '0',
-            'rod' => $dto->isRod() ? '1' : '0',
-            'rodDocumentText' => $dto->isRod() ? $dto->getRodDocumentText() : '',
-            'pod' => $dto->isPod() ? '1' : '0',
-            'agever' => $dto->isAgever() ? '1' : '0',
-            'odb' => $dto->isOdb() ? '1' : '0',
+            'collectOnDelivery' => $dto->isCollectOnDelivery() ? '1' : '0',
+            'collectOnDeliveryValue' => $dto->isCollectOnDelivery() ? $dto->getCollectOnDeliveryValue() : null,
+            'collectOnDeliveryForm' => $dto->getCollectOnDeliveryForm(),
+            'deliveryEvening' => $isEvening ? '1' : '0',
+            'deliveryOnSaturday' => $dto->isDeliveryOnSaturday() ? '1' : '0',
+            'pickupOnSaturday' => $dto->isPickupOnSaturday() ? '1' : '0',
+            'predeliveryInformation' => $dto->isPredeliveryInformation() ? '1' : '0',
+            'returnOnDelivery' => $dto->isReturnOnDelivery() ? '1' : '0',
+            'returnOnDeliveryReference' => $dto->isReturnOnDelivery() ? $dto->getReturnOnDeliveryReference() : '',
+            'proofOfDelivery' => $dto->isProofOfDelivery() ? '1' : '0',
+            'ageVer' => $dto->isAgeVer() ? '1' : '0',
+            'selfCollect' => $dto->isSelfCollect() ? '1' : '0',
         ];
     }
 

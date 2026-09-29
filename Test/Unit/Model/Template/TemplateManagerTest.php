@@ -279,7 +279,7 @@ class TemplateManagerTest extends TestCase
         $service = $this->createMock(DeliveryService::class);
         $service->method('getAdditionalServices')->willReturn([
             'insurance' => 1,
-            'cod' => 1
+            'collectOnDelivery' => 1
         ]);
 
         $this->deliveryServiceRepository->method('getById')->willReturn($service);
@@ -289,7 +289,7 @@ class TemplateManagerTest extends TestCase
         $this->assertIsArray($result);
         $this->assertTrue($result['insurance']);
         $this->assertNull($result['insuranceValue']);
-        $this->assertTrue($result['cod']);
-        $this->assertNull($result['codAmount']);
+        $this->assertTrue($result['collectOnDelivery']);
+        $this->assertNull($result['collectOnDeliveryValue']);
     }
 }

@@ -8,46 +8,52 @@ namespace Ideo\Dhl\Model\Shipment\Data;
 
 class SpecialServicesData
 {
+    public const PAYMENT_METHOD_BANK_TRANSFER = 'BANK_TRANSFER';
+    public const DELIVERY_HOURS_EVENING = '1722';
+
     /**
      * @param string|null $deliveryHours
-     * @param bool $saturdayDelivery
-     * @param bool $saturdayDispatch
+     * @param bool $deliveryEvening
+     * @param bool $deliveryOnSaturday
+     * @param bool $pickupOnSaturday
      * @param bool $insurance
      * @param float|null $insuranceValue
-     * @param string $insuranceCurrency
-     * @param bool $cod
-     * @param float|null $codAmount
-     * @param string $codCurrency
-     * @param string $codPaymentMethod
-     * @param bool $pdi
-     * @param bool $rod
-     * @param string $rodDocumentText
-     * @param bool $pod
+     * @param bool $collectOnDelivery
+     * @param float|null $collectOnDeliveryValue
+     * @param string $collectOnDeliveryForm
+     * @param bool $predeliveryInformation
+     * @param bool $returnOnDelivery
+     * @param string $returnOnDeliveryReference
+     * @param bool $proofOfDelivery
      * @param bool $euroReturn
      * @param bool $nonStandard
-     * @param bool $agever
-     * @param bool $odb
+     * @param bool $ageVer
+     * @param bool $selfCollect
      */
     public function __construct(
         private ?string $deliveryHours = null,
-        private bool $saturdayDelivery = false,
-        private bool $saturdayDispatch = false,
+        private bool $deliveryEvening = false,
+        private bool $deliveryOnSaturday = false,
+        private bool $pickupOnSaturday = false,
         private bool $insurance = false,
         private ?float $insuranceValue = null,
-        private string $insuranceCurrency = 'PLN',
-        private bool $cod = false,
-        private ?float $codAmount = null,
-        private string $codCurrency = 'PLN',
-        private string $codPaymentMethod = 'BANK_TRANSFER',
-        private bool $pdi = false,
-        private bool $rod = false,
-        private string $rodDocumentText = '',
-        private bool $pod = false,
+        private bool $collectOnDelivery = false,
+        private ?float $collectOnDeliveryValue = null,
+        private string $collectOnDeliveryForm = self::PAYMENT_METHOD_BANK_TRANSFER,
+        private bool $predeliveryInformation = false,
+        private bool $returnOnDelivery = false,
+        private string $returnOnDeliveryReference = '',
+        private bool $proofOfDelivery = false,
         private bool $euroReturn = false,
         private bool $nonStandard = false,
-        private bool $agever = false,
-        private bool $odb = false
+        private bool $ageVer = false,
+        private bool $selfCollect = false
     ) {
+        if ($this->deliveryEvening && $this->deliveryHours === null) {
+            $this->deliveryHours = self::DELIVERY_HOURS_EVENING;
+        } elseif ($this->deliveryHours === self::DELIVERY_HOURS_EVENING) {
+            $this->deliveryEvening = true;
+        }
     }
 
     /**
@@ -61,13 +67,23 @@ class SpecialServicesData
     }
 
     /**
+     * Check if Evening Delivery service is enabled.
+     *
+     * @return bool
+     */
+    public function isDeliveryEvening(): bool
+    {
+        return $this->deliveryEvening || $this->deliveryHours === self::DELIVERY_HOURS_EVENING;
+    }
+
+    /**
      * Check if Saturday delivery service is enabled.
      *
      * @return bool
      */
-    public function isSaturdayDelivery(): bool
+    public function isDeliveryOnSaturday(): bool
     {
-        return $this->saturdayDelivery;
+        return $this->deliveryOnSaturday;
     }
 
     /**
@@ -75,9 +91,9 @@ class SpecialServicesData
      *
      * @return bool
      */
-    public function isSaturdayDispatch(): bool
+    public function isPickupOnSaturday(): bool
     {
-        return $this->saturdayDispatch;
+        return $this->pickupOnSaturday;
     }
 
     /**
@@ -101,23 +117,13 @@ class SpecialServicesData
     }
 
     /**
-     * Get insurance currency code (e.g. PLN).
-     *
-     * @return string
-     */
-    public function getInsuranceCurrency(): string
-    {
-        return $this->insuranceCurrency;
-    }
-
-    /**
      * Check if Cash On Delivery (COD) service is enabled.
      *
      * @return bool
      */
-    public function isCod(): bool
+    public function isCollectOnDelivery(): bool
     {
-        return $this->cod;
+        return $this->collectOnDelivery;
     }
 
     /**
@@ -125,19 +131,9 @@ class SpecialServicesData
      *
      * @return float|null
      */
-    public function getCodAmount(): ?float
+    public function getCollectOnDeliveryValue(): ?float
     {
-        return $this->codAmount;
-    }
-
-    /**
-     * Get COD currency code (e.g. PLN).
-     *
-     * @return string
-     */
-    public function getCodCurrency(): string
-    {
-        return $this->codCurrency;
+        return $this->collectOnDeliveryValue;
     }
 
     /**
@@ -145,9 +141,9 @@ class SpecialServicesData
      *
      * @return string
      */
-    public function getCodPaymentMethod(): string
+    public function getCollectOnDeliveryForm(): string
     {
-        return $this->codPaymentMethod;
+        return $this->collectOnDeliveryForm;
     }
 
     /**
@@ -155,9 +151,9 @@ class SpecialServicesData
      *
      * @return bool
      */
-    public function isPdi(): bool
+    public function isPredeliveryInformation(): bool
     {
-        return $this->pdi;
+        return $this->predeliveryInformation;
     }
 
     /**
@@ -165,9 +161,9 @@ class SpecialServicesData
      *
      * @return bool
      */
-    public function isRod(): bool
+    public function isReturnOnDelivery(): bool
     {
-        return $this->rod;
+        return $this->returnOnDelivery;
     }
 
     /**
@@ -175,9 +171,9 @@ class SpecialServicesData
      *
      * @return string
      */
-    public function getRodDocumentText(): string
+    public function getReturnOnDeliveryReference(): string
     {
-        return $this->rodDocumentText;
+        return $this->returnOnDeliveryReference;
     }
 
     /**
@@ -185,9 +181,9 @@ class SpecialServicesData
      *
      * @return bool
      */
-    public function isPod(): bool
+    public function isProofOfDelivery(): bool
     {
-        return $this->pod;
+        return $this->proofOfDelivery;
     }
 
     /**
@@ -211,27 +207,27 @@ class SpecialServicesData
     }
 
     /**
-     * Check if Adult Verification (AGEVER) service is enabled.
+     * Check if Adult Verification (AGEVER / ageVer) service is enabled.
      *
      * @return bool
      */
-    public function isAgever(): bool
+    public function isAgeVer(): bool
     {
-        return $this->agever;
+        return $this->ageVer;
     }
 
     /**
-     * Check if Self Pickup (ODB) service is enabled.
+     * Check if Self Pickup (ODB / selfCollect) service is enabled.
      *
      * @return bool
      */
-    public function isOdb(): bool
+    public function isSelfCollect(): bool
     {
-        return $this->odb;
+        return $this->selfCollect;
     }
 
     /**
-     * Convert special services object to array representation.
+     * Convert special services object to array representation using official DHL WebAPI2 names.
      *
      * @return array
      */
@@ -239,23 +235,22 @@ class SpecialServicesData
     {
         return [
             'deliveryHours' => $this->deliveryHours,
-            'saturdayDelivery' => $this->saturdayDelivery,
-            'saturdayDispatch' => $this->saturdayDispatch,
+            'deliveryEvening' => $this->isDeliveryEvening(),
+            'deliveryOnSaturday' => $this->deliveryOnSaturday,
+            'pickupOnSaturday' => $this->pickupOnSaturday,
             'insurance' => $this->insurance,
             'insuranceValue' => $this->insurance ? $this->insuranceValue : null,
-            'insuranceCurrency' => $this->insuranceCurrency,
-            'cod' => $this->cod,
-            'codAmount' => $this->cod ? $this->codAmount : null,
-            'codCurrency' => $this->codCurrency,
-            'codPaymentMethod' => $this->codPaymentMethod,
-            'pdi' => $this->pdi,
-            'rod' => $this->rod,
-            'rodDocumentText' => $this->rod ? $this->rodDocumentText : '',
-            'pod' => $this->pod,
+            'collectOnDelivery' => $this->collectOnDelivery,
+            'collectOnDeliveryValue' => $this->collectOnDelivery ? $this->collectOnDeliveryValue : null,
+            'collectOnDeliveryForm' => $this->collectOnDeliveryForm,
+            'predeliveryInformation' => $this->predeliveryInformation,
+            'returnOnDelivery' => $this->returnOnDelivery,
+            'returnOnDeliveryReference' => $this->returnOnDelivery ? $this->returnOnDeliveryReference : '',
+            'proofOfDelivery' => $this->proofOfDelivery,
             'euroReturn' => $this->euroReturn,
             'nonStandard' => $this->nonStandard,
-            'agever' => $this->agever,
-            'odb' => $this->odb,
+            'ageVer' => $this->ageVer,
+            'selfCollect' => $this->selfCollect,
         ];
     }
 
@@ -275,33 +270,38 @@ class SpecialServicesData
             ? (float)$insuranceValRaw
             : null;
 
-        $cod = filter_var($data['cod'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $codAmtRaw = $data['codAmount'] ?? null;
+        $cod = filter_var($data['collectOnDelivery'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $codAmtRaw = $data['collectOnDeliveryValue'] ?? null;
         $codAmount = ($cod && $codAmtRaw !== null && $codAmtRaw !== '') ? (float)$codAmtRaw : null;
 
-        $rod = filter_var($data['rod'] ?? $data['returnOnDelivery'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $rodDocRaw = (string)($data['rodDocumentText'] ?? '');
+        $rod = filter_var($data['returnOnDelivery'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $rodDocRaw = (string)($data['returnOnDeliveryReference'] ?? '');
         $rodDocumentText = $rod ? trim($rodDocRaw) : '';
 
+        $isEvening = filter_var($data['deliveryEvening'] ?? false, FILTER_VALIDATE_BOOLEAN)
+            || (isset($data['deliveryHours']) && (string)$data['deliveryHours'] === '1722');
+        $deliveryHours = (isset($data['deliveryHours']) && $data['deliveryHours'] !== '1722')
+            ? (string)$data['deliveryHours']
+            : ($isEvening ? '1722' : null);
+
         return new self(
-            $data['deliveryHours'] ?? null,
-            filter_var($data['saturdayDelivery'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            filter_var($data['saturdayDispatch'] ?? $data['pickupOnSaturday'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            $insurance,
-            $insuranceValue,
-            (string)($data['insuranceCurrency'] ?? 'PLN'),
-            $cod,
-            $codAmount,
-            (string)($data['codCurrency'] ?? 'PLN'),
-            (string)($data['codPaymentMethod'] ?? 'BANK_TRANSFER'),
-            filter_var($data['pdi'] ?? $data['predeliveryInformation'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            $rod,
-            $rodDocumentText,
-            filter_var($data['pod'] ?? $data['proofOfDelivery'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            filter_var($data['euroReturn'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            filter_var($data['nonStandard'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            filter_var($data['agever'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            filter_var($data['odb'] ?? false, FILTER_VALIDATE_BOOLEAN)
+            deliveryHours: $deliveryHours,
+            deliveryEvening: $isEvening,
+            deliveryOnSaturday: filter_var($data['deliveryOnSaturday'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            pickupOnSaturday: filter_var($data['pickupOnSaturday'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            insurance: $insurance,
+            insuranceValue: $insuranceValue,
+            collectOnDelivery: $cod,
+            collectOnDeliveryValue: $codAmount,
+            collectOnDeliveryForm: (string)($data['collectOnDeliveryForm'] ?? self::PAYMENT_METHOD_BANK_TRANSFER),
+            predeliveryInformation: filter_var($data['predeliveryInformation'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            returnOnDelivery: $rod,
+            returnOnDeliveryReference: $rodDocumentText,
+            proofOfDelivery: filter_var($data['proofOfDelivery'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            euroReturn: filter_var($data['euroReturn'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            nonStandard: filter_var($data['nonStandard'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            ageVer: filter_var($data['ageVer'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            selfCollect: filter_var($data['selfCollect'] ?? false, FILTER_VALIDATE_BOOLEAN)
         );
     }
 }

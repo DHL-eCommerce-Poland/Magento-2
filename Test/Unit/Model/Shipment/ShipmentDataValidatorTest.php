@@ -196,10 +196,10 @@ class ShipmentDataValidatorTest extends TestCase
         $specialServices = new \Ideo\Dhl\Model\Shipment\Data\SpecialServicesData(
             insurance: true,
             insuranceValue: null,
-            cod: true,
-            codAmount: null,
-            rod: true,
-            rodDocumentText: ''
+            collectOnDelivery: true,
+            collectOnDeliveryValue: null,
+            returnOnDelivery: true,
+            returnOnDeliveryReference: ''
         );
 
         $shipmentData = new DhlShipmentData(

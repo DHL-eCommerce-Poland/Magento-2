@@ -22,7 +22,7 @@ class DhlShipmentDataTest extends TestCase
     {
         $sender = new SenderData(name: 'Sender Company');
         $recipient = new RecipientData(name: 'Recipient Company');
-        $services = new SpecialServicesData(cod: true, codAmount: 100.0);
+        $services = new SpecialServicesData(collectOnDelivery: true, collectOnDeliveryValue: 100.0);
         $settings = new ShipmentSettingsData(serviceType: 'AH');
 
         $shipmentData = new DhlShipmentData(
@@ -38,7 +38,7 @@ class DhlShipmentDataTest extends TestCase
         $this->assertEquals(150.00, $shipmentData->getOrderGrandTotal());
         $this->assertEquals('Sender Company', $shipmentData->getSender()->getName());
         $this->assertEquals('Recipient Company', $shipmentData->getRecipient()->getName());
-        $this->assertTrue($shipmentData->getSpecialServices()->isCod());
+        $this->assertTrue($shipmentData->getSpecialServices()->isCollectOnDelivery());
         $this->assertEquals('AH', $shipmentData->getShipmentSettings()->getServiceType());
     }
 

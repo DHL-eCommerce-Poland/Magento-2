@@ -229,42 +229,37 @@ class OrderToShipmentDataMapper
         $insuranceValue = isset($presetSS['insuranceValue']) && $presetSS['insuranceValue'] !== null && $presetSS['insuranceValue'] !== ''
             ? (float)$presetSS['insuranceValue']
             : ($isInsurance ? $grandTotal : null);
-        $isEvening = !empty($presetSS['eveningDelivery'])
-            || !empty($presetSS['deliveryHours']);
-        $isSaturdayDelivery = !empty($presetSS['saturdayDelivery']);
-        $isSaturdayDispatch = !empty($presetSS['saturdayDispatch'])
-            || !empty($presetSS['pickupOnSaturday']);
-        $isPdi = !empty($presetSS['pdi'])
-            || !empty($presetSS['predeliveryInformation']);
-        $isRod = !empty($presetSS['rod'])
-            || !empty($presetSS['returnOnDelivery']);
-        $rodDocumentText = (string)($presetSS['rodDocumentText'] ?? '');
-        $isPod = !empty($presetSS['pod'])
-            || !empty($presetSS['proofOfDelivery']);
-        $isAgever = !empty($presetSS['agever']);
-        $isOdb = !empty($presetSS['odb']);
+        $isEvening = !empty($presetSS['deliveryEvening']) || !empty($presetSS['deliveryHours']);
+        $isSaturdayDelivery = !empty($presetSS['deliveryOnSaturday']);
+        $isSaturdayDispatch = !empty($presetSS['pickupOnSaturday']);
+        $isPdi = !empty($presetSS['predeliveryInformation']);
+        $isRod = !empty($presetSS['returnOnDelivery']);
+        $rodDocumentText = (string)($presetSS['returnOnDeliveryReference'] ?? '');
+        $isPod = !empty($presetSS['proofOfDelivery']);
+        $isAgever = !empty($presetSS['ageVer']);
+        $isOdb = !empty($presetSS['selfCollect']);
 
-        $presetCodAmount = isset($presetSS['codAmount']) && $presetSS['codAmount'] !== null && $presetSS['codAmount'] !== ''
-            ? (float)$presetSS['codAmount']
+        $presetCodAmount = isset($presetSS['collectOnDeliveryValue']) && $presetSS['collectOnDeliveryValue'] !== null && $presetSS['collectOnDeliveryValue'] !== ''
+            ? (float)$presetSS['collectOnDeliveryValue']
             : $grandTotal;
 
-        $hasCod = $isCod || !empty($presetSS['cod']);
+        $hasCod = $isCod || !empty($presetSS['collectOnDelivery']);
 
         $specialServices = new SpecialServicesData(
             deliveryHours: $isEvening ? '1722' : null,
-            saturdayDelivery: $isSaturdayDelivery,
-            saturdayDispatch: $isSaturdayDispatch,
+            deliveryEvening: $isEvening,
+            deliveryOnSaturday: $isSaturdayDelivery,
+            pickupOnSaturday: $isSaturdayDispatch,
             insurance: $isInsurance,
             insuranceValue: $insuranceValue,
-            cod: $hasCod,
-            codAmount: $hasCod ? ($codAmount ?? $presetCodAmount) : null,
-            codCurrency: (string)($order->getOrderCurrencyCode() ?? 'PLN'),
-            pdi: $isPdi,
-            rod: $isRod,
-            rodDocumentText: $rodDocumentText,
-            pod: $isPod,
-            agever: $isAgever,
-            odb: $isOdb
+            collectOnDelivery: $hasCod,
+            collectOnDeliveryValue: $hasCod ? ($codAmount ?? $presetCodAmount) : null,
+            predeliveryInformation: $isPdi,
+            returnOnDelivery: $isRod,
+            returnOnDeliveryReference: $rodDocumentText,
+            proofOfDelivery: $isPod,
+            ageVer: $isAgever,
+            selfCollect: $isOdb
         );
 
         // 6. Packages

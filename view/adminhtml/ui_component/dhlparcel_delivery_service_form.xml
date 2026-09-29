@@ -320,7 +320,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="additional_services[cod]" formElement="checkbox">
+        <field name="additional_services[collectOnDelivery]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -329,7 +329,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Cash On Delivery</label>
-                <dataScope>additional_services.cod</dataScope>
+                <dataScope>additional_services.collectOnDelivery</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -343,7 +343,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="additional_services[eveningDelivery]" formElement="checkbox">
+        <field name="additional_services[deliveryEvening]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -352,7 +352,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Evening Delivery (18-22)</label>
-                <dataScope>additional_services.eveningDelivery</dataScope>
+                <dataScope>additional_services.deliveryEvening</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -366,7 +366,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="additional_services[saturdayDelivery]" formElement="checkbox">
+        <field name="additional_services[deliveryOnSaturday]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -375,7 +375,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Saturday Delivery</label>
-                <dataScope>additional_services.saturdayDelivery</dataScope>
+                <dataScope>additional_services.deliveryOnSaturday</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -481,7 +481,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="additional_services[agever]" formElement="checkbox">
+        <field name="additional_services[ageVer]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -490,7 +490,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Adult Verification / Delivery</label>
-                <dataScope>additional_services.agever</dataScope>
+                <dataScope>additional_services.ageVer</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -504,7 +504,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="additional_services[odb]" formElement="checkbox">
+        <field name="additional_services[selfCollect]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -513,7 +513,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Self Pickup</label>
-                <dataScope>additional_services.odb</dataScope>
+                <dataScope>additional_services.selfCollect</dataScope>
             </settings>
             <formElements>
                 <checkbox>

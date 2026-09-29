@@ -372,15 +372,28 @@ define([
             ? formatMoney(ss.insuranceValue)
             : (initialInsurance ? orderGrandTotalVal : '');
 
-        var initialCod = isTruthy(ss.cod);
-        var initialCodAmount = (ss.codAmount !== undefined && ss.codAmount !== null && ss.codAmount !== '')
-            ? formatMoney(ss.codAmount)
+        var initialCod = isTruthy(ss.collectOnDelivery);
+        var initialCodAmountRaw = ss.collectOnDeliveryValue;
+        var initialCodAmount = (initialCodAmountRaw !== undefined && initialCodAmountRaw !== null && initialCodAmountRaw !== '')
+            ? formatMoney(initialCodAmountRaw)
             : (initialCod ? orderGrandTotalVal : '');
 
         var insuranceObs = ko.observable(initialInsurance);
         var insuranceValueObs = ko.observable(initialInsuranceValue);
         var codObs = ko.observable(initialCod);
         var codAmountObs = ko.observable(initialCodAmount);
+        var eveningDeliveryObs = ko.observable(ss.deliveryHours === '1722' || isTruthy(ss.deliveryEvening));
+        var saturdayDeliveryObs = ko.observable(isTruthy(ss.deliveryOnSaturday));
+        var saturdayDispatchObs = ko.observable(isTruthy(ss.pickupOnSaturday));
+        var pdiObs = ko.observable(isTruthy(ss.predeliveryInformation));
+        var rodObs = ko.observable(isTruthy(ss.returnOnDelivery));
+        var rodDocumentTextVal = (ss.returnOnDeliveryReference !== undefined && ss.returnOnDeliveryReference !== null)
+            ? ss.returnOnDeliveryReference
+            : '';
+        var rodDocumentTextObs = ko.observable(rodDocumentTextVal);
+        var podObs = ko.observable(isTruthy(ss.proofOfDelivery));
+        var ageverObs = ko.observable(isTruthy(ss.ageVer));
+        var odbObs = ko.observable(isTruthy(ss.selfCollect));
 
         insuranceObs.subscribe(function (checked) {
             if (checked) {
@@ -422,17 +435,17 @@ define([
             specialServices: {
                 insurance: insuranceObs,
                 insuranceValue: insuranceValueObs,
-                cod: codObs,
-                codAmount: codAmountObs,
-                eveningDelivery: ko.observable(ss.deliveryHours === '1722' || isTruthy(ss.eveningDelivery)),
-                saturdayDelivery: ko.observable(isTruthy(ss.saturdayDelivery)),
-                saturdayDispatch: ko.observable(isTruthy(ss.saturdayDispatch || ss.pickupOnSaturday)),
-                pdi: ko.observable(isTruthy(ss.pdi || ss.predeliveryInformation)),
-                rod: ko.observable(isTruthy(ss.rod || ss.returnOnDelivery)),
-                rodDocumentText: ko.observable((ss.rodDocumentText !== undefined && ss.rodDocumentText !== null) ? ss.rodDocumentText : ''),
-                pod: ko.observable(isTruthy(ss.pod || ss.proofOfDelivery)),
-                agever: ko.observable(isTruthy(ss.agever)),
-                odb: ko.observable(isTruthy(ss.odb))
+                collectOnDelivery: codObs,
+                collectOnDeliveryValue: codAmountObs,
+                deliveryEvening: eveningDeliveryObs,
+                deliveryOnSaturday: saturdayDeliveryObs,
+                pickupOnSaturday: saturdayDispatchObs,
+                predeliveryInformation: pdiObs,
+                returnOnDelivery: rodObs,
+                returnOnDeliveryReference: rodDocumentTextObs,
+                proofOfDelivery: podObs,
+                ageVer: ageverObs,
+                selfCollect: odbObs
             },
             shipmentSettings: shipmentSettingsObj,
             customs: createCustomsData(data.customs || {})
@@ -946,43 +959,76 @@ define([
                         var tplInsuranceVal = (specialServices.insuranceValue !== null && specialServices.insuranceValue !== undefined && specialServices.insuranceValue !== '')
                             ? formatMoney(specialServices.insuranceValue)
                             : '';
-                        var tplCodAmt = (specialServices.codAmount !== null && specialServices.codAmount !== undefined && specialServices.codAmount !== '')
-                            ? formatMoney(specialServices.codAmount)
+                        var tplCodAmt = (specialServices.collectOnDeliveryValue !== null && specialServices.collectOnDeliveryValue !== undefined && specialServices.collectOnDeliveryValue !== '')
+                            ? formatMoney(specialServices.collectOnDeliveryValue)
                             : '';
 
                         if (typeof currentSS.insuranceValue === 'function') {
                             currentSS.insuranceValue(tplInsuranceVal);
                         }
-                        if (typeof currentSS.codAmount === 'function') {
-                            currentSS.codAmount(tplCodAmt);
+                        if (typeof currentSS.collectOnDeliveryValue === 'function') {
+                            currentSS.collectOnDeliveryValue(tplCodAmt);
                         }
-                        if (specialServices.rodDocumentText !== undefined && typeof currentSS.rodDocumentText === 'function') {
-                            currentSS.rodDocumentText(specialServices.rodDocumentText || '');
+
+                        if (specialServices.returnOnDeliveryReference !== undefined && typeof currentSS.returnOnDeliveryReference === 'function') {
+                            currentSS.returnOnDeliveryReference(specialServices.returnOnDeliveryReference || '');
                         }
-                        if (specialServices.proofOfDelivery !== undefined && typeof currentSS.pod === 'function') {
-                            currentSS.pod(isTruthy(specialServices.proofOfDelivery));
+
+                        if (specialServices.deliveryEvening !== undefined && typeof currentSS.deliveryEvening === 'function') {
+                            currentSS.deliveryEvening(isTruthy(specialServices.deliveryEvening));
+                        } else if (specialServices.deliveryHours !== undefined && typeof currentSS.deliveryEvening === 'function') {
+                            currentSS.deliveryEvening(specialServices.deliveryHours === '1722');
                         }
-                        if (specialServices.predeliveryInformation !== undefined && typeof currentSS.pdi === 'function') {
-                            currentSS.pdi(isTruthy(specialServices.predeliveryInformation));
+
+                        if (specialServices.deliveryOnSaturday !== undefined && typeof currentSS.deliveryOnSaturday === 'function') {
+                            currentSS.deliveryOnSaturday(isTruthy(specialServices.deliveryOnSaturday));
                         }
-                        if (specialServices.returnOnDelivery !== undefined && typeof currentSS.rod === 'function') {
-                            currentSS.rod(isTruthy(specialServices.returnOnDelivery));
+
+                        if (specialServices.pickupOnSaturday !== undefined && typeof currentSS.pickupOnSaturday === 'function') {
+                            currentSS.pickupOnSaturday(isTruthy(specialServices.pickupOnSaturday));
                         }
-                        if (specialServices.pickupOnSaturday !== undefined && typeof currentSS.saturdayDispatch === 'function') {
-                            currentSS.saturdayDispatch(isTruthy(specialServices.pickupOnSaturday));
+
+                        if (specialServices.predeliveryInformation !== undefined && typeof currentSS.predeliveryInformation === 'function') {
+                            currentSS.predeliveryInformation(isTruthy(specialServices.predeliveryInformation));
                         }
+
+                        if (specialServices.returnOnDelivery !== undefined && typeof currentSS.returnOnDelivery === 'function') {
+                            currentSS.returnOnDelivery(isTruthy(specialServices.returnOnDelivery));
+                        }
+
+                        if (specialServices.proofOfDelivery !== undefined && typeof currentSS.proofOfDelivery === 'function') {
+                            currentSS.proofOfDelivery(isTruthy(specialServices.proofOfDelivery));
+                        }
+
+                        if (specialServices.ageVer !== undefined && typeof currentSS.ageVer === 'function') {
+                            currentSS.ageVer(isTruthy(specialServices.ageVer));
+                        }
+
+                        if (specialServices.selfCollect !== undefined && typeof currentSS.selfCollect === 'function') {
+                            currentSS.selfCollect(isTruthy(specialServices.selfCollect));
+                        }
+
+                        if (specialServices.collectOnDelivery !== undefined && typeof currentSS.collectOnDelivery === 'function') {
+                            currentSS.collectOnDelivery(isTruthy(specialServices.collectOnDelivery));
+                        }
+
                         $.each(specialServices, function (key, val) {
-                            if (key === 'insuranceValue' || key === 'codAmount' || key === 'rodDocumentText') return;
+                            if (key === 'insuranceValue' || key === 'collectOnDeliveryValue' || key === 'returnOnDeliveryReference') return;
                             if (typeof currentSS[key] === 'function') {
                                 currentSS[key](isTruthy(val));
                             }
                         });
 
-                        if (currentSS.insurance() && (!currentSS.insuranceValue() || String(currentSS.insuranceValue()).trim() === '')) {
+                        var isInsChecked = typeof currentSS.insurance === 'function' ? currentSS.insurance() : false;
+                        if (isInsChecked && (!currentSS.insuranceValue() || String(currentSS.insuranceValue()).trim() === '')) {
                             currentSS.insuranceValue(orderTotal);
                         }
-                        if (currentSS.cod() && (!currentSS.codAmount() || String(currentSS.codAmount()).trim() === '')) {
-                            currentSS.codAmount(orderTotal);
+
+                        var isCodChecked = typeof currentSS.collectOnDelivery === 'function' && currentSS.collectOnDelivery();
+                        if (isCodChecked) {
+                            if (typeof currentSS.collectOnDeliveryValue === 'function' && (!currentSS.collectOnDeliveryValue() || String(currentSS.collectOnDeliveryValue()).trim() === '')) {
+                                currentSS.collectOnDeliveryValue(orderTotal);
+                            }
                         }
                     }
 
@@ -1100,7 +1146,7 @@ define([
                                         };
 
                                         if (draftJs.specialServices) {
-                                            if (checkComma(draftJs.specialServices.insuranceValue) || checkComma(draftJs.specialServices.codAmount)) {
+                                            if (checkComma(draftJs.specialServices.insuranceValue) || checkComma(draftJs.specialServices.collectOnDeliveryValue)) {
                                                 hasCommaError = true;
                                             }
                                         }
