@@ -370,4 +370,36 @@ class OrderToShipmentDataMapperTest extends TestCase
         $this->assertSame('DE', $shipmentData->getRecipient()->getCountry());
         $this->assertSame('12-345', $shipmentData->getRecipient()->getPostalCode());
     }
+
+    /**
+     * Test mapping order with French shipping address format correctly splits prefix house number.
+     *
+     * @return void
+     */
+    public function testMapFrenchAddressOrderSplitsStreetAndHouseNumber(): void
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getFirstname')->willReturn('Pierre');
+        $address->method('getLastname')->willReturn('Dubois');
+        $address->method('getStreet')->willReturn(['30 Rue des Buissons']);
+        $address->method('getCity')->willReturn('Paris');
+        $address->method('getPostcode')->willReturn('75001');
+        $address->method('getCountryId')->willReturn('FR');
+
+        $payment = $this->createStub(Payment::class);
+        $payment->method('getMethod')->willReturn('checkmo');
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getEntityId')->willReturn(110);
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getPayment')->willReturn($payment);
+        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska');
+
+        $shipmentData = $this->mapper->map($order);
+
+        $this->assertSame('FR', $shipmentData->getRecipient()->getCountry());
+        $this->assertSame('Rue des Buissons', $shipmentData->getRecipient()->getStreet());
+        $this->assertSame('30', $shipmentData->getRecipient()->getHouseNumber());
+    }
 }

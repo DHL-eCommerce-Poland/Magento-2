@@ -48,6 +48,13 @@ class StreetAddressParserTest extends TestCase
             'array input 1 line' => [['Marszałkowska 10/12'], 'Marszałkowska', '10/12', ''],
             'empty string' => ['', '', '', ''],
             'unparseable single text' => ['BezNumeru', 'BezNumeru', '', ''],
+            'french address standard' => ['30 Rue des Buissons', 'Rue des Buissons', '30', ''],
+            'french address with comma' => ['30, Rue des Buissons', 'Rue des Buissons', '30', ''],
+            'french address with bis' => ['30 bis Rue des Buissons', 'Rue des Buissons', '30 bis', ''],
+            'french address with letter' => ['10A Rue des Buissons', 'Rue des Buissons', '10A', ''],
+            'french address with slash' => ['10/34 Rue des Buissons', 'Rue des Buissons', '10/34', ''],
+            'french address with letter and slash' => ['10C/23 Rue des Buissons', 'Rue des Buissons', '10C/23', ''],
+            'french address range' => ['10-12 Rue de la Paix', 'Rue de la Paix', '10-12', ''],
         ];
     }
 }
