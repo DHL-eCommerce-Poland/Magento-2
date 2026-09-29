@@ -303,12 +303,12 @@ class OrderToShipmentDataMapper
         $shippingMethod = (string)($order->getShippingMethod() ?? '');
         $serviceType = $this->methodCatalog->getServiceCodeForMethod($shippingMethod);
 
-        $isSpOrPsOrEks = in_array(
+        $isSpOrPsOrEk = in_array(
             strtoupper(trim((string)$serviceType)),
-            [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EKS],
+            [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EK],
             true
         );
-        if ($isSpOrPsOrEks
+        if ($isSpOrPsOrEk
             && (empty($popId) || trim((string)$popId) === '')
             && $this->nearestPointResolver !== null
         ) {

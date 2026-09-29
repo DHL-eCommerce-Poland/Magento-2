@@ -14,7 +14,7 @@ class ServiceCodeTest extends TestCase
         $source = new ServiceCode();
         $options = $source->toOptionArray();
 
-        self::assertCount(10, $options);
+        self::assertCount(9, $options);
         self::assertSame('', $options[0]['value']);
         self::assertSame('AH', $options[1]['value']);
         self::assertSame('09', $options[2]['value']);
@@ -22,8 +22,7 @@ class ServiceCodeTest extends TestCase
         self::assertSame('PR', $options[4]['value']);
         self::assertSame('SP', $options[5]['value']);
         self::assertSame('EK', $options[6]['value']);
-        self::assertSame('EKS', $options[7]['value']);
-        self::assertSame('CP', $options[8]['value']);
-        self::assertSame('CM', $options[9]['value']);
+        self::assertSame('CP', $options[7]['value']);
+        self::assertSame('CM', $options[8]['value']);
     }
 }

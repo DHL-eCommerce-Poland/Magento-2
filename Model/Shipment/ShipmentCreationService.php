@@ -329,7 +329,7 @@ class ShipmentCreationService
     }
 
     /**
-     * Resolve nearest service point if service is SP / EKS and recipient popId is empty.
+     * Resolve nearest service point if service is SP / PS / EK and recipient popId is empty.
      *
      * @param DhlShipmentData $shipmentData
      * @param string $environment
@@ -342,7 +342,7 @@ class ShipmentCreationService
         $serviceType = strtoupper(trim((string)$shipmentData->getShipmentSettings()->getServiceType()));
         $popId = $shipmentData->getRecipient()->getPopId();
 
-        if (in_array($serviceType, [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EKS], true) && (empty($popId) || trim((string)$popId) === '')) {
+        if (in_array($serviceType, [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EK], true) && (empty($popId) || trim((string)$popId) === '')) {
             if ($this->nearestPointResolver !== null) {
                 try {
                     $updatedRecipient = $this->nearestPointResolver->resolveForRecipient(

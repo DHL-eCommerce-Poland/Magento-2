@@ -249,7 +249,7 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $sender = new SenderData();
         $specialServices = new SpecialServicesData();
-        $settings = new ShipmentSettingsData(serviceType: 'EKS', packages: [new PackageData()]);
+        $settings = new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]);
 
         $shipmentData = new DhlShipmentData(
             orderId: 102,
@@ -295,7 +295,7 @@ class ShipmentFullDataMapperTest extends TestCase
             sender: new SenderData(),
             recipient: $recipient,
             specialServices: new SpecialServicesData(),
-            shipmentSettings: new ShipmentSettingsData(serviceType: 'EKS', packages: [new PackageData()])
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()])
         );
 
         $mapped = $this->mapper->map($shipmentData);
@@ -327,7 +327,7 @@ class ShipmentFullDataMapperTest extends TestCase
             sender: new SenderData(),
             recipient: $recipient,
             specialServices: new SpecialServicesData(),
-            shipmentSettings: new ShipmentSettingsData(serviceType: 'EKS', packages: [new PackageData()])
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()])
         );
 
         $mapped = $this->mapper->map($shipmentData);
@@ -393,7 +393,7 @@ class ShipmentFullDataMapperTest extends TestCase
             sender: $sender,
             recipient: $recipient,
             specialServices: new SpecialServicesData(),
-            shipmentSettings: new ShipmentSettingsData(serviceType: 'EKS', packages: [new PackageData()]),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
             itemsQty: [],
             customs: $customs
         );
@@ -447,7 +447,7 @@ class ShipmentFullDataMapperTest extends TestCase
             sender: $sender,
             recipient: $recipient,
             specialServices: new SpecialServicesData(),
-            shipmentSettings: new ShipmentSettingsData(serviceType: 'EKS', packages: [new PackageData()]),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
             customs: $customs
         );
 

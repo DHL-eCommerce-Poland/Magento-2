@@ -440,6 +440,83 @@ class ShipmentCreationServiceTest extends TestCase
     }
 
     /**
+     * Test auto-resolving nearest service point when serviceType is EK and popId is empty.
+     *
+     * @return void
+     */
+    public function testCreateShipmentAutoResolvesNearestPointWhenPopIdIsEmptyForEkService(): void
+    {
+        $recipientData = new \Ideo\Dhl\Model\Shipment\Data\RecipientData(
+            postalCode: '10115',
+            city: 'Berlin',
+            country: 'DE',
+            popId: null
+        );
+
+        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(
+            serviceType: 'EK'
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 201,
+            recipient: $recipientData,
+            shipmentSettings: $shipmentSettings
+        );
+
+        $this->lockManagerMock->method('lock')->willReturn(true);
+
+        $resolvedRecipient = new \Ideo\Dhl\Model\Shipment\Data\RecipientData(
+            postalCode: '10115',
+            city: 'Berlin',
+            country: 'DE',
+            popId: 'POP-BER-888',
+            popName: 'Berlin Service Point'
+        );
+
+        $resolverMock = $this->createMock(\Ideo\Dhl\Model\ServicePoint\NearestPointResolver::class);
+        $resolverMock->expects($this->once())
+            ->method('resolveForRecipient')
+            ->willReturn($resolvedRecipient);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+
+        $mapperMock = $this->createMock(ShipmentFullDataMapper::class);
+        $mapperMock->expects($this->once())
+            ->method('map')
+            ->with($this->callback(function (DhlShipmentData $data) {
+                return $data->getRecipient()->getPopId() === 'POP-BER-888';
+            }))
+            ->willReturn(['servicePointAccountNumber' => 'POP-BER-888']);
+
+        $apiResult = new CreateShipmentResult(true, false, '900999001');
+        $this->clientStub->method('createShipment')->willReturn($apiResult);
+
+        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
+        $returnBuilderMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
+        $returnCreationServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
+        $magentoSyncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+
+        $serviceWithResolver = new ShipmentCreationService(
+            $this->shipmentDataServiceMock,
+            $this->validatorStub,
+            $mapperMock,
+            $this->credentialsProviderStub,
+            $this->clientStub,
+            $this->lockManagerMock,
+            $this->loggerStub,
+            $serializer,
+            $returnBuilderMock,
+            $returnCreationServiceMock,
+            $magentoSyncServiceMock,
+            $resolverMock
+        );
+
+        $result = $serviceWithResolver->createShipment($shipmentData, 'sandbox');
+        $this->assertTrue($result->isSuccess());
+    }
+
+    /**
      * Test createShipment throws LocalizedException when a shipment has already been created for the order.
      *
      * @return void

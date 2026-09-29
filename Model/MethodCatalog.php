@@ -13,7 +13,6 @@ class MethodCatalog
     public const SERVICE_SP = 'SP';
     public const SERVICE_PS = 'PS';
     public const SERVICE_EK = 'EK';
-    public const SERVICE_EKS = 'EKS';
     public const SERVICE_CP = 'CP';
     public const SERVICE_CM = 'CM';
     public const SERVICE_LM = 'LM';

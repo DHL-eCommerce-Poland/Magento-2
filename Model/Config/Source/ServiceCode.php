@@ -24,7 +24,6 @@ class ServiceCode implements OptionSourceInterface
             ['value' => MethodCatalog::SERVICE_PR, 'label' => __('PR - Premium Shipment')],
             ['value' => MethodCatalog::SERVICE_SP, 'label' => __('SP - Domestic Service Point Delivery')],
             ['value' => MethodCatalog::SERVICE_EK, 'label' => __('EK - Connect Shipment')],
-            ['value' => MethodCatalog::SERVICE_EKS, 'label' => __('EKS - International Service Point Delivery')],
             ['value' => MethodCatalog::SERVICE_CP, 'label' => __('CP - Connect Plus Shipment')],
             ['value' => MethodCatalog::SERVICE_CM, 'label' => __('CM - Connect Plus Pallet Shipment')],
         ];
