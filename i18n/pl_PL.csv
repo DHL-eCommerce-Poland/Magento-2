@@ -326,8 +326,8 @@ Address Type,Typ adresu
 Consumer / Private (C),Osoba prywatna / Konsument (C)
 Company / Business (B),Firma / Biznes (B)
 Company Name,Nazwa odbiorcy
-POP Service Point ID,Numer punktu POP / ServicePoint
-POP Service Point Address,Adres punktu POP / ServicePoint
+POP Service Point ID,Numer punktu POP / BOX
+POP Service Point Address,Adres punktu POP / BOX
 German Customer Number (Postnummer),Niemiecki numer klienta (Postnummer)
 Shipment Settings,Ustawienia przesyłki
 Delivery Service Template,Szablon usługi dostawy
@@ -615,4 +615,15 @@ Help,Pomoc
 "DHL connection error: %1","Błąd połączenia z DHL: %1"
 "An error occurred while connecting to DHL: %1","Wystąpił błąd podczas połączenia z DHL: %1"
 "Success","Sukces"
-
+"Select delivery point from map","Wybierz punkt dostawy z mapy"
+"Select Delivery Point","Wybierz punkt dostawy z mapy"
+"Delivery Point","Punkt dostawy"
+"International Point Type","Typ punktu międzynarodowego"
+"PackStation","Packstation"
+"ParcelShop","Parcelshop"
+"Packstation","Packstation"
+"Parcelshop","Parcelshop"
+"Select DHL Delivery Point","Wybierz punkt dostawy DHL"
+"Courier","Kurier"
+"Amount in PLN","Kwota w PLN"
+"Amount in destination country's currency","Kwota w walucie docelowego kraju"

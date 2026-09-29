@@ -134,30 +134,48 @@ $dateFormat = $viewModel->getDateFormat();
                                 <input type="email" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Email')) ?>" data-bind="value: email" style="flex: 1;" required />
                             </div>
                         </div>
-                        <!-- POP data only displayed if a POP Service Point was selected on the map -->
-                        <!-- ko if: popId() && popId().trim() !== '' -->
+                        <!-- Delivery Point Fields (Visible for SP or EK service) -->
+                        <!-- ko if: $parent.isPointServiceSelected() -->
+                        <!-- International Point Type select (visible for non-PL recipient countries) -->
+                        <!-- ko if: country() && country().toUpperCase() !== 'PL' -->
+                        <div class="admin__field">
+                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('International Point Type')) ?></span></label>
+                            <div class="admin__field-control">
+                                <select class="admin__control-select" data-bind="options: $parent.internationalMapPointTypeOptions, optionsText: 'label', optionsValue: 'value', value: mapPointType"></select>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                        <!-- Delivery Point Button -->
+                        <div class="admin__field">
+                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Delivery Point')) ?></span></label>
+                            <div class="admin__field-control">
+                                <button type="button" class="action-secondary" data-bind="click: function() { if (mapPointType() !== 'courier') { $parent.openPointMapModal(); } }, disable: mapPointType() === 'courier'">
+                                    <span><?= $escaper->escapeHtml(__('Select delivery point from map')) ?></span>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- POP data fields -->
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('POP Service Point ID')) ?></span></label>
                             <div class="admin__field-control">
                                 <input type="text" class="admin__control-text" data-bind="value: popId" disabled readonly />
                             </div>
                         </div>
-                        <!-- ko if: popName() && popName().trim() !== '' -->
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('POP Service Point Address')) ?></span></label>
                             <div class="admin__field-control">
                                 <input type="text" class="admin__control-text" data-bind="value: popName" disabled readonly />
                             </div>
                         </div>
-                        <!-- /ko -->
-                        <!-- /ko -->
-                        <!-- ko if: postnummer() && postnummer().trim() !== '' -->
+                        <!-- German Postnummer field (Visible for Germany / DE) -->
+                        <!-- ko if: country() && country().toUpperCase() === 'DE' -->
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('German Customer Number (Postnummer)')) ?></span></label>
                             <div class="admin__field-control">
-                                <input type="text" class="admin__control-text" data-bind="value: postnummer" disabled readonly />
+                                <input type="text" class="admin__control-text" data-bind="value: postnummer" />
                             </div>
                         </div>
+                        <!-- /ko -->
                         <!-- /ko -->
                     </fieldset>
                 </div>
@@ -276,6 +294,9 @@ $dateFormat = $viewModel->getDateFormat();
                                 </div>
                                 <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: insurance">
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Insurance Value')) ?>" data-bind="value: insuranceValue" data-validate="{'validate-no-comma': true}" />
+                                    <div class="admin__field-note">
+                                        <span><?= $escaper->escapeHtml(__('Amount in PLN')) ?></span>
+                                    </div>
                                 </div>
                                 <div class="admin__field admin__field-option">
                                     <input type="checkbox" class="admin__control-checkbox" id="service_collect_on_delivery" data-bind="checked: collectOnDelivery" />
@@ -285,6 +306,9 @@ $dateFormat = $viewModel->getDateFormat();
                                 </div>
                                 <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: collectOnDelivery">
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('COD Amount')) ?>" data-bind="value: collectOnDeliveryValue" data-validate="{'validate-no-comma': true}" />
+                                    <div class="admin__field-note">
+                                        <span><?= $escaper->escapeHtml(__('Amount in destination country\'s currency')) ?></span>
+                                    </div>
                                 </div>
                                 <div class="admin__field admin__field-option">
                                     <input type="checkbox" class="admin__control-checkbox" id="service_delivery_evening" data-bind="checked: deliveryEvening" />

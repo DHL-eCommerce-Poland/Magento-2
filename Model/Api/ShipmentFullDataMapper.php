@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\Api;
 
 use Ideo\Dhl\Model\Config\Source\AddressType;
+use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 
@@ -100,7 +101,13 @@ class ShipmentFullDataMapper
             default => 'SHIPPER',
         };
 
-        $servicePointAccountNumber = !empty($recipient->getPopId())
+        $isPointService = in_array(
+            strtoupper(trim((string)$product)),
+            [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EK],
+            true
+        );
+
+        $servicePointAccountNumber = ($isPointService && !empty($recipient->getPopId()))
             ? $this->sanitizeString($recipient->getPopId())
             : null;
 
@@ -142,14 +149,14 @@ class ShipmentFullDataMapper
             'apartmentNumber' => $this->sanitizeString($recipient->getFlatNumber()),
         ];
 
-        if ($countryCode === 'DE') {
+        if ($countryCode !== 'PL' && $isPointService) {
             if ($recipient->isPackstation()) {
                 $receiverAddress['isPackstation'] = true;
             } elseif ($recipient->isPostfiliale()) {
                 $receiverAddress['isPostfiliale'] = true;
             }
 
-            if ($recipient->getPostnummer() !== null && $recipient->getPostnummer() !== '') {
+            if ($countryCode === 'DE' && $recipient->getPostnummer() !== null && $recipient->getPostnummer() !== '') {
                 $receiverAddress['postnummer'] = $this->sanitizeString($recipient->getPostnummer());
             }
         }

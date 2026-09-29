@@ -300,9 +300,24 @@ define([
             popId: ko.observable(r.popId || ''),
             popName: ko.observable(r.popName || ''),
             postnummer: ko.observable(r.postnummer || ''),
+            mapPointType: ko.observable(r.mapPointType || 'parcelShop'),
             phone: ko.observable(r.phone || ''),
             email: ko.observable(r.email || '')
         };
+
+        recipientObj.mapPointType.subscribe(function (newType) {
+            if (newType === 'courier') {
+                recipientObj.popId('');
+                recipientObj.popName('');
+                recipientObj.postnummer('');
+            }
+        });
+
+        if (recipientObj.mapPointType() === 'courier') {
+            recipientObj.popId('');
+            recipientObj.popName('');
+            recipientObj.postnummer('');
+        }
 
         recipientObj.name.subscribe(function (newName) {
             if (newName && newName.trim() !== '' && recipientObj.type() !== 'B') {
@@ -494,8 +509,25 @@ define([
             this.customsTypeOptions = ko.observableArray([]);
             this.categoryOfItemOptions = ko.observableArray([]);
             this.customsCurrencyOptions = ko.observableArray([]);
+            this.internationalMapPointTypeOptions = ko.observableArray([
+                { value: 'packStation', label: $.mage.__('Packstation') },
+                { value: 'parcelShop', label: $.mage.__('Parcelshop') },
+                { value: 'courier', label: $.mage.__('Courier') }
+            ]);
 
             var self = this;
+
+            this.initMapMessageListener();
+
+            this.isPointServiceSelected = ko.pureComputed(function () {
+                var draft = self.shipmentData();
+                if (!draft || !draft.shipmentSettings || typeof draft.shipmentSettings.serviceType !== 'function') {
+                    return false;
+                }
+                var sType = (draft.shipmentSettings.serviceType() || '').toUpperCase();
+                return sType === 'SP' || sType === 'EK';
+            });
+            this.isSpServiceSelected = this.isPointServiceSelected;
 
             this.isCustomsClearanceVisible = ko.pureComputed(function () {
                 var draft = self.shipmentData();
@@ -561,6 +593,101 @@ define([
             };
 
             return this;
+        },
+
+        initMapMessageListener: function () {
+            var self = this;
+            if (this._mapMessageListener) {
+                return;
+            }
+            this._mapMessageListener = function (event) {
+                if (!event || !event.data) {
+                    return;
+                }
+                var pointData = event.data;
+                if (typeof pointData === 'string') {
+                    try {
+                        pointData = JSON.parse(pointData);
+                    } catch (e) {
+                        return;
+                    }
+                }
+                if (pointData && typeof pointData === 'object' && pointData.sap) {
+                    var draft = self.draft();
+                    if (draft && draft.recipient) {
+                        var nameStr = pointData.name || '';
+                        var addrStr = pointData.address || '';
+                        if (!addrStr && (pointData.street || pointData.city)) {
+                            var streetStr = $.trim((pointData.street || '') + ' ' + (pointData.houseNo || pointData.streetNo || ''));
+                            var cityStr = $.trim((pointData.zip || pointData.postalCode || '') + ' ' + (pointData.city || ''));
+                            addrStr = $.trim(streetStr + (streetStr && cityStr ? ', ' : '') + cityStr);
+                        }
+                        var popName = (nameStr && addrStr && nameStr !== addrStr) ? (nameStr + ' - ' + addrStr) : (nameStr || addrStr || pointData.sap || '');
+
+                        if (typeof draft.recipient.popId === 'function') draft.recipient.popId(pointData.sap || '');
+                        if (typeof draft.recipient.popName === 'function') draft.recipient.popName(popName);
+                        if (pointData.postnummer && typeof draft.recipient.postnummer === 'function') {
+                            draft.recipient.postnummer(pointData.postnummer);
+                        }
+                    }
+                    if (self._activeMapModal) {
+                        self._activeMapModal.closeModal();
+                    }
+                }
+            };
+
+            if (window.addEventListener) {
+                window.addEventListener('message', this._mapMessageListener, false);
+            } else if (window.attachEvent) {
+                window.attachEvent('onmessage', this._mapMessageListener);
+            }
+        },
+
+        openPointMapModal: function () {
+            var self = this;
+            var draft = this.draft();
+            if (!draft || !draft.recipient) {
+                return;
+            }
+            var country = (typeof draft.recipient.country === 'function' ? draft.recipient.country() : draft.recipient.country) || 'PL';
+            country = String(country).toUpperCase();
+            var baseUrl = 'https://parcelshop.dhl.pl/mapa';
+            var params = [];
+
+            if (country !== 'PL') {
+                params.push('country=' + encodeURIComponent(country));
+                var pType = typeof draft.recipient.mapPointType === 'function' ? draft.recipient.mapPointType() : draft.recipient.mapPointType;
+                pType = pType || 'parcelShop';
+                params.push('ptype=' + encodeURIComponent(pType));
+            }
+
+            var iframeUrl = params.length ? baseUrl + '?' + params.join('&') : baseUrl;
+
+            var $modalContainer = $('#ideo-dhl-prepare-map-modal-container');
+            if (!$modalContainer.length) {
+                $modalContainer = $('<div id="ideo-dhl-prepare-map-modal-container" style="display:none;"><iframe id="ideo-dhl-prepare-map-iframe" style="width:100%; height:80vh; min-height:500px; border:none;"></iframe></div>');
+                $('body').append($modalContainer);
+            }
+
+            $modalContainer.find('iframe').attr('src', iframeUrl);
+
+            var options = {
+                type: 'popup',
+                responsive: true,
+                innerScroll: false,
+                title: $.mage.__('Select DHL Delivery Point'),
+                modalClass: 'dhl-map-modal-popup',
+                buttons: [],
+                closed: function () {
+                    $modalContainer.find('iframe').attr('src', '');
+                }
+            };
+
+            if (!$modalContainer.data('mageModal')) {
+                modal(options, $modalContainer);
+            }
+            $modalContainer.modal('openModal');
+            self._activeMapModal = $modalContainer.data('mageModal');
         },
 
         addPackageRow: function () {
@@ -1079,6 +1206,9 @@ define([
                         self.customsTypeOptions(response.customsTypeOptions || []);
                         self.categoryOfItemOptions(response.categoryOfItemOptions || []);
                         self.customsCurrencyOptions(response.customsCurrencyOptions || []);
+                        if (response.internationalMapPointTypeOptions && response.internationalMapPointTypeOptions.length) {
+                            self.internationalMapPointTypeOptions(response.internationalMapPointTypeOptions);
+                        }
 
                         // 2. Set default IDs if missing
                         var defaultPointId = response.defaultDropOffPointId || (response.data.sender ? response.data.sender.selectedDropOffPointId : null);

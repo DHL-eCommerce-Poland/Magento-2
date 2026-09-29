@@ -106,6 +106,7 @@ class Prepare extends Action
                 'customsTypeOptions' => $this->templateManager->getCustomsTypeOptions(),
                 'categoryOfItemOptions' => $this->templateManager->getCategoryOfItemOptions(),
                 'customsCurrencyOptions' => $this->templateManager->getCustomsCurrencyOptions(),
+                'internationalMapPointTypeOptions' => $this->templateManager->getInternationalMapPointTypeOptions(),
             ]);
         } catch (Exception $e) {
             $this->logger?->error('Error preparing DHL shipment data: ' . $e->getMessage(), ['exception' => $e]);

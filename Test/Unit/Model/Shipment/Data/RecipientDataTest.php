@@ -127,4 +127,24 @@ class RecipientDataTest extends TestCase
         $recipient = RecipientData::fromArray($data);
         $this->assertEquals('B', $recipient->getType());
     }
+
+    /**
+     * Test fromArray mapping mapPointType values correctly.
+     *
+     * @return void
+     */
+    public function testFromArrayWithMapPointType(): void
+    {
+        $recipientPackstation = RecipientData::fromArray(['mapPointType' => 'packstation']);
+        $this->assertTrue($recipientPackstation->isPackstation());
+        $this->assertFalse($recipientPackstation->isPostfiliale());
+
+        $recipientParcelshop = RecipientData::fromArray(['mapPointType' => 'parcelshop']);
+        $this->assertFalse($recipientParcelshop->isPackstation());
+        $this->assertTrue($recipientParcelshop->isPostfiliale());
+
+        $recipientCourier = RecipientData::fromArray(['mapPointType' => 'courier']);
+        $this->assertFalse($recipientCourier->isPackstation());
+        $this->assertFalse($recipientCourier->isPostfiliale());
+    }
 }

@@ -104,23 +104,44 @@ define([
             country = (country || 'PL').toUpperCase();
 
             var params = [];
-            if (country && country !== 'PL') {
-                params.push('country=' + encodeURIComponent(country));
-            }
+            var currentMethod = this.currentMethodCode() || '';
+            var isCod = currentMethod.indexOf('_cod') !== -1 || currentMethod.toLowerCase().endsWith('cod');
 
-            if (config) {
-                var currentMethod = this.currentMethodCode();
-                var mapType = 'all';
-                if (config.pointMapTypes && config.pointMapTypes[currentMethod]) {
-                    mapType = config.pointMapTypes[currentMethod];
-                } else if (config.pointMapType) {
-                    mapType = config.pointMapType;
+            if (country !== 'PL') {
+                params.push('country=' + encodeURIComponent(country));
+
+                if (config) {
+                    var mapType = 'all';
+                    if (config.pointMapTypes && config.pointMapTypes[currentMethod]) {
+                        mapType = config.pointMapTypes[currentMethod];
+                    } else if (config.pointMapType) {
+                        mapType = config.pointMapType;
+                    }
+
+                    if (mapType === 'box') {
+                        params.push('ptype=packStation');
+                    } else if (mapType === 'pop') {
+                        params.push('ptype=parcelShop');
+                    }
+                }
+            } else {
+                if (isCod) {
+                    params.push('options_pickup_cod=T');
                 }
 
-                if (mapType === 'box') {
-                    params.push('ptype=packStation');
-                } else if (mapType === 'pop') {
-                    params.push('ptype=parcelShop');
+                if (config) {
+                    var mapTypePl = 'all';
+                    if (config.pointMapTypes && config.pointMapTypes[currentMethod]) {
+                        mapTypePl = config.pointMapTypes[currentMethod];
+                    } else if (config.pointMapType) {
+                        mapTypePl = config.pointMapType;
+                    }
+
+                    if (mapTypePl === 'box') {
+                        params.push('show_on_map_parcelshop=N&show_on_map_parcelshop_late=N&show_on_map_parcelstation=T');
+                    } else if (mapTypePl === 'pop') {
+                        params.push('show_on_map_parcelshop=T&show_on_map_parcelshop_late=N&show_on_map_parcelstation=N');
+                    }
                 }
             }
 

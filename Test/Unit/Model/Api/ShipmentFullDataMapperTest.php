@@ -152,7 +152,7 @@ class ShipmentFullDataMapperTest extends TestCase
     }
 
     /**
-     * Test servicePointAccountNumber mapping when popId is present.
+     * Test servicePointAccountNumber mapping when popId is present and service is point service.
      *
      * @return void
      */
@@ -166,7 +166,7 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $sender = new SenderData();
         $specialServices = new SpecialServicesData();
-        $settings = new ShipmentSettingsData(packages: [new PackageData()]);
+        $settings = new ShipmentSettingsData(serviceType: 'SP', packages: [new PackageData()]);
 
         $shipmentData = new DhlShipmentData(
             orderId: 101,
@@ -180,6 +180,36 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $this->assertEquals('4529508', $mapped['ship']['servicePointAccountNumber']);
         $this->assertEquals('C', $mapped['ship']['receiver']['address']['addressType']);
+    }
+
+    /**
+     * Test servicePointAccountNumber is null when popId is present but service is courier (AH).
+     *
+     * @return void
+     */
+    public function testMapIgnoresServicePointAccountNumberWhenServiceIsCourier(): void
+    {
+        $recipient = new RecipientData(
+            name: 'Jan Kowalski',
+            popId: '4529508',
+            popName: 'DHL POP ŻABKA'
+        );
+
+        $sender = new SenderData();
+        $specialServices = new SpecialServicesData();
+        $settings = new ShipmentSettingsData(serviceType: 'AH', packages: [new PackageData()]);
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 102,
+            sender: $sender,
+            recipient: $recipient,
+            specialServices: $specialServices,
+            shipmentSettings: $settings
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertNull($mapped['ship']['servicePointAccountNumber']);
     }
 
     /**

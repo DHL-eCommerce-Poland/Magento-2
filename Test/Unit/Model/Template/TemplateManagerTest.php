@@ -55,6 +55,7 @@ class TemplateManagerTest extends TestCase
     private $customsTypeSource;
     private $categoryOfItemSource;
     private $customsCurrencySource;
+    private $internationalMapPointTypeSource;
     private TemplateManager $templateManager;
 
     protected function setUp(): void
@@ -72,7 +73,6 @@ class TemplateManagerTest extends TestCase
         $this->returnQrCodeTypeSource = $this->createStub(ReturnQrCodeTypeSource::class);
         $this->returnBookCourierSource = $this->createStub(ReturnBookCourierSource::class);
         $this->orderRepository = $this->createStub(OrderRepositoryInterface::class);
-        $this->mapper = $this->createStub(OrderToShipmentDataMapper::class);
         $this->variableResolver = $this->createStub(TemplateVariableResolver::class);
         $this->serializer = $this->createStub(SerializerInterface::class);
         $this->timezone = $this->createStub(TimezoneInterface::class);
@@ -81,6 +81,7 @@ class TemplateManagerTest extends TestCase
         $this->customsTypeSource = $this->createStub(\Ideo\Dhl\Model\Source\CustomsType::class);
         $this->categoryOfItemSource = $this->createStub(\Ideo\Dhl\Model\Source\CategoryOfItem::class);
         $this->customsCurrencySource = $this->createStub(\Ideo\Dhl\Model\Source\CustomsCurrency::class);
+        $this->internationalMapPointTypeSource = $this->createStub(\Ideo\Dhl\Model\Config\Source\InternationalMapPointType::class);
 
         $this->templateManager = new TemplateManager(
             $this->dropOffPointCollectionFactory,
@@ -96,7 +97,6 @@ class TemplateManagerTest extends TestCase
             $this->returnQrCodeTypeSource,
             $this->returnBookCourierSource,
             $this->orderRepository,
-            $this->mapper,
             $this->variableResolver,
             $this->serializer,
             $this->timezone,
@@ -104,7 +104,8 @@ class TemplateManagerTest extends TestCase
             $this->customsTemplateCollectionFactory,
             $this->customsTypeSource,
             $this->categoryOfItemSource,
-            $this->customsCurrencySource
+            $this->customsCurrencySource,
+            $this->internationalMapPointTypeSource
         );
     }
 
@@ -256,7 +257,6 @@ class TemplateManagerTest extends TestCase
             $this->returnQrCodeTypeSource,
             $this->returnBookCourierSource,
             $this->orderRepository,
-            $this->mapper,
             $this->variableResolver,
             $this->serializer,
             $this->timezone,
@@ -264,7 +264,8 @@ class TemplateManagerTest extends TestCase
             $factory,
             $typeSource,
             $catSource,
-            $currSource
+            $currSource,
+            $this->internationalMapPointTypeSource
         );
 
         $options = $manager->getCustomsTemplatesOptions();

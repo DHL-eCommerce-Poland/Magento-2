@@ -273,6 +273,23 @@ class RecipientData
             ? $rawType
             : (trim($name) !== '' ? 'B' : 'C');
 
+        $isPackstation = !empty($data['isPackstation']);
+        $isPostfiliale = !empty($data['isPostfiliale']);
+
+        if (isset($data['mapPointType'])) {
+            $mapPointType = strtolower(trim((string)$data['mapPointType']));
+            if ($mapPointType === 'packstation') {
+                $isPackstation = true;
+                $isPostfiliale = false;
+            } elseif ($mapPointType === 'parcelshop') {
+                $isPackstation = false;
+                $isPostfiliale = true;
+            } elseif ($mapPointType === 'courier' || $mapPointType === '') {
+                $isPackstation = false;
+                $isPostfiliale = false;
+            }
+        }
+
         return new self(
             $name,
             $type,
@@ -289,8 +306,8 @@ class RecipientData
             (string)($data['email'] ?? ''),
             isset($data['popId']) ? (string)$data['popId'] : null,
             isset($data['popName']) ? (string)$data['popName'] : null,
-            !empty($data['isPackstation']),
-            !empty($data['isPostfiliale']),
+            $isPackstation,
+            $isPostfiliale,
             isset($data['postnummer']) ? (string)$data['postnummer'] : null
         );
     }

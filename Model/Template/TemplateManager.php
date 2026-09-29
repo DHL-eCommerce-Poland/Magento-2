@@ -9,6 +9,7 @@ use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
 use Ideo\Dhl\Model\Carrier;
 use Ideo\Dhl\Model\Config\Source\AddressType as AddressTypeSource;
+use Ideo\Dhl\Model\Config\Source\InternationalMapPointType;
 use Ideo\Dhl\Model\Config\Source\LabelType as LabelTypeSource;
 use Ideo\Dhl\Model\Config\Source\PackageType as PackageTypeSource;
 use Ideo\Dhl\Model\Config\Source\ReturnBookCourier as ReturnBookCourierSource;
@@ -50,7 +51,6 @@ class TemplateManager
      * @param ReturnQrCodeTypeSource $returnQrCodeTypeSource
      * @param ReturnBookCourierSource $returnBookCourierSource
      * @param OrderRepositoryInterface $orderRepository
-     * @param OrderToShipmentDataMapper $mapper
      * @param TemplateVariableResolver $variableResolver
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
@@ -59,6 +59,7 @@ class TemplateManager
      * @param CustomsType $customsTypeSource
      * @param CategoryOfItem $categoryOfItemSource
      * @param CustomsCurrency $customsCurrencySource
+     * @param InternationalMapPointType $internationalMapPointTypeSource
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -75,7 +76,6 @@ class TemplateManager
         private readonly ReturnQrCodeTypeSource $returnQrCodeTypeSource,
         private readonly ReturnBookCourierSource $returnBookCourierSource,
         private readonly OrderRepositoryInterface $orderRepository,
-        private readonly OrderToShipmentDataMapper $mapper,
         private readonly TemplateVariableResolver $variableResolver,
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
@@ -84,6 +84,7 @@ class TemplateManager
         private readonly CustomsType $customsTypeSource,
         private readonly CategoryOfItem $categoryOfItemSource,
         private readonly CustomsCurrency $customsCurrencySource,
+        private readonly InternationalMapPointType $internationalMapPointTypeSource,
         private readonly ?LoggerInterface $logger = null
     ) {
     }
@@ -390,6 +391,16 @@ class TemplateManager
     public function getCustomsCurrencyOptions(): array
     {
         return $this->customsCurrencySource->toOptionArray();
+    }
+
+    /**
+     * Get International Map Point Type options.
+     *
+     * @return array
+     */
+    public function getInternationalMapPointTypeOptions(): array
+    {
+        return $this->internationalMapPointTypeSource->toOptionArray();
     }
 
     /**
