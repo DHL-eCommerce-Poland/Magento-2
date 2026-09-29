@@ -58,22 +58,42 @@ class SaveServicePointToQuoteAddress
         }
         $isPackstationMethod = in_array(
             $cleanMethodCode,
-            [MethodCatalog::METHOD_CONNECT_PACKSTATION, MethodCatalog::METHOD_CONNECT_PACKSTATION_COD],
+            [
+                MethodCatalog::METHOD_CONNECT_PACKSTATION,
+                MethodCatalog::METHOD_CONNECT_PACKSTATION_COD,
+            ],
             true
         );
 
-        if ($servicePoint !== null && $isPackstationMethod && !$servicePoint->isPackstation()) {
-            $servicePoint = new ServicePointValueObject(
-                $servicePoint->getId(),
-                $servicePoint->getName(),
-                $servicePoint->getStreet(),
-                $servicePoint->getPostcode(),
-                $servicePoint->getCity(),
-                true,
-                false,
-                $servicePoint->getPostnummer(),
-                $servicePoint->getCountry()
-            );
+        $isParcelShopOnlyMethod = in_array(
+            $cleanMethodCode,
+            [
+                MethodCatalog::METHOD_CONNECT_PARCELSHOP,
+                MethodCatalog::METHOD_CONNECT_PARCELSHOP_COD,
+                MethodCatalog::METHOD_ECONOMY_POP,
+                MethodCatalog::METHOD_ECONOMY_POP_COD
+            ],
+            true
+        );
+
+        if ($servicePoint !== null) {
+            $isPackstation = $isPackstationMethod || ($servicePoint->isPackstation() && !$isParcelShopOnlyMethod);
+            $country = strtoupper((string)($shippingAddress->getCountryId() ?: $servicePoint->getCountry()));
+            $isPostfiliale = ($country === 'DE') && !$isPackstation;
+
+            if ($servicePoint->isPackstation() !== $isPackstation || $servicePoint->isPostfiliale() !== $isPostfiliale) {
+                $servicePoint = new ServicePointValueObject(
+                    $servicePoint->getId(),
+                    $servicePoint->getName(),
+                    $servicePoint->getStreet(),
+                    $servicePoint->getPostcode(),
+                    $servicePoint->getCity(),
+                    $isPackstation,
+                    $isPostfiliale,
+                    $servicePoint->getPostnummer(),
+                    $servicePoint->getCountry()
+                );
+            }
         }
 
         // Validate selection requirement

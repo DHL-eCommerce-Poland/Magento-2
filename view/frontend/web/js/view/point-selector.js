@@ -211,18 +211,14 @@ define([
                     var curMethod = self.targetMethodObj || quote.shippingMethod();
                     var mCode = curMethod ? (curMethod.method_code || curMethod.methodCode || '') : '';
                     var fullMCode = pointState.getMethodKey(curMethod) || mCode;
-                    var isPackstationMethod = mCode === methodCodes.METHOD_CONNECT_PACKSTATION ||
-                        mCode === methodCodes.METHOD_CONNECT_PACKSTATION_COD ||
+                    var cleanCode = mCode.indexOf(methodCodes.CARRIER_CODE + '_') === 0 ?
+                        mCode.substring(methodCodes.CARRIER_CODE.length + 1) : mCode;
+                    var isPackstationMethod = cleanCode === methodCodes.METHOD_CONNECT_PACKSTATION ||
+                        cleanCode === methodCodes.METHOD_CONNECT_PACKSTATION_COD ||
                         fullMCode === methodCodes.FULL_CONNECT_PACKSTATION ||
                         fullMCode === methodCodes.FULL_CONNECT_PACKSTATION_COD;
 
-                    var isPackstation = isPackstationMethod || !!(
-                        pointData.isPackstation ||
-                        pointData.packstation ||
-                        typeStr === 'packstation' ||
-                        (pointData.ptype || '').toLowerCase() === 'packstation'
-                    );
-
+                    var isPackstation = isPackstationMethod;
                     var isPostfiliale = recipientCountry.toUpperCase() === 'DE' && !isPackstation;
 
                     var curMethodKey = pointState.getMethodKey(curMethod) || fullMCode;

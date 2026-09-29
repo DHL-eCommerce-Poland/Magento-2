@@ -415,15 +415,13 @@ define([
             var curMethod = quote.shippingMethod();
             var mCode = curMethod ? (curMethod.method_code || curMethod.methodCode || '') : '';
             var fullMCode = curMethod ? ((curMethod.carrier_code || curMethod.carrierCode || '') + '_' + mCode) : '';
-            if (mCode === methodCodes.METHOD_CONNECT_PACKSTATION ||
-                mCode === methodCodes.METHOD_CONNECT_PACKSTATION_COD ||
-                fullMCode === methodCodes.FULL_CONNECT_PACKSTATION ||
-                fullMCode === methodCodes.FULL_CONNECT_PACKSTATION_COD
-            ) {
-                return true;
-            }
+            var cleanCode = mCode.indexOf(methodCodes.CARRIER_CODE + '_') === 0 ?
+                mCode.substring(methodCodes.CARRIER_CODE.length + 1) : mCode;
 
-            return !!(point.isPackstation || point.packstation);
+            return cleanCode === methodCodes.METHOD_CONNECT_PACKSTATION ||
+                cleanCode === methodCodes.METHOD_CONNECT_PACKSTATION_COD ||
+                fullMCode === methodCodes.FULL_CONNECT_PACKSTATION ||
+                fullMCode === methodCodes.FULL_CONNECT_PACKSTATION_COD;
         },
 
         /**
