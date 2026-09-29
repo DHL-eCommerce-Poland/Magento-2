@@ -82,7 +82,7 @@ class ShipmentDataValidator
         }
 
         // ServicePoint / POP point requirement
-        if (in_array(strtoupper(trim((string)$serviceType)), [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS], true) && empty($popId)) {
+        if (in_array(strtoupper(trim((string)$serviceType)), [MethodCatalog::SERVICE_SP], true) && empty($popId)) {
             $errors[] = __('Service Point ID is required for ServicePoint shipments.')->render();
         }
 

@@ -93,9 +93,17 @@ class NearestPointResolver
                         $city
                     ));
 
+                    $isGenericPrefix = (bool)preg_match('/^(packstation|postfiliale)\b/i', $name);
+                    $fullStreetStr = (!empty($name) && !empty($streetStr) && $name !== $streetStr && !$isGenericPrefix)
+                        ? sprintf('%s - %s', $name, $streetStr)
+                        : ($streetStr ?: $name);
+
                     $recipientArr = $recipient->toArray();
                     $recipientArr['popId'] = $sap;
                     $recipientArr['popName'] = $formattedPopName ?: $sap;
+                    $recipientArr['popStreet'] = $fullStreetStr ?: null;
+                    $recipientArr['popPostcode'] = $pointPostcode ?: null;
+                    $recipientArr['popCity'] = $pointCity ?: null;
 
                     return RecipientData::fromArray($recipientArr);
                 }

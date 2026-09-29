@@ -299,6 +299,9 @@ define([
             country: ko.observable(recipientCountry),
             popId: ko.observable(r.popId || ''),
             popName: ko.observable(r.popName || ''),
+            popStreet: ko.observable(r.popStreet || ''),
+            popCity: ko.observable(r.popCity || ''),
+            popPostcode: ko.observable(r.popPostcode || ''),
             postnummer: ko.observable(r.postnummer || ''),
             mapPointType: ko.observable(r.mapPointType || 'parcelShop'),
             phone: ko.observable(r.phone || ''),
@@ -309,6 +312,9 @@ define([
             if (newType === 'courier') {
                 recipientObj.popId('');
                 recipientObj.popName('');
+                recipientObj.popStreet('');
+                recipientObj.popCity('');
+                recipientObj.popPostcode('');
                 recipientObj.postnummer('');
             }
         });
@@ -316,6 +322,9 @@ define([
         if (recipientObj.mapPointType() === 'courier') {
             recipientObj.popId('');
             recipientObj.popName('');
+            recipientObj.popStreet('');
+            recipientObj.popCity('');
+            recipientObj.popPostcode('');
             recipientObj.postnummer('');
         }
 
@@ -624,8 +633,24 @@ define([
                         }
                         var popName = (nameStr && addrStr && nameStr !== addrStr) ? (nameStr + ' - ' + addrStr) : (nameStr || addrStr || pointData.sap || '');
 
+                        var streetBase = $.trim(pointData.street || '');
+                        var houseNo = $.trim(pointData.houseNo || pointData.streetNo || '');
+                        var streetWithHouse = streetBase;
+                        if (houseNo && streetBase && streetBase.indexOf(houseNo) === -1) {
+                            streetWithHouse = streetBase + ' ' + houseNo;
+                        } else if (!streetBase && houseNo) {
+                            streetWithHouse = houseNo;
+                        }
+                        var isGenericPrefix = /^(packstation|postfiliale)\b/i.test(nameStr);
+                        var popStreet = (nameStr && streetWithHouse && nameStr !== streetWithHouse && !isGenericPrefix)
+                            ? (nameStr + ' - ' + streetWithHouse)
+                            : (streetWithHouse || nameStr);
+
                         if (typeof draft.recipient.popId === 'function') draft.recipient.popId(pointData.sap || '');
                         if (typeof draft.recipient.popName === 'function') draft.recipient.popName(popName);
+                        if (typeof draft.recipient.popStreet === 'function') draft.recipient.popStreet(popStreet);
+                        if (typeof draft.recipient.popPostcode === 'function') draft.recipient.popPostcode(pointData.zip || pointData.postalCode || '');
+                        if (typeof draft.recipient.popCity === 'function') draft.recipient.popCity(pointData.city || '');
                         if (pointData.postnummer && typeof draft.recipient.postnummer === 'function') {
                             draft.recipient.postnummer(pointData.postnummer);
                         }
@@ -1342,15 +1367,6 @@ define([
                                     }
 
                                     if (self.isCustomsClearanceVisible() && draftJs.customs) {
-                                        var customsItems = draftJs.customs.customsItems || [];
-                                        if (!customsItems.length) {
-                                            alert({
-                                                title: $.mage.__('Error'),
-                                                content: $.mage.__('At least one customs goods item is required when customs clearance is selected.')
-                                            });
-                                            return false;
-                                        }
-
                                         if (draftJs.customs.customsType === 'I' && (!draftJs.customs.invoiceFile || !draftJs.customs.invoiceFile.trim())) {
                                             alert({
                                                 title: $.mage.__('Error'),

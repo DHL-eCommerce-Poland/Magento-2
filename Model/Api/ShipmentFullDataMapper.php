@@ -101,13 +101,26 @@ class ShipmentFullDataMapper
             default => 'SHIPPER',
         };
 
+        $serviceTypeUpper = strtoupper(trim((string)$product));
         $isPointService = in_array(
-            strtoupper(trim((string)$product)),
-            [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EK],
+            $serviceTypeUpper,
+            [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_EK],
             true
         );
 
-        $servicePointAccountNumber = ($isPointService && !empty($recipient->getPopId()))
+        $countryCode = strtoupper($recipient->getCountry() ?: 'PL');
+        $senderCountryCode = strtoupper($sender->getCountry() ?: 'PL');
+
+        $isPointDelivery = false;
+        if ($isPointService) {
+            if ($countryCode === 'PL') {
+                $isPointDelivery = !empty($recipient->getPopId());
+            } else {
+                $isPointDelivery = $recipient->isPackstation() || $recipient->isPostfiliale();
+            }
+        }
+
+        $servicePointAccountNumber = ($isPointDelivery && !empty($recipient->getPopId()))
             ? $this->sanitizeString($recipient->getPopId())
             : null;
 
@@ -119,9 +132,6 @@ class ShipmentFullDataMapper
         $recipientName = $recipient->getName() !== ''
             ? $recipient->getName()
             : $recipientContact;
-
-        $countryCode = strtoupper($recipient->getCountry() ?: 'PL');
-        $senderCountryCode = strtoupper($sender->getCountry() ?: 'PL');
 
         $senderAddress = [
             'name' => $this->sanitizeString($senderName),
@@ -138,18 +148,43 @@ class ShipmentFullDataMapper
             'emailAddress' => $this->sanitizeString($sender->getEmail()),
         ];
 
-        $receiverAddress = [
-            'addressType' => $receiverAddressType,
-            'country' => $countryCode,
-            'name' => $this->sanitizeString($recipientName),
-            'postalCode' => $this->sanitizePostalCode($recipient->getPostalCode(), $countryCode),
-            'city' => $this->sanitizeString($recipient->getCity()),
-            'street' => $this->sanitizeString($recipient->getStreet()),
-            'houseNumber' => $this->sanitizeString($recipient->getHouseNumber()),
-            'apartmentNumber' => $this->sanitizeString($recipient->getFlatNumber()),
-        ];
+        if ($isPointDelivery && $countryCode !== 'PL') {
+            $popStreet = trim((string)$recipient->getPopStreet());
+            $popCity = trim((string)$recipient->getPopCity());
+            $popPostcode = trim((string)$recipient->getPopPostcode());
+            $popName = trim((string)$recipient->getPopName());
 
-        if ($countryCode !== 'PL' && $isPointService) {
+            if ($popName !== '') {
+                $parsed = $this->parsePointAddressFromName($popName);
+                if (!empty($parsed['street'])
+                    && ($popStreet === '' || (str_contains($parsed['street'], $popStreet) && strlen($parsed['street']) > strlen($popStreet)))
+                ) {
+                    $popStreet = $parsed['street'];
+                }
+                if ($popPostcode === '' && !empty($parsed['postcode'])) {
+                    $popPostcode = $parsed['postcode'];
+                }
+                if ($popCity === '' && !empty($parsed['city'])) {
+                    $popCity = $parsed['city'];
+                }
+            }
+
+            $pointStreet = $popStreet !== '' ? $popStreet : $recipient->getStreet();
+            $pointCity = $popCity !== '' ? $popCity : $recipient->getCity();
+            $pointPostcode = $popPostcode !== '' ? $popPostcode : $recipient->getPostalCode();
+            $pointHouseNumber = $recipient->getPopId() ?: $recipient->getHouseNumber();
+
+            $receiverAddress = [
+                'addressType' => AddressType::TYPE_CONSUMER,
+                'country' => $countryCode,
+                'name' => $this->sanitizeString($recipientName),
+                'postalCode' => $this->sanitizePostalCode($pointPostcode, $countryCode),
+                'city' => $this->sanitizeString($pointCity),
+                'street' => $this->sanitizeString($pointStreet),
+                'houseNumber' => $this->sanitizeString($pointHouseNumber),
+                'apartmentNumber' => '',
+            ];
+
             if ($recipient->isPackstation()) {
                 $receiverAddress['isPackstation'] = true;
             } elseif ($recipient->isPostfiliale()) {
@@ -159,6 +194,17 @@ class ShipmentFullDataMapper
             if ($countryCode === 'DE' && $recipient->getPostnummer() !== null && $recipient->getPostnummer() !== '') {
                 $receiverAddress['postnummer'] = $this->sanitizeString($recipient->getPostnummer());
             }
+        } else {
+            $receiverAddress = [
+                'addressType' => $receiverAddressType,
+                'country' => $countryCode,
+                'name' => $this->sanitizeString($recipientName),
+                'postalCode' => $this->sanitizePostalCode($recipient->getPostalCode(), $countryCode),
+                'city' => $this->sanitizeString($recipient->getCity()),
+                'street' => $this->sanitizeString($recipient->getStreet()),
+                'houseNumber' => $this->sanitizeString($recipient->getHouseNumber()),
+                'apartmentNumber' => $this->sanitizeString($recipient->getFlatNumber()),
+            ];
         }
 
         $recipientContactInfo = [
@@ -340,5 +386,60 @@ class ShipmentFullDataMapper
         }
 
         return $postalCode;
+    }
+
+    /**
+     * Parse point street, postcode, and city from a combined popName string.
+     *
+     * @param string $popName
+     *
+     * @return array{street: string, postcode: string, city: string}
+     */
+    private function parsePointAddressFromName(string $popName): array
+    {
+        $result = ['street' => '', 'postcode' => '', 'city' => ''];
+        if (trim($popName) === '') {
+            return $result;
+        }
+
+        $shopName = '';
+        $addressPart = $popName;
+        if (str_contains($popName, ' - ')) {
+            $parts = explode(' - ', $popName, 2);
+            $shopName = trim($parts[0]);
+            $addressPart = trim($parts[1]);
+        }
+
+        if (preg_match('/\b(\d{4,5})\b/', $addressPart, $matches, PREG_OFFSET_CAPTURE)) {
+            $postcode = $matches[1][0];
+            $postcodePos = (int)$matches[1][1];
+            $result['postcode'] = $postcode;
+
+            $afterPostcode = trim(substr($addressPart, $postcodePos + strlen($postcode)));
+            if ($afterPostcode !== '') {
+                $result['city'] = trim($afterPostcode, " \t\n\r\0\x0B,");
+            }
+
+            $beforePostcode = trim(substr($addressPart, 0, $postcodePos));
+            $streetPart = trim($beforePostcode, " \t\n\r\0\x0B,");
+            $isGenericPrefix = (bool)preg_match('/^(packstation|postfiliale)\b/i', $shopName);
+            $includeShopName = $shopName !== '' && !$isGenericPrefix && $streetPart !== '' && $shopName !== $streetPart;
+            $result['street'] = $includeShopName
+                ? sprintf('%s - %s', $shopName, $streetPart)
+                : ($streetPart ?: $shopName);
+        } elseif (str_contains($addressPart, ',')) {
+            $parts = array_map('trim', explode(',', $addressPart, 2));
+            $streetPart = $parts[0];
+            $isGenericPrefix = (bool)preg_match('/^(packstation|postfiliale)\b/i', $shopName);
+            $includeShopName = $shopName !== '' && !$isGenericPrefix && $streetPart !== '' && $shopName !== $streetPart;
+            $result['street'] = $includeShopName
+                ? sprintf('%s - %s', $shopName, $streetPart)
+                : ($streetPart ?: $shopName);
+            if (!empty($parts[1])) {
+                $result['city'] = $parts[1];
+            }
+        }
+
+        return $result;
     }
 }

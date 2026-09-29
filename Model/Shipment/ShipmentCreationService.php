@@ -342,7 +342,7 @@ class ShipmentCreationService
         $serviceType = strtoupper(trim((string)$shipmentData->getShipmentSettings()->getServiceType()));
         $popId = $shipmentData->getRecipient()->getPopId();
 
-        if (in_array($serviceType, [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EK], true) && (empty($popId) || trim((string)$popId) === '')) {
+        if (in_array($serviceType, [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_EK], true) && (empty($popId) || trim((string)$popId) === '')) {
             if ($this->nearestPointResolver !== null) {
                 try {
                     $updatedRecipient = $this->nearestPointResolver->resolveForRecipient(

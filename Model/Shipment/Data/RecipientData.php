@@ -25,6 +25,9 @@ class RecipientData
      * @param bool $isPackstation
      * @param bool $isPostfiliale
      * @param string|null $postnummer
+     * @param string|null $popStreet
+     * @param string|null $popCity
+     * @param string|null $popPostcode
      */
     public function __construct(
         private string $name = '',
@@ -44,7 +47,10 @@ class RecipientData
         private ?string $popName = null,
         private bool $isPackstation = false,
         private bool $isPostfiliale = false,
-        private ?string $postnummer = null
+        private ?string $postnummer = null,
+        private ?string $popStreet = null,
+        private ?string $popCity = null,
+        private ?string $popPostcode = null
     ) {
     }
 
@@ -229,6 +235,36 @@ class RecipientData
     }
 
     /**
+     * Get POP Service Point Street.
+     *
+     * @return string|null
+     */
+    public function getPopStreet(): ?string
+    {
+        return $this->popStreet;
+    }
+
+    /**
+     * Get POP Service Point City.
+     *
+     * @return string|null
+     */
+    public function getPopCity(): ?string
+    {
+        return $this->popCity;
+    }
+
+    /**
+     * Get POP Service Point Postal Code.
+     *
+     * @return string|null
+     */
+    public function getPopPostcode(): ?string
+    {
+        return $this->popPostcode;
+    }
+
+    /**
      * Convert recipient object to array format.
      *
      * @return array
@@ -254,6 +290,9 @@ class RecipientData
             'isPackstation' => $this->isPackstation,
             'isPostfiliale' => $this->isPostfiliale,
             'postnummer' => $this->postnummer,
+            'popStreet' => $this->popStreet,
+            'popCity' => $this->popCity,
+            'popPostcode' => $this->popPostcode,
         ];
     }
 
@@ -308,7 +347,10 @@ class RecipientData
             isset($data['popName']) ? (string)$data['popName'] : null,
             $isPackstation,
             $isPostfiliale,
-            isset($data['postnummer']) ? (string)$data['postnummer'] : null
+            isset($data['postnummer']) ? (string)$data['postnummer'] : null,
+            isset($data['popStreet']) ? (string)$data['popStreet'] : null,
+            isset($data['popCity']) ? (string)$data['popCity'] : null,
+            isset($data['popPostcode']) ? (string)$data['popPostcode'] : null
         );
     }
 }

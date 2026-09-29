@@ -157,10 +157,27 @@ define([
                     }
                     var popName = (nameStr && addrStr && nameStr !== addrStr) ? (nameStr + ' - ' + addrStr) : (nameStr || addrStr || pointData.sap || '');
                     var postnummer = pointData.postnummer || '';
+                    var streetBase = $.trim(pointData.street || '');
+                    var houseNo = $.trim(pointData.houseNo || pointData.streetNo || '');
+                    var streetWithHouse = streetBase;
+                    if (houseNo && streetBase && streetBase.indexOf(houseNo) === -1) {
+                        streetWithHouse = streetBase + ' ' + houseNo;
+                    } else if (!streetBase && houseNo) {
+                        streetWithHouse = houseNo;
+                    }
+                    var isGenericPrefix = /^(packstation|postfiliale)\b/i.test(nameStr);
+                    var popStreet = (nameStr && streetWithHouse && nameStr !== streetWithHouse && !isGenericPrefix)
+                        ? (nameStr + ' - ' + streetWithHouse)
+                        : (streetWithHouse || nameStr);
+                    var popPostcode = pointData.zip || pointData.postalCode || '';
+                    var popCity = pointData.city || '';
 
                     if (self.source) {
                         self.source.set('data.recipient.popId', popId);
                         self.source.set('data.recipient.popName', popName);
+                        self.source.set('data.recipient.popStreet', popStreet);
+                        self.source.set('data.recipient.popPostcode', popPostcode);
+                        self.source.set('data.recipient.popCity', popCity);
                         if (postnummer) {
                             self.source.set('data.recipient.postnummer', postnummer);
                         }
@@ -170,7 +187,13 @@ define([
                         { query: 'dataScope = recipient.popId', val: popId },
                         { query: 'name = recipient[popId]', val: popId },
                         { query: 'dataScope = recipient.popName', val: popName },
-                        { query: 'name = recipient[popName]', val: popName }
+                        { query: 'name = recipient[popName]', val: popName },
+                        { query: 'dataScope = recipient.popStreet', val: popStreet },
+                        { query: 'name = recipient[popStreet]', val: popStreet },
+                        { query: 'dataScope = recipient.popPostcode', val: popPostcode },
+                        { query: 'name = recipient[popPostcode]', val: popPostcode },
+                        { query: 'dataScope = recipient.popCity', val: popCity },
+                        { query: 'name = recipient[popCity]', val: popCity }
                     ];
                     if (postnummer) {
                         targets.push({ query: 'dataScope = recipient.postnummer', val: postnummer });

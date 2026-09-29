@@ -112,6 +112,9 @@ class OrderToShipmentDataMapper
         // Check POP Service Point ID & Address from shipping address or order shipping description
         $popId = null;
         $popName = null;
+        $popStreet = null;
+        $popCity = null;
+        $popPostcode = null;
 
         if ($shippingAddress) {
             $servicePointId = (string)($shippingAddress->getData('dhl_service_point_id') ?? '');
@@ -121,6 +124,10 @@ class OrderToShipmentDataMapper
                 $spStreet = (string)($shippingAddress->getData('dhl_service_point_street') ?? '');
                 $spPostcode = (string)($shippingAddress->getData('dhl_service_point_postcode') ?? '');
                 $spCity = (string)($shippingAddress->getData('dhl_service_point_city') ?? '');
+
+                $popStreet = $spStreet !== '' ? $spStreet : null;
+                $popPostcode = $spPostcode !== '' ? $spPostcode : null;
+                $popCity = $spCity !== '' ? $spCity : null;
 
                 $addressParts = array_filter([$spStreet, trim($spPostcode . ' ' . $spCity)]);
                 $fullAddressStr = implode(', ', $addressParts);
@@ -155,7 +162,7 @@ class OrderToShipmentDataMapper
         $isPostfiliale = false;
         $postnummer = null;
 
-        if ($shippingAddress && strtoupper($country) === 'DE') {
+        if ($shippingAddress) {
             $isPackstation = (bool)($shippingAddress->getData('dhl_is_packstation') ?? false);
             $isPostfiliale = (bool)($shippingAddress->getData('dhl_is_postfiliale') ?? false);
             $postnummerVal = (string)($shippingAddress->getData('dhl_postnummer') ?? '');
@@ -180,7 +187,10 @@ class OrderToShipmentDataMapper
             popName: $popName,
             isPackstation: $isPackstation,
             isPostfiliale: $isPostfiliale,
-            postnummer: $postnummer
+            postnummer: $postnummer,
+            popStreet: $popStreet,
+            popCity: $popCity,
+            popPostcode: $popPostcode
         );
 
         // 2. Sender mapping
@@ -308,7 +318,7 @@ class OrderToShipmentDataMapper
 
         $isSpOrPsOrEk = in_array(
             strtoupper(trim((string)$serviceType)),
-            [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_PS, MethodCatalog::SERVICE_EK],
+            [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_EK],
             true
         );
         if ($isSpOrPsOrEk

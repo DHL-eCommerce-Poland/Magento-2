@@ -11,11 +11,9 @@ class MethodCatalog
     public const SERVICE_09 = '09';
     public const SERVICE_12 = '12';
     public const SERVICE_SP = 'SP';
-    public const SERVICE_PS = 'PS';
     public const SERVICE_EK = 'EK';
     public const SERVICE_CP = 'CP';
     public const SERVICE_CM = 'CM';
-    public const SERVICE_LM = 'LM';
 
     public const METHOD_PARCEL_POLSKA = 'parcel_polska';
     public const METHOD_PARCEL_POLSKA_COD = 'parcel_polska_cod';

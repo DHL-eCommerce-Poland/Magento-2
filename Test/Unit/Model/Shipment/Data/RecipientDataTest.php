@@ -102,6 +102,9 @@ class RecipientDataTest extends TestCase
             'isPackstation' => false,
             'isPostfiliale' => false,
             'postnummer' => null,
+            'popStreet' => null,
+            'popCity' => null,
+            'popPostcode' => null,
         ];
 
         $recipient = RecipientData::fromArray($data);

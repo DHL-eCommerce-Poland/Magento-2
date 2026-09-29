@@ -357,6 +357,27 @@
                 <dataScope>recipient.postnummer</dataScope>
             </settings>
         </field>
+        <field name="recipient[popStreet]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>recipient.popStreet</dataScope>
+            </settings>
+        </field>
+        <field name="recipient[popCity]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>recipient.popCity</dataScope>
+            </settings>
+        </field>
+        <field name="recipient[popPostcode]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>recipient.popPostcode</dataScope>
+            </settings>
+        </field>
     </fieldset>
 
     <fieldset name="shipment_settings">
