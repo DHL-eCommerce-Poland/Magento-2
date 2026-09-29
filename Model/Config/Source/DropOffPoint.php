@@ -29,12 +29,14 @@ class DropOffPoint implements OptionSourceInterface
         $collection->setOrder('template_name', 'ASC');
 
         foreach ($collection as $item) {
-            $name = $item->getTemplateName();
-            $id = $item->getEntityId();
-            $label = $name ? sprintf('%s (ID: %d)', $name, $id) : sprintf('ID: %d', $id);
+            $nameStr = $item->getTemplateName() ?: $item->getSenderName();
+            $label = sprintf('%s (%s, %s)', $nameStr, $item->getCity(), $item->getStreet());
+            if ($item->getIsDefault()) {
+                $label .= ' *';
+            }
 
             $options[] = [
-                'value' => (string)$id,
+                'value' => (string)$item->getEntityId(),
                 'label' => $label,
             ];
         }
