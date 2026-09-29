@@ -96,7 +96,7 @@ class OrderToShipmentDataMapperTest extends TestCase
         $this->assertSame('10/12', $shipmentData->getRecipient()->getHouseNumber());
         $this->assertSame('', $shipmentData->getRecipient()->getFlatNumber());
         $this->assertSame('Warszawa', $shipmentData->getRecipient()->getCity());
-        $this->assertSame('00-001', $shipmentData->getRecipient()->getPostalCode());
+        $this->assertSame('00001', $shipmentData->getRecipient()->getPostalCode());
         $this->assertSame('500600700', $shipmentData->getRecipient()->getPhone());
         $this->assertSame('jan@example.com', $shipmentData->getRecipient()->getEmail());
     }
@@ -338,5 +338,36 @@ class OrderToShipmentDataMapperTest extends TestCase
         $this->assertEquals(350.75, $shipmentData->getOrderGrandTotal());
         $this->assertTrue($shipmentData->getSpecialServices()->isInsurance());
         $this->assertEquals(350.75, $shipmentData->getSpecialServices()->getInsuranceValue());
+    }
+
+    /**
+     * Test mapping international order preserves hyphen in postcode for non-PL country.
+     *
+     * @return void
+     */
+    public function testMapInternationalOrderPreservesHyphenInPostcode(): void
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getFirstname')->willReturn('Hans');
+        $address->method('getLastname')->willReturn('Müller');
+        $address->method('getStreet')->willReturn(['Hauptstraße 12']);
+        $address->method('getCity')->willReturn('Berlin');
+        $address->method('getPostcode')->willReturn('12-345');
+        $address->method('getCountryId')->willReturn('DE');
+
+        $payment = $this->createStub(Payment::class);
+        $payment->method('getMethod')->willReturn('checkmo');
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getEntityId')->willReturn(109);
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getPayment')->willReturn($payment);
+        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska');
+
+        $shipmentData = $this->mapper->map($order);
+
+        $this->assertSame('DE', $shipmentData->getRecipient()->getCountry());
+        $this->assertSame('12-345', $shipmentData->getRecipient()->getPostalCode());
     }
 }

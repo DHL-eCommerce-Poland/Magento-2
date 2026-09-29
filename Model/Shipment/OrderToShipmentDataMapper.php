@@ -88,6 +88,9 @@ class OrderToShipmentDataMapper
             $city = (string)($shippingAddress->getCity() ?? '');
             $postcode = (string)($shippingAddress->getPostcode() ?? '');
             $country = (string)($shippingAddress->getCountryId() ?? 'PL');
+            if (strtoupper($country) === 'PL') {
+                $postcode = str_replace('-', '', $postcode);
+            }
             $phone = (string)($shippingAddress->getTelephone() ?? '');
             if (empty($email)) {
                 $email = (string)($shippingAddress->getEmail() ?? '');

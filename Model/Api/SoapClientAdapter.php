@@ -1523,9 +1523,13 @@ class SoapClientAdapter implements ClientInterface
             $client = $this->createSoapClient($wsdlUrl);
 
             $cleanCountry = strtoupper(trim($country)) ?: 'PL';
-            $cleanPostCode = (string) preg_replace('/[^0-9]/', '', $postCode);
-            if (strlen($cleanPostCode) < 5 && $cleanCountry === 'PL' && !empty($cleanPostCode)) {
-                $cleanPostCode = str_pad($cleanPostCode, 5, '0', STR_PAD_LEFT);
+            if ($cleanCountry === 'PL') {
+                $cleanPostCode = (string) preg_replace('/[^0-9]/', '', $postCode);
+                if (strlen($cleanPostCode) < 5 && !empty($cleanPostCode)) {
+                    $cleanPostCode = str_pad($cleanPostCode, 5, '0', STR_PAD_LEFT);
+                }
+            } else {
+                $cleanPostCode = trim($postCode);
             }
 
             $params = [
