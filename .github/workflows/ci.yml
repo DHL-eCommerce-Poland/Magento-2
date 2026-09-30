@@ -67,11 +67,15 @@ jobs:
           tools: composer:v2
 
       - name: Configure Magento Auth Keys
-        if: ${{ secrets.MAGENTO_MARKETPLACE_USERNAME != '' }}
         env:
           MAGENTO_USER: ${{ secrets.MAGENTO_MARKETPLACE_USERNAME }}
           MAGENTO_PASS: ${{ secrets.MAGENTO_MARKETPLACE_PASSWORD }}
-        run: composer config -g http-basic.repo.magento.com "$MAGENTO_USER" "$MAGENTO_PASS"
+        run: |
+          if [ -n "$MAGENTO_USER" ] && [ -n "$MAGENTO_PASS" ]; then
+            composer config -g http-basic.repo.magento.com "$MAGENTO_USER" "$MAGENTO_PASS"
+          else
+            echo "Magento marketplace credentials not configured in secrets; skipping auth config."
+          fi
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
