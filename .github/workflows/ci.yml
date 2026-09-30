@@ -37,6 +37,18 @@ jobs:
       - name: Validate composer.json
         run: composer validate --strict
 
+  security-secrets:
+    name: Secret Detection (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        run: docker run --rm -v "${{ github.workspace }}":/code zricethezav/gitleaks:v8.24.0 detect --source /code --verbose --redact
+
   coding-standards:
     name: Magento Coding Standard (PHPCS)
     runs-on: ubuntu-latest
@@ -72,7 +84,7 @@ jobs:
 
   unit-tests-php81:
     name: Unit Tests (PHP 8.1)
-    needs: [composer-validate, coding-standards]
+    needs: [composer-validate, coding-standards, security-secrets]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -127,7 +139,7 @@ jobs:
 
   unit-tests-php82:
     name: Unit Tests (PHP 8.2)
-    needs: [composer-validate, coding-standards]
+    needs: [composer-validate, coding-standards, security-secrets]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -182,7 +194,7 @@ jobs:
 
   unit-tests-php83:
     name: Unit Tests (PHP 8.3)
-    needs: [composer-validate, coding-standards]
+    needs: [composer-validate, coding-standards, security-secrets]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -237,7 +249,7 @@ jobs:
 
   unit-tests-php84:
     name: Unit Tests (PHP 8.4)
-    needs: [composer-validate, coding-standards]
+    needs: [composer-validate, coding-standards, security-secrets]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -292,7 +304,7 @@ jobs:
 
   unit-tests-php85:
     name: Unit Tests (PHP 8.5)
-    needs: [composer-validate, coding-standards]
+    needs: [composer-validate, coding-standards, security-secrets]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
