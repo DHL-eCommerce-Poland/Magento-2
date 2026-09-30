@@ -18,7 +18,6 @@ concurrency:
 
 permissions:
   contents: read
-  checks: write
 
 jobs:
   composer-validate:
@@ -95,7 +94,7 @@ jobs:
         with:
           php-version: '8.1'
           extensions: mbstring, intl, soap, zip, json
-          coverage: none
+          coverage: pcov
           tools: composer:v2
 
       - name: Configure Magento Repository & Auth Keys
@@ -126,17 +125,14 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-plugins --prefer-dist --no-progress --no-interaction
 
-      - name: Run Module Unit Tests
-        run: vendor/bin/phpunit -c phpunit.xml.dist --log-junit test-results-8.1.xml
-
-      - name: Publish Test Report (Checks & Summary)
-        uses: dorny/test-reporter@6c357194179c694acfcad2100dbf27c5b9b0d5e0 # v1.9.1
-        if: success() || failure()
-        with:
-          name: PHPUnit (PHP 8.1)
-          path: test-results-8.1.xml
-          reporter: phpunit-junit
-          fail-on-empty: false
+      - name: Run Module Unit Tests & Coverage
+        run: |
+          vendor/bin/phpunit -c phpunit.xml.dist --testdox --coverage-text=coverage.txt
+          cat coverage.txt
+          echo "### Code Coverage (PHP 8.1)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -n 15 coverage.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
   unit-tests-php82:
     name: Unit Tests (PHP 8.2)
@@ -183,16 +179,7 @@ jobs:
         run: composer install --no-plugins --prefer-dist --no-progress --no-interaction
 
       - name: Run Module Unit Tests
-        run: vendor/bin/phpunit -c phpunit.xml.dist --log-junit test-results-8.2.xml
-
-      - name: Publish Test Report (Checks & Summary)
-        uses: dorny/test-reporter@6c357194179c694acfcad2100dbf27c5b9b0d5e0 # v1.9.1
-        if: success() || failure()
-        with:
-          name: PHPUnit (PHP 8.2)
-          path: test-results-8.2.xml
-          reporter: phpunit-junit
-          fail-on-empty: false
+        run: vendor/bin/phpunit -c phpunit.xml.dist --testdox
 
   unit-tests-php83:
     name: Unit Tests (PHP 8.3)
@@ -239,16 +226,7 @@ jobs:
         run: composer install --no-plugins --prefer-dist --no-progress --no-interaction
 
       - name: Run Module Unit Tests
-        run: vendor/bin/phpunit -c phpunit.xml.dist --log-junit test-results-8.3.xml
-
-      - name: Publish Test Report (Checks & Summary)
-        uses: dorny/test-reporter@6c357194179c694acfcad2100dbf27c5b9b0d5e0 # v1.9.1
-        if: success() || failure()
-        with:
-          name: PHPUnit (PHP 8.3)
-          path: test-results-8.3.xml
-          reporter: phpunit-junit
-          fail-on-empty: false
+        run: vendor/bin/phpunit -c phpunit.xml.dist --testdox
 
   unit-tests-php84:
     name: Unit Tests (PHP 8.4)
@@ -295,16 +273,7 @@ jobs:
         run: composer install --no-plugins --prefer-dist --no-progress --no-interaction
 
       - name: Run Module Unit Tests
-        run: vendor/bin/phpunit -c phpunit.xml.dist --log-junit test-results-8.4.xml
-
-      - name: Publish Test Report (Checks & Summary)
-        uses: dorny/test-reporter@6c357194179c694acfcad2100dbf27c5b9b0d5e0 # v1.9.1
-        if: success() || failure()
-        with:
-          name: PHPUnit (PHP 8.4)
-          path: test-results-8.4.xml
-          reporter: phpunit-junit
-          fail-on-empty: false
+        run: vendor/bin/phpunit -c phpunit.xml.dist --testdox
 
   unit-tests-php85:
     name: Unit Tests (PHP 8.5)
@@ -351,13 +320,4 @@ jobs:
         run: composer install --no-plugins --prefer-dist --no-progress --no-interaction
 
       - name: Run Module Unit Tests
-        run: vendor/bin/phpunit -c phpunit.xml.dist --log-junit test-results-8.5.xml
-
-      - name: Publish Test Report (Checks & Summary)
-        uses: dorny/test-reporter@6c357194179c694acfcad2100dbf27c5b9b0d5e0 # v1.9.1
-        if: success() || failure()
-        with:
-          name: PHPUnit (PHP 8.5)
-          path: test-results-8.5.xml
-          reporter: phpunit-junit
-          fail-on-empty: false
+        run: vendor/bin/phpunit -c phpunit.xml.dist --testdox

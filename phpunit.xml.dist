@@ -16,6 +16,19 @@
             <directory>Test/Unit</directory>
         </testsuite>
     </testsuites>
+    <source>
+        <include>
+            <directory suffix=".php">Api</directory>
+            <directory suffix=".php">Block</directory>
+            <directory suffix=".php">Controller</directory>
+            <directory suffix=".php">Logger</directory>
+            <directory suffix=".php">Model</directory>
+            <directory suffix=".php">Plugin</directory>
+            <directory suffix=".php">Setup</directory>
+            <directory suffix=".php">Ui</directory>
+            <directory suffix=".php">ViewModel</directory>
+        </include>
+    </source>
     <php>
         <includePath>.</includePath>
         <ini name="memory_limit" value="-1"/>
