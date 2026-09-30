@@ -44,24 +44,7 @@ class PopulateDefaultCountryRates implements DataPatchInterface, PatchRevertable
             return $this;
         }
 
-        $etcDir = $this->moduleDirReader->getModuleDir('etc', 'Ideo_Dhl');
-        $filePath = $etcDir . '/dhl_international_rates_default.csv';
-
-        $data = $this->csvReader->getData($filePath);
-        if (empty($data)) {
-            return $this;
-        }
-
-        $csvText = '';
-        foreach ($data as $row) {
-            $escaped = array_map(
-                static fn ($cell) => '"' . str_replace('"', '""', (string)$cell) . '"',
-                $row
-            );
-            $csvText .= implode(',', $escaped) . "\n";
-        }
-
-        $parsedRows = $this->countryRateBackend->parseCsvContent($csvText);
+        $parsedRows = $this->getDefaultCountryRateRows();
         if (!empty($parsedRows)) {
             $this->countryRateBackend->saveCountryRates(0, $parsedRows);
             $this->countryRateBackend->syncConfigSpecificCountries($parsedRows);
@@ -74,9 +57,14 @@ class PopulateDefaultCountryRates implements DataPatchInterface, PatchRevertable
      * Revert data patch changes.
      *
      * @return void
+     * @throws LocalizedException
      */
     public function revert(): void
     {
+        $parsedRows = $this->getDefaultCountryRateRows();
+        $methodCodes = array_values(array_unique(array_column($parsedRows, 'method_code')));
+        $this->countryRateBackend->clearConfigSpecificCountries($methodCodes);
+
         $connection = $this->resourceConnection->getConnection();
         $tableName = $this->resourceConnection->getTableName('dhlpoland_country_rate');
         $connection->delete($tableName);
@@ -100,5 +88,32 @@ class PopulateDefaultCountryRates implements DataPatchInterface, PatchRevertable
     public function getAliases(): array
     {
         return [];
+    }
+
+    /**
+     * Load and parse the bundled default country rates used by both patch operations.
+     *
+     * @return array
+     * @throws LocalizedException
+     */
+    private function getDefaultCountryRateRows(): array
+    {
+        $etcDir = $this->moduleDirReader->getModuleDir('etc', 'Ideo_Dhl');
+        $filePath = $etcDir . '/dhl_international_rates_default.csv';
+        $data = $this->csvReader->getData($filePath);
+        if (empty($data)) {
+            return [];
+        }
+
+        $csvText = '';
+        foreach ($data as $row) {
+            $escaped = array_map(
+                static fn ($cell) => '"' . str_replace('"', '""', (string)$cell) . '"',
+                $row
+            );
+            $csvText .= implode(',', $escaped) . "\n";
+        }
+
+        return $this->countryRateBackend->parseCsvContent($csvText);
     }
 }

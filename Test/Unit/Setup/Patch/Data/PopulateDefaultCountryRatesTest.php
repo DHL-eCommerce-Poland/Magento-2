@@ -141,11 +141,11 @@ class PopulateDefaultCountryRatesTest extends TestCase
 
     public function testRevertDeletesAllRows(): void
     {
-        $moduleDirReaderStub = $this->createStub(ModuleDirReader::class);
-        $csvReaderStub = $this->createStub(Csv::class);
+        $moduleDirReaderMock = $this->createMock(ModuleDirReader::class);
+        $csvReaderMock = $this->createMock(Csv::class);
         $resourceConnectionStub = $this->createStub(ResourceConnection::class);
         $connectionMock = $this->createMock(AdapterInterface::class);
-        $countryRateBackendStub = $this->createStub(CountryRate::class);
+        $countryRateBackendMock = $this->createMock(CountryRate::class);
 
         $resourceConnectionStub
             ->method('getConnection')
@@ -155,16 +155,49 @@ class PopulateDefaultCountryRatesTest extends TestCase
             ->method('getTableName')
             ->willReturn('dhlpoland_country_rate');
 
+        $moduleDirReaderMock->expects($this->once())
+            ->method('getModuleDir')
+            ->with('etc', 'Ideo_Dhl')
+            ->willReturn('/path/to/module/etc');
+
+        $csvReaderMock->expects($this->once())
+            ->method('getData')
+            ->with('/path/to/module/etc/dhl_international_rates_default.csv')
+            ->willReturn([
+                ['Method Code', 'Country', 'Price'],
+                ['connect', 'DE', '45.00'],
+                ['connect', 'CZ', '25.00'],
+                ['connect_pallet', 'DE', '614.00'],
+            ]);
+
+        $countryRateBackendMock->expects($this->once())
+            ->method('parseCsvContent')
+            ->with(
+                "\"Method Code\",\"Country\",\"Price\"\n" .
+                "\"connect\",\"DE\",\"45.00\"\n" .
+                "\"connect\",\"CZ\",\"25.00\"\n" .
+                "\"connect_pallet\",\"DE\",\"614.00\"\n"
+            )
+            ->willReturn([
+                ['method_code' => 'connect', 'country_id' => 'DE', 'price' => 45.0],
+                ['method_code' => 'connect', 'country_id' => 'CZ', 'price' => 25.0],
+                ['method_code' => 'connect_pallet', 'country_id' => 'DE', 'price' => 614.0],
+            ]);
+
+        $countryRateBackendMock->expects($this->once())
+            ->method('clearConfigSpecificCountries')
+            ->with(['connect', 'connect_pallet']);
+
         $connectionMock
             ->expects($this->once())
             ->method('delete')
             ->with('dhlpoland_country_rate');
 
         $patch = new PopulateDefaultCountryRates(
-            $moduleDirReaderStub,
-            $csvReaderStub,
+            $moduleDirReaderMock,
+            $csvReaderMock,
             $resourceConnectionStub,
-            $countryRateBackendStub
+            $countryRateBackendMock
         );
 
         $patch->revert();

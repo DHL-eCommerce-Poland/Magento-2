@@ -121,4 +121,25 @@ class PopulateDefaultTableRatesTest extends TestCase
 
         $patch->apply();
     }
+
+    public function testRevertDeletesAllRows(): void
+    {
+        $resourceConnectionStub = $this->createStub(ResourceConnection::class);
+        $connectionMock = $this->createMock(AdapterInterface::class);
+        $resourceConnectionStub->method('getConnection')->willReturn($connectionMock);
+        $resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_tablerate');
+
+        $connectionMock->expects($this->once())
+            ->method('delete')
+            ->with('dhlpoland_tablerate');
+
+        $patch = new PopulateDefaultTableRates(
+            $this->createStub(ModuleDirReader::class),
+            $this->createStub(Csv::class),
+            $resourceConnectionStub,
+            $this->createStub(Tablerate::class)
+        );
+
+        $patch->revert();
+    }
 }

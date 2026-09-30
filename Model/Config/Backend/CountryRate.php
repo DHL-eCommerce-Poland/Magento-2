@@ -275,6 +275,40 @@ class CountryRate extends File
     }
 
     /**
+     * Remove default-scope country restrictions for the supplied shipping methods.
+     *
+     * @param string[] $methodCodes
+     *
+     * @return void
+     */
+    public function clearConfigSpecificCountries(array $methodCodes): void
+    {
+        $methodCodes = array_values(array_unique(array_filter(
+            array_map(static fn ($methodCode) => is_string($methodCode) ? trim($methodCode) : '', $methodCodes),
+            static fn (string $methodCode): bool => $methodCode !== ''
+        )));
+
+        if ($methodCodes === []) {
+            return;
+        }
+
+        foreach ($methodCodes as $methodCode) {
+            $this->configWriter->delete(
+                'carriers/dhlparcel/method_' . $methodCode . '_sallowspecific',
+                ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+                0
+            );
+            $this->configWriter->delete(
+                'carriers/dhlparcel/method_' . $methodCode . '_specificcountry',
+                ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+                0
+            );
+        }
+
+        $this->cacheTypeList->cleanType('config');
+    }
+
+    /**
      * Save country rates into database table for the given website and methods.
      *
      * @param int $websiteId

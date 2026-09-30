@@ -273,6 +273,63 @@ class CountryRateTest extends TestCase
         $backendModel->syncConfigSpecificCountries($rows);
     }
 
+    public function testClearConfigSpecificCountriesDeletesUniqueMethodPathsFromDefaultScope(): void
+    {
+        $deletedConfigs = [];
+        $configWriterMock = $this->createMock(WriterInterface::class);
+        $configWriterMock->expects($this->exactly(4))
+            ->method('delete')
+            ->willReturnCallback(
+                static function (string $path, string $scope, int $scopeId) use (&$deletedConfigs): void {
+                    $deletedConfigs[] = [$path, $scope, $scopeId];
+                }
+            );
+
+        $cacheTypeListMock = $this->createMock(TypeListInterface::class);
+        $cacheTypeListMock->expects($this->once())
+            ->method('cleanType')
+            ->with('config');
+
+        $backendModel = $this->createBackendModel(
+            configWriter: $configWriterMock,
+            cacheTypeList: $cacheTypeListMock
+        );
+        $backendModel->clearConfigSpecificCountries(['connect', 'connect', 'connect_pallet']);
+
+        $this->assertSame(
+            [
+                ['carriers/dhlparcel/method_connect_sallowspecific', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0],
+                ['carriers/dhlparcel/method_connect_specificcountry', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0],
+                [
+                    'carriers/dhlparcel/method_connect_pallet_sallowspecific',
+                    ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+                    0,
+                ],
+                [
+                    'carriers/dhlparcel/method_connect_pallet_specificcountry',
+                    ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+                    0,
+                ],
+            ],
+            $deletedConfigs
+        );
+    }
+
+    public function testClearConfigSpecificCountriesDoesNothingWhenNoMethodsAreProvided(): void
+    {
+        $configWriterMock = $this->createMock(WriterInterface::class);
+        $configWriterMock->expects($this->never())->method('delete');
+
+        $cacheTypeListMock = $this->createMock(TypeListInterface::class);
+        $cacheTypeListMock->expects($this->never())->method('cleanType');
+
+        $backendModel = $this->createBackendModel(
+            configWriter: $configWriterMock,
+            cacheTypeList: $cacheTypeListMock
+        );
+        $backendModel->clearConfigSpecificCountries([]);
+    }
+
     public function testAfterSaveCleansConfigCache(): void
     {
         $cacheTypeListMock = $this->createMock(TypeListInterface::class);
