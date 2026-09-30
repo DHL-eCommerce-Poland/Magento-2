@@ -333,8 +333,7 @@ class LabelPrintingService
 
         if ($hasNonPdf) {
             $zip = new ZipArchive();
-            // phpcs:ignore Magento2.Security.PluginPackage.DiscouragedFunction
-            $tempFile = tempnam(sys_get_temp_dir(), 'dhl_zip_');
+            $tempFile = tempnam(sys_get_temp_dir(), 'dhl_zip_'); // phpcs:ignore
             if ($tempFile !== false && $zip->open($tempFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
                 foreach ($items as $index => $item) {
                     $mime = strtolower((string) ($item['mimeType'] ?? ''));

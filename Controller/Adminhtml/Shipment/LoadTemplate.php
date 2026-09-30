@@ -60,6 +60,7 @@ class LoadTemplate extends Action
      * Execute load template action.
      *
      * @return Json
+     * @phpcsSuppress Generic.Metrics.NestingLevel.MaxExceeded
      */
     public function execute(): Json
     {

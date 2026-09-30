@@ -341,8 +341,8 @@ class CustomsData
      * @param array $data
      *
      * @return self
+     * @phpcsSuppress Magento2.Classes.DiscourageStaticFunction
      */
-    // phpcs:ignore Magento2.Classes.DiscourageStaticFunction
     public static function fromArray(array $data): self
     {
         $templateId = isset($data['selectedCustomsTemplateId']) && $data['selectedCustomsTemplateId'] !== ''

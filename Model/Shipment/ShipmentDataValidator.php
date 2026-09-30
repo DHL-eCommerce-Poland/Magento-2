@@ -215,7 +215,8 @@ class ShipmentDataValidator
                 'grossWeight' => __('Gross Weight'),
             ];
             foreach ($customsFields as $fieldKey => $label) {
-                if (isset($customs[$fieldKey]) && is_string($customs[$fieldKey]) && str_contains($customs[$fieldKey], ',')) {
+                $val = $customs[$fieldKey] ?? null;
+                if (is_string($val) && str_contains($val, ',')) {
                     $errors[] = __(
                         'Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.',
                         $label
@@ -236,7 +237,8 @@ class ShipmentDataValidator
                         'quantity' => __('Customs Item #%1 quantity', $rowNum),
                     ];
                     foreach ($itemFields as $fieldKey => $label) {
-                        if (isset($item[$fieldKey]) && is_string($item[$fieldKey]) && str_contains($item[$fieldKey], ',')) {
+                        $itemVal = $item[$fieldKey] ?? null;
+                        if (is_string($itemVal) && str_contains($itemVal, ',')) {
                             $errors[] = __(
                                 'Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.',
                                 $label

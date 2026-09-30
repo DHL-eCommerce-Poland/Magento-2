@@ -110,7 +110,6 @@ class Save extends Action implements HttpPostActionInterface
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
         }
 
-
         // Validate and sanitize shipmentDate (must be valid and not in the past)
         if (isset($payload['shipmentSettings']) && is_array($payload['shipmentSettings'])) {
             $today = $this->timezone->scopeDate()->format('Y-m-d');
