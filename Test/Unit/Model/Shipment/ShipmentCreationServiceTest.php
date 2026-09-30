@@ -256,7 +256,15 @@ class ShipmentCreationServiceTest extends TestCase
             ->method('clearShipmentId')
             ->with($entityId);
 
-        $failedCreateResult = new CreateShipmentResult(false, false, null, null, [], '106', 'Nie odnaleziono wybranego punktu Parelstation');
+        $failedCreateResult = new CreateShipmentResult(
+            false,
+            false,
+            null,
+            null,
+            [],
+            '106',
+            'Nie odnaleziono wybranego punktu Parelstation'
+        );
         $this->clientStub->method('createShipment')->willReturn($failedCreateResult);
 
         $result = $this->service->recreateShipment($entityId, $shipmentData, 'sandbox');

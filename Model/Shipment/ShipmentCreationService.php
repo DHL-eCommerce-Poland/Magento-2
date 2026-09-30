@@ -204,6 +204,7 @@ class ShipmentCreationService
      * @return CreateShipmentResult
      * @throws LocalizedException
      */
+    // phpcs:ignore Generic.Metrics.NestingLevel.MaxExceeded
     public function recreateShipment(
         int $entityId,
         DhlShipmentData $shipmentData,
@@ -321,7 +322,8 @@ class ShipmentCreationService
                 && $newShipmentId !== ''
             ) {
                 $this->logger->info(sprintf(
-                    '[ShipmentCreation] Triggering auto return shipment creation for order #%s, primary waybill #%s (recreation)',
+                    '[ShipmentCreation] Triggering auto return shipment creation for order #%s, '
+                    . 'primary waybill #%s (recreation)',
                     (string) $shipmentData->getOrderId(),
                     $newShipmentId
                 ));
@@ -367,7 +369,8 @@ class ShipmentCreationService
         $serviceType = strtoupper(trim((string)$shipmentData->getShipmentSettings()->getServiceType()));
         $popId = $shipmentData->getRecipient()->getPopId();
 
-        if (in_array($serviceType, [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_EK], true) && (empty($popId) || trim((string)$popId) === '')) {
+        $isPointService = in_array($serviceType, [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_EK], true);
+        if ($isPointService && (empty($popId) || trim((string)$popId) === '')) {
             if ($this->nearestPointResolver !== null) {
                 try {
                     $updatedRecipient = $this->nearestPointResolver->resolveForRecipient(

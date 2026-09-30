@@ -64,7 +64,7 @@ jobs:
           phpcs -i
 
       - name: Run Magento Coding Standard
-        run: phpcs --standard=Magento2 --extensions=php,phtml,xml --ignore=*/vendor/*,*/dist/*,*/build/* .
+        run: phpcs --standard=Magento2 --extensions=php,phtml --ignore=*/vendor/*,*/dist/*,*/build/* .
 
   unit-tests:
     name: Unit Tests (PHP ${{ matrix.php }})

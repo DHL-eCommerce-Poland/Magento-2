@@ -321,8 +321,14 @@ class ShipmentDataServiceTest extends TestCase
         $this->assertEquals($packageNumbers, $decoded['packageNumbers']);
         $this->assertEquals('JJD000030025688110000001106', $decoded['packages'][0]['packageNumber']);
         $this->assertEquals('JJD000030025688110000001117', $decoded['packages'][1]['packageNumber']);
-        $this->assertEquals('JJD000030025688110000001106', $decoded['shipmentSettings']['packages'][0]['packageNumber']);
-        $this->assertEquals('JJD000030025688110000001117', $decoded['shipmentSettings']['packages'][1]['packageNumber']);
+        $this->assertEquals(
+            'JJD000030025688110000001106',
+            $decoded['shipmentSettings']['packages'][0]['packageNumber']
+        );
+        $this->assertEquals(
+            'JJD000030025688110000001117',
+            $decoded['shipmentSettings']['packages'][1]['packageNumber']
+        );
     }
 
     /**
@@ -343,7 +349,12 @@ class ShipmentDataServiceTest extends TestCase
 
         $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(
             packages: [
-                ['packageType' => 'PACKAGE', 'weight' => 2.5, 'returnShipmentId' => 'OLD_RET_123', 'packagesTrackingNumbers' => 'OLD_RET_123'],
+                [
+                    'packageType' => 'PACKAGE',
+                    'weight' => 2.5,
+                    'returnShipmentId' => 'OLD_RET_123',
+                    'packagesTrackingNumbers' => 'OLD_RET_123',
+                ],
             ]
         );
 

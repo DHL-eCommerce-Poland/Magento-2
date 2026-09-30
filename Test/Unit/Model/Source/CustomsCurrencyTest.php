@@ -11,7 +11,14 @@ use PHPUnit\Framework\TestCase;
 
 class CustomsCurrencyTest extends TestCase
 {
+    /**
+     * @var ListsInterface
+     */
     private ListsInterface $localeLists;
+
+    /**
+     * @var CustomsCurrency
+     */
     private CustomsCurrency $source;
 
     protected function setUp(): void

@@ -161,4 +161,3 @@ class DeleteTest extends TestCase
         $this->assertSame($this->redirectMock, $result);
     }
 }
-

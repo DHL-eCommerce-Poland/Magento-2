@@ -10,6 +10,9 @@ use PHPUnit\Framework\TestCase;
 
 class CategoryOfItemTest extends TestCase
 {
+    /**
+     * @var CategoryOfItem
+     */
     private CategoryOfItem $source;
 
     protected function setUp(): void

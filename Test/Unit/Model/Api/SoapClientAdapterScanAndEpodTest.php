@@ -54,7 +54,12 @@ class SoapClientAdapterScanAndEpodTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
+            ->setConstructorArgs([
+                $this->loggerStub,
+                $this->scopeConfigStub,
+                $this->dateSanitizer,
+                $this->fileDriverStub,
+            ])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -74,7 +79,12 @@ class SoapClientAdapterScanAndEpodTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
+            ->setConstructorArgs([
+                $this->loggerStub,
+                $this->scopeConfigStub,
+                $this->dateSanitizer,
+                $this->fileDriverStub,
+            ])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -94,7 +104,12 @@ class SoapClientAdapterScanAndEpodTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
+            ->setConstructorArgs([
+                $this->loggerStub,
+                $this->scopeConfigStub,
+                $this->dateSanitizer,
+                $this->fileDriverStub,
+            ])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -114,7 +129,12 @@ class SoapClientAdapterScanAndEpodTest extends TestCase
         $soapClientStub = new TestSoapClient(true);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
+            ->setConstructorArgs([
+                $this->loggerStub,
+                $this->scopeConfigStub,
+                $this->dateSanitizer,
+                $this->fileDriverStub,
+            ])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 

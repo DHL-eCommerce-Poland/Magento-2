@@ -25,7 +25,7 @@ if (file_exists($vendorAutoload)) {
 
 // 2. Define temp directory for generated test code
 if (!defined('TESTS_TEMP_DIR')) {
-    define('TESTS_TEMP_DIR', sys_get_temp_dir() . '/magento_unit_tests_' . md5(__DIR__));
+    define('TESTS_TEMP_DIR', sys_get_temp_dir() . '/magento_unit_tests_' . hash('sha256', __DIR__));
 }
 
 // 3. Load generated code autoloader (factories, proxies, extension attributes)

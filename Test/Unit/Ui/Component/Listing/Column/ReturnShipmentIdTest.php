@@ -13,6 +13,9 @@ use PHPUnit\Framework\TestCase;
 
 class ReturnShipmentIdTest extends TestCase
 {
+    /**
+     * @var ReturnShipmentId
+     */
     private ReturnShipmentId $column;
 
     protected function setUp(): void

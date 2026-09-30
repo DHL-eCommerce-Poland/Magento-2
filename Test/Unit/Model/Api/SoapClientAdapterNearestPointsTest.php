@@ -16,11 +16,34 @@ use Psr\Log\LoggerInterface;
 #[AllowMockObjectsWithoutExpectations]
 class SoapClientAdapterNearestPointsTest extends TestCase
 {
+    /**
+     * @var Credentials
+     */
     private Credentials $credentials;
+
+    /**
+     * @var LoggerInterface|MockObject
+     */
     private LoggerInterface $loggerMock;
+
+    /**
+     * @var ScopeConfigInterface|MockObject
+     */
     private ScopeConfigInterface $scopeConfigMock;
+
+    /**
+     * @var TimezoneInterface|MockObject
+     */
     private TimezoneInterface $timezoneMock;
+
+    /**
+     * @var ShipmentDateSanitizer
+     */
     private ShipmentDateSanitizer $sanitizer;
+
+    /**
+     * @var \Magento\Framework\Filesystem\Driver\File|MockObject
+     */
     private \Magento\Framework\Filesystem\Driver\File $fileDriverMock;
 
     protected function setUp(): void

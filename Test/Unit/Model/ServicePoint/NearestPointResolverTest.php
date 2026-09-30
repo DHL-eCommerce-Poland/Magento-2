@@ -18,10 +18,29 @@ use Psr\Log\LoggerInterface;
 #[AllowMockObjectsWithoutExpectations]
 class NearestPointResolverTest extends TestCase
 {
+    /**
+     * @var CredentialsProvider|MockObject
+     */
     private CredentialsProvider $credentialsProviderMock;
+
+    /**
+     * @var ClientInterface|MockObject
+     */
     private ClientInterface $clientMock;
+
+    /**
+     * @var LoggerInterface|MockObject
+     */
     private LoggerInterface $loggerMock;
+
+    /**
+     * @var Credentials
+     */
     private Credentials $credentials;
+
+    /**
+     * @var NearestPointResolver
+     */
     private NearestPointResolver $resolver;
 
     protected function setUp(): void

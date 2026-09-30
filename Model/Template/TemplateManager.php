@@ -244,8 +244,6 @@ class TemplateManager
         return $this->shipmentAddressTypeSource->toOptionArray();
     }
 
-
-
     /**
      * Get Return QR Code Type options from source model.
      *

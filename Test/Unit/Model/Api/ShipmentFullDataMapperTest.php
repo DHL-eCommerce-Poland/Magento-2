@@ -127,7 +127,8 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('2', $mapped['ship']['shipper']['address']['apartmentNumber']);
 
         // Check receiver inside ship
-        $this->assertEquals('B', $mapped['ship']['receiver']['address']['addressType']); // B2B maps to 'B' in DHL WebAPI2
+        // B2B maps to 'B' in DHL WebAPI2
+        $this->assertEquals('B', $mapped['ship']['receiver']['address']['addressType']);
         $this->assertEquals('Firma ABC', $mapped['ship']['receiver']['address']['name']);
         $this->assertEquals('30002', $mapped['ship']['receiver']['address']['postalCode']);
         $this->assertEquals('PL', $mapped['ship']['receiver']['address']['country']);

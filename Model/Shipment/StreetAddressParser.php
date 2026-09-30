@@ -54,7 +54,8 @@ class StreetAddressParser
             ];
         }
 
-        // Pattern 4: House number prefix e.g. "30 Rue des Buissons", "10A Rue des Buissons", "10C/23 Rue des Buissons", "30 bis Rue des Buissons", "10-12 Rue de la Paix"
+        // Pattern 4: House number prefix e.g. "30 Rue des Buissons", "10A Rue des Buissons",
+        // "10C/23 Rue des Buissons", "30 bis Rue des Buissons", "10-12 Rue de la Paix"
         $prefixPattern = '/^([0-9]+\s*(?:bis|ter|quater|[a-zA-Z])?(?:\s*[\/\-\|]\s*[0-9a-zA-Z]+)?)\s*[,.]?\s+(.+)$/ui';
         if (preg_match($prefixPattern, $fullAddress, $matches)) {
             $houseNum = (string) preg_replace('/\s*([\/\-\|])\s*/', '$1', trim($matches[1]));

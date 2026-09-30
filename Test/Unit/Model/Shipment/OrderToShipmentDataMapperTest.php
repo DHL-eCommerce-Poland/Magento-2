@@ -440,4 +440,3 @@ class OrderToShipmentDataMapperTest extends TestCase
         $this->assertFalse($shipmentData->getRecipient()->isPackstation());
     }
 }
-

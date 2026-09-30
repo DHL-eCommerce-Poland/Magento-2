@@ -252,9 +252,24 @@ class LabelPrintingServiceTest extends TestCase
                 ['shipmentId' => '90040025527', 'labelType' => 'BLP'],
             ])
             ->willReturn(new GetLabelsResult(true, [
-                ['shipmentId' => '90040025505', 'labelType' => 'BLP', 'labelData' => 'PDF1', 'mimeType' => 'application/pdf'],
-                ['shipmentId' => '90040025516', 'labelType' => 'BLP', 'labelData' => 'PDF2', 'mimeType' => 'application/pdf'],
-                ['shipmentId' => '90040025527', 'labelType' => 'BLP', 'labelData' => 'PDF3', 'mimeType' => 'application/pdf'],
+                [
+                    'shipmentId' => '90040025505',
+                    'labelType' => 'BLP',
+                    'labelData' => 'PDF1',
+                    'mimeType' => 'application/pdf',
+                ],
+                [
+                    'shipmentId' => '90040025516',
+                    'labelType' => 'BLP',
+                    'labelData' => 'PDF2',
+                    'mimeType' => 'application/pdf',
+                ],
+                [
+                    'shipmentId' => '90040025527',
+                    'labelType' => 'BLP',
+                    'labelData' => 'PDF3',
+                    'mimeType' => 'application/pdf',
+                ],
             ]));
 
         $labelGeneratorStub = $this->createStub(\Magento\Shipping\Model\Shipping\LabelGenerator::class);
@@ -290,8 +305,18 @@ class LabelPrintingServiceTest extends TestCase
         $clientMock->expects($this->once())
             ->method('getLabels')
             ->willReturn(new GetLabelsResult(true, [
-                ['shipmentId' => '90040025505', 'labelType' => 'PNG', 'labelData' => 'PNG_BYTES_1', 'mimeType' => 'image/png'],
-                ['shipmentId' => '90040025516', 'labelType' => 'PNG', 'labelData' => 'PNG_BYTES_2', 'mimeType' => 'image/png'],
+                [
+                    'shipmentId' => '90040025505',
+                    'labelType' => 'PNG',
+                    'labelData' => 'PNG_BYTES_1',
+                    'mimeType' => 'image/png',
+                ],
+                [
+                    'shipmentId' => '90040025516',
+                    'labelType' => 'PNG',
+                    'labelData' => 'PNG_BYTES_2',
+                    'mimeType' => 'image/png',
+                ],
             ]));
 
         $service = new LabelPrintingService(

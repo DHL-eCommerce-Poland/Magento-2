@@ -12,7 +12,14 @@ use Psr\Log\LoggerInterface;
 
 class SoapClientAdapterReturnTest extends TestCase
 {
+    /**
+     * @var LoggerInterface|MockObject
+     */
     private mixed $loggerStub;
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface|MockObject
+     */
     private mixed $scopeConfigStub;
 
     protected function setUp(): void

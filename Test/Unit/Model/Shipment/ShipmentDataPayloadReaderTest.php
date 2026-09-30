@@ -10,6 +10,9 @@ use PHPUnit\Framework\TestCase;
 
 class ShipmentDataPayloadReaderTest extends TestCase
 {
+    /**
+     * @var ShipmentDataPayloadReader
+     */
     private ShipmentDataPayloadReader $reader;
 
     protected function setUp(): void

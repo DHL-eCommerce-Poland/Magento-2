@@ -14,7 +14,8 @@ class DataProviderTest extends TestCase
 {
     public function testGetDataExplodesMethodCodeStringToArray(): void
     {
-        $methodsString = 'parcel_polska,parcel_polska_cod,premium,premium_cod,parcel_9,parcel_9_cod,parcel_12,parcel_12_cod,economy_box,economy_box_cod';
+        $methodsString = 'parcel_polska,parcel_polska_cod,premium,premium_cod,parcel_9,parcel_9_cod,'
+            . 'parcel_12,parcel_12_cod,economy_box,economy_box_cod';
         $methodsArray = explode(',', $methodsString);
 
         $item = $this->createStub(DeliveryService::class);
