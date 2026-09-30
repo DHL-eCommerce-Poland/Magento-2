@@ -23,6 +23,37 @@ define([
     }
 
     /**
+     * Retrieve the destination country from a shipping address or its checkout form field.
+     *
+     * @param {Object|null} address Shipping address.
+     *
+     * @return {string} Uppercase destination country code, or an empty string when unavailable.
+     */
+    function getAddressCountry(address) {
+        var country = address && (address.countryId || address.country_id);
+
+        if (!country) {
+            country = $('select[name="country_id"]').val();
+        }
+
+        return country ? String(country).toUpperCase() : '';
+    }
+
+    /**
+     * Check whether a saved service point belongs to the current shipping destination.
+     *
+     * @param {Object|null} point Selected service point.
+     *
+     * @return {Boolean} True when the point country matches or either country is unavailable.
+     */
+    function pointMatchesDestination(point) {
+        var pointCountry = point && point.country ? String(point.country).toUpperCase() : '';
+        var destinationCountry = getAddressCountry(quote.shippingAddress());
+
+        return !pointCountry || !destinationCountry || pointCountry === destinationCountry;
+    }
+
+    /**
      * Helper to get full normalized method key string (e.g. 'dhlparcel_economy_all_cod').
      *
      * @param {Object|string|null} method Shipping method object or code.
@@ -48,6 +79,26 @@ define([
             return mCode;
         }
         return carrierCode + '_' + mCode;
+    }
+
+    /**
+     * Clear the checkout configuration fallback when it refers to the cleared method.
+     *
+     * @param {string|null} methodKey Full carrier and method code, or null to clear any configured point.
+     */
+    function clearConfiguredPoint(methodKey) {
+        var config = window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel;
+        var configuredPoint = config && config.selectedPoint;
+        var configuredMethodKey;
+
+        if (!configuredPoint) {
+            return;
+        }
+
+        configuredMethodKey = getMethodKey(configuredPoint.methodCode) || getMethodKey(quote.shippingMethod());
+        if (!methodKey || !configuredMethodKey || configuredMethodKey === methodKey) {
+            config.selectedPoint = null;
+        }
     }
 
     /**
@@ -222,6 +273,10 @@ define([
         var pt = getPointForMethodKey(mKey);
 
         if (pt && pt.sap) {
+            if (!pointMatchesDestination(pt)) {
+                clearPoint(method);
+                return;
+            }
             selectedPoint(pt);
             updateQuoteExtensionAttributes(pt);
         } else {
@@ -258,6 +313,7 @@ define([
             delete pointsMap[shortCode];
 
             saveToStorage(pointsMap);
+            clearConfiguredPoint(mKey);
 
             var activeKey = getMethodKey(quote.shippingMethod());
             if (activeKey === mKey || activeKey === shortCode) {
@@ -269,6 +325,7 @@ define([
         } else if (!point && !targetMethod) {
             pointsMap = {};
             saveToStorage({});
+            clearConfiguredPoint(null);
             selectedPoint(null);
             pointErrorMessage('');
             postnummerErrorMessage('');
@@ -287,6 +344,7 @@ define([
         } else {
             pointsMap = {};
             saveToStorage({});
+            clearConfiguredPoint(null);
             selectedPoint(null);
             pointErrorMessage('');
             postnummerErrorMessage('');
@@ -327,7 +385,14 @@ define([
     // Subscribe to shippingAddress updates to keep extension_attributes attached when address updates
     quote.shippingAddress.subscribe(function (newAddress) {
         if (newAddress) {
-            updateQuoteExtensionAttributes(selectedPoint());
+            var point = selectedPoint();
+
+            if (point && !pointMatchesDestination(point)) {
+                clearPoint(quote.shippingMethod());
+                return;
+            }
+
+            updateQuoteExtensionAttributes(point);
         }
     });
 
@@ -458,7 +523,10 @@ define([
             }
 
             var point = selectedPoint();
-            if (!point || !point.sap) {
+            if (!point || !point.sap || !pointMatchesDestination(point)) {
+                if (point && point.sap) {
+                    clearPoint(method);
+                }
                 pointErrorMessage($t('Please select a DHL pickup point on the map.'));
                 return false;
             }

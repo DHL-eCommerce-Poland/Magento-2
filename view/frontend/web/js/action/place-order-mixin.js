@@ -2,9 +2,9 @@ define([
     'mage/utils/wrapper',
     'Magento_Checkout/js/model/quote',
     'Ideo_Dhl/js/model/point-state',
-    'Magento_Ui/js/model/messages',
+    'Magento_Ui/js/model/messageList',
     'jquery'
-], function (wrapper, quote, pointState, globalMessageList, $) {
+], function (wrapper, quote, pointState, messageList, $) {
     'use strict';
 
     return function (placeOrderAction) {
@@ -15,7 +15,7 @@ define([
                 if (!pointState.validatePointSelection(shippingMethod)) {
                     var errorMsg = pointState.pointErrorMessage() || pointState.postnummerErrorMessage();
                     if (errorMsg) {
-                        globalMessageList.addErrorMessage({ message: errorMsg });
+                        messageList.addErrorMessage({ message: errorMsg });
                     }
                     var $input = $('#dhl_postnummer_inline:visible, #dhl_postnummer_inline_opt:visible');
                     if (pointState.postnummerErrorMessage() && $input.length) {
@@ -37,7 +37,7 @@ define([
                 pointState.clearPoint();
             }).fail(function (response) {
                 if (response && response.responseJSON && response.responseJSON.message) {
-                    globalMessageList.addErrorMessage({ message: response.responseJSON.message });
+                    messageList.addErrorMessage({ message: response.responseJSON.message });
                 }
             });
         });

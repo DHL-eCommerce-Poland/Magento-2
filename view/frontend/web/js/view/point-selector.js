@@ -210,6 +210,24 @@ define([
                 if (!event || !event.data) {
                     return;
                 }
+
+                var mapFrame = document.querySelector('#dhl-map-modal iframe');
+                var mapOrigin;
+
+                if (!mapFrame || event.source !== mapFrame.contentWindow) {
+                    return;
+                }
+
+                try {
+                    mapOrigin = new URL(mapFrame.src, window.location.href).origin;
+                } catch (e) {
+                    return;
+                }
+
+                if (event.origin !== mapOrigin) {
+                    return;
+                }
+
                 var pointData = event.data;
                 if (typeof pointData === 'string') {
                     try {
