@@ -495,6 +495,8 @@
 "Default Drop-Off Point is loaded from the DHL Drop-Off Points grid.","Default Drop-Off Point is loaded from the DHL Drop-Off Points grid."
 "Associated Shipping Method","Associated Shipping Method"
 "Select DHL methods for this template.","Select DHL methods for this template."
+"Associated Countries","Associated Countries"
+"Select countries for this template.","Select countries for this template."
 "Shipment Label Format","Shipment Label Format"
 "Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}","Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}"
 "Cost center code. Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}","Cost center code. Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}"

@@ -110,6 +110,11 @@ class Save extends Action implements HttpPostActionInterface
                 $data['customs_items'] = $this->serializer->serialize(array_values($items));
             }
 
+            if (isset($data['country_id']) && is_array($data['country_id'])) {
+                $cleanCountries = array_filter(array_map('trim', $data['country_id']));
+                $data['country_id'] = !empty($cleanCountries) ? implode(',', $cleanCountries) : null;
+            }
+
             $template->addData($data);
             $this->repository->save($template);
 

@@ -275,6 +275,114 @@ class TemplateManagerTest extends TestCase
         $this->assertSame([['value' => 'EUR', 'label' => 'EUR']], $manager->getCustomsCurrencyOptions());
     }
 
+    public function testGetMatchingCustomsTemplateIdForCountry(): void
+    {
+        $template1 = $this->createStub(\Ideo\Dhl\Model\CustomsTemplate::class);
+        $template1->method('getEntityId')->willReturn(10);
+        $template1->method('getCountryId')->willReturn('GB, US');
+
+        $template2 = $this->createStub(\Ideo\Dhl\Model\CustomsTemplate::class);
+        $template2->method('getEntityId')->willReturn(20);
+        $template2->method('getCountryId')->willReturn('GB, DE');
+
+        $collection = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Collection::class);
+        $collection->method('getIterator')->willReturn(new \ArrayIterator([$template1, $template2]));
+
+        $factory = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory::class);
+        $factory->method('create')->willReturn($collection);
+
+        $manager = new TemplateManager(
+            $this->dropOffPointCollectionFactory,
+            $this->deliveryServiceCollectionFactory,
+            $this->dropOffPointRepository,
+            $this->deliveryServiceRepository,
+            $this->countrySource,
+            $this->serviceCodeSource,
+            $this->labelTypeSource,
+            $this->packageTypeSource,
+            $this->addressTypeSource,
+            $this->shipmentAddressTypeSource,
+            $this->returnQrCodeTypeSource,
+            $this->returnBookCourierSource,
+            $this->orderRepository,
+            $this->variableResolver,
+            $this->serializer,
+            $this->timezone,
+            $this->methodCatalog,
+            $factory,
+            $this->createStub(\Ideo\Dhl\Model\Source\CustomsType::class),
+            $this->createStub(\Ideo\Dhl\Model\Source\CategoryOfItem::class),
+            $this->createStub(\Ideo\Dhl\Model\Source\CustomsCurrency::class),
+            $this->internationalMapPointTypeSource
+        );
+
+        // GB matches template1 first -> returns 10
+        $this->assertSame(10, $manager->getMatchingCustomsTemplateIdForCountry('gb'));
+
+        // US matches template1 -> returns 10
+        $this->assertSame(10, $manager->getMatchingCustomsTemplateIdForCountry('US'));
+
+        // DE matches template2 -> returns 20
+        $this->assertSame(20, $manager->getMatchingCustomsTemplateIdForCountry('DE'));
+
+        // FR does not match any template -> returns null
+        $this->assertNull($manager->getMatchingCustomsTemplateIdForCountry('FR'));
+
+        // Empty country -> returns null
+        $this->assertNull($manager->getMatchingCustomsTemplateIdForCountry(''));
+    }
+
+    public function testGetMatchingCustomsTemplateIdForOrder(): void
+    {
+        $template = $this->createStub(\Ideo\Dhl\Model\CustomsTemplate::class);
+        $template->method('getEntityId')->willReturn(15);
+        $template->method('getCountryId')->willReturn('CH, NO');
+
+        $collection = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Collection::class);
+        $collection->method('getIterator')->willReturn(new \ArrayIterator([$template]));
+
+        $factory = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory::class);
+        $factory->method('create')->willReturn($collection);
+
+        $manager = new TemplateManager(
+            $this->dropOffPointCollectionFactory,
+            $this->deliveryServiceCollectionFactory,
+            $this->dropOffPointRepository,
+            $this->deliveryServiceRepository,
+            $this->countrySource,
+            $this->serviceCodeSource,
+            $this->labelTypeSource,
+            $this->packageTypeSource,
+            $this->addressTypeSource,
+            $this->shipmentAddressTypeSource,
+            $this->returnQrCodeTypeSource,
+            $this->returnBookCourierSource,
+            $this->orderRepository,
+            $this->variableResolver,
+            $this->serializer,
+            $this->timezone,
+            $this->methodCatalog,
+            $factory,
+            $this->createStub(\Ideo\Dhl\Model\Source\CustomsType::class),
+            $this->createStub(\Ideo\Dhl\Model\Source\CategoryOfItem::class),
+            $this->createStub(\Ideo\Dhl\Model\Source\CustomsCurrency::class),
+            $this->internationalMapPointTypeSource
+        );
+
+        $address = $this->createStub(\Magento\Sales\Model\Order\Address::class);
+        $address->method('getCountryId')->willReturn('CH');
+
+        $order = $this->createStub(\Magento\Sales\Model\Order::class);
+        $order->method('getShippingAddress')->willReturn($address);
+
+        $this->assertSame(15, $manager->getMatchingCustomsTemplateIdForOrder($order));
+
+        $orderNoAddress = $this->createStub(\Magento\Sales\Model\Order::class);
+        $orderNoAddress->method('getShippingAddress')->willReturn(null);
+
+        $this->assertNull($manager->getMatchingCustomsTemplateIdForOrder($orderNoAddress));
+    }
+
     public function testGetSpecialServicesTemplateReturnsNullInsuranceValue(): void
     {
         $service = $this->createMock(DeliveryService::class);

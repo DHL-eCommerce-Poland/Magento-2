@@ -495,6 +495,8 @@
 "Default Drop-Off Point is loaded from the DHL Drop-Off Points grid.","Domyślny punkt nadania jest ładowany z siatki punktów nadania DHL."
 "Associated Shipping Method","Powiązana metoda dostawy"
 "Select DHL methods for this template.","Wybierz metody DHL dla tego szablonu."
+"Associated Countries","Powiązane kraje"
+"Select countries for this template.","Wybierz kraje dla tego szablonu."
 "Shipment Label Format","Format etykiety przesyłki"
 "Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}","Dostępne tagi: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}"
 "Cost center code. Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}","Kod MPK (miejsce powstawania kosztów). Dostępne tagi: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}"

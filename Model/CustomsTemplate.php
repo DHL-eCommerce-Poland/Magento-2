@@ -37,7 +37,7 @@ class CustomsTemplate extends AbstractModel
     public const NOT_PROHIBITED_GOODS = 'not_prohibited_goods';
     public const NOT_RESTRICTED_GOODS = 'not_restricted_goods';
     public const CUSTOMS_ITEMS = 'customs_items';
-    public const IS_DEFAULT = 'is_default';
+    public const COUNTRY_ID = 'country_id';
 
     /**
      * @var string
@@ -536,24 +536,27 @@ class CustomsTemplate extends AbstractModel
     }
 
     /**
-     * Is Default template.
+     * Get Destination Country Codes (comma-separated or null).
      *
-     * @return bool
+     * @return string|null
      */
-    public function isDefault(): bool
+    public function getCountryId(): ?string
     {
-        return (bool)$this->getData(self::IS_DEFAULT);
+        return $this->getData(self::COUNTRY_ID);
     }
 
     /**
-     * Set Is Default.
+     * Set Destination Country Codes.
      *
-     * @param bool|int $isDefault
+     * @param string|array|null $countryId
      *
      * @return $this
      */
-    public function setIsDefault(bool|int $isDefault): static
+    public function setCountryId(string|array|null $countryId): static
     {
-        return $this->setData(self::IS_DEFAULT, (int)$isDefault);
+        if (is_array($countryId)) {
+            $countryId = implode(',', array_filter(array_map('trim', $countryId)));
+        }
+        return $this->setData(self::COUNTRY_ID, $countryId !== '' ? $countryId : null);
     }
 }

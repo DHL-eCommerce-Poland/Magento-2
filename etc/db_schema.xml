@@ -127,15 +127,12 @@
         <column xsi:type="smallint" name="not_prohibited_goods" unsigned="true" nullable="true" default="1" comment="Agreement: Not Prohibited Goods"/>
         <column xsi:type="smallint" name="not_restricted_goods" unsigned="true" nullable="true" default="1" comment="Agreement: Not Restricted Goods"/>
         <column xsi:type="text" name="customs_items" nullable="true" comment="Customs Items JSON Array"/>
-        <column xsi:type="smallint" name="is_default" unsigned="true" nullable="false" default="0" comment="Is Default Template"/>
+        <column xsi:type="text" name="country_id" nullable="true" comment="Destination Countries (comma-separated ISO codes)"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Update Time"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <index referenceId="IDX_DHLPOLAND_CUSTOMS_TEMPLATE_DEFAULT" indexType="btree">
-            <column name="is_default"/>
-        </index>
     </table>
     <table name="dhlpoland_shipment" resource="default" engine="innodb" comment="DHL Shipment Entities">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>

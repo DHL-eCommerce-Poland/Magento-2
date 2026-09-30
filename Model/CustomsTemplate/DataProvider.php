@@ -70,6 +70,9 @@ class DataProvider extends AbstractDataProvider
                     $data['customs_items'] = array_values($decoded);
                 }
             }
+            if (isset($data['country_id']) && is_string($data['country_id']) && $data['country_id'] !== '') {
+                $data['country_id'] = array_values(array_filter(array_map('trim', explode(',', $data['country_id']))));
+            }
             $this->loadedData[$item->getId()] = $data;
         }
 

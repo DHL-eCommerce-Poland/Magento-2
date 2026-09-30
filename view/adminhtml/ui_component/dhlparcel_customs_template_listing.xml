@@ -107,12 +107,11 @@
                 <label translate="true">Country Of Origin</label>
             </settings>
         </column>
-        <column name="is_default" component="Magento_Ui/js/grid/columns/select">
+        <column name="country_id">
             <settings>
-                <options class="Magento\Config\Model\Config\Source\Yesno"/>
-                <filter>select</filter>
-                <dataType>select</dataType>
-                <label translate="true">Is Default</label>
+                <filter>text</filter>
+                <dataType>text</dataType>
+                <label translate="true">Associated Countries</label>
             </settings>
         </column>
         <actionsColumn name="actions" class="Ideo\Dhl\Ui\Component\Listing\Column\CustomsTemplateActions">

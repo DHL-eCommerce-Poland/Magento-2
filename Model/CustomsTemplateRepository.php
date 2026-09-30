@@ -62,22 +62,6 @@ class CustomsTemplateRepository
     }
 
     /**
-     * Get default Customs Template.
-     *
-     * @return CustomsTemplate|null
-     */
-    public function getDefaultTemplate(): ?CustomsTemplate
-    {
-        $collection = $this->collectionFactory->create();
-        $collection->addFieldToFilter('is_default', 1);
-        $collection->setPageSize(1);
-
-        /** @var CustomsTemplate|null $template */
-        $template = $collection->getFirstItem();
-        return ($template && $template->getId()) ? $template : null;
-    }
-
-    /**
      * Delete Customs Template.
      *
      * @param CustomsTemplate $template

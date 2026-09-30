@@ -60,27 +60,19 @@
                 <dataScope>template_name</dataScope>
             </settings>
         </field>
-        <field name="is_default" formElement="checkbox">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="default" xsi:type="number">0</item>
-                </item>
-            </argument>
+        <field name="country_id" formElement="multiselect">
             <settings>
-                <dataType>boolean</dataType>
-                <label translate="true">Set as Default Template</label>
-                <dataScope>is_default</dataScope>
+                <dataType>text</dataType>
+                <label translate="true">Associated Countries</label>
+                <dataScope>country_id</dataScope>
+                <notice translate="true">Select countries for this template.</notice>
             </settings>
             <formElements>
-                <checkbox>
+                <multiselect>
                     <settings>
-                        <valueMap>
-                            <map name="false" xsi:type="number">0</map>
-                            <map name="true" xsi:type="number">1</map>
-                        </valueMap>
-                        <prefer>toggle</prefer>
+                        <options class="Magento\Directory\Model\Config\Source\Country"/>
                     </settings>
-                </checkbox>
+                </multiselect>
             </formElements>
         </field>
         <field name="customs_type" formElement="select">

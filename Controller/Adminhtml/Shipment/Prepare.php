@@ -84,6 +84,7 @@ class Prepare extends Action
             $shipmentTemplates = $this->templateManager->getShipmentTemplatesOptions($shippingMethod);
             $defaultDropOffPointId = $this->templateManager->getDefaultDropOffPointId();
             $defaultDeliveryServiceId = $this->templateManager->getMatchingDeliveryServiceIdForOrder($order);
+            $defaultCustomsTemplateId = $this->templateManager->getMatchingCustomsTemplateIdForOrder($order);
 
             return $resultJson->setData([
                 'success' => true,
@@ -94,6 +95,7 @@ class Prepare extends Action
                 'shipmentPresets' => $shipmentTemplates,
                 'defaultDropOffPointId' => $defaultDropOffPointId ? (string)$defaultDropOffPointId : null,
                 'defaultDeliveryServiceId' => $defaultDeliveryServiceId ? (string)$defaultDeliveryServiceId : null,
+                'defaultCustomsTemplateId' => $defaultCustomsTemplateId ? (string)$defaultCustomsTemplateId : null,
                 'countryOptions' => $this->templateManager->getCountryOptions(),
                 'serviceCodeOptions' => $this->templateManager->getServiceCodeOptions(),
                 'labelTypeOptions' => $this->templateManager->getLabelTypeOptions(),

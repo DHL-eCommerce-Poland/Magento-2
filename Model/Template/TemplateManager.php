@@ -351,9 +351,6 @@ class TemplateManager
 
         foreach ($collection as $item) {
             $label = (string)($item->getTemplateName() ?: __('Template #%1', $item->getEntityId()));
-            if ($item->getIsDefault()) {
-                $label .= ' *';
-            }
             $options[] = [
                 'value' => (int)$item->getEntityId(),
                 'label' => $label,
@@ -361,6 +358,57 @@ class TemplateManager
         }
 
         return $options;
+    }
+
+    /**
+     * Get matching Customs Clearance Template ID for an order based on its shipping address country.
+     *
+     * Returns the FIRST matching Customs Clearance template ID or null if none match.
+     *
+     * @param OrderInterface $order
+     *
+     * @return int|null
+     */
+    public function getMatchingCustomsTemplateIdForOrder(OrderInterface $order): ?int
+    {
+        $shippingAddress = $order->getShippingAddress();
+        $countryId = $shippingAddress ? (string)($shippingAddress->getCountryId() ?? '') : '';
+        if (empty($countryId)) {
+            return null;
+        }
+
+        return $this->getMatchingCustomsTemplateIdForCountry($countryId);
+    }
+
+    /**
+     * Get matching Customs Clearance Template ID for a destination country ISO code.
+     *
+     * Returns the FIRST matching Customs Clearance template ID or null if none match.
+     *
+     * @param string $countryId
+     *
+     * @return int|null
+     */
+    public function getMatchingCustomsTemplateIdForCountry(string $countryId): ?int
+    {
+        $cleanCountry = strtoupper(trim($countryId));
+        if (empty($cleanCountry)) {
+            return null;
+        }
+
+        $collection = $this->customsTemplateCollectionFactory->create();
+        foreach ($collection as $item) {
+            $rawCountryId = (string)($item->getCountryId() ?? '');
+            if (empty($rawCountryId)) {
+                continue;
+            }
+            $allowedCountries = array_filter(array_map('trim', explode(',', strtoupper($rawCountryId))));
+            if (in_array($cleanCountry, $allowedCountries, true)) {
+                return (int)$item->getEntityId();
+            }
+        }
+
+        return null;
     }
 
     /**

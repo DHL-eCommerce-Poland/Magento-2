@@ -1246,6 +1246,11 @@ define([
                             response.data.shipmentSettings.selectedDeliveryServiceId = defaultDeliveryServiceId;
                         }
 
+                        var defaultCustomsTemplateId = response.defaultCustomsTemplateId || (response.data.customs ? response.data.customs.selectedCustomsTemplateId : null);
+                        if (response.data.customs) {
+                            response.data.customs.selectedCustomsTemplateId = defaultCustomsTemplateId;
+                        }
+
                         self._activeSenderTemplateId = null;
                         self._activeShipmentTemplateId = null;
                         self._activeCustomsTemplateId = null;
@@ -1260,6 +1265,10 @@ define([
                         if (defaultDeliveryServiceId) {
                             newDraft.shipmentSettings.selectedDeliveryServiceId(defaultDeliveryServiceId);
                             self.onShipmentTemplateChange(defaultDeliveryServiceId);
+                        }
+                        if (defaultCustomsTemplateId) {
+                            newDraft.customs.selectedCustomsTemplateId(defaultCustomsTemplateId);
+                            self.onCustomsTemplateChange(defaultCustomsTemplateId);
                         }
 
                         newDraft.sender.selectedDropOffPointId.subscribe(function (newVal) {

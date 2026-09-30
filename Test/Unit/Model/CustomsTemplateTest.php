@@ -100,10 +100,10 @@ class CustomsTemplateTest extends TestCase
         $this->model->setCustomsItems($items);
         $this->assertSame(json_encode($items), $this->model->getCustomsItems());
 
-        $this->model->setIsDefault(true);
-        $this->assertTrue($this->model->isDefault());
+        $this->model->setCountryId('DE,GB,FR');
+        $this->assertSame('DE,GB,FR', $this->model->getCountryId());
 
-        $this->model->setIsDefault(0);
-        $this->assertFalse($this->model->isDefault());
+        $this->model->setCountryId(['DE', 'GB', 'FR']);
+        $this->assertSame('DE,GB,FR', $this->model->getCountryId());
     }
 }

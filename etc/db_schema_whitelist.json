@@ -152,12 +152,9 @@
             "not_prohibited_goods": true,
             "not_restricted_goods": true,
             "customs_items": true,
-            "is_default": true,
+            "country_id": true,
             "created_at": true,
             "updated_at": true
-        },
-        "index": {
-            "IDX_DHLPOLAND_CUSTOMS_TEMPLATE_DEFAULT": true
         },
         "constraint": {
             "PRIMARY": true
