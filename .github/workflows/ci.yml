@@ -26,10 +26,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@87d00bde2555f25eb54fedf940384e99cbdc55ef # v2.32.0
         with:
           php-version: '8.1'
           tools: composer:v2
@@ -42,10 +42,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Run Magento Coding Standard
-        uses: extdn/github-actions-m2/magento-coding-standard@master
+        uses: extdn/github-actions-m2/magento-coding-standard@a5625f652a136d892ac7de5e340bd3858942e3df # master
 
   unit-tests:
     name: Unit Tests (PHP ${{ matrix.php }})
@@ -56,10 +56,10 @@ jobs:
         php: ['8.1', '8.2', '8.3', '8.4', '8.5']
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@87d00bde2555f25eb54fedf940384e99cbdc55ef # v2.32.0
         with:
           php-version: ${{ matrix.php }}
           extensions: mbstring, intl, soap, zip, json
@@ -78,7 +78,7 @@ jobs:
           fi
 
       - name: Cache Composer dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: ~/.composer/cache
           key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
@@ -91,7 +91,7 @@ jobs:
         run: vendor/bin/phpunit -c phpunit.xml.dist --log-junit test-results-${{ matrix.php }}.xml Test/Unit
 
       - name: Publish Test Report (Checks & Summary)
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@6c357194179c694acfcad2100dbf27c5b9b0d5e0 # v1.9.1
         if: success() || failure()
         with:
           name: PHPUnit (PHP ${{ matrix.php }})
