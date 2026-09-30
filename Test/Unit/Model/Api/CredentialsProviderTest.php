@@ -53,17 +53,19 @@ class CredentialsProviderTest extends TestCase
     {
         $this->scopeConfigMock->expects(self::exactly(2))
             ->method('getValue')
-            ->willReturnMap([
-                ['carriers/dhlparcel/api_login', '0:3:encrypted_user'],
-                ['carriers/dhlparcel/api_password', '0:3:encrypted_pass'],
-            ]);
+            ->willReturnCallback(fn(string $path) => match ($path) {
+                'carriers/dhlparcel/api_login' => '0:3:encrypted_user',
+                'carriers/dhlparcel/api_password' => '0:3:encrypted_pass',
+                default => null,
+            });
 
         $this->encryptorMock->expects(self::exactly(2))
             ->method('decrypt')
-            ->willReturnMap([
-                ['0:3:encrypted_user', 'decrypted_user'],
-                ['0:3:encrypted_pass', 'decrypted_pass'],
-            ]);
+            ->willReturnCallback(fn(string $val) => match ($val) {
+                '0:3:encrypted_user' => 'decrypted_user',
+                '0:3:encrypted_pass' => 'decrypted_pass',
+                default => '',
+            });
 
         $credentials = $this->credentialsProvider->getCredentials('production');
 
@@ -81,17 +83,19 @@ class CredentialsProviderTest extends TestCase
     {
         $this->scopeConfigMock->expects(self::exactly(2))
             ->method('getValue')
-            ->willReturnMap([
-                ['carriers/dhlparcel/api_login_sandbox', '0:3:enc_sb_user'],
-                ['carriers/dhlparcel/api_password_sandbox', '0:3:enc_sb_pass'],
-            ]);
+            ->willReturnCallback(fn(string $path) => match ($path) {
+                'carriers/dhlparcel/api_login_sandbox' => '0:3:enc_sb_user',
+                'carriers/dhlparcel/api_password_sandbox' => '0:3:enc_sb_pass',
+                default => null,
+            });
 
         $this->encryptorMock->expects(self::exactly(2))
             ->method('decrypt')
-            ->willReturnMap([
-                ['0:3:enc_sb_user', 'sb_user'],
-                ['0:3:enc_sb_pass', 'sb_pass'],
-            ]);
+            ->willReturnCallback(fn(string $val) => match ($val) {
+                '0:3:enc_sb_user' => 'sb_user',
+                '0:3:enc_sb_pass' => 'sb_pass',
+                default => '',
+            });
 
         $credentials = $this->credentialsProvider->getCredentials('sandbox');
 
@@ -126,17 +130,19 @@ class CredentialsProviderTest extends TestCase
     {
         $this->scopeConfigMock->expects(self::exactly(2))
             ->method('getValue')
-            ->willReturnMap([
-                ['carriers/dhlparcel/api_login', '0:3:encrypted_user'],
-                ['carriers/dhlparcel/api_password', '0:3:encrypted_pass'],
-            ]);
+            ->willReturnCallback(fn(string $path) => match ($path) {
+                'carriers/dhlparcel/api_login' => '0:3:encrypted_user',
+                'carriers/dhlparcel/api_password' => '0:3:encrypted_pass',
+                default => null,
+            });
 
         $this->encryptorMock->expects(self::exactly(2))
             ->method('decrypt')
-            ->willReturnMap([
-                ['0:3:encrypted_user', 'decrypted_user'],
-                ['0:3:encrypted_pass', 'decrypted_pass'],
-            ]);
+            ->willReturnCallback(fn(string $val) => match ($val) {
+                '0:3:encrypted_user' => 'decrypted_user',
+                '0:3:encrypted_pass' => 'decrypted_pass',
+                default => '',
+            });
 
         $credentials = $this->credentialsProvider->getCredentials('production', '******', '******');
 

@@ -19,25 +19,36 @@ use Magento\Framework\TestFramework\Unit\Autoloader\ProxyGenerator;
 use Magento\Framework\TestFramework\Unit\Autoloader\GeneratedClassesAutoloader;
 
 if (class_exists(GeneratedClassesAutoloader::class)) {
-    $tempDir = defined('TESTS_TEMP_DIR') ? TESTS_TEMP_DIR : sys_get_temp_dir() . '/magento_unit_tests';
-    $generatedPath = class_exists(DirectoryList::class)
-        ? DirectoryList::getDefaultConfig()[DirectoryList::GENERATED_CODE][DirectoryList::PATH]
-        : 'generated/code';
+    $generators = [];
+    if (class_exists(ExtensionAttributesGenerator::class)) {
+        $generators[] = new ExtensionAttributesGenerator();
+    }
+    if (class_exists(ExtensionAttributesInterfaceGenerator::class)) {
+        $generators[] = new ExtensionAttributesInterfaceGenerator();
+    }
+    if (class_exists(FactoryGenerator::class)) {
+        $generators[] = new FactoryGenerator();
+    }
+    if (class_exists(ProxyGenerator::class)) {
+        $generators[] = new ProxyGenerator();
+    }
 
-    $generatorIo = new Io(
-        new File(),
-        $tempDir . '/' . $generatedPath
-    );
+    if (!empty($generators)) {
+        $tempDir = defined('TESTS_TEMP_DIR') ? TESTS_TEMP_DIR : sys_get_temp_dir() . '/magento_unit_tests';
+        $generatedPath = class_exists(DirectoryList::class)
+            ? DirectoryList::getDefaultConfig()[DirectoryList::GENERATED_CODE][DirectoryList::PATH]
+            : 'generated/code';
 
-    $generatedCodeAutoloader = new GeneratedClassesAutoloader(
-        [
-            new ExtensionAttributesGenerator(),
-            new ExtensionAttributesInterfaceGenerator(),
-            new FactoryGenerator(),
-            new ProxyGenerator()
-        ],
-        $generatorIo
-    );
+        $generatorIo = new Io(
+            new File(),
+            $tempDir . '/' . $generatedPath
+        );
 
-    spl_autoload_register([$generatedCodeAutoloader, 'load']);
+        $generatedCodeAutoloader = new GeneratedClassesAutoloader(
+            $generators,
+            $generatorIo
+        );
+
+        spl_autoload_register([$generatedCodeAutoloader, 'load']);
+    }
 }
