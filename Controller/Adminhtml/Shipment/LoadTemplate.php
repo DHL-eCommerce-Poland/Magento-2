@@ -60,8 +60,8 @@ class LoadTemplate extends Action
      * Execute load template action.
      *
      * @return Json
-     * @phpcsSuppress Generic.Metrics.NestingLevel.MaxExceeded
      */
+    // phpcs:ignore Generic.Metrics.NestingLevel.TooHigh
     public function execute(): Json
     {
         $resultJson = $this->jsonFactory->create();

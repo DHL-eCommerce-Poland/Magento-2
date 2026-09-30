@@ -248,8 +248,8 @@ class ShipmentDataService
      *
      * @return ShipmentDataInterface
      * @throws LocalizedException
-     * @phpcsSuppress Generic.Metrics.NestingLevel.MaxExceeded
      */
+    // phpcs:ignore Generic.Metrics.NestingLevel.TooHigh
     public function updateReturnShipmentId(
         int $entityId,
         string $returnShipmentId,

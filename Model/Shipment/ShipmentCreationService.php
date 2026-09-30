@@ -203,8 +203,8 @@ class ShipmentCreationService
      *
      * @return CreateShipmentResult
      * @throws LocalizedException
-     * @phpcsSuppress Generic.Metrics.NestingLevel.MaxExceeded
      */
+    // phpcs:ignore Generic.Metrics.NestingLevel.TooHigh
     public function recreateShipment(
         int $entityId,
         DhlShipmentData $shipmentData,
