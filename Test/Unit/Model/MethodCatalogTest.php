@@ -96,4 +96,33 @@ class MethodCatalogTest extends TestCase
         self::assertSame('CP', $catalog->getServiceCodeForMethod('dhlparcel_connect_plus_cod'));
         self::assertSame('CM', $catalog->getServiceCodeForMethod('dhlparcel_connect_pallet_cod'));
     }
+
+    /**
+     * Verify pickup-point methods are classified consistently by service point type.
+     */
+    public function testServicePointMethodClassification(): void
+    {
+        $catalog = new MethodCatalog();
+
+        $this->assertTrue($catalog->isServicePointMethod('economy_all'));
+        $this->assertTrue($catalog->isServicePointMethod('economy_all_cod'));
+        $this->assertTrue($catalog->isServicePointMethod('economy_pop'));
+        $this->assertTrue($catalog->isServicePointMethod('economy_pop_cod'));
+        $this->assertTrue($catalog->isServicePointMethod('economy_box'));
+        $this->assertTrue($catalog->isServicePointMethod('economy_box_cod'));
+        $this->assertTrue($catalog->isServicePointMethod('connect_parcelshop'));
+        $this->assertTrue($catalog->isServicePointMethod('connect_parcelshop_cod'));
+        $this->assertTrue($catalog->isServicePointMethod('connect_packstation'));
+        $this->assertTrue($catalog->isServicePointMethod('connect_packstation_cod'));
+        $this->assertFalse($catalog->isServicePointMethod('connect'));
+        $this->assertFalse($catalog->isServicePointMethod('courier'));
+
+        $this->assertTrue($catalog->isPackstationMethod('connect_packstation'));
+        $this->assertTrue($catalog->isPackstationMethod('connect_packstation_cod'));
+        $this->assertFalse($catalog->isPackstationMethod('connect_parcelshop'));
+
+        $this->assertTrue($catalog->isParcelShopMethod('connect_parcelshop'));
+        $this->assertTrue($catalog->isParcelShopMethod('connect_parcelshop_cod'));
+        $this->assertFalse($catalog->isParcelShopMethod('connect_packstation'));
+    }
 }

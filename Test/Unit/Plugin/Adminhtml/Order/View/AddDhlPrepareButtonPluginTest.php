@@ -6,6 +6,7 @@ namespace Ideo\Dhl\Test\Unit\Plugin\Adminhtml\Order\View;
 
 use Ideo\Dhl\Plugin\Adminhtml\Order\View\AddDhlPrepareButtonPlugin;
 use Magento\Backend\Model\UrlInterface;
+use Magento\Framework\Serialize\Serializer\JsonHexTag;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Block\Adminhtml\Order\View as OrderViewBlock;
 use Magento\Sales\Model\Order;
@@ -19,6 +20,11 @@ class AddDhlPrepareButtonPluginTest extends TestCase
      * @var UrlInterface
      */
     private $urlBuilder;
+
+    /**
+     * @var JsonHexTag
+     */
+    private $serializer;
 
     /**
      * @var OrderRepositoryInterface
@@ -38,10 +44,12 @@ class AddDhlPrepareButtonPluginTest extends TestCase
     protected function setUp(): void
     {
         $this->urlBuilder = $this->createStub(UrlInterface::class);
+        $this->serializer = new JsonHexTag();
         $this->orderRepository = $this->createStub(OrderRepositoryInterface::class);
         $this->shipmentDataRepository = $this->createStub(\Ideo\Dhl\Api\ShipmentDataRepositoryInterface::class);
         $this->plugin = new AddDhlPrepareButtonPlugin(
             $this->urlBuilder,
+            $this->serializer,
             $this->orderRepository,
             $this->shipmentDataRepository
         );
@@ -139,6 +147,38 @@ class AddDhlPrepareButtonPluginTest extends TestCase
         $block = $this->createMock(OrderViewBlock::class);
         $block->method('getOrderId')->willReturn(13);
         $block->expects($this->never())->method('addButton');
+
+        $this->plugin->beforeSetLayout($block);
+    }
+
+    public function testBeforeSetLayoutEncodesPrepareUrlAsJavascriptStringLiteral(): void
+    {
+        $prepareUrl = 'https://example.test/prepare?value=\'</script>&quote="';
+        $this->urlBuilder->method('getUrl')->willReturn($prepareUrl);
+
+        $order = $this->createStub(Order::class);
+        $order->method('getState')->willReturn(Order::STATE_PROCESSING);
+        $this->orderRepository->method('get')->willReturn($order);
+        $this->shipmentDataRepository->method('getByOrderId')->willReturn(null);
+
+        $safeUrl = $this->serializer->serialize($prepareUrl);
+        self::assertStringContainsString('\\u003C\\/script\\u003E', $safeUrl);
+        self::assertStringNotContainsString('</script>', $safeUrl);
+        $block = $this->createMock(OrderViewBlock::class);
+        $block->method('getOrderId')->willReturn(10);
+        $block->expects($this->once())
+            ->method('addButton')
+            ->with(
+                'dhlparcel_prepare_shipment',
+                $this->callback(static function (array $button) use ($safeUrl): bool {
+                    return $button['onclick'] === sprintf(
+                        'window.ideoDhlOpenPrepareModal && window.ideoDhlOpenPrepareModal(10, %s)',
+                        $safeUrl
+                    );
+                }),
+                0,
+                95
+            );
 
         $this->plugin->beforeSetLayout($block);
     }

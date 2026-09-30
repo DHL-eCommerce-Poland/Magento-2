@@ -19,9 +19,11 @@ class SaveServicePointToQuoteAddress
 {
     /**
      * @param ServicePointValidator $validator
+     * @param MethodCatalog $methodCatalog
      */
     public function __construct(
-        private readonly ServicePointValidator $validator
+        private readonly ServicePointValidator $validator,
+        private readonly MethodCatalog $methodCatalog
     ) {
     }
 
@@ -56,38 +58,10 @@ class SaveServicePointToQuoteAddress
         if (str_starts_with($cleanMethodCode, Carrier::CODE_PREFIX)) {
             $cleanMethodCode = substr($cleanMethodCode, strlen(Carrier::CODE_PREFIX));
         }
-        $isPackstationMethod = in_array(
-            $cleanMethodCode,
-            [
-                MethodCatalog::METHOD_CONNECT_PACKSTATION,
-                MethodCatalog::METHOD_CONNECT_PACKSTATION_COD,
-            ],
-            true
-        );
+        $isPackstationMethod = $this->methodCatalog->isPackstationMethod($cleanMethodCode);
+        $isParcelShopMethod = $this->methodCatalog->isParcelShopMethod($cleanMethodCode);
 
-        $isParcelShopMethod = in_array(
-            $cleanMethodCode,
-            [
-                MethodCatalog::METHOD_CONNECT_PARCELSHOP,
-                MethodCatalog::METHOD_CONNECT_PARCELSHOP_COD,
-            ],
-            true
-        );
-
-        $isPointMethod = $isPackstationMethod || $isParcelShopMethod || in_array(
-            $cleanMethodCode,
-            [
-                MethodCatalog::METHOD_ECONOMY_ALL,
-                MethodCatalog::METHOD_ECONOMY_ALL_COD,
-                MethodCatalog::METHOD_ECONOMY_POP,
-                MethodCatalog::METHOD_ECONOMY_POP_COD,
-                MethodCatalog::METHOD_ECONOMY_BOX,
-                MethodCatalog::METHOD_ECONOMY_BOX_COD,
-            ],
-            true
-        );
-
-        if (!$isPointMethod) {
+        if ($carrierCode !== Carrier::CODE || !$this->methodCatalog->isServicePointMethod($cleanMethodCode)) {
             $servicePoint = null;
         }
 
@@ -95,7 +69,9 @@ class SaveServicePointToQuoteAddress
             $isPackstation = $isPackstationMethod;
             $isPostfiliale = $isParcelShopMethod;
 
-            if ($servicePoint->isPackstation() !== $isPackstation || $servicePoint->isPostfiliale() !== $isPostfiliale) {
+            if ($servicePoint->isPackstation() !== $isPackstation
+                || $servicePoint->isPostfiliale() !== $isPostfiliale
+            ) {
                 $servicePoint = new ServicePointValueObject(
                     $servicePoint->getId(),
                     $servicePoint->getName(),
@@ -162,18 +138,55 @@ class SaveServicePointToQuoteAddress
         $postnummer = null;
 
         if (is_object($extAttributes)) {
-            $id = (string) (is_callable([$extAttributes, 'getDhlServicePointId']) ? $extAttributes->getDhlServicePointId() : ($extAttributes->dhl_service_point_id ?? ''));
-            $name = (string) (is_callable([$extAttributes, 'getDhlServicePointName']) ? $extAttributes->getDhlServicePointName() : ($extAttributes->dhl_service_point_name ?? ''));
-            $street = (string) (is_callable([$extAttributes, 'getDhlServicePointStreet']) ? $extAttributes->getDhlServicePointStreet() : ($extAttributes->dhl_service_point_street ?? ''));
-            $postcode = (string) (is_callable([$extAttributes, 'getDhlServicePointPostcode']) ? $extAttributes->getDhlServicePointPostcode() : ($extAttributes->dhl_service_point_postcode ?? ''));
-            $city = (string) (is_callable([$extAttributes, 'getDhlServicePointCity']) ? $extAttributes->getDhlServicePointCity() : ($extAttributes->dhl_service_point_city ?? ''));
-            $isPackstation = (bool) (is_callable([$extAttributes, 'getDhlIsPackstation']) ? $extAttributes->getDhlIsPackstation() : ($extAttributes->dhl_is_packstation ?? false));
-            $isPostfiliale = (bool) (is_callable([$extAttributes, 'getDhlIsPostfiliale']) ? $extAttributes->getDhlIsPostfiliale() : ($extAttributes->dhl_is_postfiliale ?? false));
-            $postnummerStr = (string) (is_callable([$extAttributes, 'getDhlPostnummer']) ? $extAttributes->getDhlPostnummer() : ($extAttributes->dhl_postnummer ?? ''));
+            $id = (string) (
+                is_callable([$extAttributes, 'getDhlServicePointId'])
+                    ? $extAttributes->getDhlServicePointId()
+                    : ($extAttributes->dhl_service_point_id ?? '')
+            );
+            $name = (string) (
+                is_callable([$extAttributes, 'getDhlServicePointName'])
+                    ? $extAttributes->getDhlServicePointName()
+                    : ($extAttributes->dhl_service_point_name ?? '')
+            );
+            $street = (string) (
+                is_callable([$extAttributes, 'getDhlServicePointStreet'])
+                    ? $extAttributes->getDhlServicePointStreet()
+                    : ($extAttributes->dhl_service_point_street ?? '')
+            );
+            $postcode = (string) (
+                is_callable([$extAttributes, 'getDhlServicePointPostcode'])
+                    ? $extAttributes->getDhlServicePointPostcode()
+                    : ($extAttributes->dhl_service_point_postcode ?? '')
+            );
+            $city = (string) (
+                is_callable([$extAttributes, 'getDhlServicePointCity'])
+                    ? $extAttributes->getDhlServicePointCity()
+                    : ($extAttributes->dhl_service_point_city ?? '')
+            );
+            $isPackstation = (bool) (
+                is_callable([$extAttributes, 'getDhlIsPackstation'])
+                    ? $extAttributes->getDhlIsPackstation()
+                    : ($extAttributes->dhl_is_packstation ?? false)
+            );
+            $isPostfiliale = (bool) (
+                is_callable([$extAttributes, 'getDhlIsPostfiliale'])
+                    ? $extAttributes->getDhlIsPostfiliale()
+                    : ($extAttributes->dhl_is_postfiliale ?? false)
+            );
+            $postnummerStr = (string) (
+                is_callable([$extAttributes, 'getDhlPostnummer'])
+                    ? $extAttributes->getDhlPostnummer()
+                    : ($extAttributes->dhl_postnummer ?? '')
+            );
             $postnummer = $postnummerStr !== '' ? $postnummerStr : null;
         }
 
-        if (trim($id) === '' && !$extAttributes && $shippingAddress && is_object($shippingAddress) && method_exists($shippingAddress, 'getData')) {
+        if (trim($id) === ''
+            && !$extAttributes
+            && $shippingAddress
+            && is_object($shippingAddress)
+            && method_exists($shippingAddress, 'getData')
+        ) {
             $id = (string) ($shippingAddress->getData('dhl_service_point_id') ?? '');
             $name = (string) ($shippingAddress->getData('dhl_service_point_name') ?? '');
             $street = (string) ($shippingAddress->getData('dhl_service_point_street') ?? '');

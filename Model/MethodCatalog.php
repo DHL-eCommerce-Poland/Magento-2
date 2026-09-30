@@ -42,6 +42,25 @@ class MethodCatalog
     public const METHOD_CONNECT_PALLET = 'connect_pallet';
     public const METHOD_CONNECT_PALLET_COD = 'connect_pallet_cod';
 
+    private const ECONOMY_POINT_METHODS = [
+        self::METHOD_ECONOMY_ALL,
+        self::METHOD_ECONOMY_ALL_COD,
+        self::METHOD_ECONOMY_POP,
+        self::METHOD_ECONOMY_POP_COD,
+        self::METHOD_ECONOMY_BOX,
+        self::METHOD_ECONOMY_BOX_COD,
+    ];
+
+    private const PACKSTATION_METHODS = [
+        self::METHOD_CONNECT_PACKSTATION,
+        self::METHOD_CONNECT_PACKSTATION_COD,
+    ];
+
+    private const PARCELSHOP_METHODS = [
+        self::METHOD_CONNECT_PARCELSHOP,
+        self::METHOD_CONNECT_PARCELSHOP_COD,
+    ];
+
     /**
      * Map of shipping method codes to DHL API service codes.
      *
@@ -75,6 +94,44 @@ class MethodCatalog
         self::METHOD_CONNECT_PALLET => self::SERVICE_CM,
         self::METHOD_CONNECT_PALLET_COD => self::SERVICE_CM,
     ];
+
+    /**
+     * Determine whether a clean DHL method code accepts a service point.
+     *
+     * @param string $methodCode
+     *
+     * @return bool
+     */
+    public function isServicePointMethod(string $methodCode): bool
+    {
+        return in_array($methodCode, self::ECONOMY_POINT_METHODS, true)
+            || $this->isPackstationMethod($methodCode)
+            || $this->isParcelShopMethod($methodCode);
+    }
+
+    /**
+     * Determine whether a clean DHL method code delivers to a Packstation.
+     *
+     * @param string $methodCode
+     *
+     * @return bool
+     */
+    public function isPackstationMethod(string $methodCode): bool
+    {
+        return in_array($methodCode, self::PACKSTATION_METHODS, true);
+    }
+
+    /**
+     * Determine whether a clean DHL method code delivers to a parcel shop.
+     *
+     * @param string $methodCode
+     *
+     * @return bool
+     */
+    public function isParcelShopMethod(string $methodCode): bool
+    {
+        return in_array($methodCode, self::PARCELSHOP_METHODS, true);
+    }
 
     /**
      * Return the supported DHL Parcel services.

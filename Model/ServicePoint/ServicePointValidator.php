@@ -16,24 +16,13 @@ class ServicePointValidator
 {
     private const XML_PATH_DELIVERY_MODE = 'carriers/dhlparcel/method_economy_all_point_delivery_mode';
 
-    private const POINT_METHODS = [
-        MethodCatalog::METHOD_ECONOMY_ALL,
-        MethodCatalog::METHOD_ECONOMY_ALL_COD,
-        MethodCatalog::METHOD_ECONOMY_POP,
-        MethodCatalog::METHOD_ECONOMY_POP_COD,
-        MethodCatalog::METHOD_ECONOMY_BOX,
-        MethodCatalog::METHOD_ECONOMY_BOX_COD,
-        MethodCatalog::METHOD_CONNECT_PARCELSHOP,
-        MethodCatalog::METHOD_CONNECT_PARCELSHOP_COD,
-        MethodCatalog::METHOD_CONNECT_PACKSTATION,
-        MethodCatalog::METHOD_CONNECT_PACKSTATION_COD,
-    ];
-
     /**
      * @param ScopeConfigInterface $scopeConfig
+     * @param MethodCatalog $methodCatalog
      */
     public function __construct(
-        private readonly ScopeConfigInterface $scopeConfig
+        private readonly ScopeConfigInterface $scopeConfig,
+        private readonly MethodCatalog $methodCatalog
     ) {
     }
 
@@ -113,7 +102,7 @@ class ServicePointValidator
             $cleanMethodCode = substr($cleanMethodCode, strlen(Carrier::CODE_PREFIX));
         }
 
-        if (!in_array($cleanMethodCode, self::POINT_METHODS, true)) {
+        if (!$this->methodCatalog->isServicePointMethod($cleanMethodCode)) {
             return false;
         }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Model\ServicePoint;
 
 use Ideo\Dhl\Model\Carrier;
+use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\ServicePoint\ServicePointValidator;
 use Ideo\Dhl\Model\ServicePoint\ServicePointValueObject;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -16,7 +17,7 @@ class ServicePointValidatorTest extends TestCase
     public function testValidationPassesForNonDhlCarrier(): void
     {
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
 
         $this->expectNotToPerformAssertions();
         $validator->validate('flatrate', 'flatrate', null);
@@ -25,7 +26,7 @@ class ServicePointValidatorTest extends TestCase
     public function testValidationPassesForDhlNonPointMethod(): void
     {
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
 
         $this->expectNotToPerformAssertions();
         $validator->validate(Carrier::CODE, 'courier_express', null);
@@ -36,7 +37,7 @@ class ServicePointValidatorTest extends TestCase
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $scopeConfigStub->method('getValue')->willReturn('nearest');
 
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
         $this->expectNotToPerformAssertions();
         $validator->validate(Carrier::CODE, 'economy_all', null);
     }
@@ -46,7 +47,7 @@ class ServicePointValidatorTest extends TestCase
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $scopeConfigStub->method('getValue')->willReturn('map');
 
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
 
         $this->expectException(LocalizedException::class);
         $this->expectExceptionMessage('Please select a DHL pickup point on the map.');
@@ -59,7 +60,7 @@ class ServicePointValidatorTest extends TestCase
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $scopeConfigStub->method('getValue')->willReturn('map');
 
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
 
         $this->expectException(LocalizedException::class);
         $this->expectExceptionMessage('Please select a DHL pickup point on the map.');
@@ -72,7 +73,7 @@ class ServicePointValidatorTest extends TestCase
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $scopeConfigStub->method('getValue')->willReturn('map');
 
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
 
         $this->expectException(LocalizedException::class);
         $this->expectExceptionMessage('Please select a DHL pickup point on the map.');
@@ -85,7 +86,7 @@ class ServicePointValidatorTest extends TestCase
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $scopeConfigStub->method('getValue')->willReturn('map');
 
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
         $invalidPoint = new ServicePointValueObject('');
 
         $this->expectException(LocalizedException::class);
@@ -99,7 +100,7 @@ class ServicePointValidatorTest extends TestCase
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $scopeConfigStub->method('getValue')->willReturn('map');
 
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
         $validPoint = new ServicePointValueObject('SAP123', 'Żabka');
 
         $this->expectNotToPerformAssertions();
@@ -112,7 +113,7 @@ class ServicePointValidatorTest extends TestCase
     {
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
 
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
         $point = new ServicePointValueObject(
             'DE123',
             'Packstation 101',
@@ -137,7 +138,7 @@ class ServicePointValidatorTest extends TestCase
     {
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
 
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
         $point = new ServicePointValueObject(
             'DE123',
             'Packstation 101',
@@ -162,7 +163,7 @@ class ServicePointValidatorTest extends TestCase
     {
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
 
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
         $point = new ServicePointValueObject(
             'DE123',
             'Packstation 101',
@@ -183,7 +184,7 @@ class ServicePointValidatorTest extends TestCase
     {
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
 
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
         $point = new ServicePointValueObject(
             'DE123',
             'Point Name',
@@ -208,7 +209,7 @@ class ServicePointValidatorTest extends TestCase
     {
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
 
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
         $point = new ServicePointValueObject(
             'DE123',
             'ParcelShop Filiale 501',
@@ -228,7 +229,7 @@ class ServicePointValidatorTest extends TestCase
     public function testValidationPassesForConnectMethodWithoutServicePoint(): void
     {
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
 
         $this->expectNotToPerformAssertions();
         $validator->validate(Carrier::CODE, 'connect', null);
@@ -240,7 +241,7 @@ class ServicePointValidatorTest extends TestCase
     public function testIsPointSelectionRequiredReturnsFalseForConnectDoorToDoor(): void
     {
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
 
         $this->assertFalse($validator->isPointSelectionRequired(Carrier::CODE, 'connect'));
         $this->assertFalse($validator->isPointSelectionRequired(Carrier::CODE, 'connect_cod'));
@@ -251,7 +252,7 @@ class ServicePointValidatorTest extends TestCase
     public function testIsPointSelectionRequiredReturnsTrueForConnectPointMethods(): void
     {
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
-        $validator = new ServicePointValidator($scopeConfigStub);
+        $validator = $this->createValidator($scopeConfigStub);
 
         $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'connect_parcelshop'));
         $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'connect_parcelshop_cod'));
@@ -261,5 +262,17 @@ class ServicePointValidatorTest extends TestCase
         $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_parcelshop_cod'));
         $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_packstation'));
         $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_packstation_cod'));
+    }
+
+    /**
+     * Create a validator with its method catalog dependency.
+     *
+     * @param ScopeConfigInterface $scopeConfig
+     *
+     * @return ServicePointValidator
+     */
+    private function createValidator(ScopeConfigInterface $scopeConfig): ServicePointValidator
+    {
+        return new ServicePointValidator($scopeConfig, new MethodCatalog());
     }
 }

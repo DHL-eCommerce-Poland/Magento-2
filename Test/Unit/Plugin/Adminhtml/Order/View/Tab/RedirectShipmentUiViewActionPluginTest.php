@@ -84,11 +84,12 @@ class RedirectShipmentUiViewActionPluginTest extends TestCase
 
         $dhlShipment = $this->createMock(ShipmentDataInterface::class);
         $dhlShipment->method('getEntityId')->willReturn(5);
+        $dhlShipment->method('getMagentoShipmentId')->willReturn(3);
 
         $this->shipmentDataRepository->expects($this->once())
-            ->method('getByMagentoShipmentId')
-            ->with(3)
-            ->willReturn($dhlShipment);
+            ->method('getListByMagentoShipmentIds')
+            ->with([3, 4])
+            ->willReturn([$dhlShipment]);
 
         $this->urlBuilder->expects($this->once())
             ->method('getUrl')
@@ -98,7 +99,16 @@ class RedirectShipmentUiViewActionPluginTest extends TestCase
         $dataSource = [
             'data' => [
                 'items' => [
-                    ['entity_id' => '3', 'actions' => ['view' => ['href' => 'http://example.com/native']]]
+                    [
+                        'entity_id' => '3',
+                        'order_id' => 7,
+                        'actions' => ['view' => ['href' => 'http://example.com/native']],
+                    ],
+                    [
+                        'entity_id' => '4',
+                        'order_id' => 7,
+                        'actions' => ['view' => ['href' => 'http://example.com/native/4']],
+                    ],
                 ]
             ]
         ];
@@ -109,5 +119,75 @@ class RedirectShipmentUiViewActionPluginTest extends TestCase
             'http://example.com/admin/dhlparcel/shipment/edit/entity_id/5',
             $result['data']['items'][0]['actions']['view']['href']
         );
+        $this->assertSame(
+            'http://example.com/native/4',
+            $result['data']['items'][1]['actions']['view']['href']
+        );
+    }
+
+    public function testAfterPrepareDataSourceUsesNewestDhlRecordForDuplicateShipmentLinks(): void
+    {
+        $viewAction = $this->createMock(ViewAction::class);
+        $viewAction->method('getData')->willReturnCallback(function ($key) {
+            return match ($key) {
+                'config/viewUrlPath' => 'adminhtml/order_shipment/view',
+                'name' => 'actions',
+                default => null,
+            };
+        });
+
+        $newestShipment = $this->createMock(ShipmentDataInterface::class);
+        $newestShipment->method('getMagentoShipmentId')->willReturn(3);
+        $newestShipment->method('getEntityId')->willReturn(9);
+        $olderShipment = $this->createMock(ShipmentDataInterface::class);
+        $olderShipment->method('getMagentoShipmentId')->willReturn(3);
+        $olderShipment->method('getEntityId')->willReturn(5);
+
+        $this->shipmentDataRepository->expects($this->once())
+            ->method('getListByMagentoShipmentIds')
+            ->with([3])
+            ->willReturn([$newestShipment, $olderShipment]);
+        $this->urlBuilder->expects($this->once())
+            ->method('getUrl')
+            ->with('dhlparcel/shipment/edit', ['entity_id' => 9])
+            ->willReturn('http://example.com/admin/dhlparcel/shipment/edit/entity_id/9');
+
+        $dataSource = [
+            'data' => [
+                'items' => [
+                    [
+                        'entity_id' => '3',
+                        'order_id' => 7,
+                        'actions' => ['view' => ['href' => 'http://example.com/native']],
+                    ],
+                ],
+            ],
+        ];
+
+        $result = $this->plugin->afterPrepareDataSource($viewAction, $dataSource);
+
+        $this->assertSame(
+            'http://example.com/admin/dhlparcel/shipment/edit/entity_id/9',
+            $result['data']['items'][0]['actions']['view']['href']
+        );
+    }
+
+    public function testAfterPrepareDataSourceDoesNotQueryRepositoryWithoutShipmentIds(): void
+    {
+        $viewAction = $this->createMock(ViewAction::class);
+        $viewAction->method('getData')->willReturnCallback(function ($key) {
+            return match ($key) {
+                'config/viewUrlPath' => 'adminhtml/order_shipment/view',
+                'name' => 'actions',
+                default => null,
+            };
+        });
+
+        $this->shipmentDataRepository->expects($this->never())->method('getListByMagentoShipmentIds');
+
+        $dataSource = ['data' => ['items' => [['entity_id' => '0']]]];
+        $result = $this->plugin->afterPrepareDataSource($viewAction, $dataSource);
+
+        $this->assertSame($dataSource, $result);
     }
 }

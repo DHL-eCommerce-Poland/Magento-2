@@ -18,7 +18,7 @@ class SaveServicePointToQuoteAddressTest extends TestCase
     public function testBeforeSaveAddressInformationAttachesPointDataToAddress(): void
     {
         $validatorStub = $this->createStub(ServicePointValidator::class);
-        $plugin = new SaveServicePointToQuoteAddress($validatorStub);
+        $plugin = new SaveServicePointToQuoteAddress($validatorStub, new MethodCatalog());
 
         $managementStub = $this->createStub(ShippingInformationManagementInterface::class);
         $informationStub = $this->createStub(ShippingInformationInterface::class);
@@ -67,7 +67,7 @@ class SaveServicePointToQuoteAddressTest extends TestCase
     public function testBeforeSaveAddressInformationFallbackToAddressData(): void
     {
         $validatorStub = $this->createStub(ServicePointValidator::class);
-        $plugin = new SaveServicePointToQuoteAddress($validatorStub);
+        $plugin = new SaveServicePointToQuoteAddress($validatorStub, new MethodCatalog());
 
         $managementStub = $this->createStub(ShippingInformationManagementInterface::class);
         $informationStub = $this->createStub(ShippingInformationInterface::class);
@@ -117,7 +117,7 @@ class SaveServicePointToQuoteAddressTest extends TestCase
     public function testBeforeSaveAddressInformationClearsPointDataWhenExtAttributesHasNoPoint(): void
     {
         $validatorStub = $this->createStub(ServicePointValidator::class);
-        $plugin = new SaveServicePointToQuoteAddress($validatorStub);
+        $plugin = new SaveServicePointToQuoteAddress($validatorStub, new MethodCatalog());
 
         $managementStub = $this->createStub(ShippingInformationManagementInterface::class);
         $informationStub = $this->createStub(ShippingInformationInterface::class);
@@ -154,7 +154,7 @@ class SaveServicePointToQuoteAddressTest extends TestCase
     public function testBeforeSaveAddressInformationSetsPostfilialeForNonDeInternationalPoint(): void
     {
         $validatorStub = $this->createStub(ServicePointValidator::class);
-        $plugin = new SaveServicePointToQuoteAddress($validatorStub);
+        $plugin = new SaveServicePointToQuoteAddress($validatorStub, new MethodCatalog());
 
         $managementStub = $this->createStub(ShippingInformationManagementInterface::class);
         $informationStub = $this->createStub(ShippingInformationInterface::class);
@@ -196,7 +196,7 @@ class SaveServicePointToQuoteAddressTest extends TestCase
     public function testBeforeSaveAddressInformationSetsPostfilialeFalseForDomesticPointMethod(): void
     {
         $validatorStub = $this->createStub(ServicePointValidator::class);
-        $plugin = new SaveServicePointToQuoteAddress($validatorStub);
+        $plugin = new SaveServicePointToQuoteAddress($validatorStub, new MethodCatalog());
 
         $managementStub = $this->createStub(ShippingInformationManagementInterface::class);
         $informationStub = $this->createStub(ShippingInformationInterface::class);
@@ -234,6 +234,38 @@ class SaveServicePointToQuoteAddressTest extends TestCase
         $this->assertEquals(0, $savedData['dhl_is_packstation']);
         $this->assertEquals(0, $savedData['dhl_is_postfiliale']);
     }
+
+    public function testBeforeSaveAddressInformationClearsPointForNonDhlCarrierWithMatchingMethodCode(): void
+    {
+        $validatorStub = $this->createStub(ServicePointValidator::class);
+        $plugin = new SaveServicePointToQuoteAddress($validatorStub, new MethodCatalog());
+
+        $managementStub = $this->createStub(ShippingInformationManagementInterface::class);
+        $informationStub = $this->createStub(ShippingInformationInterface::class);
+        $addressMock = $this->createStub(Address::class);
+        $addressMock->method('getExtensionAttributes')->willReturn(new DataObject([
+            'dhl_service_point_id' => 'OLD_POINT',
+            'dhl_service_point_name' => 'Old Point',
+        ]));
+
+        $savedData = [];
+        $addressMock->method('setData')->willReturnCallback(
+            static function ($key, $value = null) use (&$savedData) {
+                if (is_string($key)) {
+                    $savedData[$key] = $value;
+                }
+                return null;
+            }
+        );
+
+        $informationStub->method('getShippingAddress')->willReturn($addressMock);
+        $informationStub->method('getShippingCarrierCode')->willReturn('other_carrier');
+        $informationStub->method('getShippingMethodCode')->willReturn(MethodCatalog::METHOD_ECONOMY_ALL);
+
+        $plugin->beforeSaveAddressInformation($managementStub, 1, $informationStub);
+
+        $this->assertNull($savedData['dhl_service_point_id']);
+        $this->assertSame(0, $savedData['dhl_is_packstation']);
+        $this->assertSame(0, $savedData['dhl_is_postfiliale']);
+    }
 }
-
-

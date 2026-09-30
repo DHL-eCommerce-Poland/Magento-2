@@ -7,6 +7,7 @@ namespace Ideo\Dhl\Plugin\Adminhtml\Order\View;
 use Exception;
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Magento\Backend\Model\UrlInterface;
+use Magento\Framework\Serialize\Serializer\JsonHexTag;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Block\Adminhtml\Order\View as OrderViewBlock;
 use Magento\Sales\Model\Order;
@@ -19,12 +20,14 @@ class AddDhlPrepareButtonPlugin
 {
     /**
      * @param UrlInterface $urlBuilder
+     * @param JsonHexTag $serializer
      * @param OrderRepositoryInterface $orderRepository
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param LoggerInterface|null $logger
      */
     public function __construct(
         private readonly UrlInterface $urlBuilder,
+        private readonly JsonHexTag $serializer,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ?LoggerInterface $logger = null
@@ -70,10 +73,11 @@ class AddDhlPrepareButtonPlugin
             }
 
             $prepareUrl = $this->urlBuilder->getUrl('dhlparcel/shipment/prepare', ['order_id' => $orderId]);
+            $prepareUrlLiteral = $this->serializer->serialize($prepareUrl);
             $onClickJs = sprintf(
-                'window.ideoDhlOpenPrepareModal && window.ideoDhlOpenPrepareModal(%d, "%s")',
+                'window.ideoDhlOpenPrepareModal && window.ideoDhlOpenPrepareModal(%d, %s)',
                 $orderId,
-                $prepareUrl
+                $prepareUrlLiteral
             );
 
             $subject->addButton(

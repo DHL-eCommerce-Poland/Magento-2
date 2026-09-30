@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Plugin\Quote;
 
+use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\ServicePoint\ServicePointDescriptionFormatter;
 use Ideo\Dhl\Model\ServicePoint\ServicePointValidator;
 use Ideo\Dhl\Plugin\Quote\EnrichOrderShippingDescription;
@@ -33,7 +34,7 @@ class EnrichOrderShippingDescriptionTest extends TestCase
     protected function setUp(): void
     {
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
-        $this->validator = new ServicePointValidator($scopeConfigStub);
+        $this->validator = new ServicePointValidator($scopeConfigStub, new MethodCatalog());
         $this->formatter = new ServicePointDescriptionFormatter();
         $this->plugin = new EnrichOrderShippingDescription($this->validator, $this->formatter);
     }
