@@ -11,7 +11,9 @@ use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filesystem\Driver\File as FileDriver;
 use Magento\Shipping\Model\Shipping\LabelGenerator;
 use Psr\Log\LoggerInterface;
 use Zend_Pdf_Exception;
@@ -30,6 +32,7 @@ class LabelPrintingService
      * @param ScopeConfigInterface $scopeConfig
      * @param LabelGenerator|null $labelGenerator
      * @param LoggerInterface|null $logger
+     * @param FileDriver|null $fileDriver
      */
     public function __construct(
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
@@ -37,8 +40,10 @@ class LabelPrintingService
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly ?LabelGenerator $labelGenerator = null,
-        private readonly ?LoggerInterface $logger = null
+        private readonly ?LoggerInterface $logger = null,
+        private ?FileDriver $fileDriver = null
     ) {
+        $this->fileDriver = $fileDriver ?? new FileDriver();
     }
 
     /**
@@ -338,10 +343,22 @@ class LabelPrintingService
                 }
                 $zip->close();
 
-                $zipContent = file_get_contents($tempFile);
-                @unlink($tempFile);
+                $zipContent = null;
+                try {
+                    $zipContent = $this->fileDriver->fileGetContents($tempFile);
+                } catch (FileSystemException $e) {
+                    $this->logger?->warning(sprintf('Failed to read temporary ZIP label file: %s', $e->getMessage()));
+                }
 
-                if ($zipContent !== false) {
+                try {
+                    if ($this->fileDriver->isExists($tempFile)) {
+                        $this->fileDriver->deleteFile($tempFile);
+                    }
+                } catch (FileSystemException $e) {
+                    $this->logger?->warning(sprintf('Failed to clean up temporary ZIP label file: %s', $e->getMessage()));
+                }
+
+                if ($zipContent !== null) {
                     return [
                         'content' => $zipContent,
                         'mimeType' => 'application/zip',
