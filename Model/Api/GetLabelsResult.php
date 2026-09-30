@@ -6,6 +6,10 @@ namespace Ideo\Dhl\Model\Api;
 
 class GetLabelsResult
 {
+    public const LABEL_TYPE_BLP = 'BLP';
+    public const LABEL_TYPE_LBLP = 'LBLP';
+    public const LABEL_TYPE_ZBLP = 'ZBLP';
+    public const LABEL_TYPE_ZBLP300 = 'ZBLP300';
     /**
      * @param bool $success
      * @param array $items

@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
 
 class PricingTypeTest extends TestCase
 {
+    /**
+     * @var PricingType
+     */
     private PricingType $pricingType;
 
     protected function setUp(): void

@@ -252,9 +252,24 @@ class LabelPrintingServiceTest extends TestCase
                 ['shipmentId' => '90040025527', 'labelType' => 'BLP'],
             ])
             ->willReturn(new GetLabelsResult(true, [
-                ['shipmentId' => '90040025505', 'labelType' => 'BLP', 'labelData' => 'PDF1', 'mimeType' => 'application/pdf'],
-                ['shipmentId' => '90040025516', 'labelType' => 'BLP', 'labelData' => 'PDF2', 'mimeType' => 'application/pdf'],
-                ['shipmentId' => '90040025527', 'labelType' => 'BLP', 'labelData' => 'PDF3', 'mimeType' => 'application/pdf'],
+                [
+                    'shipmentId' => '90040025505',
+                    'labelType' => 'BLP',
+                    'labelData' => 'PDF1',
+                    'mimeType' => 'application/pdf',
+                ],
+                [
+                    'shipmentId' => '90040025516',
+                    'labelType' => 'BLP',
+                    'labelData' => 'PDF2',
+                    'mimeType' => 'application/pdf',
+                ],
+                [
+                    'shipmentId' => '90040025527',
+                    'labelType' => 'BLP',
+                    'labelData' => 'PDF3',
+                    'mimeType' => 'application/pdf',
+                ],
             ]));
 
         $labelGeneratorStub = $this->createStub(\Magento\Shipping\Model\Shipping\LabelGenerator::class);
@@ -290,8 +305,18 @@ class LabelPrintingServiceTest extends TestCase
         $clientMock->expects($this->once())
             ->method('getLabels')
             ->willReturn(new GetLabelsResult(true, [
-                ['shipmentId' => '90040025505', 'labelType' => 'PNG', 'labelData' => 'PNG_BYTES_1', 'mimeType' => 'image/png'],
-                ['shipmentId' => '90040025516', 'labelType' => 'PNG', 'labelData' => 'PNG_BYTES_2', 'mimeType' => 'image/png'],
+                [
+                    'shipmentId' => '90040025505',
+                    'labelType' => 'PNG',
+                    'labelData' => 'PNG_BYTES_1',
+                    'mimeType' => 'image/png',
+                ],
+                [
+                    'shipmentId' => '90040025516',
+                    'labelType' => 'PNG',
+                    'labelData' => 'PNG_BYTES_2',
+                    'mimeType' => 'image/png',
+                ],
             ]));
 
         $service = new LabelPrintingService(
@@ -306,5 +331,59 @@ class LabelPrintingServiceTest extends TestCase
         $this->assertEquals('application/zip', $result['mimeType']);
         $this->assertNotEmpty($result['content']);
         $this->assertStringEndsWith('.zip', $result['filename']);
+    }
+
+    public function testGetReturnLabelContentUsesFileDriverAndCleansUp(): void
+    {
+        $shipmentStub = $this->createStub(ShipmentDataInterface::class);
+        $shipmentStub->method('getReturnShipmentId')->willReturn('90040025505, 90040025516');
+        $this->repositoryStub->method('getById')->willReturn($shipmentStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->expects($this->once())
+            ->method('getLabels')
+            ->willReturn(new GetLabelsResult(true, [
+                [
+                    'shipmentId' => '90040025505',
+                    'labelType' => 'PNG',
+                    'labelData' => 'PNG_BYTES_1',
+                    'mimeType' => 'image/png',
+                ],
+                [
+                    'shipmentId' => '90040025516',
+                    'labelType' => 'PNG',
+                    'labelData' => 'PNG_BYTES_2',
+                    'mimeType' => 'image/png',
+                ],
+            ]));
+
+        $fileDriverMock = $this->createMock(\Magento\Framework\Filesystem\Driver\File::class);
+        $fileDriverMock->expects($this->once())
+            ->method('fileGetContents')
+            ->willReturn('MOCK_ZIP_CONTENT');
+        $fileDriverMock->expects($this->once())
+            ->method('isExists')
+            ->willReturn(true);
+        $fileDriverMock->expects($this->once())
+            ->method('deleteFile')
+            ->with($this->callback('is_string'));
+
+        $service = new LabelPrintingService(
+            $this->repositoryStub,
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->scopeConfigStub,
+            null,
+            null,
+            $fileDriverMock
+        );
+
+        $result = $service->getReturnLabelContent([1]);
+
+        $this->assertEquals('application/zip', $result['mimeType']);
+        $this->assertEquals('MOCK_ZIP_CONTENT', $result['content']);
     }
 }

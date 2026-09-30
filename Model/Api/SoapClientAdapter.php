@@ -771,7 +771,7 @@ class SoapClientAdapter implements ClientInterface
             foreach ($itemsToPrint as $item) {
                 if (!empty($item['shipmentId'])) {
                     $formattedItems[] = [
-                        'labelType' => $item['labelType'] ?? 'BLP',
+                        'labelType' => $item['labelType'] ?? GetLabelsResult::LABEL_TYPE_BLP,
                         'shipmentId' => (string) $item['shipmentId'],
                     ];
                 }
@@ -816,12 +816,12 @@ class SoapClientAdapter implements ClientInterface
             $parsedItems = [];
             foreach ($itemsRaw as $itemObj) {
                 $shipmentId = (string) ($itemObj->shipmentId ?? '');
-                $labelType = (string) ($itemObj->labelType ?? 'BLP');
+                $labelType = (string) ($itemObj->labelType ?? GetLabelsResult::LABEL_TYPE_BLP);
                 $rawBase64 = (string) ($itemObj->labelData ?? '');
                 // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
                 $labelBinary = !empty($rawBase64) ? base64_decode($rawBase64) : '';
 
-                $defaultMime = str_contains($labelType, 'ZBLP')
+                $defaultMime = str_contains($labelType, GetLabelsResult::LABEL_TYPE_ZBLP)
                     ? 'text/plain'
                     : (str_contains($labelType, 'IMG') ? 'image/png' : 'application/pdf');
                 $mimeType = (string) ($itemObj->labelMimeType ?? ($itemObj->mimeType ?? $defaultMime));

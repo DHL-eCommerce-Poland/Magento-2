@@ -13,6 +13,9 @@ use PHPUnit\Framework\TestCase;
 
 class PackageNumbersTest extends TestCase
 {
+    /**
+     * @var PackageNumbers
+     */
     private PackageNumbers $packageNumbersColumn;
 
     protected function setUp(): void

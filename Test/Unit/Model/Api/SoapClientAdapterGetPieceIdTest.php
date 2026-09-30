@@ -15,10 +15,29 @@ use stdClass;
 
 class SoapClientAdapterGetPieceIdTest extends TestCase
 {
+    /**
+     * @var LoggerInterface|MockObject
+     */
     private mixed $loggerStub;
+
+    /**
+     * @var ScopeConfigInterface|MockObject
+     */
     private mixed $scopeConfigStub;
+
+    /**
+     * @var TimezoneInterface|MockObject
+     */
     private mixed $timezoneStub;
+
+    /**
+     * @var ShipmentDateSanitizer
+     */
     private ShipmentDateSanitizer $dateSanitizer;
+
+    /**
+     * @var \Magento\Framework\Filesystem\Driver\File|MockObject
+     */
     private mixed $fileDriverStub;
 
     protected function setUp(): void
@@ -48,6 +67,9 @@ class SoapClientAdapterGetPieceIdTest extends TestCase
     public function testGetPieceIdSuccessWithAbstractPieceItems(): void
     {
         $soapClientMock = new class extends TestSoapClient {
+            /**
+             * @var mixed
+             */
             public mixed $capturedParams = null;
 
             public function __construct()
@@ -104,7 +126,10 @@ class SoapClientAdapterGetPieceIdTest extends TestCase
         $this->assertArrayHasKey('request', $soapClientMock->capturedParams);
         $this->assertEquals('user', $soapClientMock->capturedParams['authData']['username']);
         $this->assertEquals('pass', $soapClientMock->capturedParams['authData']['password']);
-        $this->assertEquals('90040027827', $soapClientMock->capturedParams['request']['items']['item'][0]['shipmentNumber']);
+        $this->assertEquals(
+            '90040027827',
+            $soapClientMock->capturedParams['request']['items']['item'][0]['shipmentNumber']
+        );
     }
 
     public function testGetPieceIdSuccessWithShipmentsPackagesItems(): void

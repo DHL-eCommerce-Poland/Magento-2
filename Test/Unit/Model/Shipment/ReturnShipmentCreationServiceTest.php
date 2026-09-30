@@ -21,14 +21,49 @@ use Psr\Log\LoggerInterface;
 
 class ReturnShipmentCreationServiceTest extends TestCase
 {
+    /**
+     * @var MockObject
+     */
     private MockObject $shipmentDataServiceMock;
+
+    /**
+     * @var MockObject
+     */
     private MockObject $validatorMock;
+
+    /**
+     * @var MockObject
+     */
     private MockObject $returnMapperMock;
+
+    /**
+     * @var MockObject
+     */
     private MockObject $credentialsProviderMock;
+
+    /**
+     * @var MockObject
+     */
     private MockObject $clientMock;
+
+    /**
+     * @var MockObject
+     */
     private MockObject $lockManagerMock;
+
+    /**
+     * @var LoggerInterface|MockObject
+     */
     private mixed $loggerStub;
+
+    /**
+     * @var MockObject
+     */
     private MockObject $serializerMock;
+
+    /**
+     * @var ReturnShipmentCreationService
+     */
     private ReturnShipmentCreationService $service;
 
     protected function setUp(): void
@@ -91,7 +126,13 @@ class ReturnShipmentCreationServiceTest extends TestCase
             success: true,
             timeout: false,
             items: [
-                ['shipmentId' => 'RET3003', 'waybill' => 'RET3003', 'packageTrackingNumber' => 'P1', 'labelData' => 'pdf', 'labelMimeType' => 'application/pdf'],
+                [
+                    'shipmentId' => 'RET3003',
+                    'waybill' => 'RET3003',
+                    'packageTrackingNumber' => 'P1',
+                    'labelData' => 'pdf',
+                    'labelMimeType' => 'application/pdf',
+                ],
             ]
         );
 
@@ -151,9 +192,27 @@ class ReturnShipmentCreationServiceTest extends TestCase
             success: true,
             timeout: false,
             items: [
-                ['shipmentId' => '90040025505', 'waybill' => '90040025505', 'packageTrackingNumber' => 'P1', 'labelData' => 'pdf1', 'labelMimeType' => 'application/pdf'],
-                ['shipmentId' => '90040025516', 'waybill' => '90040025516', 'packageTrackingNumber' => 'P2', 'labelData' => 'pdf2', 'labelMimeType' => 'application/pdf'],
-                ['shipmentId' => '90040025527', 'waybill' => '90040025527', 'packageTrackingNumber' => 'P3', 'labelData' => 'pdf3', 'labelMimeType' => 'application/pdf'],
+                [
+                    'shipmentId' => '90040025505',
+                    'waybill' => '90040025505',
+                    'packageTrackingNumber' => 'P1',
+                    'labelData' => 'pdf1',
+                    'labelMimeType' => 'application/pdf',
+                ],
+                [
+                    'shipmentId' => '90040025516',
+                    'waybill' => '90040025516',
+                    'packageTrackingNumber' => 'P2',
+                    'labelData' => 'pdf2',
+                    'labelMimeType' => 'application/pdf',
+                ],
+                [
+                    'shipmentId' => '90040025527',
+                    'waybill' => '90040025527',
+                    'packageTrackingNumber' => 'P3',
+                    'labelData' => 'pdf3',
+                    'labelMimeType' => 'application/pdf',
+                ],
             ]
         );
 

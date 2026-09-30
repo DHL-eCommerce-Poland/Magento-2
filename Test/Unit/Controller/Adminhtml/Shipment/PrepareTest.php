@@ -20,13 +20,44 @@ use PHPUnit\Framework\TestCase;
 #[AllowMockObjectsWithoutExpectations]
 class PrepareTest extends TestCase
 {
+    /**
+     * @var Context|MockObject
+     */
     private $context;
+
+    /**
+     * @var RequestInterface|MockObject
+     */
     private $request;
+
+    /**
+     * @var OrderRepositoryInterface|MockObject
+     */
     private $orderRepository;
+
+    /**
+     * @var TemplateManager|MockObject
+     */
     private $templateManager;
+
+    /**
+     * @var JsonFactory|MockObject
+     */
     private $jsonFactory;
+
+    /**
+     * @var Json|MockObject
+     */
     private $jsonResult;
+
+    /**
+     * @var ShipmentDataService|MockObject
+     */
     private $shipmentDataService;
+
+    /**
+     * @var Prepare
+     */
     private $controller;
 
     protected function setUp(): void

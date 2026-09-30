@@ -42,7 +42,9 @@ class ShipmentFullDataMapper
 
         $deliveryHours = $services->getDeliveryHours();
         $isEvening = $services->isDeliveryEvening();
-        $product = ($deliveryHours !== null && $deliveryHours !== '1722') ? $deliveryHours : $settings->getServiceType();
+        $product = ($deliveryHours !== null && $deliveryHours !== '1722')
+            ? $deliveryHours
+            : $settings->getServiceType();
 
         $serviceDef = [
             'product' => $product,
@@ -156,9 +158,9 @@ class ShipmentFullDataMapper
 
             if ($popName !== '') {
                 $parsed = $this->parsePointAddressFromName($popName);
-                if (!empty($parsed['street'])
-                    && ($popStreet === '' || (str_contains($parsed['street'], $popStreet) && strlen($parsed['street']) > strlen($popStreet)))
-                ) {
+                $isLongerStreet = str_contains($parsed['street'], $popStreet)
+                    && strlen($parsed['street']) > strlen($popStreet);
+                if (!empty($parsed['street']) && ($popStreet === '' || $isLongerStreet)) {
                     $popStreet = $parsed['street'];
                 }
                 if ($popPostcode === '' && !empty($parsed['postcode'])) {

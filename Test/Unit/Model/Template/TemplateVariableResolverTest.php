@@ -11,6 +11,9 @@ use PHPUnit\Framework\TestCase;
 
 class TemplateVariableResolverTest extends TestCase
 {
+    /**
+     * @var TemplateVariableResolver
+     */
     private TemplateVariableResolver $resolver;
 
     protected function setUp(): void

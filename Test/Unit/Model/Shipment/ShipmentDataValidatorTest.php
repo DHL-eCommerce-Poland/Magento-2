@@ -298,7 +298,9 @@ class ShipmentDataValidatorTest extends TestCase
         ];
 
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('Field "Package #1 weight" cannot contain a comma. Please use a dot (.) as decimal separator.');
+        $this->expectExceptionMessage(
+            'Field "Package #1 weight" cannot contain a comma. Please use a dot (.) as decimal separator.'
+        );
         $this->validator->validateRawPayload($payload);
     }
 
@@ -316,7 +318,9 @@ class ShipmentDataValidatorTest extends TestCase
         ];
 
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('Field "Insurance Value" cannot contain a comma. Please use a dot (.) as decimal separator.');
+        $this->expectExceptionMessage(
+            'Field "Insurance Value" cannot contain a comma. Please use a dot (.) as decimal separator.'
+        );
         $this->validator->validateRawPayload($payload);
     }
 
@@ -336,8 +340,9 @@ class ShipmentDataValidatorTest extends TestCase
         ];
 
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('Field "Customs Item #1 value" cannot contain a comma. Please use a dot (.) as decimal separator.');
+        $this->expectExceptionMessage(
+            'Field "Customs Item #1 value" cannot contain a comma. Please use a dot (.) as decimal separator.'
+        );
         $this->validator->validateRawPayload($payload);
     }
 }
-

@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
 
 class InternationalMapPointTypeTest extends TestCase
 {
+    /**
+     * @var InternationalMapPointType
+     */
     private InternationalMapPointType $source;
 
     protected function setUp(): void

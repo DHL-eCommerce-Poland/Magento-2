@@ -351,4 +351,3 @@ class SaveTest extends TestCase
         $this->assertSame($this->jsonResultMock, $result);
     }
 }
-

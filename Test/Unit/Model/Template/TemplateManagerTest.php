@@ -7,6 +7,7 @@ namespace Ideo\Dhl\Test\Unit\Model\Template;
 use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
 use Ideo\Dhl\Model\Config\Source\AddressType as AddressTypeSource;
+use Ideo\Dhl\Model\Config\Source\InternationalMapPointType;
 use Ideo\Dhl\Model\Config\Source\LabelType as LabelTypeSource;
 use Ideo\Dhl\Model\Config\Source\PackageType as PackageTypeSource;
 use Ideo\Dhl\Model\Config\Source\ReturnBookCourier as ReturnBookCourierSource;
@@ -15,10 +16,14 @@ use Ideo\Dhl\Model\Config\Source\ServiceCode as ServiceCodeSource;
 use Ideo\Dhl\Model\Config\Source\ShipmentAddressType as ShipmentAddressTypeSource;
 use Ideo\Dhl\Model\DeliveryService;
 use Ideo\Dhl\Model\MethodCatalog;
+use Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory as CustomsTemplateCollectionFactory;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\Collection as DeliveryServiceCollection;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory as DeliveryServiceCollectionFactory;
 use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory as DropOffPointCollectionFactory;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
+use Ideo\Dhl\Model\Source\CategoryOfItem;
+use Ideo\Dhl\Model\Source\CustomsCurrency;
+use Ideo\Dhl\Model\Source\CustomsType;
 use Ideo\Dhl\Model\Template\TemplateManager;
 use Ideo\Dhl\Model\Template\TemplateVariableResolver;
 use Magento\Directory\Model\Config\Source\Country as CountrySource;
@@ -33,29 +38,124 @@ use PHPUnit\Framework\TestCase;
 #[AllowMockObjectsWithoutExpectations]
 class TemplateManagerTest extends TestCase
 {
+    /**
+     * @var DropOffPointCollectionFactory|MockObject
+     */
     private $dropOffPointCollectionFactory;
+
+    /**
+     * @var DeliveryServiceCollectionFactory|MockObject
+     */
     private $deliveryServiceCollectionFactory;
+
+    /**
+     * @var DropOffPointRepositoryInterface|MockObject
+     */
     private $dropOffPointRepository;
+
+    /**
+     * @var DeliveryServiceRepositoryInterface|MockObject
+     */
     private $deliveryServiceRepository;
+
+    /**
+     * @var CountrySource|MockObject
+     */
     private $countrySource;
+
+    /**
+     * @var ServiceCodeSource|MockObject
+     */
     private $serviceCodeSource;
+
+    /**
+     * @var LabelTypeSource|MockObject
+     */
     private $labelTypeSource;
+
+    /**
+     * @var PackageTypeSource|MockObject
+     */
     private $packageTypeSource;
+
+    /**
+     * @var AddressTypeSource|MockObject
+     */
     private $addressTypeSource;
+
+    /**
+     * @var ShipmentAddressTypeSource|MockObject
+     */
     private $shipmentAddressTypeSource;
+
+    /**
+     * @var ReturnQrCodeTypeSource|MockObject
+     */
     private $returnQrCodeTypeSource;
+
+    /**
+     * @var ReturnBookCourierSource|MockObject
+     */
     private $returnBookCourierSource;
+
+    /**
+     * @var OrderRepositoryInterface|MockObject
+     */
     private $orderRepository;
+
+    /**
+     * @var OrderToShipmentDataMapper|MockObject
+     */
     private $mapper;
+
+    /**
+     * @var TemplateVariableResolver|MockObject
+     */
     private $variableResolver;
+
+    /**
+     * @var SerializerInterface|MockObject
+     */
     private $serializer;
+
+    /**
+     * @var TimezoneInterface|MockObject
+     */
     private $timezone;
+
+    /**
+     * @var MethodCatalog|MockObject
+     */
     private $methodCatalog;
+
+    /**
+     * @var CustomsTemplateCollectionFactory|MockObject
+     */
     private $customsTemplateCollectionFactory;
+
+    /**
+     * @var CustomsType|MockObject
+     */
     private $customsTypeSource;
+
+    /**
+     * @var CategoryOfItem|MockObject
+     */
     private $categoryOfItemSource;
+
+    /**
+     * @var CustomsCurrency|MockObject
+     */
     private $customsCurrencySource;
+
+    /**
+     * @var InternationalMapPointType|MockObject
+     */
     private $internationalMapPointTypeSource;
+
+    /**
+     * @var TemplateManager
+     */
     private TemplateManager $templateManager;
 
     protected function setUp(): void
@@ -77,11 +177,11 @@ class TemplateManagerTest extends TestCase
         $this->serializer = $this->createStub(SerializerInterface::class);
         $this->timezone = $this->createStub(TimezoneInterface::class);
         $this->methodCatalog = $this->createStub(MethodCatalog::class);
-        $this->customsTemplateCollectionFactory = $this->createStub(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory::class);
-        $this->customsTypeSource = $this->createStub(\Ideo\Dhl\Model\Source\CustomsType::class);
-        $this->categoryOfItemSource = $this->createStub(\Ideo\Dhl\Model\Source\CategoryOfItem::class);
-        $this->customsCurrencySource = $this->createStub(\Ideo\Dhl\Model\Source\CustomsCurrency::class);
-        $this->internationalMapPointTypeSource = $this->createStub(\Ideo\Dhl\Model\Config\Source\InternationalMapPointType::class);
+        $this->customsTemplateCollectionFactory = $this->createStub(CustomsTemplateCollectionFactory::class);
+        $this->customsTypeSource = $this->createStub(CustomsType::class);
+        $this->categoryOfItemSource = $this->createStub(CategoryOfItem::class);
+        $this->customsCurrencySource = $this->createStub(CustomsCurrency::class);
+        $this->internationalMapPointTypeSource = $this->createStub(InternationalMapPointType::class);
 
         $this->templateManager = new TemplateManager(
             $this->dropOffPointCollectionFactory,

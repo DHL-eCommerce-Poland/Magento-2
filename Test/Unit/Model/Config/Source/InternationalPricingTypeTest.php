@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
 
 class InternationalPricingTypeTest extends TestCase
 {
+    /**
+     * @var InternationalPricingType
+     */
     private InternationalPricingType $pricingType;
 
     protected function setUp(): void

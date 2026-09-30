@@ -123,7 +123,10 @@ class ShipmentDataService
                 $senderEntity = $this->dropOffPointRepository->getById($dropOffPointTemplateId);
                 $senderDefaults = $senderEntity->getData();
             } catch (NoSuchEntityException $e) {
-                $this->logger?->warning('Specified sender preset not found: ' . $dropOffPointTemplateId, ['exception' => $e]);
+                $this->logger?->warning(
+                    'Specified sender preset not found: ' . $dropOffPointTemplateId,
+                    ['exception' => $e]
+                );
             }
         }
         if (empty($senderDefaults)) {
@@ -176,12 +179,13 @@ class ShipmentDataService
      *
      * @param DhlShipmentData $shipmentData
      * @param string $status
-     * @param string|null $presetSenderId
-     * @param string|null $presetShipmentId
+     * @param string|null $dropOffPointTemplateId
+     * @param string|null $deliveryServiceTemplateId
      * @param string|null $shipmentId
      * @param string|null $returnShipmentId
      * @param array|null $packageNumbers
      * @param int|null $magentoShipmentId
+     * @param string|null $customsTemplateId
      *
      * @return ShipmentDataInterface
      * @throws CouldNotSaveException
@@ -245,6 +249,7 @@ class ShipmentDataService
      * @return ShipmentDataInterface
      * @throws LocalizedException
      */
+    // phpcs:ignore Generic.Metrics.NestingLevel.TooHigh
     public function updateReturnShipmentId(
         int $entityId,
         string $returnShipmentId,
@@ -284,7 +289,9 @@ class ShipmentDataService
                             $item = $returnItems[$idx] ?? null;
                             if ($item && is_array($item)) {
                                 $retId = (string) ($item['waybill'] ?? ($item['shipmentId'] ?? ''));
-                                $pkgTrackNum = (string) ($item['packageTrackingNumber'] ?? ($item['packagesTrackingNumbers'] ?? ''));
+                                $pkgTrackNum = (string) (
+                                    $item['packageTrackingNumber'] ?? ($item['packagesTrackingNumbers'] ?? '')
+                                );
 
                                 $packages[$idx]['returnShipmentId'] = $retId;
                                 $packages[$idx]['packagesTrackingNumbers'] = $pkgTrackNum;
@@ -347,7 +354,9 @@ class ShipmentDataService
                 $payloadArr['packages'][$idx]['packagesTrackingNumbers'] = null;
             }
         }
-        if (isset($payloadArr['shipmentSettings']['packages']) && is_array($payloadArr['shipmentSettings']['packages'])) {
+        if (isset($payloadArr['shipmentSettings']['packages'])
+            && is_array($payloadArr['shipmentSettings']['packages'])
+        ) {
             foreach ($payloadArr['shipmentSettings']['packages'] as $idx => $pkg) {
                 $payloadArr['shipmentSettings']['packages'][$idx]['returnShipmentId'] = null;
                 $payloadArr['shipmentSettings']['packages'][$idx]['packagesTrackingNumbers'] = null;
@@ -404,7 +413,9 @@ class ShipmentDataService
                     }
                     unset($pkg);
                 }
-                if (isset($payloadArr['shipmentSettings']['packages']) && is_array($payloadArr['shipmentSettings']['packages'])) {
+                if (isset($payloadArr['shipmentSettings']['packages'])
+                    && is_array($payloadArr['shipmentSettings']['packages'])
+                ) {
                     foreach ($payloadArr['shipmentSettings']['packages'] as $idx => &$pkg) {
                         if (is_array($pkg)) {
                             unset($pkg['packageNumber'], $pkg['returnShipmentId'], $pkg['packagesTrackingNumbers']);
@@ -511,7 +522,9 @@ class ShipmentDataService
         $pkgNums = array_values($packageNumbers);
         $payloadArr['packageNumbers'] = $pkgNums;
 
-        if (isset($payloadArr['shipmentSettings']['packages']) && is_array($payloadArr['shipmentSettings']['packages'])) {
+        if (isset($payloadArr['shipmentSettings']['packages'])
+            && is_array($payloadArr['shipmentSettings']['packages'])
+        ) {
             foreach ($payloadArr['shipmentSettings']['packages'] as $idx => &$pkg) {
                 if (is_array($pkg) && isset($pkgNums[$idx])) {
                     $pkg['packageNumber'] = (string)$pkgNums[$idx];

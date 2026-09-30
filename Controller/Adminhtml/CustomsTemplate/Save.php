@@ -86,7 +86,8 @@ class Save extends Action implements HttpPostActionInterface
                 if (!$this->categoryOfItem->isCategoryAllowed($customsType, $category)) {
                     throw new LocalizedException(
                         __(
-                            'Category of item "%1" is not allowed for customs clearance type "%2". Allowed categories: %3.',
+                            'Category of item "%1" is not allowed for customs clearance type "%2". '
+                            . 'Allowed categories: %3.',
                             $data['category_of_item'],
                             $data['customs_type'],
                             implode(', ', $this->categoryOfItem->getCategoriesForType((string)$data['customs_type']))

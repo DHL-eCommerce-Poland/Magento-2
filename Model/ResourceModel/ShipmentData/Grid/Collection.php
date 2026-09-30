@@ -95,7 +95,8 @@ class Collection extends SearchResult
             if (!empty($value)) {
                 $searchTerm = '%' . $value . '%';
 
-                if (in_array($field, ['package_numbers', 'return_shipment_id', 'shipment_id', 'dispatch_number'], true)) {
+                $targetFields = ['package_numbers', 'return_shipment_id', 'shipment_id', 'dispatch_number'];
+                if (in_array($field, $targetFields, true)) {
                     $whereExpr = $this->getConnection()->quoteInto(
                         'main_table.' . $field . ' LIKE ?',
                         $searchTerm

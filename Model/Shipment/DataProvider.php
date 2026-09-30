@@ -116,7 +116,9 @@ class DataProvider extends AbstractDataProvider
                             $hasPackages = isset($payload['shipmentSettings']['packages'])
                                 && is_array($payload['shipmentSettings']['packages']);
                             if ($hasPackages) {
-                                $rootPkgNums = (array) ($payload['packageNumbers'] ?? ($payload['shipmentSettings']['packageNumbers'] ?? []));
+                                $pkgNumsRaw = $payload['packageNumbers']
+                                    ?? ($payload['shipmentSettings']['packageNumbers'] ?? []);
+                                $rootPkgNums = (array) $pkgNumsRaw;
                                 $data['packages'] = $this->normalizePackages(
                                     $payload['shipmentSettings']['packages'],
                                     $rootPkgNums
@@ -148,7 +150,9 @@ class DataProvider extends AbstractDataProvider
                         && is_array($payload['packages']);
                     if ($hasRootPackages) {
                         try {
-                            $rootPkgNums = (array) ($payload['packageNumbers'] ?? ($payload['shipmentSettings']['packageNumbers'] ?? []));
+                            $pkgNumsRaw = $payload['packageNumbers']
+                                ?? ($payload['shipmentSettings']['packageNumbers'] ?? []);
+                            $rootPkgNums = (array) $pkgNumsRaw;
                             $data['packages'] = $this->normalizePackages($payload['packages'], $rootPkgNums);
                             $data['packages_fieldset'] = ['packages' => $data['packages']];
                         } catch (Throwable $e) {

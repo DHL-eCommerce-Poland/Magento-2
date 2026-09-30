@@ -26,18 +26,69 @@ use PHPUnit\Framework\TestCase;
 #[AllowMockObjectsWithoutExpectations]
 class LoadTemplateTest extends TestCase
 {
+    /**
+     * @var Context|MockObject
+     */
     private $context;
+
+    /**
+     * @var RequestInterface|MockObject
+     */
     private $request;
+
+    /**
+     * @var DropOffPointRepositoryInterface|MockObject
+     */
     private $dropOffPointRepository;
+
+    /**
+     * @var DeliveryServiceRepositoryInterface|MockObject
+     */
     private $deliveryServiceRepository;
+
+    /**
+     * @var OrderRepositoryInterface|MockObject
+     */
     private $orderRepository;
+
+    /**
+     * @var TemplateManager|MockObject
+     */
     private $templateManager;
+
+    /**
+     * @var JsonFactory|MockObject
+     */
     private $jsonFactory;
+
+    /**
+     * @var Json|MockObject
+     */
     private $jsonResult;
+
+    /**
+     * @var TemplateVariableResolver|MockObject
+     */
     private $variableResolver;
+
+    /**
+     * @var MethodCatalog|MockObject
+     */
     private $methodCatalog;
+
+    /**
+     * @var CustomsTemplateRepository|MockObject
+     */
     private $customsTemplateRepository;
+
+    /**
+     * @var SerializerInterface|MockObject
+     */
     private $serializer;
+
+    /**
+     * @var LoadTemplate
+     */
     private LoadTemplate $controller;
 
     protected function setUp(): void

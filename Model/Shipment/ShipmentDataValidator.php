@@ -169,7 +169,10 @@ class ShipmentDataValidator
 
                 foreach ($numericFields as $fieldKey => $label) {
                     if (isset($pkg[$fieldKey]) && is_string($pkg[$fieldKey]) && str_contains($pkg[$fieldKey], ',')) {
-                        $errors[] = __('Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.', $label)->render();
+                        $errors[] = __(
+                            'Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.',
+                            $label
+                        )->render();
                     }
                 }
             }
@@ -184,7 +187,10 @@ class ShipmentDataValidator
             ];
             foreach ($ssFields as $fieldKey => $label) {
                 if (isset($ss[$fieldKey]) && is_string($ss[$fieldKey]) && str_contains($ss[$fieldKey], ',')) {
-                    $errors[] = __('Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.', $label)->render();
+                    $errors[] = __(
+                        'Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.',
+                        $label
+                    )->render();
                 }
             }
         }
@@ -192,8 +198,12 @@ class ShipmentDataValidator
         // 3. Shipment Settings
         $st = $payload['shipmentSettings'] ?? [];
         if (is_array($st)) {
-            if (isset($st['returnLabelExpDays']) && is_string($st['returnLabelExpDays']) && str_contains($st['returnLabelExpDays'], ',')) {
-                $errors[] = __('Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.', __('Return Label Expiration (7-183 Days)'))->render();
+            $expDays = $st['returnLabelExpDays'] ?? null;
+            if (is_string($expDays) && str_contains($expDays, ',')) {
+                $errors[] = __(
+                    'Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.',
+                    __('Return Label Expiration (7-183 Days)')
+                )->render();
             }
         }
 
@@ -205,8 +215,12 @@ class ShipmentDataValidator
                 'grossWeight' => __('Gross Weight'),
             ];
             foreach ($customsFields as $fieldKey => $label) {
-                if (isset($customs[$fieldKey]) && is_string($customs[$fieldKey]) && str_contains($customs[$fieldKey], ',')) {
-                    $errors[] = __('Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.', $label)->render();
+                $val = $customs[$fieldKey] ?? null;
+                if (is_string($val) && str_contains($val, ',')) {
+                    $errors[] = __(
+                        'Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.',
+                        $label
+                    )->render();
                 }
             }
 
@@ -223,8 +237,12 @@ class ShipmentDataValidator
                         'quantity' => __('Customs Item #%1 quantity', $rowNum),
                     ];
                     foreach ($itemFields as $fieldKey => $label) {
-                        if (isset($item[$fieldKey]) && is_string($item[$fieldKey]) && str_contains($item[$fieldKey], ',')) {
-                            $errors[] = __('Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.', $label)->render();
+                        $itemVal = $item[$fieldKey] ?? null;
+                        if (is_string($itemVal) && str_contains($itemVal, ',')) {
+                            $errors[] = __(
+                                'Field "%1" cannot contain a comma. Please use a dot (.) as decimal separator.',
+                                $label
+                            )->render();
                         }
                     }
                 }

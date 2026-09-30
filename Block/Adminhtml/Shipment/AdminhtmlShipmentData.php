@@ -13,9 +13,24 @@ use Throwable;
 
 class AdminhtmlShipmentData
 {
+    /**
+     * @var bool
+     */
     private bool $shipmentResolved = false;
+
+    /**
+     * @var ShipmentDataInterface|null
+     */
     private ?ShipmentDataInterface $shipmentData = null;
+
+    /**
+     * @var bool
+     */
     private bool $entityIdResolved = false;
+
+    /**
+     * @var int|null
+     */
     private ?int $entityId = null;
 
     /**

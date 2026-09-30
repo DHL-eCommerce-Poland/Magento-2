@@ -91,7 +91,8 @@ class DataProvider extends AbstractDataProvider
         $meta = parent::getMeta();
 
         $tagsNotice = __(
-            'Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}'
+            'Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, '
+            . '{order_description}'
         );
 
         $contentConfig = &$meta['general']['children']['content']['arguments']['data']['config'];
@@ -105,7 +106,8 @@ class DataProvider extends AbstractDataProvider
 
         $mpkConfig = &$meta['general']['children']['mpk']['arguments']['data']['config'];
         $mpkConfig['notice'] = __(
-            'Cost center code. Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}'
+            'Cost center code. Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, '
+            . '{product_name}, {order_description}'
         );
 
         return $meta;

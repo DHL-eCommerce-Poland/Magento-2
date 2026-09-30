@@ -1,16 +1,42 @@
 {
     "name": "ideo/module-dhl",
-    "description": "DHL integration module for Magento 2",
+    "description": "DHL eCommerce shipping integration module for Magento 2",
     "type": "magento2-module",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "DHL eCommerce Poland",
+            "email": "norbert.cios.KR@dhl.com",
+            "homepage": "https://dhl24.com.pl/"
+        }
+    ],
+    "keywords": [
+        "magento2",
+        "magento",
+        "dhl",
+        "shipping",
+        "courier",
+        "parcel",
+        "delivery"
+    ],
     "require": {
-        "php": "^8.1",
+        "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
         "ext-intl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-soap": "*",
         "ext-zip": "*",
-        "magento/framework": "^103.0"
+        "magento/framework": "^103.0",
+        "magento/module-checkout": "^100.4",
+        "magento/module-config": "^101.0",
+        "magento/module-quote": "^101.0",
+        "magento/module-sales": "^103.0",
+        "magento/module-shipping": "^100.4",
+        "magento/module-store": "^101.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5 || ^10.0 || ^12.0",
+        "magento/magento-coding-standard": "*"
     },
     "autoload": {
         "files": [
@@ -19,14 +45,6 @@
         "psr-4": {
             "Ideo\\Dhl\\": ""
         }
-    },
-    "extra": {
-        "map": [
-            [
-                "*",
-                "Ideo_Dhl"
-            ]
-        ]
     },
     "minimum-stability": "stable",
     "prefer-stable": true
