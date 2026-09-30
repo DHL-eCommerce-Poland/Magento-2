@@ -48,7 +48,7 @@ jobs:
         uses: shivammathur/setup-php@87d00bde2555f25eb54fedf940384e99cbdc55ef # v2.32.0
         with:
           php-version: '8.1'
-          tools: phpcs, composer:v2
+          tools: composer:v2
 
       - name: Cache Composer dependencies
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
@@ -61,8 +61,7 @@ jobs:
         run: |
           composer global config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
           composer global require --dev magento/magento-coding-standard --no-interaction --prefer-dist
-          VENDOR_DIR=$(composer global config vendor-dir --absolute)
-          phpcs --config-set installed_paths "${VENDOR_DIR}/magento/magento-coding-standard"
+          phpcs -i
 
       - name: Run Magento Coding Standard
         run: phpcs --standard=Magento2 --extensions=php,phtml,xml --ignore=*/vendor/*,*/dist/*,*/build/* .
