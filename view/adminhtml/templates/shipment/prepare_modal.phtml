@@ -12,6 +12,7 @@ use Magento\Framework\View\Element\Template;
 
 $viewModel = $block->getViewModel();
 $dateFormat = $viewModel->getDateFormat();
+$todayIsoDate = $viewModel->getIsoDate();
 ?>
 <div id="ideo-dhl-prepare-modal" style="display: none;" data-bind="scope: 'dhlShipmentForm'">
     <form id="ideo-dhl-prepare-modal-form" data-mage-init='{"validation":{}}' onsubmit="return false;">
@@ -643,7 +644,8 @@ $dateFormat = $viewModel->getDateFormat();
                     "component": "Ideo_Dhl/js/shipment/prepare-modal",
                     "saveUrl": "<?= $escaper->escapeUrl($block->getUrl('dhlparcel/shipment/save')) ?>",
                     "loadTemplateUrl": "<?= $escaper->escapeUrl($block->getUrl('dhlparcel/shipment/loadTemplate')) ?>",
-                    "dateFormat": "<?= $escaper->escapeJs($dateFormat) ?>"
+                    "dateFormat": "<?= $escaper->escapeJs($dateFormat) ?>",
+                    "todayDate": "<?= $escaper->escapeJs($todayIsoDate) ?>"
                 }
             }
         }

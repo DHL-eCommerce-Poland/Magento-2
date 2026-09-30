@@ -4,10 +4,11 @@ define([
     'uiComponent',
     'Magento_Ui/js/modal/modal',
     'Magento_Ui/js/modal/alert',
+    'Ideo_Dhl/js/utils/safe-message-content',
     'mage/translate',
     'mage/validation',
     'mage/loader'
-], function ($, ko, Component, modal, alert) {
+], function ($, ko, Component, modal, alert, createSafeMessageContent) {
     'use strict';
 
     if ($.validator && !$.validator.methods['validate-no-comma']) {
@@ -265,7 +266,7 @@ define([
         return customsObj;
     }
 
-    function createShipmentData(data) {
+    function createShipmentData(data, todayDate) {
         data = data || {};
         var s = data.sender || {};
         var r = data.recipient || {};
@@ -343,7 +344,7 @@ define([
             });
         }
 
-        var todayStr = new Date().toISOString().split('T')[0];
+        var todayStr = todayDate;
         var dDate = st.shipmentDate || todayStr;
         if (dDate < todayStr) {
             dDate = todayStr;
@@ -483,10 +484,11 @@ define([
             $('.page-main-actions').after($messages);
         }
         var cssClass = (type === 'success') ? 'message-success success' : 'message-error error';
-        var html = '<div class="message ' + cssClass + ' message-dismissible" data-ui-id="messages-message-' + type + '">' +
-            '<div>' + messageText + '</div>' +
-            '</div>';
-        $messages.find('.messages').html(html);
+        var $message = $('<div/>')
+            .addClass('message ' + cssClass + ' message-dismissible')
+            .attr('data-ui-id', 'messages-message-' + type);
+        $message.append(createSafeMessageContent(messageText));
+        $messages.find('.messages').empty().append($message);
         $('html, body').animate({ scrollTop: 0 }, 'fast');
     }
 
@@ -494,19 +496,16 @@ define([
         defaults: {
             saveUrl: '',
             loadTemplateUrl: '',
-            loadPresetUrl: ''
+            todayDate: ''
         },
 
         initialize: function () {
             this._super();
 
-            this.shipmentData = ko.observable(createShipmentData({}));
-            this.draft = this.shipmentData; // Alias for backward compatibility
+            this.shipmentData = ko.observable(createShipmentData({}, this.todayDate));
             this.senderTemplates = ko.observableArray([]);
-            this.senderPresets = this.senderTemplates; // Alias
             this.countryOptions = ko.observableArray([]);
             this.shipmentTemplates = ko.observableArray([]);
-            this.shipmentPresets = this.shipmentTemplates; // Alias
             this.serviceCodeOptions = ko.observableArray([]);
             this.labelTypeOptions = ko.observableArray([]);
             this.packageTypeOptions = ko.observableArray([]);
@@ -610,7 +609,9 @@ define([
                 return;
             }
             this._mapMessageListener = function (event) {
-                if (!event || !event.data) {
+                var iframe = document.getElementById('ideo-dhl-prepare-map-iframe');
+                if (!event || event.origin !== 'https://parcelshop.dhl.pl' || !iframe
+                    || event.source !== iframe.contentWindow || !self._activeMapModal || !event.data) {
                     return;
                 }
                 var pointData = event.data;
@@ -622,7 +623,7 @@ define([
                     }
                 }
                 if (pointData && typeof pointData === 'object' && pointData.sap) {
-                    var draft = self.draft();
+                    var draft = self.shipmentData();
                     if (draft && draft.recipient) {
                         var nameStr = pointData.name || '';
                         var addrStr = pointData.address || '';
@@ -670,7 +671,7 @@ define([
 
         openPointMapModal: function () {
             var self = this;
-            var draft = this.draft();
+            var draft = this.shipmentData();
             if (!draft || !draft.recipient) {
                 return;
             }
@@ -705,6 +706,7 @@ define([
                 buttons: [],
                 closed: function () {
                     $modalContainer.find('iframe').attr('src', '');
+                    self._activeMapModal = null;
                 }
             };
 
@@ -716,28 +718,28 @@ define([
         },
 
         addPackageRow: function () {
-            var settings = this.draft().shipmentSettings;
+            var settings = this.shipmentData().shipmentSettings;
             if (settings && typeof settings.addPackageRow === 'function') {
                 settings.addPackageRow();
             }
         },
 
         removePackageRow: function (index) {
-            var settings = this.draft().shipmentSettings;
+            var settings = this.shipmentData().shipmentSettings;
             if (settings && typeof settings.removePackageRow === 'function') {
                 settings.removePackageRow(index);
             }
         },
 
         addCustomsItemRow: function () {
-            var customs = this.draft() ? this.draft().customs : null;
+            var customs = this.shipmentData() ? this.shipmentData().customs : null;
             if (customs && typeof customs.addCustomsItemRow === 'function') {
                 customs.addCustomsItemRow();
             }
         },
 
         removeCustomsItemRow: function (index) {
-            var customs = this.draft() ? this.draft().customs : null;
+            var customs = this.shipmentData() ? this.shipmentData().customs : null;
             if (customs && typeof customs.removeCustomsItemRow === 'function') {
                 customs.removeCustomsItemRow(index);
             }
@@ -773,7 +775,7 @@ define([
             reader.onload = function (e) {
                 var result = e.target.result || '';
                 var base64 = result.indexOf(',') !== -1 ? result.split(',')[1] : result;
-                var customs = self.draft() ? self.draft().customs : null;
+                var customs = self.shipmentData() ? self.shipmentData().customs : null;
                 if (customs) {
                     customs.invoiceFile(base64);
                     if (typeof customs.invoiceFileName === 'function') {
@@ -793,7 +795,7 @@ define([
         },
 
         resetCustomsData: function () {
-            var customs = this.draft() ? this.draft().customs : null;
+            var customs = this.shipmentData() ? this.shipmentData().customs : null;
             if (!customs) return;
 
             customs.selectedCustomsTemplateId(null);
@@ -825,7 +827,7 @@ define([
         },
 
         populateCustomsData: function (data) {
-            var customs = this.draft() ? this.draft().customs : null;
+            var customs = this.shipmentData() ? this.shipmentData().customs : null;
             if (!customs || !data) return;
 
             if (data.customsType !== undefined) customs.customsType(data.customsType);
@@ -861,7 +863,7 @@ define([
         },
 
         onCustomsTemplateChange: function (templateId, event) {
-            var customs = this.draft() ? this.draft().customs : null;
+            var customs = this.shipmentData() ? this.shipmentData().customs : null;
             if (!customs) return;
 
             if (event && event.target) {
@@ -892,16 +894,14 @@ define([
                 return;
             }
 
-            var url = this.loadTemplateUrl || this.loadPresetUrl;
+            var url = this.loadTemplateUrl;
             if (!url) return;
 
             var self = this;
             $.getJSON(url, {
                 template_id: templateId,
                 template_type: 'customs',
-                preset_id: templateId,
-                preset_type: 'customs',
-                order_id: self.draft().orderId
+                order_id: self.shipmentData().orderId
             }).done(function (res) {
                 if (res.success && res.data) {
                     self.populateCustomsData(res.data);
@@ -910,7 +910,7 @@ define([
         },
 
         onSenderTemplateChange: function (templateId, event) {
-            var sender = this.draft() ? this.draft().sender : null;
+            var sender = this.shipmentData() ? this.shipmentData().sender : null;
             if (!sender) return;
 
             if (event && event.target) {
@@ -948,25 +948,25 @@ define([
                 sender.country('PL');
                 sender.phone('');
                 sender.email('');
-                if (this.draft() && this.draft().shipmentSettings) {
-                    if (typeof this.draft().shipmentSettings.pickupHourFrom === 'function') {
-                        this.draft().shipmentSettings.pickupHourFrom('');
+                if (this.shipmentData() && this.shipmentData().shipmentSettings) {
+                    if (typeof this.shipmentData().shipmentSettings.pickupHourFrom === 'function') {
+                        this.shipmentData().shipmentSettings.pickupHourFrom('');
                     }
-                    if (typeof this.draft().shipmentSettings.pickupHourTo === 'function') {
-                        this.draft().shipmentSettings.pickupHourTo('');
+                    if (typeof this.shipmentData().shipmentSettings.pickupHourTo === 'function') {
+                        this.shipmentData().shipmentSettings.pickupHourTo('');
                     }
                 }
                 return;
             }
 
-            var url = this.loadTemplateUrl || this.loadPresetUrl;
+            var url = this.loadTemplateUrl;
             if (!url) return;
 
             var self = this;
-            $.getJSON(url, { template_id: templateId, template_type: 'sender', preset_id: templateId, preset_type: 'sender' })
+            $.getJSON(url, { template_id: templateId, template_type: 'sender' })
                 .done(function (res) {
                     if (res.success && res.data) {
-                        var currentSender = self.draft().sender;
+                        var currentSender = self.shipmentData().sender;
                         $.each(res.data, function (key, val) {
                             if (key === 'payer' || key === 'selectedDropOffPointId') return;
                             if (typeof currentSender[key] === 'function') {
@@ -976,12 +976,12 @@ define([
                                 currentSender[key](val);
                             }
                         });
-                        if (self.draft() && self.draft().shipmentSettings) {
-                            if (res.data.pickupHourFrom !== undefined && typeof self.draft().shipmentSettings.pickupHourFrom === 'function') {
-                                self.draft().shipmentSettings.pickupHourFrom(res.data.pickupHourFrom || '');
+                        if (self.shipmentData() && self.shipmentData().shipmentSettings) {
+                            if (res.data.pickupHourFrom !== undefined && typeof self.shipmentData().shipmentSettings.pickupHourFrom === 'function') {
+                                self.shipmentData().shipmentSettings.pickupHourFrom(res.data.pickupHourFrom || '');
                             }
-                            if (res.data.pickupHourTo !== undefined && typeof self.draft().shipmentSettings.pickupHourTo === 'function') {
-                                self.draft().shipmentSettings.pickupHourTo(res.data.pickupHourTo || '');
+                            if (res.data.pickupHourTo !== undefined && typeof self.shipmentData().shipmentSettings.pickupHourTo === 'function') {
+                                self.shipmentData().shipmentSettings.pickupHourTo(res.data.pickupHourTo || '');
                             }
                         }
                     }
@@ -993,7 +993,7 @@ define([
         },
 
         onShipmentTemplateChange: function (templateId, event) {
-            var settings = this.draft() ? this.draft().shipmentSettings : null;
+            var settings = this.shipmentData() ? this.shipmentData().shipmentSettings : null;
             if (!settings) return;
 
             if (event && event.target) {
@@ -1035,42 +1035,40 @@ define([
                 if (settings.packages) {
                     settings.packages.removeAll();
                 }
-                if (this.draft().specialServices) {
-                    var ssReset = this.draft().specialServices;
+                if (this.shipmentData().specialServices) {
+                    var ssReset = this.shipmentData().specialServices;
                     ssReset.insurance(false);
                     ssReset.insuranceValue('');
-                    ssReset.cod(false);
-                    ssReset.codAmount('');
-                    ssReset.eveningDelivery(false);
-                    ssReset.saturdayDelivery(false);
-                    ssReset.saturdayDispatch(false);
-                    ssReset.pdi(false);
-                    ssReset.rod(false);
-                    ssReset.rodDocumentText('');
-                    ssReset.pod(false);
-                    ssReset.agever(false);
-                    ssReset.odb(false);
+                    ssReset.collectOnDelivery(false);
+                    ssReset.collectOnDeliveryValue('');
+                    ssReset.deliveryEvening(false);
+                    ssReset.deliveryOnSaturday(false);
+                    ssReset.pickupOnSaturday(false);
+                    ssReset.predeliveryInformation(false);
+                    ssReset.returnOnDelivery(false);
+                    ssReset.returnOnDeliveryReference('');
+                    ssReset.proofOfDelivery(false);
+                    ssReset.ageVer(false);
+                    ssReset.selfCollect(false);
                 }
                 return;
             }
 
-            var url = this.loadTemplateUrl || this.loadPresetUrl;
+            var url = this.loadTemplateUrl;
             if (!url) return;
 
             var self = this;
             $.getJSON(url, {
                 template_id: templateId,
                 template_type: 'shipment',
-                preset_id: templateId,
-                preset_type: 'shipment',
-                order_id: self.draft().orderId
+                order_id: self.shipmentData().orderId
             }).done(function (res) {
                 if (res.success && res.data) {
                     var shipmentSettings = res.data.shipmentSettings || res.data;
                     var specialServices = res.data.specialServices || res.specialServices;
 
-                    if (shipmentSettings && self.draft().shipmentSettings) {
-                        var currentSettings = self.draft().shipmentSettings;
+                    if (shipmentSettings && self.shipmentData().shipmentSettings) {
+                        var currentSettings = self.shipmentData().shipmentSettings;
                         $.each(shipmentSettings, function (key, val) {
                             if (key === 'selectedDeliveryServiceId' || key === 'packages') return;
                             if (typeof currentSettings[key] === 'function') {
@@ -1096,17 +1094,17 @@ define([
                         }
                     }
 
-                    if (specialServices && self.draft().specialServices) {
-                        var currentSS = self.draft().specialServices;
+                    if (specialServices && self.shipmentData().specialServices) {
+                        var currentSS = self.shipmentData().specialServices;
                         var resOrderTotal = (res.data && res.data.orderGrandTotal !== undefined && res.data.orderGrandTotal !== null && res.data.orderGrandTotal !== '')
                             ? formatMoney(res.data.orderGrandTotal)
                             : null;
 
-                        if (resOrderTotal && typeof self.draft().orderGrandTotal === 'function') {
-                            self.draft().orderGrandTotal(resOrderTotal);
+                        if (resOrderTotal && typeof self.shipmentData().orderGrandTotal === 'function') {
+                            self.shipmentData().orderGrandTotal(resOrderTotal);
                         }
 
-                        var orderTotal = (typeof self.draft().orderGrandTotal === 'function' ? self.draft().orderGrandTotal() : self.draft().orderGrandTotal) || resOrderTotal || '';
+                        var orderTotal = (typeof self.shipmentData().orderGrandTotal === 'function' ? self.shipmentData().orderGrandTotal() : self.shipmentData().orderGrandTotal) || resOrderTotal || '';
 
                         var tplInsuranceVal = (specialServices.insuranceValue !== null && specialServices.insuranceValue !== undefined && specialServices.insuranceValue !== '')
                             ? formatMoney(specialServices.insuranceValue)
@@ -1186,11 +1184,11 @@ define([
 
                     // Dynamically update recipient.type based on template addressType
                     var addressType = (shipmentSettings && shipmentSettings.addressType) || (res.data && res.data.addressType) || 'N';
-                    if (self.draft().recipient) {
+                    if (self.shipmentData().recipient) {
                         if (addressType === 'B') {
-                            self.draft().recipient.type('B');
+                            self.shipmentData().recipient.type('B');
                         } else if (addressType === 'C') {
-                            self.draft().recipient.type('C');
+                            self.shipmentData().recipient.type('C');
                         }
                     }
                 }
@@ -1212,14 +1210,9 @@ define([
                 .done(function (response) {
                     if (response.success && response.data) {
                         // 1. Populate dropdown options FIRST
-                        var senderTemplates = response.senderTemplates || response.senderPresets || [];
-                        var shipmentTemplates = response.shipmentTemplates || response.shipmentPresets || [];
-
-                        self.senderTemplates(senderTemplates);
-                        self.senderPresets(senderTemplates);
+                        self.senderTemplates(response.senderTemplates || []);
                         self.countryOptions(response.countryOptions || []);
-                        self.shipmentTemplates(shipmentTemplates);
-                        self.shipmentPresets(shipmentTemplates);
+                        self.shipmentTemplates(response.shipmentTemplates || []);
                         self.serviceCodeOptions(response.serviceCodeOptions || []);
                         self.labelTypeOptions(response.labelTypeOptions || []);
                         self.packageTypeOptions(response.packageTypeOptions || []);
@@ -1256,33 +1249,33 @@ define([
                         self._activeCustomsTemplateId = null;
 
                         // 3. Create reactive shipmentData instance AFTER options are set
-                        var newDraft = createShipmentData(response.data);
-                        self.draft(newDraft);
+                        var newShipmentData = createShipmentData(response.data, self.todayDate);
+                        self.shipmentData(newShipmentData);
 
                         if (defaultPointId) {
-                            newDraft.sender.selectedDropOffPointId(defaultPointId);
+                            newShipmentData.sender.selectedDropOffPointId(defaultPointId);
                         }
                         if (defaultDeliveryServiceId) {
-                            newDraft.shipmentSettings.selectedDeliveryServiceId(defaultDeliveryServiceId);
+                            newShipmentData.shipmentSettings.selectedDeliveryServiceId(defaultDeliveryServiceId);
                             self.onShipmentTemplateChange(defaultDeliveryServiceId);
                         }
                         if (defaultCustomsTemplateId) {
-                            newDraft.customs.selectedCustomsTemplateId(defaultCustomsTemplateId);
+                            newShipmentData.customs.selectedCustomsTemplateId(defaultCustomsTemplateId);
                             self.onCustomsTemplateChange(defaultCustomsTemplateId);
                         }
 
-                        newDraft.sender.selectedDropOffPointId.subscribe(function (newVal) {
+                        newShipmentData.sender.selectedDropOffPointId.subscribe(function (newVal) {
                             self.onSenderTemplateChange(newVal);
                         });
-                        newDraft.shipmentSettings.selectedDeliveryServiceId.subscribe(function (newVal) {
+                        newShipmentData.shipmentSettings.selectedDeliveryServiceId.subscribe(function (newVal) {
                             self.onShipmentTemplateChange(newVal);
                         });
-                        newDraft.recipient.country.subscribe(function (newCountry) {
+                        newShipmentData.recipient.country.subscribe(function (newCountry) {
                             if (newCountry && newCountry.toUpperCase() === 'PL') {
                                 self.resetCustomsData();
                             }
                         });
-                        newDraft.customs.selectedCustomsTemplateId.subscribe(function (newVal) {
+                        newShipmentData.customs.selectedCustomsTemplateId.subscribe(function (newVal) {
                             self.onCustomsTemplateChange(newVal);
                         });
 
@@ -1301,37 +1294,37 @@ define([
                                         return false;
                                     }
 
-                                    var draftJs = ko.toJS(self.shipmentData());
+                                    var shipmentDataPayload = ko.toJS(self.shipmentData());
 
                                     var hasCommaError = false;
-                                    if (draftJs) {
+                                    if (shipmentDataPayload) {
                                         var checkComma = function (val) {
                                             return val !== null && val !== undefined && String(val).indexOf(',') !== -1;
                                         };
 
-                                        if (draftJs.specialServices) {
-                                            if (checkComma(draftJs.specialServices.insuranceValue) || checkComma(draftJs.specialServices.collectOnDeliveryValue)) {
+                                        if (shipmentDataPayload.specialServices) {
+                                            if (checkComma(shipmentDataPayload.specialServices.insuranceValue) || checkComma(shipmentDataPayload.specialServices.collectOnDeliveryValue)) {
                                                 hasCommaError = true;
                                             }
                                         }
-                                        if (draftJs.shipmentSettings) {
-                                            if (checkComma(draftJs.shipmentSettings.returnLabelExpDays)) {
+                                        if (shipmentDataPayload.shipmentSettings) {
+                                            if (checkComma(shipmentDataPayload.shipmentSettings.returnLabelExpDays)) {
                                                 hasCommaError = true;
                                             }
-                                            if (Array.isArray(draftJs.shipmentSettings.packages)) {
-                                                $.each(draftJs.shipmentSettings.packages, function (i, pkg) {
+                                            if (Array.isArray(shipmentDataPayload.shipmentSettings.packages)) {
+                                                $.each(shipmentDataPayload.shipmentSettings.packages, function (i, pkg) {
                                                     if (checkComma(pkg.weight) || checkComma(pkg.width) || checkComma(pkg.length) || checkComma(pkg.height) || checkComma(pkg.quantity)) {
                                                         hasCommaError = true;
                                                     }
                                                 });
                                             }
                                         }
-                                        if (draftJs.customs) {
-                                            if (checkComma(draftJs.customs.costsOfShipment) || checkComma(draftJs.customs.grossWeight)) {
+                                        if (shipmentDataPayload.customs) {
+                                            if (checkComma(shipmentDataPayload.customs.costsOfShipment) || checkComma(shipmentDataPayload.customs.grossWeight)) {
                                                 hasCommaError = true;
                                             }
-                                            if (Array.isArray(draftJs.customs.customsItems)) {
-                                                $.each(draftJs.customs.customsItems, function (i, item) {
+                                            if (Array.isArray(shipmentDataPayload.customs.customsItems)) {
+                                                $.each(shipmentDataPayload.customs.customsItems, function (i, item) {
                                                     if (checkComma(item.weight) || checkComma(item.value) || checkComma(item.quantity)) {
                                                         hasCommaError = true;
                                                     }
@@ -1348,9 +1341,9 @@ define([
                                         return false;
                                     }
 
-                                    var pFrom = draftJs.sender ? draftJs.sender.pickupHourFrom : null;
-                                    var pTo = draftJs.sender ? draftJs.sender.pickupHourTo : null;
-                                    var pkgs = (draftJs.shipmentSettings && draftJs.shipmentSettings.packages) ? draftJs.shipmentSettings.packages : [];
+                                    var pFrom = shipmentDataPayload.sender ? shipmentDataPayload.sender.pickupHourFrom : null;
+                                    var pTo = shipmentDataPayload.sender ? shipmentDataPayload.sender.pickupHourTo : null;
+                                    var pkgs = (shipmentDataPayload.shipmentSettings && shipmentDataPayload.shipmentSettings.packages) ? shipmentDataPayload.shipmentSettings.packages : [];
                                     if (!pkgs.length) {
                                         alert({
                                             title: $.mage.__('Error'),
@@ -1375,8 +1368,8 @@ define([
                                         return false;
                                     }
 
-                                    if (self.isCustomsClearanceVisible() && draftJs.customs) {
-                                        if (draftJs.customs.customsType === 'I' && (!draftJs.customs.invoiceFile || !draftJs.customs.invoiceFile.trim())) {
+                                    if (self.isCustomsClearanceVisible() && shipmentDataPayload.customs) {
+                                        if (shipmentDataPayload.customs.customsType === 'I' && (!shipmentDataPayload.customs.invoiceFile || !shipmentDataPayload.customs.invoiceFile.trim())) {
                                             alert({
                                                 title: $.mage.__('Error'),
                                                 content: $.mage.__('VAT Invoice PDF file is required for individual customs clearance.')
@@ -1392,14 +1385,12 @@ define([
                                     }
                                     $('body').trigger('processStart');
 
-                                    var senderTemplateId = (draftJs.sender && draftJs.sender.selectedDropOffPointId) ? draftJs.sender.selectedDropOffPointId : null;
-                                    var shipmentTemplateId = (draftJs.shipmentSettings && draftJs.shipmentSettings.selectedDeliveryServiceId) ? draftJs.shipmentSettings.selectedDeliveryServiceId : null;
-                                    var customsTemplateId = (draftJs.customs && draftJs.customs.selectedCustomsTemplateId) ? draftJs.customs.selectedCustomsTemplateId : null;
+                                    var senderTemplateId = (shipmentDataPayload.sender && shipmentDataPayload.sender.selectedDropOffPointId) ? shipmentDataPayload.sender.selectedDropOffPointId : null;
+                                    var shipmentTemplateId = (shipmentDataPayload.shipmentSettings && shipmentDataPayload.shipmentSettings.selectedDeliveryServiceId) ? shipmentDataPayload.shipmentSettings.selectedDeliveryServiceId : null;
+                                    var customsTemplateId = (shipmentDataPayload.customs && shipmentDataPayload.customs.selectedCustomsTemplateId) ? shipmentDataPayload.customs.selectedCustomsTemplateId : null;
 
                                     $.post(self.saveUrl, {
-                                        payload: JSON.stringify(draftJs),
-                                        shipment_data: JSON.stringify(draftJs),
-                                        draft: JSON.stringify(draftJs),
+                                        shipment_data: JSON.stringify(shipmentDataPayload),
                                         drop_off_point_template_id: senderTemplateId,
                                         delivery_service_template_id: shipmentTemplateId,
                                         customs_template_id: customsTemplateId
@@ -1416,11 +1407,9 @@ define([
                                         } else {
                                             $('body').trigger('processStop');
                                             $btn.prop('disabled', false);
-                                            var errorMsg = (saveRes.message || $.mage.__('Error creating DHL shipment.'))
-                                                .replace(/\n/g, '<br/>');
                                             alert({
                                                 title: $.mage.__('Error'),
-                                                content: errorMsg
+                                                content: createSafeMessageContent(saveRes.message || $.mage.__('Error creating DHL shipment.'))
                                             });
                                         }
                                     }).fail(function () {
@@ -1438,7 +1427,7 @@ define([
                     } else {
                         alert({
                             title: $.mage.__('Error'),
-                            content: response.message || $.mage.__('Error preparing DHL shipment.')
+                            content: createSafeMessageContent(response.message || $.mage.__('Error preparing DHL shipment.'))
                         });
                     }
                 })

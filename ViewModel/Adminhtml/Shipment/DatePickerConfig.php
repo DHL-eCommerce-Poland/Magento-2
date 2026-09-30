@@ -44,4 +44,14 @@ class DatePickerConfig implements ArgumentInterface
             false
         );
     }
+
+    /**
+     * Get the current store date in the ISO format used by shipment data.
+     *
+     * @return string
+     */
+    public function getIsoDate(): string
+    {
+        return $this->localeDate->scopeDate()->format('Y-m-d');
+    }
 }

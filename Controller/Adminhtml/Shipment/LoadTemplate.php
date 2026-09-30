@@ -64,10 +64,8 @@ class LoadTemplate extends Action
     public function execute(): Json
     {
         $resultJson = $this->jsonFactory->create();
-        $templateId = (int)($this->getRequest()->getParam('template_id')
-            ?? $this->getRequest()->getParam('preset_id'));
-        $templateType = (string)($this->getRequest()->getParam('template_type')
-            ?? $this->getRequest()->getParam('preset_type'));
+        $templateId = (int)$this->getRequest()->getParam('template_id');
+        $templateType = (string)$this->getRequest()->getParam('template_type');
         $orderId = (int)$this->getRequest()->getParam('order_id');
 
         if (!$templateId || empty($templateType)) {

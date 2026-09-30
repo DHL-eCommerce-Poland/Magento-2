@@ -109,7 +109,9 @@ class PrepareTest extends TestCase
                 return is_array($data)
                     && ($data['success'] ?? false) === true
                     && ($data['shipmentTemplates'] ?? []) === [['value' => 1, 'label' => 'Template Polska']]
-                    && ($data['customsTemplates'] ?? []) === [['value' => 5, 'label' => 'Customs Template 1']];
+                    && ($data['customsTemplates'] ?? []) === [['value' => 5, 'label' => 'Customs Template 1']]
+                    && !array_key_exists('senderPresets', $data)
+                    && !array_key_exists('shipmentPresets', $data);
             }))
             ->willReturnSelf();
 

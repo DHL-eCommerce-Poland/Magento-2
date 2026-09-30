@@ -73,6 +73,28 @@ class LoadTemplateTest extends TestCase
         );
     }
 
+    /**
+     * Test execute ignores preset parameter aliases.
+     *
+     * @return void
+     */
+    public function testExecuteDoesNotAcceptPresetParameterAliases(): void
+    {
+        $this->request->method('getParam')->willReturnCallback(fn ($key) => match ($key) {
+            'preset_id' => '3',
+            'preset_type' => 'sender',
+            default => null,
+        });
+
+        $this->dropOffPointRepository->expects($this->never())->method('getById');
+        $this->jsonResult->expects($this->once())
+            ->method('setData')
+            ->with(self::callback(fn (array $data) => ($data['success'] ?? true) === false))
+            ->willReturnSelf();
+
+        $this->assertSame($this->jsonResult, $this->controller->execute());
+    }
+
     public function testExecuteLoadsSenderTemplate(): void
     {
         $this->request->method('getParam')->willReturnCallback(fn ($key) => match ($key) {

@@ -60,4 +60,20 @@ class DatePickerConfigTest extends TestCase
 
         $this->assertEquals('09/2/2026', $this->viewModel->getFormattedDate());
     }
+
+    /**
+     * Test getIsoDate returns the current store date in ISO format.
+     *
+     * @return void
+     */
+    public function testGetIsoDateUsesCurrentStoreDate(): void
+    {
+        $storeDate = new DateTime('2026-09-02 00:30:00');
+
+        $this->localeDateMock->expects($this->once())
+            ->method('scopeDate')
+            ->willReturn($storeDate);
+
+        $this->assertSame('2026-09-02', $this->viewModel->getIsoDate());
+    }
 }

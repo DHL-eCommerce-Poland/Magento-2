@@ -135,7 +135,9 @@ define([
             }
 
             this._messageListener = function (event) {
-                if (!event || !event.data) {
+                var iframe = document.getElementById('ideo-dhl-admin-form-map-iframe');
+                if (!event || event.origin !== 'https://parcelshop.dhl.pl' || !iframe
+                    || event.source !== iframe.contentWindow || !self._activeModal || !event.data) {
                     return;
                 }
                 var pointData = event.data;
@@ -262,6 +264,7 @@ define([
                 buttons: [],
                 closed: function () {
                     $modalContainer.find('iframe').attr('src', '');
+                    self._activeModal = null;
                 }
             };
 

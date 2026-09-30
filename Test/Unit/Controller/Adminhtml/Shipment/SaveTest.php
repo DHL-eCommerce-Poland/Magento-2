@@ -11,7 +11,7 @@ use Ideo\Dhl\Model\Shipment\ShipmentCreationService;
 use Ideo\Dhl\Model\Shipment\ShipmentDataService;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\Request\Http;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use PHPUnit\Framework\Assert;
@@ -29,7 +29,7 @@ class SaveTest extends TestCase
     private $contextStub;
 
     /**
-     * @var RequestInterface|MockObject
+     * @var Http|MockObject
      */
     private $requestStub;
 
@@ -71,7 +71,8 @@ class SaveTest extends TestCase
     protected function setUp(): void
     {
         $this->contextStub = $this->createStub(Context::class);
-        $this->requestStub = $this->createStub(RequestInterface::class);
+        $this->requestStub = $this->createStub(Http::class);
+        $this->requestStub->method('isXmlHttpRequest')->willReturn(true);
         $this->shipmentDataServiceMock = $this->createStub(ShipmentDataService::class);
         $this->shipmentCreationServiceMock = $this->createMock(ShipmentCreationService::class);
         $this->scopeConfigMock = $this->createMock(ScopeConfigInterface::class);
@@ -124,9 +125,9 @@ class SaveTest extends TestCase
         $this->requestStub
             ->method('getParam')
             ->willReturnMap([
-                ['draft', null, null],
+                ['draft', null, '{"orderId":123}'],
+                ['payload', null, '{"orderId":123}'],
                 ['shipment_data', null, null],
-                ['isAjax', null, true],
             ]);
 
         $this->scopeConfigMock->expects(self::never())->method('getValue');
@@ -161,7 +162,7 @@ class SaveTest extends TestCase
         $this->requestStub
             ->method('getParam')
             ->willReturnCallback(function (string $param) use ($payloadData) {
-                if ($param === 'draft') {
+                if ($param === 'shipment_data') {
                     return json_encode($payloadData);
                 }
                 if ($param === 'drop_off_point_template_id') {
@@ -215,7 +216,7 @@ class SaveTest extends TestCase
         $this->requestStub
             ->method('getParam')
             ->willReturnCallback(function (string $param) use ($payloadData) {
-                if ($param === 'draft') {
+                if ($param === 'shipment_data') {
                     return json_encode($payloadData);
                 }
                 return null;
@@ -242,6 +243,48 @@ class SaveTest extends TestCase
 
         $result = $this->controller->execute();
         $this->assertSame($this->jsonResultMock, $result);
+    }
+
+    /**
+     * Test execute accepts the active Magento UI Component data envelope.
+     *
+     * @return void
+     */
+    public function testExecuteAcceptsMagentoUiComponentDataEnvelope(): void
+    {
+        $payloadData = [
+            'orderId' => 123,
+            'sender' => ['name' => 'Jan Kowalski'],
+            'recipient' => ['name' => 'Firma ABC'],
+            'specialServices' => [],
+            'shipmentSettings' => ['serviceType' => 'AH']
+        ];
+
+        $this->requestStub
+            ->method('getParam')
+            ->willReturnCallback(function (string $param) use ($payloadData) {
+                if ($param === 'data') {
+                    return $payloadData;
+                }
+                return null;
+            });
+
+        $this->scopeConfigMock->expects(self::once())
+            ->method('getValue')
+            ->with('carriers/dhlparcel/sandbox')
+            ->willReturn('1');
+
+        $this->shipmentCreationServiceMock->expects(self::once())
+            ->method('createShipment')
+            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'sandbox', null, null, null)
+            ->willReturn(new CreateShipmentResult(true, false, '90039521201'));
+
+        $this->jsonResultMock->expects(self::once())
+            ->method('setData')
+            ->with(Assert::callback(fn (array $data) => $data['success'] === true))
+            ->willReturn($this->jsonResultMock);
+
+        $this->assertSame($this->jsonResultMock, $this->controller->execute());
     }
 
     /**
@@ -289,11 +332,8 @@ class SaveTest extends TestCase
         $this->requestStub
             ->method('getParam')
             ->willReturnCallback(function (string $param) use ($payloadData) {
-                if ($param === 'draft') {
+                if ($param === 'shipment_data') {
                     return json_encode($payloadData);
-                }
-                if ($param === 'isAjax') {
-                    return true;
                 }
                 return null;
             });

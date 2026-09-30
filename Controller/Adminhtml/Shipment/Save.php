@@ -61,20 +61,20 @@ class Save extends Action implements HttpPostActionInterface
      */
     public function execute(): ResultInterface|ResponseInterface
     {
-        $isAjax = (method_exists($this->getRequest(), 'isXmlHttpRequest') && $this->getRequest()->isXmlHttpRequest())
-            || (bool)$this->getRequest()->getParam('isAjax')
-            || $this->getRequest()->getParam('draft') !== null;
+        $request = $this->getRequest();
+        $isAjax = $request->isXmlHttpRequest();
         $resultJson = $this->jsonFactory->create();
 
-        $postValue = method_exists($this->getRequest(), 'getPostValue') ? $this->getRequest()->getPostValue() : null;
+        $postValue = $request->getPostValue();
 
         if (is_array($postValue) && (isset($postValue['shipmentSettings']) || isset($postValue['sender']))) {
             $payload = $postValue;
         } else {
-            $payload = $this->getRequest()->getParam('draft')
-                ?? $this->getRequest()->getParam('shipment_data')
-                ?? $this->getRequest()->getParam('data')
-                ?? (is_array($postValue) ? ($postValue['data'] ?? $postValue) : null);
+            $payload = $request->getParam('shipment_data');
+            if ($payload === null) {
+                $payload = $request->getParam('data')
+                    ?? (is_array($postValue) ? ($postValue['data'] ?? null) : null);
+            }
         }
 
         if (is_string($payload)) {

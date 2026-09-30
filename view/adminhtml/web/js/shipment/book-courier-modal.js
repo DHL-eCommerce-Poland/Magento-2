@@ -5,8 +5,9 @@ define([
     'Magento_Ui/js/modal/modal',
     'Magento_Ui/js/modal/alert',
     'mage/translate',
+    'Ideo_Dhl/js/utils/safe-message-content',
     'mage/loader'
-], function ($, ko, Component, modal, alert, $t) {
+], function ($, ko, Component, modal, alert, $t, createSafeMessageContent) {
     'use strict';
 
     if (!ko.bindingHandlers.dhlDatepicker) {
@@ -313,7 +314,7 @@ define([
                         $('#ideo-dhl-book-courier-modal').modal('closeModal');
                         alert({
                             title: $t('Courier Booked'),
-                            content: response.message,
+                            content: createSafeMessageContent(response.message),
                             actions: {
                                 always: function () {
                                     window.location.reload();
@@ -323,7 +324,7 @@ define([
                     } else {
                         alert({
                             title: $t('Error Booking Courier'),
-                            content: response.message || $t('Failed to book courier.')
+                            content: createSafeMessageContent(response.message || $t('Failed to book courier.'))
                         });
                     }
                 },
