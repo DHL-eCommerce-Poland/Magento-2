@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
-use Magento\Framework\App\RequestInterface;
+use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
+use Magento\Backend\Block\Widget\Context;
+use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
-use Throwable;
 
-class TrackShipment implements ButtonProviderInterface
+class TrackShipment extends Generic implements ButtonProviderInterface
 {
     /**
-     * @param RequestInterface $request
-     * @param ShipmentDataRepositoryInterface $shipmentDataRepository
+     * @param Context $context
+     * @param Escaper $escaper
+     * @param AdminhtmlShipmentData $shipmentData
      */
     public function __construct(
-        private readonly RequestInterface $request,
-        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository
+        Context $context,
+        Escaper $escaper,
+        private readonly AdminhtmlShipmentData $shipmentData
     ) {
+        parent::__construct($context, $escaper);
     }
 
     /**
@@ -28,18 +31,13 @@ class TrackShipment implements ButtonProviderInterface
      */
     public function getButtonData(): array
     {
-        $entityId = (int) $this->request->getParam('entity_id');
-        if (!$entityId) {
+        $shipment = $this->shipmentData->getShipment();
+        if ($shipment === null) {
             return [];
         }
 
-        try {
-            $entity = $this->shipmentDataRepository->getById($entityId);
-            $shipmentId = $entity->getShipmentId();
-            if (empty($shipmentId)) {
-                return [];
-            }
-        } catch (Throwable) {
+        $shipmentId = $shipment->getShipmentId();
+        if (empty($shipmentId)) {
             return [];
         }
 
@@ -48,7 +46,7 @@ class TrackShipment implements ButtonProviderInterface
             'class' => '',
             'on_click' => sprintf(
                 "window.open('https://mojdhl.pl/sprawdz?paczki=%s', '_blank');",
-                urlencode($shipmentId)
+                $this->escapeJs(urlencode($shipmentId))
             ),
             'sort_order' => 40,
         ];

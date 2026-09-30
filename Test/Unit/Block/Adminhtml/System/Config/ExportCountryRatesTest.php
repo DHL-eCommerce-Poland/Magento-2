@@ -9,6 +9,7 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Backend\Block\Widget\Button;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\LayoutInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -39,11 +40,13 @@ class ExportCountryRatesTest extends TestCase
 
         $context->method('getLayout')->willReturn($this->layoutMock);
         $context->method('getUrlBuilder')->willReturn($this->urlBuilderMock);
+        $escaper = $this->createStub(Escaper::class);
+        $escaper->method('escapeJs')->willReturnCallback(static fn (string $value): string => addslashes($value));
 
         $omStub = $this->createStub(ObjectManager::class);
         ObjectManager::setInstance($omStub);
 
-        $this->exportBlock = new ExportCountryRates($context);
+        $this->exportBlock = new ExportCountryRates($context, $escaper);
     }
 
     protected function tearDown(): void
@@ -61,14 +64,15 @@ class ExportCountryRatesTest extends TestCase
             ->expects($this->once())
             ->method('getUrl')
             ->with('dhlparcel/system_config/exportCountryRates')
-            ->willReturn('http://example.com/admin/dhlparcel/system_config/exportCountryRates');
+            ->willReturn("http://example.com/admin/exportCountryRates');alert(1);//");
 
         $buttonMock = $this->createMock(Button::class);
         $buttonMock->expects($this->once())
             ->method('setData')
             ->with($this->callback(static function (array $data) {
                 return $data['id'] === 'export_dhl_country_rates_button'
-                    && str_contains($data['onclick'], 'exportCountryRates');
+                    && str_contains($data['onclick'], 'exportCountryRates')
+                    && !str_contains($data['onclick'], "exportCountryRates');alert(1)");
             }))
             ->willReturnSelf();
 

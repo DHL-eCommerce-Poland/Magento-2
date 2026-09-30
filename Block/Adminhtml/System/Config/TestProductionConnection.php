@@ -4,13 +4,28 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Block\Adminhtml\System\Config;
 
+use Magento\Backend\Block\Template\Context;
 use Magento\Backend\Block\Widget\Button;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\Escaper;
 use Magento\Framework\Exception\LocalizedException;
 
 class TestProductionConnection extends Field
 {
+    /**
+     * @param Context $context
+     * @param Escaper $escaper
+     * @param array $data
+     */
+    public function __construct(
+        Context $context,
+        private readonly Escaper $escaper,
+        array $data = []
+    ) {
+        parent::__construct($context, $data);
+    }
+
     /**
      * Render button HTML element.
      *
@@ -26,7 +41,9 @@ class TestProductionConnection extends Field
         $button = $this->getLayout()->createBlock(Button::class)->setData([
             'id' => 'dhl_test_connection_production_button',
             'label' => __('Test Connection (Production)'),
-            'onclick' => 'javascript:testDhlConnection("production", "' . $url . '"); return false;',
+            'onclick' => 'javascript:testDhlConnection("production", "'
+                . $this->escaper->escapeJs($url)
+                . '"); return false;',
         ]);
 
         $titleSuccess = json_encode((string) __('Success'));
@@ -70,15 +87,16 @@ require(['jquery', 'Magento_Ui/js/modal/alert'], function($, alert) {
             data: postData,
             success: function(response) {
                 $('body').trigger('processStop');
+                var content = $('<div>').text(response.message || '').html();
                 if (response.success) {
                     alert({
                         title: {$titleSuccess},
-                        content: response.message
+                        content: content
                     });
                 } else {
                     alert({
                         title: {$titleConnectionError},
-                        content: response.message
+                        content: content
                     });
                 }
             },

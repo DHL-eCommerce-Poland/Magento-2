@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Block\Adminhtml\Button;
 
 use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Block\Adminhtml\Button\PrintReturnQrCode;
-use Magento\Framework\App\RequestInterface;
+use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
+use Magento\Backend\Block\Widget\Context;
+use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -15,21 +16,18 @@ class PrintReturnQrCodeTest extends TestCase
 {
     public function testGetButtonDataReturnsConfigWhenReturnShipmentIdExists(): void
     {
-        $request = $this->createMock(RequestInterface::class);
-        $request->method('getParam')->with('entity_id')->willReturn(10);
-
         $shipment = $this->createStub(ShipmentDataInterface::class);
         $shipment->method('getReturnShipmentId')->willReturn('RET123456');
-
-        $repository = $this->createMock(ShipmentDataRepositoryInterface::class);
-        $repository->method('getById')->with(10)->willReturn($shipment);
+        $shipmentData = $this->createStub(AdminhtmlShipmentData::class);
+        $shipmentData->method('getEntityId')->willReturn(10);
+        $shipmentData->method('getShipment')->willReturn($shipment);
 
         $urlBuilder = $this->createMock(UrlInterface::class);
         $urlBuilder->method('getUrl')
             ->with('dhlparcel/shipment/printReturnQrCode', ['entity_id' => 10])
             ->willReturn('http://example.com/dhl/shipment/printReturnQrCode/entity_id/10');
 
-        $button = new PrintReturnQrCode($request, $repository, $urlBuilder);
+        $button = $this->createButton($shipmentData, $urlBuilder);
         $data = $button->getButtonData();
 
         $this->assertEquals('Print Return QR Code', (string)$data['label']);
@@ -38,20 +36,27 @@ class PrintReturnQrCodeTest extends TestCase
 
     public function testGetButtonDataReturnsEmptyWhenNoReturnShipmentId(): void
     {
-        $request = $this->createMock(RequestInterface::class);
-        $request->method('getParam')->with('entity_id')->willReturn(10);
-
         $shipment = $this->createStub(ShipmentDataInterface::class);
         $shipment->method('getReturnShipmentId')->willReturn(null);
-
-        $repository = $this->createMock(ShipmentDataRepositoryInterface::class);
-        $repository->method('getById')->with(10)->willReturn($shipment);
+        $shipmentData = $this->createStub(AdminhtmlShipmentData::class);
+        $shipmentData->method('getEntityId')->willReturn(10);
+        $shipmentData->method('getShipment')->willReturn($shipment);
 
         $urlBuilder = $this->createStub(UrlInterface::class);
 
-        $button = new PrintReturnQrCode($request, $repository, $urlBuilder);
+        $button = $this->createButton($shipmentData, $urlBuilder);
         $data = $button->getButtonData();
 
         $this->assertEmpty($data);
+    }
+
+    private function createButton(AdminhtmlShipmentData $shipmentData, UrlInterface $urlBuilder): PrintReturnQrCode
+    {
+        $context = $this->createStub(Context::class);
+        $context->method('getUrlBuilder')->willReturn($urlBuilder);
+        $escaper = $this->createStub(Escaper::class);
+        $escaper->method('escapeJs')->willReturnCallback(static fn (string $value): string => addslashes($value));
+
+        return new PrintReturnQrCode($context, $escaper, $shipmentData);
     }
 }

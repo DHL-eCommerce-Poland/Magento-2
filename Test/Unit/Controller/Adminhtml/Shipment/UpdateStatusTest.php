@@ -67,7 +67,7 @@ class UpdateStatusTest extends TestCase
             ->willReturn($this->messageManagerStub);
 
         $this->redirectFactoryStub->method('create')
-            ->willReturn($this->redirectStub);
+            ->willReturnCallback(fn (): Redirect => $this->redirectStub);
 
         $this->controller = new UpdateStatus(
             $this->contextStub,
@@ -124,5 +124,32 @@ class UpdateStatusTest extends TestCase
             ->willReturnSelf();
 
         $this->assertSame($this->redirectStub, $this->controller->execute());
+    }
+
+    public function testExecuteRedirectsBackToShipmentEditWhenRequested(): void
+    {
+        $this->requestStub->method('getParam')
+            ->willReturnMap([
+                ['entity_id', null, 5],
+                ['order_id', null, null],
+                ['redirect_to_edit', null, 1],
+            ]);
+
+        $this->trackingServiceStub->method('updateStatus')
+            ->willReturn(new TrackingResult(
+                success: true,
+                shipmentId: '1234567890',
+                receivedBy: null,
+                events: []
+            ));
+
+        $redirect = $this->createMock(Redirect::class);
+        $redirect->expects($this->once())
+            ->method('setPath')
+            ->with('*/*/edit', ['entity_id' => 5])
+            ->willReturnSelf();
+        $this->redirectStub = $redirect;
+
+        $this->assertSame($redirect, $this->controller->execute());
     }
 }

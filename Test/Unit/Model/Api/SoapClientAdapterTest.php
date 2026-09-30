@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 #[AllowMockObjectsWithoutExpectations]
 class SoapClientAdapterTest extends TestCase
@@ -201,10 +202,15 @@ class SoapClientAdapterTest extends TestCase
      */
     public function testTestConnectionSoapFault(): void
     {
-        $soapClientStub = new TestSoapClient(true);
+        $soapClientStub = new TestSoapClient(true, 'Rejected user wrong_pass');
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->once())
+            ->method('error')
+            ->with('[DHL WebAPI2] SoapFault during testConnection: [AUTH_ERR] Rejected [redacted] [redacted]');
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([$this->loggerStub, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
+            ->setConstructorArgs([$loggerMock, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
             ->onlyMethods(['createSoapClient'])
             ->getMock();
 
@@ -216,8 +222,39 @@ class SoapClientAdapterTest extends TestCase
         $result = $adapter->testConnection($credentials);
 
         $this->assertFalse($result->isSuccess());
-        $this->assertStringContainsString('Invalid credentials', $result->getMessage());
+        $this->assertSame(
+            'DHL connection failed. Verify the API credentials and try again.',
+            $result->getMessage()
+        );
+        $this->assertStringNotContainsString('Invalid credentials', $result->getMessage());
         $this->assertEquals('AUTH_ERR', $result->getErrorCode());
+    }
+
+    public function testTestConnectionUnexpectedFailureIsLoggedWithoutCredentials(): void
+    {
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->once())
+            ->method('error')
+            ->with('[DHL WebAPI2] Exception during testConnection: Failed for [redacted] using [redacted]');
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([$loggerMock, $this->scopeConfigStub, $this->dateSanitizer, $this->fileDriverStub])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willThrowException(new RuntimeException('Failed for secret_user using secret_pass'));
+
+        $result = $adapter->testConnection(new Credentials('secret_user', 'secret_pass', true));
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertSame(
+            'DHL connection failed. Verify the API credentials and try again.',
+            $result->getMessage()
+        );
+        $this->assertStringNotContainsString('secret_user', $result->getMessage());
+        $this->assertStringNotContainsString('secret_pass', $result->getMessage());
     }
 
     /**

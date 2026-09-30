@@ -42,4 +42,16 @@ class Generic
     {
         return $this->context->getUrlBuilder()->getUrl($route, $params);
     }
+
+    /**
+     * Escape a value before embedding it in a JavaScript string literal.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    protected function escapeJs(string $value): string
+    {
+        return $this->escaper->escapeJs($value);
+    }
 }

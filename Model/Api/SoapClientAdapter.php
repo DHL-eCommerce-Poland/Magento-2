@@ -53,23 +53,23 @@ class SoapClientAdapter implements ClientInterface
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during testConnection: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
-                $fault->getMessage()
+                $this->redactCredentials($fault->getMessage(), $credentials)
             ));
 
             return new TestConnectionResult(
                 false,
-                (string) __('DHL connection error: %1', $fault->getMessage()),
+                (string) __('DHL connection failed. Verify the API credentials and try again.'),
                 $fault->faultcode ?? 'SOAP_FAULT'
             );
         } catch (Throwable $e) {
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during testConnection: %s',
-                $e->getMessage()
+                $this->redactCredentials($e->getMessage(), $credentials)
             ));
 
             return new TestConnectionResult(
                 false,
-                (string) __('An error occurred while connecting to DHL: %1', $e->getMessage()),
+                (string) __('DHL connection failed. Verify the API credentials and try again.'),
                 'CONNECTION_ERROR'
             );
         }
@@ -214,22 +214,6 @@ class SoapClientAdapter implements ClientInterface
                 errorMessage: 'An error occurred while connecting to DHL: ' . $e->getMessage()
             );
         }
-    }
-
-    /**
-     * Check if exception message or code indicates a network/SOAP timeout.
-     *
-     * @param Throwable $e
-     * @return bool
-     */
-    private function isTimeoutException(Throwable $e): bool
-    {
-        $message = strtolower($e->getMessage());
-
-        return str_contains($message, 'timed out')
-            || str_contains($message, 'timeout')
-            || str_contains($message, 'could not connect')
-            || str_contains($message, 'connection refused');
     }
 
     /**
@@ -1150,61 +1134,6 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
-     * Create SoapClient instance with custom timeout, DHLApiOrgin header and WSDL caching rules.
-     *
-     * @param string $wsdlUrl
-     *
-     * @return SoapClient
-     * @throws SoapFault
-     */
-    protected function createSoapClient(string $wsdlUrl): SoapClient
-    {
-        $tempDir = sys_get_temp_dir();
-        $isWritable = false;
-
-        try {
-            $isWritable = $this->fileDriver->isWritable($tempDir);
-        } catch (Throwable) {
-            $isWritable = false;
-        }
-
-        $cacheWsdl = $isWritable ? WSDL_CACHE_BOTH : WSDL_CACHE_NONE;
-
-        try {
-            // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
-            $context = stream_context_create([
-                'http' => [
-                    'header' => 'DHLApiOrgin: ' . self::API_ORIGIN,
-                    'user_agent' => 'PHP-SOAP/' . PHP_VERSION . ' (Magento 2 Ideo_Dhl)',
-                ],
-                'ssl' => [
-                    'verify_peer' => true,
-                    'verify_peer_name' => true,
-                ],
-            ]);
-        } catch (Throwable) {
-            $context = null;
-        }
-
-        $options = [
-            'trace' => true,
-            'exceptions' => true,
-            'connection_timeout' => self::CONNECTION_TIMEOUT,
-            'keep-alive' => true,
-            'stream_context' => $context,
-            'cache_wsdl' => $cacheWsdl,
-            'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
-            'encoding' => 'UTF-8',
-        ];
-
-        $finalWsdlUrl = !str_contains($wsdlUrl, '?wsdl') && !str_starts_with($wsdlUrl, 'http://localhost')
-            ? $wsdlUrl . '?wsdl'
-            : $wsdlUrl;
-
-        return new SoapClient($finalWsdlUrl, $options);
-    }
-
-    /**
      * Sanitize XML content by masking sensitive auth values.
      *
      * @param string $xml
@@ -1257,65 +1186,6 @@ class SoapClientAdapter implements ClientInterface
         $result = iconv('UTF-8', 'UTF-8//IGNORE', $string);
 
         return $result !== false ? $result : $string;
-    }
-
-    /**
-     * Log SOAP request and response dumps to dhl_api.log with sanitization.
-     *
-     * @param SoapClient|null $client
-     * @param string $action
-     * @param bool $skipResponseBody Option to skip logging response body (e.g. for connection test endpoints)
-     *
-     * @return void
-     */
-    private function logSoapCommunication(
-        ?SoapClient $client,
-        string $action,
-        bool $skipResponseBody = false
-    ): void {
-        if ($client === null) {
-            return;
-        }
-        try {
-            $isDebug = false;
-            if ($this->scopeConfig !== null) {
-                $isDebug = (bool) $this->scopeConfig->getValue('carriers/dhlparcel/debug');
-            }
-
-            if ($isDebug) {
-                $requestHeaders = (string) $client->__getLastRequestHeaders();
-                if (!empty($requestHeaders)) {
-                    $logMsg = sprintf('[DHL SOAP Request Headers - %s] %s', $action, trim($requestHeaders));
-                    $this->logger->info($logMsg);
-                }
-            }
-
-            $lastRequest = (string) $client->__getLastRequest();
-            if (!empty($lastRequest)) {
-                $requestXml = $this->sanitizeXml($lastRequest);
-                $this->logger->info(sprintf('[DHL SOAP Request - %s] %s', $action, $requestXml));
-            }
-
-            if ($isDebug) {
-                $responseHeaders = (string) $client->__getLastResponseHeaders();
-                if (!empty($responseHeaders)) {
-                    $logMsg = sprintf('[DHL SOAP Response Headers - %s] %s', $action, trim($responseHeaders));
-                    $this->logger->info($logMsg);
-                }
-            }
-
-            $lastResponse = (string) $client->__getLastResponse();
-            if (!empty($lastResponse)) {
-                if ($skipResponseBody) {
-                    $this->logger->info(sprintf('[DHL SOAP Response - %s] [RESPONSE_BODY_OMITTED]', $action));
-                } else {
-                    $responseXml = $this->sanitizeXml($lastResponse);
-                    $this->logger->info(sprintf('[DHL SOAP Response - %s] %s', $action, $responseXml));
-                }
-            }
-        } catch (Throwable $e) {
-            $this->logger->warning('Failed to log SOAP communication: ' . $e->getMessage());
-        }
     }
 
     /**
@@ -1464,39 +1334,6 @@ class SoapClientAdapter implements ClientInterface
                 errorMessage: 'An error occurred while connecting to DHL: ' . $e->getMessage()
             );
         }
-    }
-
-    /**
-     * Extract package numbers / piece IDs from DHL SOAP shipment result object.
-     *
-     * @param mixed $shipmentResult
-     *
-     * @return string[]
-     */
-    private function extractPackageNumbers(mixed $shipmentResult): array
-    {
-        if (!is_object($shipmentResult)) {
-            return [];
-        }
-
-        $packageNumbers = [];
-
-        $pieceList = $shipmentResult->pieceList->item ?? $shipmentResult->pieceList ?? $shipmentResult->pieces ?? null;
-        if ($pieceList) {
-            $pieces = is_array($pieceList) ? $pieceList : [$pieceList];
-            foreach ($pieces as $piece) {
-                if (is_object($piece)) {
-                    $pieceId = $piece->blpPieceId ?? $piece->pieceId ?? $piece->packageNumber ?? $piece->id ?? null;
-                    if ($pieceId !== null && (string) $pieceId !== '') {
-                        $packageNumbers[] = (string) $pieceId;
-                    }
-                } elseif (is_string($piece) || is_numeric($piece)) {
-                    $packageNumbers[] = (string) $piece;
-                }
-            }
-        }
-
-        return array_values(array_unique($packageNumbers));
     }
 
     /**
@@ -1684,6 +1521,120 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
+     * Create SoapClient instance with custom timeout, DHLApiOrgin header and WSDL caching rules.
+     *
+     * @param string $wsdlUrl
+     *
+     * @return SoapClient
+     * @throws SoapFault
+     */
+    protected function createSoapClient(string $wsdlUrl): SoapClient
+    {
+        $tempDir = sys_get_temp_dir();
+        $isWritable = false;
+
+        try {
+            $isWritable = $this->fileDriver->isWritable($tempDir);
+        } catch (Throwable) {
+            $isWritable = false;
+        }
+
+        $cacheWsdl = $isWritable ? WSDL_CACHE_BOTH : WSDL_CACHE_NONE;
+
+        try {
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
+            $context = stream_context_create([
+                'http' => [
+                    'header' => 'DHLApiOrgin: ' . self::API_ORIGIN,
+                    'user_agent' => 'PHP-SOAP/' . PHP_VERSION . ' (Magento 2 Ideo_Dhl)',
+                ],
+                'ssl' => [
+                    'verify_peer' => true,
+                    'verify_peer_name' => true,
+                ],
+            ]);
+        } catch (Throwable) {
+            $context = null;
+        }
+
+        $options = [
+            'trace' => true,
+            'exceptions' => true,
+            'connection_timeout' => self::CONNECTION_TIMEOUT,
+            'keep-alive' => true,
+            'stream_context' => $context,
+            'cache_wsdl' => $cacheWsdl,
+            'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
+            'encoding' => 'UTF-8',
+        ];
+
+        $finalWsdlUrl = !str_contains($wsdlUrl, '?wsdl') && !str_starts_with($wsdlUrl, 'http://localhost')
+            ? $wsdlUrl . '?wsdl'
+            : $wsdlUrl;
+
+        return new SoapClient($finalWsdlUrl, $options);
+    }
+
+    /**
+     * Log SOAP request and response dumps to dhl_api.log with sanitization.
+     *
+     * @param SoapClient|null $client
+     * @param string $action
+     * @param bool $skipResponseBody Option to skip logging response body (e.g. for connection test endpoints)
+     *
+     * @return void
+     */
+    private function logSoapCommunication(
+        ?SoapClient $client,
+        string $action,
+        bool $skipResponseBody = false
+    ): void {
+        if ($client === null) {
+            return;
+        }
+        try {
+            $isDebug = false;
+            if ($this->scopeConfig !== null) {
+                $isDebug = (bool) $this->scopeConfig->getValue('carriers/dhlparcel/debug');
+            }
+
+            if ($isDebug) {
+                $requestHeaders = (string) $client->__getLastRequestHeaders();
+                if (!empty($requestHeaders)) {
+                    $logMsg = sprintf('[DHL SOAP Request Headers - %s] %s', $action, trim($requestHeaders));
+                    $this->logger->info($logMsg);
+                }
+            }
+
+            $lastRequest = (string) $client->__getLastRequest();
+            if (!empty($lastRequest)) {
+                $requestXml = $this->sanitizeXml($lastRequest);
+                $this->logger->info(sprintf('[DHL SOAP Request - %s] %s', $action, $requestXml));
+            }
+
+            if ($isDebug) {
+                $responseHeaders = (string) $client->__getLastResponseHeaders();
+                if (!empty($responseHeaders)) {
+                    $logMsg = sprintf('[DHL SOAP Response Headers - %s] %s', $action, trim($responseHeaders));
+                    $this->logger->info($logMsg);
+                }
+            }
+
+            $lastResponse = (string) $client->__getLastResponse();
+            if (!empty($lastResponse)) {
+                if ($skipResponseBody) {
+                    $this->logger->info(sprintf('[DHL SOAP Response - %s] [RESPONSE_BODY_OMITTED]', $action));
+                } else {
+                    $responseXml = $this->sanitizeXml($lastResponse);
+                    $this->logger->info(sprintf('[DHL SOAP Response - %s] %s', $action, $responseXml));
+                }
+            }
+        } catch (Throwable $e) {
+            $this->logger->warning('Failed to log SOAP communication: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Helper to extract piece ID strings from getPieceId result item.
      *
      * @param mixed $resultItem
@@ -1729,5 +1680,41 @@ class SoapClientAdapter implements ClientInterface
         }
 
         return array_values(array_unique($packageNumbers));
+    }
+
+    /**
+     * Check if exception message or code indicates a network/SOAP timeout.
+     *
+     * @param Throwable $e
+     *
+     * @return bool
+     */
+    private function isTimeoutException(Throwable $e): bool
+    {
+        $message = strtolower($e->getMessage());
+
+        return str_contains($message, 'timed out')
+            || str_contains($message, 'timeout')
+            || str_contains($message, 'could not connect')
+            || str_contains($message, 'connection refused');
+    }
+
+    /**
+     * Remove DHL credentials from connection-test diagnostic messages.
+     *
+     * @param string $message
+     * @param Credentials $credentials
+     *
+     * @return string
+     */
+    private function redactCredentials(string $message, Credentials $credentials): string
+    {
+        foreach ([$credentials->getUsername(), $credentials->getPassword()] as $secret) {
+            if ($secret !== '') {
+                $message = str_replace($secret, '[redacted]', $message);
+            }
+        }
+
+        return $message;
     }
 }

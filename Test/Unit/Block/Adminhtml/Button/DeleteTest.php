@@ -57,8 +57,9 @@ class DeleteTest extends TestCase
     public function testGetButtonDataReturnsConfiguredButtonWhenEntityIdExists(): void
     {
         $this->requestMock->method('getParam')->with('entity_id')->willReturn('12');
-        $this->escaperMock->method('escapeHtml')->willReturn('Are you sure you want to delete this record?');
-        $this->escaperMock->method('escapeJs')->willReturn('Are you sure you want to delete this record?');
+        $this->escaperMock->method('escapeJs')->willReturnCallback(
+            static fn (string $value): string => addslashes($value)
+        );
         $this->urlBuilderMock->expects($this->once())
             ->method('getUrl')
             ->with('*/*/delete', ['entity_id' => 12])

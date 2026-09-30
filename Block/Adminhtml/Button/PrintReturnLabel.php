@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
-use Magento\Framework\App\RequestInterface;
-use Magento\Framework\UrlInterface;
+use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
+use Magento\Backend\Block\Widget\Context;
+use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
-use Throwable;
 
-class PrintReturnLabel implements ButtonProviderInterface
+class PrintReturnLabel extends Generic implements ButtonProviderInterface
 {
     /**
-     * @param RequestInterface $request
-     * @param ShipmentDataRepositoryInterface $shipmentDataRepository
-     * @param UrlInterface $urlBuilder
+     * @param Context $context
+     * @param Escaper $escaper
+     * @param AdminhtmlShipmentData $shipmentData
      */
     public function __construct(
-        private readonly RequestInterface $request,
-        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
-        private readonly UrlInterface $urlBuilder
+        Context $context,
+        Escaper $escaper,
+        private readonly AdminhtmlShipmentData $shipmentData
     ) {
+        parent::__construct($context, $escaper);
     }
 
     /**
@@ -31,27 +31,18 @@ class PrintReturnLabel implements ButtonProviderInterface
      */
     public function getButtonData(): array
     {
-        $entityId = (int) $this->request->getParam('entity_id');
-        if (!$entityId) {
+        $entityId = $this->shipmentData->getEntityId();
+        $shipment = $this->shipmentData->getShipment();
+        if ($entityId === null || $shipment === null || empty($shipment->getReturnShipmentId())) {
             return [];
         }
 
-        try {
-            $entity = $this->shipmentDataRepository->getById($entityId);
-            $returnShipmentId = $entity->getReturnShipmentId();
-            if (empty($returnShipmentId)) {
-                return [];
-            }
-        } catch (Throwable) {
-            return [];
-        }
-
-        $printUrl = $this->urlBuilder->getUrl('dhlparcel/shipment/printReturnLabel', ['entity_id' => $entityId]);
+        $printUrl = $this->getUrl('dhlparcel/shipment/printReturnLabel', ['entity_id' => $entityId]);
 
         return [
             'label' => __('Print Return Label'),
             'class' => '',
-            'on_click' => sprintf("window.open('%s', '_blank');", $printUrl),
+            'on_click' => sprintf("window.open('%s', '_blank');", $this->escapeJs($printUrl)),
             'sort_order' => 52,
         ];
     }

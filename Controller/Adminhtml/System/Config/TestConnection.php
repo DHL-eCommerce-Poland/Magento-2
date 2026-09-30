@@ -11,6 +11,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 class TestConnection extends Action implements HttpPostActionInterface
@@ -25,12 +26,14 @@ class TestConnection extends Action implements HttpPostActionInterface
      * @param JsonFactory $resultJsonFactory
      * @param CredentialsProvider $credentialsProvider
      * @param ClientInterface $client
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         private readonly JsonFactory $resultJsonFactory,
         private readonly CredentialsProvider $credentialsProvider,
-        private readonly ClientInterface $client
+        private readonly ClientInterface $client,
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }
@@ -56,7 +59,6 @@ class TestConnection extends Action implements HttpPostActionInterface
 
             $loginStr = (string) $typedLogin;
             $passStr = (string) $typedPassword;
-
             $overrideLogin = ($typedLogin !== null && trim($loginStr) !== '') ? $loginStr : null;
             $overridePassword = ($typedPassword !== null && trim($passStr) !== '') ? $passStr : null;
 
@@ -65,17 +67,26 @@ class TestConnection extends Action implements HttpPostActionInterface
                 $overrideLogin,
                 $overridePassword
             );
-
             $testResult = $this->client->testConnection($credentials);
+            $success = $testResult->isSuccess();
 
             return $resultJson->setData([
-                'success' => $testResult->isSuccess(),
-                'message' => $testResult->getMessage(),
+                'success' => $success,
+                'message' => $success
+                    ? (string) __('Connection to DHL WebAPI2 succeeded. Authentication valid.')
+                    : (string) __('DHL connection failed. Verify the API credentials and try again.'),
             ]);
         } catch (Throwable $e) {
+            $this->logger->error('DHL connection test failed unexpectedly.', [
+                'exception_type' => $e::class,
+                'exception_code' => $e->getCode(),
+                'exception_file' => $e->getFile(),
+                'exception_line' => $e->getLine(),
+            ]);
+
             return $resultJson->setData([
                 'success' => false,
-                'message' => __('Execution error: %1', $e->getMessage()),
+                'message' => (string) __('DHL connection failed. Verify the API credentials and try again.'),
             ]);
         }
     }

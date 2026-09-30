@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
+use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
-use Throwable;
 
 class RecreateShipment extends Generic implements ButtonProviderInterface
 {
     /**
      * @param Context $context
      * @param Escaper $escaper
-     * @param ShipmentDataRepositoryInterface $shipmentDataRepository
+     * @param AdminhtmlShipmentData $shipmentData
      */
     public function __construct(
         Context $context,
         Escaper $escaper,
-        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository
+        private readonly AdminhtmlShipmentData $shipmentData
     ) {
         parent::__construct($context, $escaper);
     }
@@ -32,19 +31,13 @@ class RecreateShipment extends Generic implements ButtonProviderInterface
      */
     public function getButtonData(): array
     {
-        $entityId = $this->getEntityId();
-        if (!$entityId || $entityId <= 0) {
+        $entity = $this->shipmentData->getShipment();
+        if ($entity === null) {
             return [];
         }
 
-        try {
-            $entity = $this->shipmentDataRepository->getById($entityId);
-
-            // Hide Save & Resend button if courier has already been ordered for this shipment
-            if (!empty($entity->getDispatchNumber())) {
-                return [];
-            }
-        } catch (Throwable) {
+        // Hide Save & Resend button if courier has already been ordered for this shipment.
+        if (!empty($entity->getDispatchNumber())) {
             return [];
         }
 
@@ -53,8 +46,8 @@ class RecreateShipment extends Generic implements ButtonProviderInterface
             'Clicking "Save & Resend to DHL" will cancel the existing DHL shipment'
             . ' and generate a new shipment for the updated data.'
         );
-        $safeTitle = $this->escaper->escapeJs((string) $title);
-        $safeMsg = $this->escaper->escapeJs((string) $msg);
+        $safeTitle = $this->escapeJs((string) $title);
+        $safeMsg = $this->escapeJs((string) $msg);
 
         return [
             'label' => __('Save & Resend to DHL'),

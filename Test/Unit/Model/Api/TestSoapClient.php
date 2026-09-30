@@ -11,9 +11,11 @@ class TestSoapClient extends SoapClient
 {
     /**
      * @param bool $shouldThrowFault
+     * @param string $faultMessage
      */
     public function __construct(
-        private readonly bool $shouldThrowFault = false
+        private readonly bool $shouldThrowFault = false,
+        private readonly string $faultMessage = 'Invalid credentials'
     ) {
         parent::__construct(null, [
             'location' => 'http://localhost',
@@ -32,7 +34,7 @@ class TestSoapClient extends SoapClient
     public function getInternationalParams2(mixed $args): mixed
     {
         if ($this->shouldThrowFault) {
-            throw new SoapFault('AUTH_ERR', 'Invalid credentials');
+            throw new SoapFault('AUTH_ERR', $this->faultMessage);
         }
 
         return (object) [

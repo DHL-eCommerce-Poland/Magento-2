@@ -15,6 +15,8 @@ use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class TestConnectionTest extends TestCase
 {
@@ -44,6 +46,11 @@ class TestConnectionTest extends TestCase
     private $clientMock;
 
     /**
+     * @var LoggerInterface|MockObject
+     */
+    private $loggerMock;
+
+    /**
      * @var TestConnection
      */
     private $controller;
@@ -60,12 +67,14 @@ class TestConnectionTest extends TestCase
         $this->resultJsonFactoryMock = $this->createMock(JsonFactory::class);
         $this->credentialsProviderMock = $this->createMock(CredentialsProvider::class);
         $this->clientMock = $this->createMock(ClientInterface::class);
+        $this->loggerMock = $this->createMock(LoggerInterface::class);
 
         $this->controller = new TestConnection(
             $this->contextStub,
             $this->resultJsonFactoryMock,
             $this->credentialsProviderMock,
-            $this->clientMock
+            $this->clientMock,
+            $this->loggerMock
         );
     }
 
@@ -76,13 +85,11 @@ class TestConnectionTest extends TestCase
      */
     public function testExecuteSuccess(): void
     {
-        $this->requestStub
-            ->method('getParam')
-            ->willReturnMap([
-                ['environment', 'production', 'sandbox'],
-                ['api_login_sandbox', null, 'user_sb'],
-                ['api_password_sandbox', null, 'pass_sb'],
-            ]);
+        $this->configureRequest([
+            'environment' => 'sandbox',
+            'api_login_sandbox' => 'user_sb',
+            'api_password_sandbox' => 'pass_sb',
+        ]);
 
         $credentials = new Credentials('user_sb', 'pass_sb', true);
         $this->credentialsProviderMock->expects($this->once())
@@ -90,7 +97,7 @@ class TestConnectionTest extends TestCase
             ->with('sandbox', 'user_sb', 'pass_sb')
             ->willReturn($credentials);
 
-        $testResult = new TestConnectionResult(true, 'Connection successful.');
+        $testResult = new TestConnectionResult(true, '<img src=x onerror=alert(1)>');
         $this->clientMock->expects($this->once())
             ->method('testConnection')
             ->with($credentials)
@@ -101,15 +108,100 @@ class TestConnectionTest extends TestCase
             ->method('setData')
             ->with([
                 'success' => true,
-                'message' => 'Connection successful.',
+                'message' => 'Connection to DHL WebAPI2 succeeded. Authentication valid.',
             ])
             ->willReturnSelf();
 
         $this->resultJsonFactoryMock->expects($this->once())
             ->method('create')
             ->willReturn($jsonMock);
+        $this->loggerMock->expects($this->never())->method('error');
 
         $result = $this->controller->execute();
         $this->assertSame($jsonMock, $result);
+    }
+
+    public function testExecuteFailureReturnsGenericMessageInsteadOfClientMessage(): void
+    {
+        $this->configureRequest([
+            'environment' => 'sandbox',
+            'api_login_sandbox' => 'user_sb',
+            'api_password_sandbox' => 'pass_sb',
+        ]);
+
+        $credentials = new Credentials('user_sb', 'pass_sb', true);
+        $this->credentialsProviderMock->expects($this->once())
+            ->method('getCredentials')
+            ->with('sandbox', 'user_sb', 'pass_sb')
+            ->willReturn($credentials);
+        $this->clientMock->expects($this->once())
+            ->method('testConnection')
+            ->with($credentials)
+            ->willReturn(new TestConnectionResult(false, '<script>alert("secret")</script>'));
+        $this->loggerMock->expects($this->never())->method('error');
+
+        $jsonMock = $this->createMock(Json::class);
+        $jsonMock->expects($this->once())
+            ->method('setData')
+            ->with([
+                'success' => false,
+                'message' => 'DHL connection failed. Verify the API credentials and try again.',
+            ])
+            ->willReturnSelf();
+        $this->resultJsonFactoryMock->expects($this->once())
+            ->method('create')
+            ->willReturn($jsonMock);
+
+        $this->assertSame($jsonMock, $this->controller->execute());
+    }
+
+    public function testExecuteLogsUnexpectedErrorsAndReturnsGenericMessage(): void
+    {
+        $this->configureRequest([]);
+
+        $exception = new RuntimeException('Sensitive internal detail password123.');
+        $this->credentialsProviderMock->expects($this->once())
+            ->method('getCredentials')
+            ->with('production', null, null)
+            ->willThrowException($exception);
+        $this->clientMock->expects($this->never())->method('testConnection');
+        $this->loggerMock->expects($this->once())
+            ->method('error')
+            ->with('DHL connection test failed unexpectedly.', [
+                'exception_type' => RuntimeException::class,
+                'exception_code' => 0,
+                'exception_file' => $exception->getFile(),
+                'exception_line' => $exception->getLine(),
+            ]);
+
+        $jsonMock = $this->createMock(Json::class);
+        $jsonMock->expects($this->once())
+            ->method('setData')
+            ->with([
+                'success' => false,
+                'message' => 'DHL connection failed. Verify the API credentials and try again.',
+            ])
+            ->willReturnSelf();
+        $this->resultJsonFactoryMock->expects($this->once())
+            ->method('create')
+            ->willReturn($jsonMock);
+
+        $this->assertSame($jsonMock, $this->controller->execute());
+    }
+
+    /**
+     * Configure request parameter values while retaining Magento's default parameter behavior.
+     *
+     * @param array $parameters
+     *
+     * @return void
+     */
+    private function configureRequest(array $parameters): void
+    {
+        $this->requestStub->method('getParam')->willReturnCallback(
+            static function (string $key, mixed $default = null) use ($parameters) {
+                return array_key_exists($key, $parameters) ? $parameters[$key] : $default;
+            }
+        );
     }
 }

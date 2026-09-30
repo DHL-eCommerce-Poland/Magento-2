@@ -4,25 +4,24 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
+use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
-use Throwable;
 
 class UpdateStatusShipment extends Generic implements ButtonProviderInterface
 {
     /**
      * @param Context $context
      * @param Escaper $escaper
-     * @param ShipmentDataRepositoryInterface $shipmentDataRepository
+     * @param AdminhtmlShipmentData $shipmentData
      * @param SerializerInterface $serializer
      */
     public function __construct(
         Context $context,
         Escaper $escaper,
-        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
+        private readonly AdminhtmlShipmentData $shipmentData,
         private readonly SerializerInterface $serializer
     ) {
         parent::__construct($context, $escaper);
@@ -35,19 +34,14 @@ class UpdateStatusShipment extends Generic implements ButtonProviderInterface
      */
     public function getButtonData(): array
     {
-        $entityId = $this->getEntityId();
-        if (!$entityId) {
+        $entityId = $this->shipmentData->getEntityId();
+        $entity = $this->shipmentData->getShipment();
+        if ($entityId === null || $entity === null) {
             return [];
         }
 
-        try {
-            $entity = $this->shipmentDataRepository->getById($entityId);
-
-            // Display button ONLY if shipment has a generated DHL shipment ID
-            if (empty($entity->getShipmentId())) {
-                return [];
-            }
-        } catch (Throwable) {
+        // Display the button only if shipment has a generated DHL shipment ID.
+        if (empty($entity->getShipmentId())) {
             return [];
         }
 
@@ -55,9 +49,9 @@ class UpdateStatusShipment extends Generic implements ButtonProviderInterface
             [
                 'action' => $this->getUrl(
                     'dhlparcel/shipment/updateStatus',
-                    ['entity_id' => $entityId, 'redirect_to_edit' => 1]
+                    ['entity_id' => $entityId]
                 ),
-                'data' => [],
+                'data' => ['redirect_to_edit' => 1],
             ]
         );
 

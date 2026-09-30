@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Block\Adminhtml\Button;
 
 use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Block\Adminhtml\Button\RecreateShipment;
+use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Escaper;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class RecreateShipmentTest extends TestCase
 {
@@ -22,13 +19,9 @@ class RecreateShipmentTest extends TestCase
      */
     private $contextStub;
     /**
-     * @var MockObject
-     */
-    private $requestMock;
-    /**
      * @var Stub
      */
-    private $shipmentRepositoryStub;
+    private $shipmentDataStub;
     /**
      * @var RecreateShipment
      */
@@ -37,78 +30,46 @@ class RecreateShipmentTest extends TestCase
     protected function setUp(): void
     {
         $this->contextStub = $this->createStub(Context::class);
-        $this->requestMock = $this->createMock(RequestInterface::class);
-        $this->shipmentRepositoryStub = $this->createStub(ShipmentDataRepositoryInterface::class);
+        $this->shipmentDataStub = $this->createStub(AdminhtmlShipmentData::class);
 
         $escaperStub = $this->createStub(Escaper::class);
         $escaperStub->method('escapeJs')->willReturnCallback(fn (string $str) => addslashes($str));
         $this->contextStub->method('getEscaper')->willReturn($escaperStub);
 
-        $this->contextStub->method('getRequest')
-            ->willReturn($this->requestMock);
-
         $this->button = new RecreateShipment(
             $this->contextStub,
             $escaperStub,
-            $this->shipmentRepositoryStub
+            $this->shipmentDataStub
         );
-    }
-
-    public function testGetButtonDataReturnsEmptyWithoutEntityId(): void
-    {
-        $this->requestMock->expects($this->once())
-            ->method('getParam')
-            ->with('entity_id')
-            ->willReturn(null);
-
-        $this->assertEmpty($this->button->getButtonData());
     }
 
     public function testGetButtonDataReturnsEmptyWhenDispatchNumberExists(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('getParam')
-            ->with('entity_id')
-            ->willReturn(10);
-
         $shipmentMock = $this->createMock(ShipmentDataInterface::class);
         $shipmentMock->expects($this->once())
             ->method('getDispatchNumber')
             ->willReturn('DISPATCH123');
 
-        $this->shipmentRepositoryStub->method('getById')
-            ->willReturn($shipmentMock);
+        $this->shipmentDataStub->method('getShipment')->willReturn($shipmentMock);
 
         $this->assertEmpty($this->button->getButtonData());
     }
 
-    public function testGetButtonDataReturnsEmptyOnRepositoryException(): void
+    public function testGetButtonDataReturnsEmptyWhenShipmentIsUnavailable(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('getParam')
-            ->with('entity_id')
-            ->willReturn(10);
-
-        $this->shipmentRepositoryStub->method('getById')
-            ->willThrowException(new RuntimeException('Entity not found'));
+        $this->shipmentDataStub->method('getShipment')->willReturn(null);
 
         $this->assertEmpty($this->button->getButtonData());
     }
 
     public function testGetButtonDataReturnsConfigForValidShipmentWithoutDispatchNumber(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('getParam')
-            ->with('entity_id')
-            ->willReturn(10);
-
         $shipmentMock = $this->createMock(ShipmentDataInterface::class);
         $shipmentMock->expects($this->once())
             ->method('getDispatchNumber')
             ->willReturn(null);
 
-        $this->shipmentRepositoryStub->method('getById')
-            ->willReturn($shipmentMock);
+        $this->shipmentDataStub->method('getShipment')->willReturn($shipmentMock);
 
         $buttonData = $this->button->getButtonData();
 

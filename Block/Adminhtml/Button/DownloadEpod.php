@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
-use Magento\Framework\App\RequestInterface;
-use Magento\Framework\UrlInterface;
+use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
+use Magento\Backend\Block\Widget\Context;
+use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
-use Throwable;
 
-class DownloadEpod implements ButtonProviderInterface
+class DownloadEpod extends Generic implements ButtonProviderInterface
 {
     /**
-     * @param RequestInterface $request
-     * @param ShipmentDataRepositoryInterface $shipmentDataRepository
-     * @param UrlInterface $urlBuilder
+     * @param Context $context
+     * @param Escaper $escaper
+     * @param AdminhtmlShipmentData $shipmentData
      */
     public function __construct(
-        private readonly RequestInterface $request,
-        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
-        private readonly UrlInterface $urlBuilder
+        Context $context,
+        Escaper $escaper,
+        private readonly AdminhtmlShipmentData $shipmentData
     ) {
+        parent::__construct($context, $escaper);
     }
 
     /**
@@ -31,27 +31,18 @@ class DownloadEpod implements ButtonProviderInterface
      */
     public function getButtonData(): array
     {
-        $entityId = (int) $this->request->getParam('entity_id');
-        if (!$entityId) {
+        $entityId = $this->shipmentData->getEntityId();
+        $shipment = $this->shipmentData->getShipment();
+        if ($entityId === null || $shipment === null || empty($shipment->getShipmentId())) {
             return [];
         }
 
-        try {
-            $entity = $this->shipmentDataRepository->getById($entityId);
-            $shipmentId = $entity->getShipmentId();
-            if (empty($shipmentId)) {
-                return [];
-            }
-        } catch (Throwable) {
-            return [];
-        }
-
-        $downloadUrl = $this->urlBuilder->getUrl('dhlparcel/shipment/downloadEpod', ['entity_id' => $entityId]);
+        $downloadUrl = $this->getUrl('dhlparcel/shipment/downloadEpod', ['entity_id' => $entityId]);
 
         return [
             'label' => __('Download ePOD'),
             'class' => '',
-            'on_click' => sprintf("window.open('%s', '_blank');", $downloadUrl),
+            'on_click' => sprintf("window.open('%s', '_blank');", $this->escapeJs($downloadUrl)),
             'sort_order' => 54,
         ];
     }

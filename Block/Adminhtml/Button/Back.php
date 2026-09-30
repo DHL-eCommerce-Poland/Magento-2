@@ -18,7 +18,7 @@ class Back extends Generic implements ButtonProviderInterface
         return [
             'label' => __('Back'),
             'class' => 'back',
-            'on_click' => sprintf("location.href = '%s';", $this->getUrl('*/*/index')),
+            'on_click' => sprintf("location.href = '%s';", $this->escapeJs($this->getUrl('*/*/index'))),
             'sort_order' => 10,
         ];
     }

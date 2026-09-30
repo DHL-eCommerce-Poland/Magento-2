@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
+use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
-use Throwable;
 
 class DeleteShipment extends Generic implements ButtonProviderInterface
 {
     /**
      * @param Context $context
      * @param Escaper $escaper
-     * @param ShipmentDataRepositoryInterface $shipmentDataRepository
+     * @param AdminhtmlShipmentData $shipmentData
      */
     public function __construct(
         Context $context,
         Escaper $escaper,
-        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository
+        private readonly AdminhtmlShipmentData $shipmentData
     ) {
         parent::__construct($context, $escaper);
     }
@@ -32,32 +31,30 @@ class DeleteShipment extends Generic implements ButtonProviderInterface
      */
     public function getButtonData(): array
     {
-        $entityId = $this->getEntityId();
-        if (!$entityId) {
+        $entityId = $this->shipmentData->getEntityId();
+        $entity = $this->shipmentData->getShipment();
+        if ($entityId === null || $entity === null) {
             return [];
         }
 
-        try {
-            $entity = $this->shipmentDataRepository->getById($entityId);
-
-            // Hide Delete button if courier has already been ordered for this shipment
-            if (!empty($entity->getDispatchNumber())) {
-                return [];
-            }
-        } catch (Throwable) {
+        // Hide Delete button if courier has already been ordered for this shipment.
+        if (!empty($entity->getDispatchNumber())) {
             return [];
         }
+
+        $confirmMessage = $this->escapeJs((string) __(
+            'Are you sure you want to delete this shipment?'
+            . ' It will be cancelled in DHL and removed from Magento.'
+        ));
+        $url = $this->escapeJs($this->getUrl('dhlparcel/shipment/delete', ['entity_id' => $entityId]));
 
         return [
             'label' => __('Delete Shipment'),
             'class' => 'delete',
             'on_click' => sprintf(
                 "deleteConfirm('%s', '%s')",
-                __(
-                    'Are you sure you want to delete this shipment?'
-                    . ' It will be cancelled in DHL and removed from Magento.'
-                ),
-                $this->getUrl('dhlparcel/shipment/delete', ['entity_id' => $entityId])
+                $confirmMessage,
+                $url
             ),
             'sort_order' => 20,
         ];

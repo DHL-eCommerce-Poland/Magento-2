@@ -4,13 +4,28 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Block\Adminhtml\System\Config;
 
+use Magento\Backend\Block\Template\Context;
 use Magento\Backend\Block\Widget\Button;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\Escaper;
 use Magento\Framework\Exception\LocalizedException;
 
 class ExportCountryRates extends Field
 {
+    /**
+     * @param Context $context
+     * @param Escaper $escaper
+     * @param array $data
+     */
+    public function __construct(
+        Context $context,
+        private readonly Escaper $escaper,
+        array $data = []
+    ) {
+        parent::__construct($context, $data);
+    }
+
     /**
      * Render export button HTML element.
      *
@@ -34,7 +49,7 @@ class ExportCountryRates extends Field
         $button = $this->getLayout()->createBlock(Button::class)->setData([
             'id' => 'export_dhl_country_rates_button',
             'label' => __('Export CSV'),
-            'onclick' => 'setLocation(\'' . $url . '\')',
+            'onclick' => 'setLocation(\'' . $this->escaper->escapeJs($url) . '\')',
         ]);
 
         return $button->toHtml();

@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
+use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
-use Throwable;
 
 class BookCourierShipment extends Generic implements ButtonProviderInterface
 {
     /**
      * @param Context $context
      * @param Escaper $escaper
-     * @param ShipmentDataRepositoryInterface $shipmentDataRepository
+     * @param AdminhtmlShipmentData $shipmentData
      */
     public function __construct(
         Context $context,
         Escaper $escaper,
-        private readonly ShipmentDataRepositoryInterface $shipmentDataRepository
+        private readonly AdminhtmlShipmentData $shipmentData
     ) {
         parent::__construct($context, $escaper);
     }
@@ -32,26 +31,21 @@ class BookCourierShipment extends Generic implements ButtonProviderInterface
      */
     public function getButtonData(): array
     {
-        $entityId = $this->getEntityId();
-        if (!$entityId) {
+        $entityId = $this->shipmentData->getEntityId();
+        $entity = $this->shipmentData->getShipment();
+        if ($entityId === null || $entity === null) {
             return [];
         }
 
-        try {
-            $entity = $this->shipmentDataRepository->getById($entityId);
-
-            // Hide Order Courier button if courier has already been ordered for this shipment
-            if (!empty($entity->getDispatchNumber())) {
-                return [];
-            }
-        } catch (Throwable) {
+        // Hide Order Courier button if courier has already been ordered for this shipment.
+        if (!empty($entity->getDispatchNumber())) {
             return [];
         }
 
         $shipmentNumber = $entity->getShipmentId() ?: (string) $entityId;
 
-        $safeShipmentNumber = $this->escaper->escapeJs($shipmentNumber);
-        $safeLoadingMsg = $this->escaper->escapeJs((string) __('Courier booking dialog is loading. Please try again.'));
+        $safeShipmentNumber = $this->escapeJs($shipmentNumber);
+        $safeLoadingMsg = $this->escapeJs((string) __('Courier booking dialog is loading. Please try again.'));
 
         return [
             'label' => __('Order Courier'),

@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Block\Adminhtml\Button;
 
 use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Block\Adminhtml\Button\UpdateStatusShipment;
+use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\UrlInterface;
@@ -23,17 +22,13 @@ class UpdateStatusShipmentTest extends TestCase
      */
     private $contextStub;
     /**
-     * @var MockObject
-     */
-    private $requestMock;
-    /**
      * @var MockObject|Stub
      */
     private $urlBuilderStub;
     /**
      * @var Stub
      */
-    private $shipmentRepositoryStub;
+    private $shipmentDataStub;
     /**
      * @var UpdateStatusShipment
      */
@@ -42,16 +37,12 @@ class UpdateStatusShipmentTest extends TestCase
     protected function setUp(): void
     {
         $this->contextStub = $this->createStub(Context::class);
-        $this->requestMock = $this->createMock(RequestInterface::class);
         $this->urlBuilderStub = $this->createStub(UrlInterface::class);
-        $this->shipmentRepositoryStub = $this->createStub(ShipmentDataRepositoryInterface::class);
+        $this->shipmentDataStub = $this->createStub(AdminhtmlShipmentData::class);
 
         $escaperStub = $this->createStub(Escaper::class);
         $escaperStub->method('escapeJs')->willReturnCallback(fn (string $str) => addslashes($str));
         $this->contextStub->method('getEscaper')->willReturn($escaperStub);
-
-        $this->contextStub->method('getRequest')
-            ->willReturn($this->requestMock);
 
         $this->contextStub->method('getUrlBuilder')
             ->willReturnCallback(fn () => $this->urlBuilderStub);
@@ -59,60 +50,50 @@ class UpdateStatusShipmentTest extends TestCase
         $this->button = new UpdateStatusShipment(
             $this->contextStub,
             $escaperStub,
-            $this->shipmentRepositoryStub,
+            $this->shipmentDataStub,
             new Json()
         );
     }
 
     public function testGetButtonDataReturnsEmptyWithoutEntityId(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('getParam')
-            ->with('entity_id')
-            ->willReturn(null);
+        $this->shipmentDataStub->method('getEntityId')->willReturn(null);
+        $this->shipmentDataStub->method('getShipment')->willReturn(null);
 
         $this->assertEmpty($this->button->getButtonData());
     }
 
     public function testGetButtonDataReturnsEmptyWhenNoShipmentId(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('getParam')
-            ->with('entity_id')
-            ->willReturn(10);
+        $this->shipmentDataStub->method('getEntityId')->willReturn(10);
 
         $shipmentMock = $this->createMock(ShipmentDataInterface::class);
         $shipmentMock->expects($this->once())
             ->method('getShipmentId')
             ->willReturn(null);
 
-        $this->shipmentRepositoryStub->method('getById')
-            ->willReturn($shipmentMock);
+        $this->shipmentDataStub->method('getShipment')->willReturn($shipmentMock);
 
         $this->assertEmpty($this->button->getButtonData());
     }
 
     public function testGetButtonDataReturnsConfigWithValidShipmentId(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('getParam')
-            ->with('entity_id')
-            ->willReturn(10);
+        $this->shipmentDataStub->method('getEntityId')->willReturn(10);
 
         $shipmentMock = $this->createMock(ShipmentDataInterface::class);
         $shipmentMock->expects($this->once())
             ->method('getShipmentId')
             ->willReturn('1234567890');
 
-        $this->shipmentRepositoryStub->method('getById')
-            ->willReturn($shipmentMock);
+        $this->shipmentDataStub->method('getShipment')->willReturn($shipmentMock);
 
         $this->urlBuilderStub = $this->createMock(UrlInterface::class);
         $this->urlBuilderStub->expects($this->once())
             ->method('getUrl')
             ->with(
                 'dhlparcel/shipment/updateStatus',
-                ['entity_id' => 10, 'redirect_to_edit' => 1]
+                ['entity_id' => 10]
             )
             ->willReturn('http://magento.local/admin/dhlparcel/shipment/updateStatus/entity_id/10');
 
@@ -130,7 +111,7 @@ class UpdateStatusShipmentTest extends TestCase
         $this->assertSame(
             [
                 'action' => 'http://magento.local/admin/dhlparcel/shipment/updateStatus/entity_id/10',
-                'data' => [],
+                'data' => ['redirect_to_edit' => 1],
             ],
             $postData
         );
