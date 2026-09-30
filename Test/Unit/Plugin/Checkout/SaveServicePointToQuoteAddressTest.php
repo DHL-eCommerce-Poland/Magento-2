@@ -49,7 +49,7 @@ class SaveServicePointToQuoteAddressTest extends TestCase
 
         $informationStub->method('getShippingAddress')->willReturn($addressMock);
         $informationStub->method('getShippingCarrierCode')->willReturn('dhlparcel');
-        $informationStub->method('getShippingMethodCode')->willReturn(MethodCatalog::METHOD_ECONOMY_ALL);
+        $informationStub->method('getShippingMethodCode')->willReturn(MethodCatalog::METHOD_CONNECT_PACKSTATION);
 
         $result = $plugin->beforeSaveAddressInformation($managementStub, 1, $informationStub);
 
@@ -150,4 +150,90 @@ class SaveServicePointToQuoteAddressTest extends TestCase
         $this->assertNull($savedData['dhl_service_point_id']);
         $this->assertNull($savedData['dhl_service_point_name']);
     }
+
+    public function testBeforeSaveAddressInformationSetsPostfilialeForNonDeInternationalPoint(): void
+    {
+        $validatorStub = $this->createStub(ServicePointValidator::class);
+        $plugin = new SaveServicePointToQuoteAddress($validatorStub);
+
+        $managementStub = $this->createStub(ShippingInformationManagementInterface::class);
+        $informationStub = $this->createStub(ShippingInformationInterface::class);
+        $addressMock = $this->createStub(Address::class);
+
+        $extAttributesStub = new DataObject([
+            'dhl_service_point_id' => 'AT123',
+            'dhl_service_point_name' => 'Postamt Wien',
+            'dhl_service_point_street' => 'Hauptstrasse 10',
+            'dhl_service_point_postcode' => '1010',
+            'dhl_service_point_city' => 'Wien',
+            'dhl_is_packstation' => false,
+            'dhl_is_postfiliale' => false,
+        ]);
+
+        $addressMock->method('getExtensionAttributes')->willReturn($extAttributesStub);
+        $addressMock->method('getCountryId')->willReturn('AT');
+
+        $savedData = [];
+        $addressMock->method('setData')->willReturnCallback(
+            static function ($key, $value = null) use (&$savedData) {
+                if (is_string($key)) {
+                    $savedData[$key] = $value;
+                }
+                return null;
+            }
+        );
+
+        $informationStub->method('getShippingAddress')->willReturn($addressMock);
+        $informationStub->method('getShippingCarrierCode')->willReturn('dhlparcel');
+        $informationStub->method('getShippingMethodCode')->willReturn(MethodCatalog::METHOD_CONNECT_PARCELSHOP);
+
+        $plugin->beforeSaveAddressInformation($managementStub, 1, $informationStub);
+
+        $this->assertEquals(0, $savedData['dhl_is_packstation']);
+        $this->assertEquals(1, $savedData['dhl_is_postfiliale']);
+    }
+
+    public function testBeforeSaveAddressInformationSetsPostfilialeFalseForDomesticPointMethod(): void
+    {
+        $validatorStub = $this->createStub(ServicePointValidator::class);
+        $plugin = new SaveServicePointToQuoteAddress($validatorStub);
+
+        $managementStub = $this->createStub(ShippingInformationManagementInterface::class);
+        $informationStub = $this->createStub(ShippingInformationInterface::class);
+        $addressMock = $this->createStub(Address::class);
+
+        $extAttributesStub = new DataObject([
+            'dhl_service_point_id' => 'PL123',
+            'dhl_service_point_name' => 'POP Zabka',
+            'dhl_service_point_street' => 'Warszawska 1',
+            'dhl_service_point_postcode' => '00-001',
+            'dhl_service_point_city' => 'Warszawa',
+            'dhl_is_packstation' => false,
+            'dhl_is_postfiliale' => false,
+        ]);
+
+        $addressMock->method('getExtensionAttributes')->willReturn($extAttributesStub);
+        $addressMock->method('getCountryId')->willReturn('PL');
+
+        $savedData = [];
+        $addressMock->method('setData')->willReturnCallback(
+            static function ($key, $value = null) use (&$savedData) {
+                if (is_string($key)) {
+                    $savedData[$key] = $value;
+                }
+                return null;
+            }
+        );
+
+        $informationStub->method('getShippingAddress')->willReturn($addressMock);
+        $informationStub->method('getShippingCarrierCode')->willReturn('dhlparcel');
+        $informationStub->method('getShippingMethodCode')->willReturn(MethodCatalog::METHOD_ECONOMY_POP);
+
+        $plugin->beforeSaveAddressInformation($managementStub, 1, $informationStub);
+
+        $this->assertEquals(0, $savedData['dhl_is_packstation']);
+        $this->assertEquals(0, $savedData['dhl_is_postfiliale']);
+    }
 }
+
+

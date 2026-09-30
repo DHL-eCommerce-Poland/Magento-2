@@ -65,21 +65,35 @@ class SaveServicePointToQuoteAddress
             true
         );
 
-        $isParcelShopOnlyMethod = in_array(
+        $isParcelShopMethod = in_array(
             $cleanMethodCode,
             [
                 MethodCatalog::METHOD_CONNECT_PARCELSHOP,
                 MethodCatalog::METHOD_CONNECT_PARCELSHOP_COD,
-                MethodCatalog::METHOD_ECONOMY_POP,
-                MethodCatalog::METHOD_ECONOMY_POP_COD
             ],
             true
         );
 
+        $isPointMethod = $isPackstationMethod || $isParcelShopMethod || in_array(
+            $cleanMethodCode,
+            [
+                MethodCatalog::METHOD_ECONOMY_ALL,
+                MethodCatalog::METHOD_ECONOMY_ALL_COD,
+                MethodCatalog::METHOD_ECONOMY_POP,
+                MethodCatalog::METHOD_ECONOMY_POP_COD,
+                MethodCatalog::METHOD_ECONOMY_BOX,
+                MethodCatalog::METHOD_ECONOMY_BOX_COD,
+            ],
+            true
+        );
+
+        if (!$isPointMethod) {
+            $servicePoint = null;
+        }
+
         if ($servicePoint !== null) {
-            $isPackstation = $isPackstationMethod || ($servicePoint->isPackstation() && !$isParcelShopOnlyMethod);
-            $country = strtoupper((string)($shippingAddress->getCountryId() ?: $servicePoint->getCountry()));
-            $isPostfiliale = ($country === 'DE') && !$isPackstation;
+            $isPackstation = $isPackstationMethod;
+            $isPostfiliale = $isParcelShopMethod;
 
             if ($servicePoint->isPackstation() !== $isPackstation || $servicePoint->isPostfiliale() !== $isPostfiliale) {
                 $servicePoint = new ServicePointValueObject(

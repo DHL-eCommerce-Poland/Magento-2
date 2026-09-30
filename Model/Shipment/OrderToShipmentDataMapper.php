@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Ideo\Dhl\Model\Carrier;
 use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\ServicePoint\NearestPointResolver;
 use Ideo\Dhl\Model\Shipment\Data\PackageData;
@@ -162,7 +163,23 @@ class OrderToShipmentDataMapper
         $isPostfiliale = false;
         $postnummer = null;
 
-        if ($shippingAddress) {
+        $cleanMethodCode = strtolower(trim((string)($order->getShippingMethod() ?? '')));
+        if (str_starts_with($cleanMethodCode, Carrier::CODE_PREFIX)) {
+            $cleanMethodCode = substr($cleanMethodCode, strlen(Carrier::CODE_PREFIX));
+        }
+
+        $isInternationalPointMethod = in_array(
+            $cleanMethodCode,
+            [
+                MethodCatalog::METHOD_CONNECT_PARCELSHOP,
+                MethodCatalog::METHOD_CONNECT_PARCELSHOP_COD,
+                MethodCatalog::METHOD_CONNECT_PACKSTATION,
+                MethodCatalog::METHOD_CONNECT_PACKSTATION_COD,
+            ],
+            true
+        );
+
+        if ($shippingAddress && $isInternationalPointMethod) {
             $isPackstation = (bool)($shippingAddress->getData('dhl_is_packstation') ?? false);
             $isPostfiliale = (bool)($shippingAddress->getData('dhl_is_postfiliale') ?? false);
             $postnummerVal = (string)($shippingAddress->getData('dhl_postnummer') ?? '');

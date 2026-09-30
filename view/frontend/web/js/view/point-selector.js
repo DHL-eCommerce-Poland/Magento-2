@@ -239,8 +239,13 @@ define([
                         fullMCode === methodCodes.FULL_CONNECT_PACKSTATION ||
                         fullMCode === methodCodes.FULL_CONNECT_PACKSTATION_COD;
 
+                    var isParcelShopMethod = cleanCode === methodCodes.METHOD_CONNECT_PARCELSHOP ||
+                        cleanCode === methodCodes.METHOD_CONNECT_PARCELSHOP_COD ||
+                        fullMCode === methodCodes.FULL_CONNECT_PARCELSHOP ||
+                        fullMCode === methodCodes.FULL_CONNECT_PARCELSHOP_COD;
+
                     var isPackstation = isPackstationMethod;
-                    var isPostfiliale = recipientCountry.toUpperCase() === 'DE' && !isPackstation;
+                    var isPostfiliale = isParcelShopMethod;
 
                     var curMethodKey = pointState.getMethodKey(curMethod) || fullMCode;
 
