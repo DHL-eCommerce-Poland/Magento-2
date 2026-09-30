@@ -1,548 +1,547 @@
-Back,Wstecz
-Courier booking dialog is loading. Please try again.,Okno zamawiania kuriera ładuje się. Prosimy spróbować ponownie.
-Order Courier,Zamów kuriera
-Cancel Courier Booking,Anuluj zamówienie kuriera
-Are you sure you want to cancel courier booking for this shipment?,Czy na pewno chcesz anulować zamówienie kuriera dla tej przesyłki?
-Are you sure you want to cancel courier booking for the selected shipments?,Czy na pewno chcesz anulować zamówienie kuriera dla wybranych przesyłek?
-Create Return Shipment,Utwórz przesyłkę zwrotną
-Are you sure you want to create a return shipment for this parcel?,Czy na pewno chcesz utworzyć przesyłkę zwrotną dla tej paczki?
-Delete,Usuń
-Are you sure you want to delete this record?,Czy na pewno chcesz usunąć ten rekord?
-Delete Shipment,Usuń przesyłkę
-Are you sure you want to delete this shipment? It will be cancelled in DHL and removed from Magento.,Czy na pewno chcesz usunąć tę przesyłkę? Zostanie ona anulowana w systemie DHL oraz usunięta z Magento.
-Download ePOD,Pobierz ePOD
-Download Scan,Pobierz skan LP
-PNP report dialog is loading. Please try again.,Okno raportu PNP ładuje się. Prosimy spróbować ponownie.
-Generate PNP Report,Generuj raport PNP
-Print Label,Pobierz etykietę
-Print Return Label,Pobierz etykietę zwrotną
-Print Return QR Code,Drukuj kod QR zwrotu
-Confirm Shipment Re-creation,Potwierdź ponowne utworzenie przesyłki
+"Back","Wstecz"
+"Courier booking dialog is loading. Please try again.","Okno zamawiania kuriera ładuje się. Prosimy spróbować ponownie."
+"Order Courier","Zamów kuriera"
+"Cancel Courier Booking","Anuluj zamówienie kuriera"
+"Are you sure you want to cancel courier booking for this shipment?","Czy na pewno chcesz anulować zamówienie kuriera dla tej przesyłki?"
+"Are you sure you want to cancel courier booking for the selected shipments?","Czy na pewno chcesz anulować zamówienie kuriera dla wybranych przesyłek?"
+"Create Return Shipment","Utwórz przesyłkę zwrotną"
+"Are you sure you want to create a return shipment for this parcel?","Czy na pewno chcesz utworzyć przesyłkę zwrotną dla tej paczki?"
+"Delete","Usuń"
+"Are you sure you want to delete this record?","Czy na pewno chcesz usunąć ten rekord?"
+"Delete Shipment","Usuń przesyłkę"
+"Are you sure you want to delete this shipment? It will be cancelled in DHL and removed from Magento.","Czy na pewno chcesz usunąć tę przesyłkę? Zostanie ona anulowana w systemie DHL oraz usunięta z Magento."
+"Download ePOD","Pobierz ePOD"
+"Download Scan","Pobierz skan LP"
+"PNP report dialog is loading. Please try again.","Okno raportu PNP ładuje się. Prosimy spróbować ponownie."
+"Generate PNP Report","Generuj raport PNP"
+"Print Label","Pobierz etykietę"
+"Print Return Label","Pobierz etykietę zwrotną"
+"Print Return QR Code","Drukuj kod QR zwrotu"
+"Confirm Shipment Re-creation","Potwierdź ponowne utworzenie przesyłki"
 "Clicking ""Save & Resend to DHL"" will cancel the existing DHL shipment and generate a new shipment for the updated data.","Kliknięcie ""Zapisz i wyślij ponownie do DHL"" anuluje istniejącą przesyłkę DHL i wygeneruje nową przesyłkę ze zaktualizowanymi danymi."
-Save & Resend to DHL,Zapisz i wyślij ponownie do DHL
-Save,Zapisz
-Save and Continue Edit,Zapisz i kontynuuj edycję
-Track Shipment,Śledź przesyłkę
-Update Status,Aktualizuj status przesyłki
-Export CSV,Eksportuj CSV
-Test Connection (Production),Testuj połączenie (Produkcja)
-Test Connection (Sandbox),Testuj połączenie (Sandbox)
-You deleted the Customs Clearance.,Usunięto odprawę celną.
-We can not find a Customs Clearance to delete.,Nie znaleziono odprawy celnej do usunięcia.
+"Save & Resend to DHL","Zapisz i wyślij ponownie do DHL"
+"Save","Zapisz"
+"Save and Continue Edit","Zapisz i kontynuuj edycję"
+"Track Shipment","Śledź przesyłkę"
+"Update Status","Aktualizuj status przesyłki"
+"Export CSV","Eksportuj CSV"
+"Test Connection (Production)","Testuj połączenie (Produkcja)"
+"Test Connection (Sandbox)","Testuj połączenie (Sandbox)"
+"You deleted the Customs Clearance.","Usunięto odprawę celną."
+"We can not find a Customs Clearance to delete.","Nie znaleziono odprawy celnej do usunięcia."
 "Edit Customs Clearance Template ""%1""","Edytuj szablon odprawy celnej ""%1"""
-This customs clearance no longer exists.,Ta odprawa celna już nie istnieje.
-New Customs Clearance Template,Nowy szablon odprawy celnej
-DHL Customs Clearance,Odprawa celna DHL
-A total of %1 record(s) have been deleted.,Usunięto łącznie %1 rekord(ów).
-You saved the Customs Clearance.,Zapisano odprawę celną.
-Something went wrong while saving the Customs Clearance.,Wystąpił błąd podczas zapisywania odprawy celnej.
-File cannot be saved.,Plik nie może zostać zapisany.
-You deleted the delivery service.,Usunięto usługę dostawy.
-Error deleting delivery service: %1,Błąd podczas usuwania usługi dostawy: %1
+"This customs clearance no longer exists.","Ta odprawa celna już nie istnieje."
+"New Customs Clearance Template","Nowy szablon odprawy celnej"
+"DHL Customs Clearance","Odprawa celna DHL"
+"A total of %1 record(s) have been deleted.","Usunięto łącznie %1 rekord(ów)."
+"You saved the Customs Clearance.","Zapisano odprawę celną."
+"Something went wrong while saving the Customs Clearance.","Wystąpił błąd podczas zapisywania odprawy celnej."
+"File cannot be saved.","Plik nie może zostać zapisany."
+"You deleted the delivery service.","Usunięto usługę dostawy."
+"Error deleting delivery service: %1","Błąd podczas usuwania usługi dostawy: %1"
 "Edit Delivery Service Template ""%1""","Edytuj szablon usługi dostawy ""%1"""
-This delivery service no longer exists.,Ta usługa dostawy już nie istnieje.
-New Delivery Service Template,Nowy szablon usługi dostawy
-Delivery Services,Szablony usług dostawy
-Error during mass delete: %1,Błąd podczas masowego usuwania: %1
-You saved the delivery service.,Zapisano usługę dostawy.
-Error saving delivery service: %1,Błąd podczas zapisywania usługi dostawy: %1
-You deleted the drop-off point.,Usunięto punkt nadania.
-Error deleting drop-off point: %1,Błąd podczas usuwania punktu nadania: %1
+"This delivery service no longer exists.","Ta usługa dostawy już nie istnieje."
+"New Delivery Service Template","Nowy szablon usługi dostawy"
+"Delivery Services","Szablony usług dostawy"
+"Error during mass delete: %1","Błąd podczas masowego usuwania: %1"
+"You saved the delivery service.","Zapisano usługę dostawy."
+"Error saving delivery service: %1","Błąd podczas zapisywania usługi dostawy: %1"
+"You deleted the drop-off point.","Usunięto punkt nadania."
+"Error deleting drop-off point: %1","Błąd podczas usuwania punktu nadania: %1"
 "Edit Drop-Off Point Template ""%1""","Edytuj szablon punktu nadania ""%1"""
-This drop-off point no longer exists.,Ten punkt nadania już nie istnieje.
-New Drop-Off Point Template,Nowy szablon punktu nadania
-Drop-Off Points,Szablony punktów nadania
-You saved the drop-off point.,Zapisano punkt nadania.
-Error saving drop-off point: %1,Błąd podczas zapisywania punktu nadania: %1
-DHL eCommerce Poland - Help & Support,DHL eCommerce Poland - Pomoc i wsparcie
-Please select at least one shipment for courier booking.,Prosimy wybrać co najmniej jedną przesyłkę do zamówienia kuriera.
-Pickup date and time window (From - To) must be specified.,Data odbioru oraz przedział godzinowy (Od - Do) muszą zostać określone.
-Courier booked successfully. Confirmation / Order ID: %1,Kurier został pomyślnie zamówiony. Potwierdzenie / Numer zamówienia: %1
-Courier booked successfully.,Kurier został pomyślnie zamówiony.
-Failed to book courier via DHL WebAPI2.,Nie udało się zamówić kuriera przez DHL WebAPI2.
-Error while booking courier: %1,Błąd podczas zamawiania kuriera: %1
-Please select at least one shipment to cancel courier booking.,Prosimy wybrać co najmniej jedną przesyłkę do anulowania zamówienia kuriera.
-Courier booking has been successfully cancelled.,Zamówienie kuriera zostało pomyślnie anulowane.
-Failed to cancel courier booking: %1,Nie udało się anulować zamówienia kuriera: %1
-An error occurred while cancelling courier booking: %1,Wystąpił błąd podczas anulowania zamówienia kuriera: %1
-Invalid shipment entity ID.,Nieprawidłowy numer encji przesyłki.
-Could not load shipment data for return shipment creation.,Nie można było załadować danych przesyłki do utworzenia przesyłki zwrotnej.
-Return shipment created successfully. Return Package Number: %1,Przesyłka zwrotna została pomyślnie utworzona. Numer paczki zwrotnej: %1
-Failed to create return shipment: %1,Nie udało się utworzyć przesyłki zwrotnej: %1
-Shipment has been deleted successfully.,Przesyłka została pomyślnie usunięta.
-Failed to delete shipment: %1,Nie udało się usunąć przesyłki: %1
-Could not download ePOD: %1,Nie można było pobrać ePOD: %1
-Could not download waybill scan: %1,Nie można było pobrać skanu listu przewozowego: %1
-DHL Shipment #%1,Przesyłka DHL #%1
-This DHL shipment no longer exists.,Ta przesyłka DHL już nie istnieje.
-DHL Shipment Details,Szczegóły przesyłki DHL
-Could not generate courier report: %1,Nie można było wygenerować raportu dla kuriera: %1
-Sender postal code is required to retrieve courier pickup hours.,Kod pocztowy nadawcy jest wymagany do pobrania godzin odbioru kuriera.
-Failed to load pickup hours: %1,Nie udało się załadować godzin odbioru: %1
-Shipments,Przesyłki
-Missing template_id or template_type parameter.,Brakujący parametr template_id lub template_type.
-Invalid template type specified.,Określono nieprawidłowy typ szablonu.
-A total of %1 shipment(s) have been deleted.,Usunięto łącznie %1 przesyłek.
-Failed to delete %1 shipment(s). Please check system logs.,Nie udało się usunąć %1 przesyłek. Prosimy sprawdzić logi systemowe.
-No shipments selected for downloading ePODs.,Nie wybrano przesyłek do pobrania ePOD.
-Could not download ePODs: %1,Nie można było pobrać ePOD: %1
-No shipments selected for downloading scans.,Nie wybrano przesyłek do pobrania skanów.
-Could not download waybill scans: %1,Nie można było pobrać skanów listów przewozowych: %1
-No shipments selected for label printing.,Nie wybrano przesyłek do druku etykiet.
-Could not print labels: %1,Nie można było wydrukować etykiet: %1
-No shipments selected for status update.,Nie wybrano przesyłek do aktualizacji statusu.
-A total of %1 shipment(s) status updated successfully.,Zaktualizowano łącznie status %1 przesyłek.
-Failed to update status for %1 shipment(s). Please check logs.,Nie udało się zaktualizować statusu dla %1 przesyłek. Prosimy sprawdzić logi.
-Error during status update: %1,Błąd podczas aktualizacji statusu: %1
-Order ID is required.,Numer zamówienia jest wymagany.
-Could not print label: %1,Nie można było wydrukować etykiety: %1
-Could not print return label: %1,Nie można było wydrukować etykiety zwrotnej: %1
-Could not print return QR code: %1,Nie można było wydrukować kodu QR zwrotu: %1
-Invalid shipment data provided.,Podano nieprawidłowe dane przesyłki.
-Invalid shipment date format provided.,Podano nieprawidłowy format daty przesyłki.
-Shipment date cannot be in the past.,Data przesyłki nie może być w przeszłości.
-Connection to DHL timed out. Please verify parcel status in DHL24 portal before re-trying.,Przekroczono czas połączenia z DHL. Prosimy weryfikować status paczki w portalu DHL24 przed ponowną próbą.
-Failed to create shipment in DHL.,Nie udało się utworzyć przesyłki w DHL.
-DHL shipment %1 has been created successfully.,Przesyłka DHL %1 została pomyślnie utworzona.
-Error saving DHL shipment: %1,Błąd podczas zapisywania przesyłki DHL: %1
-DHL shipment status updated to: %1,Status przesyłki DHL zaktualizowano do: %1
-DHL shipment status updated to: %1 (Received by: %2),Status przesyłki DHL zaktualizowano do: %1 (Odebrał: %2)
-DHL status updated successfully (no tracking events registered yet).,Status DHL został pomyślnie zaktualizowany (brak zarejestrowanych zdarzeń śledzenia).
-Failed to fetch status from DHL WebAPI2.,Nie udało się pobrać statusu z DHL WebAPI2.
-DHL status update failed: %1,Aktualizacja statusu DHL nie powiodła się: %1
-Failed to update shipment status: %1,Nie udało się zaktualizować statusu przesyłki: %1
-Execution error: %1,Błąd wykonania: %1
-Zwrot zamówienia,Zwrot zamówienia
-Kurier zamówiony,Kurier zamówiony
-This shipping method is currently unavailable.,Ta metoda dostawy jest obecnie niedostępna.
-CSV file is empty.,Plik CSV jest pusty.
-Invalid CSV header structure.,Nieprawidłowa struktura nagłówka pliku CSV.
-Invalid data format on line %1.,Nieprawidłowy format danych w linii %1.
+"This drop-off point no longer exists.","Ten punkt nadania już nie istnieje."
+"New Drop-Off Point Template","Nowy szablon punktu nadania"
+"Drop-Off Points","Szablony punktów nadania"
+"You saved the drop-off point.","Zapisano punkt nadania."
+"Error saving drop-off point: %1","Błąd podczas zapisywania punktu nadania: %1"
+"DHL eCommerce Poland - Help & Support","DHL eCommerce Poland - Pomoc i wsparcie"
+"Please select at least one shipment for courier booking.","Prosimy wybrać co najmniej jedną przesyłkę do zamówienia kuriera."
+"Pickup date and time window (From - To) must be specified.","Data odbioru oraz przedział godzinowy (Od - Do) muszą zostać określone."
+"Courier booked successfully. Confirmation / Order ID: %1","Kurier został pomyślnie zamówiony. Potwierdzenie / Numer zamówienia: %1"
+"Courier booked successfully.","Kurier został pomyślnie zamówiony."
+"Failed to book courier via DHL WebAPI2.","Nie udało się zamówić kuriera przez DHL WebAPI2."
+"Error while booking courier: %1","Błąd podczas zamawiania kuriera: %1"
+"Please select at least one shipment to cancel courier booking.","Prosimy wybrać co najmniej jedną przesyłkę do anulowania zamówienia kuriera."
+"Courier booking has been successfully cancelled.","Zamówienie kuriera zostało pomyślnie anulowane."
+"Failed to cancel courier booking: %1","Nie udało się anulować zamówienia kuriera: %1"
+"An error occurred while cancelling courier booking: %1","Wystąpił błąd podczas anulowania zamówienia kuriera: %1"
+"Invalid shipment entity ID.","Nieprawidłowy numer encji przesyłki."
+"Could not load shipment data for return shipment creation.","Nie można było załadować danych przesyłki do utworzenia przesyłki zwrotnej."
+"Return shipment created successfully. Return Package Number: %1","Przesyłka zwrotna została pomyślnie utworzona. Numer paczki zwrotnej: %1"
+"Failed to create return shipment: %1","Nie udało się utworzyć przesyłki zwrotnej: %1"
+"Shipment has been deleted successfully.","Przesyłka została pomyślnie usunięta."
+"Failed to delete shipment: %1","Nie udało się usunąć przesyłki: %1"
+"Could not download ePOD: %1","Nie można było pobrać ePOD: %1"
+"Could not download waybill scan: %1","Nie można było pobrać skanu listu przewozowego: %1"
+"DHL Shipment #%1","Przesyłka DHL #%1"
+"This DHL shipment no longer exists.","Ta przesyłka DHL już nie istnieje."
+"DHL Shipment Details","Szczegóły przesyłki DHL"
+"Could not generate courier report: %1","Nie można było wygenerować raportu dla kuriera: %1"
+"Sender postal code is required to retrieve courier pickup hours.","Kod pocztowy nadawcy jest wymagany do pobrania godzin odbioru kuriera."
+"Failed to load pickup hours: %1","Nie udało się załadować godzin odbioru: %1"
+"Shipments","Przesyłki"
+"Missing template_id or template_type parameter.","Brakujący parametr template_id lub template_type."
+"Invalid template type specified.","Określono nieprawidłowy typ szablonu."
+"A total of %1 shipment(s) have been deleted.","Usunięto łącznie %1 przesyłek."
+"Failed to delete %1 shipment(s). Please check system logs.","Nie udało się usunąć %1 przesyłek. Prosimy sprawdzić logi systemowe."
+"No shipments selected for downloading ePODs.","Nie wybrano przesyłek do pobrania ePOD."
+"Could not download ePODs: %1","Nie można było pobrać ePOD: %1"
+"No shipments selected for downloading scans.","Nie wybrano przesyłek do pobrania skanów."
+"Could not download waybill scans: %1","Nie można było pobrać skanów listów przewozowych: %1"
+"No shipments selected for label printing.","Nie wybrano przesyłek do druku etykiet."
+"Could not print labels: %1","Nie można było wydrukować etykiet: %1"
+"No shipments selected for status update.","Nie wybrano przesyłek do aktualizacji statusu."
+"A total of %1 shipment(s) status updated successfully.","Zaktualizowano łącznie status %1 przesyłek."
+"Failed to update status for %1 shipment(s). Please check logs.","Nie udało się zaktualizować statusu dla %1 przesyłek. Prosimy sprawdzić logi."
+"Error during status update: %1","Błąd podczas aktualizacji statusu: %1"
+"Order ID is required.","Numer zamówienia jest wymagany."
+"Could not print label: %1","Nie można było wydrukować etykiety: %1"
+"Could not print return label: %1","Nie można było wydrukować etykiety zwrotnej: %1"
+"Could not print return QR code: %1","Nie można było wydrukować kodu QR zwrotu: %1"
+"Invalid shipment data provided.","Podano nieprawidłowe dane przesyłki."
+"Invalid shipment date format provided.","Podano nieprawidłowy format daty przesyłki."
+"Shipment date cannot be in the past.","Data przesyłki nie może być w przeszłości."
+"Connection to DHL timed out. Please verify parcel status in DHL24 portal before re-trying.","Przekroczono czas połączenia z DHL. Prosimy weryfikować status paczki w portalu DHL24 przed ponowną próbą."
+"Failed to create shipment in DHL.","Nie udało się utworzyć przesyłki w DHL."
+"DHL shipment %1 has been created successfully.","Przesyłka DHL %1 została pomyślnie utworzona."
+"Error saving DHL shipment: %1","Błąd podczas zapisywania przesyłki DHL: %1"
+"DHL shipment status updated to: %1","Status przesyłki DHL zaktualizowano do: %1"
+"DHL shipment status updated to: %1 (Received by: %2)","Status przesyłki DHL zaktualizowano do: %1 (Odebrał: %2)"
+"DHL status updated successfully (no tracking events registered yet).","Status DHL został pomyślnie zaktualizowany (brak zarejestrowanych zdarzeń śledzenia)."
+"Failed to fetch status from DHL WebAPI2.","Nie udało się pobrać statusu z DHL WebAPI2."
+"DHL status update failed: %1","Aktualizacja statusu DHL nie powiodła się: %1"
+"Failed to update shipment status: %1","Nie udało się zaktualizować statusu przesyłki: %1"
+"Execution error: %1","Błąd wykonania: %1"
+"Zwrot zamówienia","Zwrot zamówienia"
+"Kurier zamówiony","Kurier zamówiony"
+"This shipping method is currently unavailable.","Ta metoda dostawy jest obecnie niedostępna."
+"CSV file is empty.","Plik CSV jest pusty."
+"Invalid CSV header structure.","Nieprawidłowa struktura nagłówka pliku CSV."
+"Invalid data format on line %1.","Nieprawidłowy format danych w linii %1."
 "Unsupported condition type ""%1"" on line %2.","Nieobsługiwany typ warunku ""%1"" w linii %2."
-Failed to save table rates: %1,Nie udało się zapisać stawek tabelarycznych: %1
-Failed to save country rates: %1,Nie udało się zapisać międzynarodowych stawek tabelarycznych: %1
-Invalid CSV header structure. Expected columns: Method Code, Country, Price.,Nieprawidłowa struktura nagłówka pliku CSV. Oczekiwane kolumny: Method Code, Country, Price.
+"Failed to save table rates: %1","Nie udało się zapisać stawek tabelarycznych: %1"
+"Failed to save country rates: %1","Nie udało się zapisać międzynarodowych stawek tabelarycznych: %1"
+"Invalid CSV header structure. Expected columns: Method Code"," Country"," Price.","Nieprawidłowa struktura nagłówka pliku CSV. Oczekiwane kolumny: Method Code"," Country"," Price."
 "Invalid country code ""%1"" on line %2. Please use 2-letter ISO country codes.","Nieprawidłowy kod kraju ""%1"" w linii %2. Prosimy użyć 2-literowych kodów ISO kraju."
 "Unsupported method code ""%1"" on line %2.","Nieobsługiwany kod metody ""%1"" w linii %2."
 "Invalid price value ""%1"" on line %2.","Nieprawidłowa wartość ceny ""%1"" w linii %2."
-Based on Cart,Na podstawie koszyka
-Private Address,Adres prywatny
-Company Address,Adres firmowy
-Order Number,Numer zamówienia
-Order #,Numer zamówienia
-Invoice Number,Numer faktury
-Static Value,Wartość stała
-Point selection from map and delivery,Wybór punktu z mapy i dostawa
-Delivery to nearest point based on recipient address,Dostawa do najbliższego punktu na podstawie adresu odbiorcy
-BLP 10x15 PDF Label,Etykieta BLP w formacie PDF 10x15
-LBLP A4 PDF Label,BLP w formacie PDF A4
-ZBLP Zebra Printer Format,BLP w formacie drukarek Zebra
-ZBLP 300dpi Zebra Printer Format,BLP 300dpi w formacie drukarek Zebra
-Map containing all points,Mapa zawierająca wszystkie punkty
-Only DHL BOX,Tylko automat DHL BOX
-Only DHL POPs,Tylko punkty DHL POP
-Package,Paczka
-Envelope,Koperta
-Pallet,Paleta
-EX - Domestic express up to 31.5kg,"EX - Przesyłka ekspresowa krajowa do 31,5 kg"
-DR - Domestic general cargo,DR - Przesyłka drobnicowa krajowa
-ALL - All package types,ALL - Wszystkie typy paczek
-2EUROPE - Export shipments,2EUROPE - Przesyłki eksportowe
-PR - Premium shipments,PR - Przesyłki premium
-Fixed Price,Stała cena
-Table Rates: By Country,Stawki tabelaryczne: Wg kraju
-Table Rates: By Weight,Stawki tabelaryczne: Wg wagi
-Table Rates: By Subtotal,Stawki tabelaryczne: Wg wartości zamówienia
-Drop-Off Point or Courier,Nadanie w punkcie lub kurierem
-Drop-Off Point,Nadanie w punkcie
-QR_PDF - PDF QR Code for ZK and ZC Shipment,QR_PDF - kod QR w formacie PDF dla przesyłki ZK i ZC
-QR2_IMG - PNG QR Code (2cm x 2cm) for ZK and ZC Shipment,QR2_IMG - kod QR w formacie PNG o wymiarach 2cm x 2cm dla przesyłki ZK i ZC
-QR4_IMG - PNG QR Code (4cm x 4cm) for ZK and ZC Shipment,QR4_IMG - kod QR w formacie PNG o wymiarach 4cm x 4cm dla przesyłki ZK i ZC
-QR6_IMG - PNG QR Code (6cm x 6cm) for ZK and ZC Shipment,QR6_IMG - kod QR w formacie PNG o wymiarach 6cm x 6cm dla przesyłki ZK i ZC
--- Please Select --,-- Prosimy wybrać --
-AH - Domestic Shipment,AH - Przesyłka krajowa
-09 - Delivery by 9:00 AM,09 - Doręczenie do godziny 9:00
-12 - Delivery by 12:00 PM,12 - Doręczenie do godziny 12:00
-PR - Premium Shipment,PR - Przesyłka Premium
-SP - Domestic Service Point Delivery,SP - przesyłka krajowa z doręczeniem do punktu
-EK - Connect Shipment,EK - Przesyłka Connect
-CP - Connect Plus Shipment,CP - Przesyłka Connect Plus
-CM - Connect Plus Pallet Shipment,CM - Przesyłka paletowa Connect Plus
-Private Address (C),Adres prywatny (C)
-Company Address (B),Adres firmowy (B)
-%1 [%2],%1 [%2]
-Could not save Customs Clearance: %1,Nie można było zapisać odprawy celnej: %1
+"Based on Cart","Na podstawie koszyka"
+"Private Address","Adres prywatny"
+"Company Address","Adres firmowy"
+"Order Number","Numer zamówienia"
+"Order #","Numer zamówienia"
+"Invoice Number","Numer faktury"
+"Static Value","Wartość stała"
+"Point selection from map and delivery","Wybór punktu z mapy i dostawa"
+"Delivery to nearest point based on recipient address","Dostawa do najbliższego punktu na podstawie adresu odbiorcy"
+"BLP 10x15 PDF Label","Etykieta BLP w formacie PDF 10x15"
+"LBLP A4 PDF Label","BLP w formacie PDF A4"
+"ZBLP Zebra Printer Format","BLP w formacie drukarek Zebra"
+"ZBLP 300dpi Zebra Printer Format","BLP 300dpi w formacie drukarek Zebra"
+"Map containing all points","Mapa zawierająca wszystkie punkty"
+"Only DHL BOX","Tylko automat DHL BOX"
+"Only DHL POPs","Tylko punkty DHL POP"
+"Package","Paczka"
+"Envelope","Koperta"
+"Pallet","Paleta"
+"EX - Domestic express up to 31.5kg","EX - Przesyłka ekspresowa krajowa do 31,5 kg"
+"DR - Domestic general cargo","DR - Przesyłka drobnicowa krajowa"
+"ALL - All package types","ALL - Wszystkie typy paczek"
+"2EUROPE - Export shipments","2EUROPE - Przesyłki eksportowe"
+"PR - Premium shipments","PR - Przesyłki premium"
+"Fixed Price","Stała cena"
+"Table Rates: By Country","Stawki tabelaryczne: Wg kraju"
+"Table Rates: By Weight","Stawki tabelaryczne: Wg wagi"
+"Table Rates: By Subtotal","Stawki tabelaryczne: Wg wartości zamówienia"
+"Drop-Off Point or Courier","Nadanie w punkcie lub kurierem"
+"Drop-Off Point","Nadanie w punkcie"
+"QR_PDF - PDF QR Code for ZK and ZC Shipment","QR_PDF - kod QR w formacie PDF dla przesyłki ZK i ZC"
+"QR2_IMG - PNG QR Code (2cm x 2cm) for ZK and ZC Shipment","QR2_IMG - kod QR w formacie PNG o wymiarach 2cm x 2cm dla przesyłki ZK i ZC"
+"QR4_IMG - PNG QR Code (4cm x 4cm) for ZK and ZC Shipment","QR4_IMG - kod QR w formacie PNG o wymiarach 4cm x 4cm dla przesyłki ZK i ZC"
+"QR6_IMG - PNG QR Code (6cm x 6cm) for ZK and ZC Shipment","QR6_IMG - kod QR w formacie PNG o wymiarach 6cm x 6cm dla przesyłki ZK i ZC"
+"-- Please Select --","-- Prosimy wybrać --"
+"AH - Domestic Shipment","AH - Przesyłka krajowa"
+"09 - Delivery by 9:00 AM","09 - Doręczenie do godziny 9:00"
+"12 - Delivery by 12:00 PM","12 - Doręczenie do godziny 12:00"
+"PR - Premium Shipment","PR - Przesyłka Premium"
+"SP - Domestic Service Point Delivery","SP - przesyłka krajowa z doręczeniem do punktu"
+"EK - Connect Shipment","EK - Przesyłka Connect"
+"CP - Connect Plus Shipment","CP - Przesyłka Connect Plus"
+"CM - Connect Plus Pallet Shipment","CM - Przesyłka paletowa Connect Plus"
+"Private Address (C)","Adres prywatny (C)"
+"Company Address (B)","Adres firmowy (B)"
+"%1 [%2]","%1 [%2]"
+"Could not save Customs Clearance: %1","Nie można było zapisać odprawy celnej: %1"
 "Customs Clearance with ID ""%1"" does not exist.","Odprawa celna o numerze ""%1"" nie istnieje."
-Could not delete Customs Clearance: %1,Nie można było usunąć odprawy celnej: %1
+"Could not delete Customs Clearance: %1","Nie można było usunąć odprawy celnej: %1"
 "Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description} (max %1 chars)","Dostępne tagi: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description} (maks. %1 znaków)"
-Could not save delivery service: %1,Nie można było zapisać usługi dostawy: %1
+"Could not save delivery service: %1","Nie można było zapisać usługi dostawy: %1"
 "Delivery service with ID ""%1"" does not exist.","Usługa dostawy o numerze ""%1"" nie istnieje."
-Could not delete delivery service: %1,Nie można było usunąć usługi dostawy: %1
-Could not save drop-off point: %1,Nie można było zapisać punktu nadania: %1
+"Could not delete delivery service: %1","Nie można było usunąć usługi dostawy: %1"
+"Could not save drop-off point: %1","Nie można było zapisać punktu nadania: %1"
 "Drop-off point with ID ""%1"" does not exist.","Punkt nadania o numerze ""%1"" nie istnieje."
-Could not delete drop-off point: %1,Nie można było usunąć punktu nadania: %1
-Pickup Point,Punkt odbioru
-Please select a DHL pickup point on the map.,Prosimy wybrać punkt odbioru DHL na mapie.
-German Customer Number (Postnummer) is required for delivery to a German Packstation.,Niemiecki numer klienta (Postnummer) jest wymagany w przypadku dostawy do automatów Packstation w Niemczech.
-Invalid German Customer Number (Postnummer). It must contain between 6 and 10 digits.,Nieprawidłowy niemiecki numer klienta (Postnummer). Musi składać się z 6 do 10 cyfr.
-No shipments or courier orders selected for cancellation.,Nie wybrano żadnych przesyłek ani zamówień kuriera do anulowania.
-None of the selected shipments have an active courier booking/dispatch number to cancel.,Żadna z wybranych przesyłek nie posiada aktywnego numeru zamówienia/zlecenia kuriera do anulowania.
-Nowa,Nowa
-No shipments selected for courier booking.,Nie wybrano przesyłek do zamówienia kuriera.
-Courier pickup is not available for weekends. Please select a business day in the calendar.,Odbiór przez kuriera nie jest dostępny w weekendy. Prosimy wybrać dzień roboczy w kalendarzu.
-None of the selected shipments have valid DHL Shipment IDs for courier booking.,Żadna z wybranych przesyłek nie posiada prawidłowych numerów przesyłek DHL do zamówienia kuriera.
-Courier pickup is not available for the selected date. Please select another date in the calendar.,Odbiór przez kuriera nie jest dostępny w wybranym dniu. Prosimy wybrać inną datę w kalendarzu.
-Sender postal code is required.,Kod pocztowy nadawcy jest wymagany.
-Shipment entity #%1 does not have a DHL shipment ID.,Encja przesyłki #%1 nie posiada numeru przesyłki DHL.
-Unknown API error,Nieznany błąd API
-Failed to retrieve waybill scan from DHL: %1,Nie udało się pobrać skanu listu przewozowego z DHL: %1
-No scan data returned by DHL.,Brak danych skanu zwróconych przez DHL.
-Failed to retrieve ePOD from DHL: %1,Nie udało się pobrać ePOD z DHL: %1
-No ePOD data returned by DHL.,Brak danych ePOD zwróconych przez DHL.
-Could not retrieve scan documents for the selected shipments.,Nie można było pobrać dokumentów skanu dla wybranych przesyłek.
-Could not retrieve ePOD documents for the selected shipments.,Nie można było pobrać dokumentów ePOD dla wybranych przesyłek.
-Failed to initialize ZIP archive.,Nie udało się zainicjować archiwum ZIP.
-Failed to read generated ZIP archive content.,Nie udało się odczytać zawartości wygenerowanego archiwum ZIP.
-Shipment entity #%1 could not be loaded.,Nie można było załadować encji przesyłki #%1.
-None of the selected shipments have valid DHL shipment IDs.,Żadna z wybranych przesyłek nie posiada prawidłowych numerów przesyłek DHL.
-Failed to retrieve labels from DHL: %1,Nie udało się pobrać etykiet z DHL: %1
-No label data returned by DHL.,Brak danych etykiety zwróconych przez DHL.
-No shipments selected for return label printing.,Nie wybrano przesyłek do druku etykiety zwrotnej.
-None of the selected shipments have valid DHL return shipment IDs.,Żadna z wybranych przesyłek nie posiada prawidłowych numerów przesyłek zwrotnych DHL.
-Failed to retrieve return labels from DHL: %1,Nie udało się pobrać etykiet zwrotnych z DHL: %1
-No return label data returned by DHL.,Brak danych etykiety zwrotnej zwróconych przez DHL.
-No shipments selected for return QR code printing.,Nie wybrano przesyłek do druku kodu QR zwrotu.
-Failed to retrieve return QR code from DHL: %1,Nie udało się pobrać kodu QR zwrotu z DHL: %1
-No return QR code data returned by DHL.,Brak danych kodu QR zwrotu zwróconych przez DHL.
-Cannot create or find Magento shipment for order #%1.,Nie można utworzyć ani znaleźć przesyłki Magento dla zamówienia #%1.
-DHL shipment #%1 created with tracking number(s): %2.,Przesyłka DHL #%1 została utworzona z numerem(ami) śledzenia: %2.
-DHL tracking for shipment #%1 has been canceled.,Śledzenie DHL dla przesyłki #%1 zostało anulowane.
-DHL shipping cannot be created for virtual orders.,Wysyłka DHL nie może zostać utworzona dla zamówień wirtualnych.
-Invalid date format. Please specify date in YYYY-MM-DD format.,Nieprawidłowy format daty. Prosimy podać datę w formacie RRRR-MM-DD.
-Invalid package type specified for courier report.,Określono nieprawidłowy typ paczki dla raportu kurierskiego.
-Failed to generate courier report: %1,Nie udało się wygenerować raportu dla kuriera: %1
-No courier report data returned by DHL for date %1.,Brak danych raportu kurierskiego zwróconych przez DHL dla daty %1.
-Return shipment creation is already in progress. Please wait a moment.,Tworzenie przesyłki zwrotnej jest już w toku. Prosimy chwilę poczekać.
-Shipment creation is already in progress. Please wait a moment.,Tworzenie przesyłki jest już w toku. Prosimy chwilę poczekać.
-Shipment re-creation is already in progress. Please wait a moment.,Ponowne tworzenie przesyłki jest już w toku. Prosimy chwilę poczekać.
-Shipment data payload is empty for entity #%1.,Dane przesyłki są puste dla encji #%1.
-Invalid JSON shipment payload for entity #%1.,Nieprawidłowy ładunek JSON przesyłki dla encji #%1.
-Sender Name is required.,Nazwa nadawcy jest wymagana.
-Sender Street is required.,Ulica nadawcy jest wymagana.
-Sender House Number is required.,Numer domu nadawcy jest wymagany.
-Sender Postal Code is required.,Kod pocztowy nadawcy jest wymagany.
-Sender City is required.,Miejscowość nadawcy jest wymagana.
-Recipient Name or First & Last Name is required.,Nazwa odbiorcy lub Imię i Nazwisko jest wymagane.
-Recipient Street is required.,Ulica odbiorcy jest wymagana.
-Recipient House Number is required.,Numer domu odbiorcy jest wymagany.
-Recipient Postal Code is required.,Kod pocztowy odbiorcy jest wymagany.
-Recipient City is required.,Miejscowość odbiorcy jest wymagana.
-Package Contents Description is required.,Opis zawartości paczki jest wymagany.
-Package Contents Description cannot exceed %1 characters.,Opis zawartości paczki nie może przekraczać %1 znaków.
-Additional Comments cannot exceed %1 characters.,Uwagi dodatkowe nie mogą przekraczać %1 znaków.
-Shipment Reference Number cannot exceed %1 characters.,Numer referencyjny przesyłki nie może przekraczać %1 znaków.
-Service Point ID is required for ServicePoint shipments.,Numer punktu odbioru (Service Point ID) jest wymagany dla przesyłek do punktu.
-At least one package is required.,Wymagana jest co najmniej jedna paczka.
+"Could not delete drop-off point: %1","Nie można było usunąć punktu nadania: %1"
+"Pickup Point","Punkt odbioru"
+"Please select a DHL pickup point on the map.","Prosimy wybrać punkt odbioru DHL na mapie."
+"German Customer Number (Postnummer) is required for delivery to a German Packstation.","Niemiecki numer klienta (Postnummer) jest wymagany w przypadku dostawy do automatów Packstation w Niemczech."
+"Invalid German Customer Number (Postnummer). It must contain between 6 and 10 digits.","Nieprawidłowy niemiecki numer klienta (Postnummer). Musi składać się z 6 do 10 cyfr."
+"No shipments or courier orders selected for cancellation.","Nie wybrano żadnych przesyłek ani zamówień kuriera do anulowania."
+"None of the selected shipments have an active courier booking/dispatch number to cancel.","Żadna z wybranych przesyłek nie posiada aktywnego numeru zamówienia/zlecenia kuriera do anulowania."
+"Nowa","Nowa"
+"No shipments selected for courier booking.","Nie wybrano przesyłek do zamówienia kuriera."
+"Courier pickup is not available for weekends. Please select a business day in the calendar.","Odbiór przez kuriera nie jest dostępny w weekendy. Prosimy wybrać dzień roboczy w kalendarzu."
+"None of the selected shipments have valid DHL Shipment IDs for courier booking.","Żadna z wybranych przesyłek nie posiada prawidłowych numerów przesyłek DHL do zamówienia kuriera."
+"Courier pickup is not available for the selected date. Please select another date in the calendar.","Odbiór przez kuriera nie jest dostępny w wybranym dniu. Prosimy wybrać inną datę w kalendarzu."
+"Sender postal code is required.","Kod pocztowy nadawcy jest wymagany."
+"Shipment entity #%1 does not have a DHL shipment ID.","Encja przesyłki #%1 nie posiada numeru przesyłki DHL."
+"Unknown API error","Nieznany błąd API"
+"Failed to retrieve waybill scan from DHL: %1","Nie udało się pobrać skanu listu przewozowego z DHL: %1"
+"No scan data returned by DHL.","Brak danych skanu zwróconych przez DHL."
+"Failed to retrieve ePOD from DHL: %1","Nie udało się pobrać ePOD z DHL: %1"
+"No ePOD data returned by DHL.","Brak danych ePOD zwróconych przez DHL."
+"Could not retrieve scan documents for the selected shipments.","Nie można było pobrać dokumentów skanu dla wybranych przesyłek."
+"Could not retrieve ePOD documents for the selected shipments.","Nie można było pobrać dokumentów ePOD dla wybranych przesyłek."
+"Failed to initialize ZIP archive.","Nie udało się zainicjować archiwum ZIP."
+"Failed to read generated ZIP archive content.","Nie udało się odczytać zawartości wygenerowanego archiwum ZIP."
+"Shipment entity #%1 could not be loaded.","Nie można było załadować encji przesyłki #%1."
+"None of the selected shipments have valid DHL shipment IDs.","Żadna z wybranych przesyłek nie posiada prawidłowych numerów przesyłek DHL."
+"Failed to retrieve labels from DHL: %1","Nie udało się pobrać etykiet z DHL: %1"
+"No label data returned by DHL.","Brak danych etykiety zwróconych przez DHL."
+"No shipments selected for return label printing.","Nie wybrano przesyłek do druku etykiety zwrotnej."
+"None of the selected shipments have valid DHL return shipment IDs.","Żadna z wybranych przesyłek nie posiada prawidłowych numerów przesyłek zwrotnych DHL."
+"Failed to retrieve return labels from DHL: %1","Nie udało się pobrać etykiet zwrotnych z DHL: %1"
+"No return label data returned by DHL.","Brak danych etykiety zwrotnej zwróconych przez DHL."
+"No shipments selected for return QR code printing.","Nie wybrano przesyłek do druku kodu QR zwrotu."
+"Failed to retrieve return QR code from DHL: %1","Nie udało się pobrać kodu QR zwrotu z DHL: %1"
+"No return QR code data returned by DHL.","Brak danych kodu QR zwrotu zwróconych przez DHL."
+"Cannot create or find Magento shipment for order #%1.","Nie można utworzyć ani znaleźć przesyłki Magento dla zamówienia #%1."
+"DHL shipment #%1 created with tracking number(s): %2.","Przesyłka DHL #%1 została utworzona z numerem(ami) śledzenia: %2."
+"DHL tracking for shipment #%1 has been canceled.","Śledzenie DHL dla przesyłki #%1 zostało anulowane."
+"DHL shipping cannot be created for virtual orders.","Wysyłka DHL nie może zostać utworzona dla zamówień wirtualnych."
+"Invalid date format. Please specify date in YYYY-MM-DD format.","Nieprawidłowy format daty. Prosimy podać datę w formacie RRRR-MM-DD."
+"Invalid package type specified for courier report.","Określono nieprawidłowy typ paczki dla raportu kurierskiego."
+"Failed to generate courier report: %1","Nie udało się wygenerować raportu dla kuriera: %1"
+"No courier report data returned by DHL for date %1.","Brak danych raportu kurierskiego zwróconych przez DHL dla daty %1."
+"Return shipment creation is already in progress. Please wait a moment.","Tworzenie przesyłki zwrotnej jest już w toku. Prosimy chwilę poczekać."
+"Shipment creation is already in progress. Please wait a moment.","Tworzenie przesyłki jest już w toku. Prosimy chwilę poczekać."
+"Shipment re-creation is already in progress. Please wait a moment.","Ponowne tworzenie przesyłki jest już w toku. Prosimy chwilę poczekać."
+"Shipment data payload is empty for entity #%1.","Dane przesyłki są puste dla encji #%1."
+"Invalid JSON shipment payload for entity #%1.","Nieprawidłowy ładunek JSON przesyłki dla encji #%1."
+"Sender Name is required.","Nazwa nadawcy jest wymagana."
+"Sender Street is required.","Ulica nadawcy jest wymagana."
+"Sender House Number is required.","Numer domu nadawcy jest wymagany."
+"Sender Postal Code is required.","Kod pocztowy nadawcy jest wymagany."
+"Sender City is required.","Miejscowość nadawcy jest wymagana."
+"Recipient Name or First & Last Name is required.","Nazwa odbiorcy lub Imię i Nazwisko jest wymagane."
+"Recipient Street is required.","Ulica odbiorcy jest wymagana."
+"Recipient House Number is required.","Numer domu odbiorcy jest wymagany."
+"Recipient Postal Code is required.","Kod pocztowy odbiorcy jest wymagany."
+"Recipient City is required.","Miejscowość odbiorcy jest wymagana."
+"Package Contents Description is required.","Opis zawartości paczki jest wymagany."
+"Package Contents Description cannot exceed %1 characters.","Opis zawartości paczki nie może przekraczać %1 znaków."
+"Additional Comments cannot exceed %1 characters.","Uwagi dodatkowe nie mogą przekraczać %1 znaków."
+"Shipment Reference Number cannot exceed %1 characters.","Numer referencyjny przesyłki nie może przekraczać %1 znaków."
+"Service Point ID is required for ServicePoint shipments.","Numer punktu odbioru (Service Point ID) jest wymagany dla przesyłek do punktu."
+"At least one package is required.","Wymagana jest co najmniej jedna paczka."
 "Only single-piece (1 package) shipments are allowed for ServicePoint, Return, or POP point deliveries.","Dla przesyłek ServicePoint, zwrotnych lub dostaw do punktów POP dozwolone są wyłącznie przesyłki jednopaczkowe (1 paczka)."
-Package #%1 weight must be greater than zero.,Waga paczki #%1 musi być większa niż zero.
+"Package #%1 weight must be greater than zero.","Waga paczki #%1 musi być większa niż zero."
 "Non-standard (NST) packages are not allowed for ServicePoint, Return, or POP point deliveries.","Paczki niestandardowe (NST) nie są dozwolone dla dostaw do punktów ServicePoint, zwrotnych oraz punktów POP."
-Package #%1 width must be greater than zero.,Szerokość paczki #%1 musi być większa niż zero.
-Package #%1 length must be greater than zero.,Długość paczki #%1 musi być większa niż zero.
-Package #%1 height must be greater than zero.,Wysokość paczki #%1 musi być większa niż zero.
-Both Courier Pickup Time [From] and [To] must be specified.,Zarówno godzina odbioru przez kuriera [Od] jak i [Do] muszą być określone.
-Courier Pickup Time [From] must be earlier than Pickup Time [To].,Godzina odbioru przez kuriera [Od] musi być wcześniejsza niż godzina odbioru [Do].
-DHL API returned an error during deletion.,API DHL zwróciło błąd podczas usuwania.
-Failed to delete shipment in DHL: %1,Nie udało się usunąć przesyłki w DHL: %1
-No DHL shipment ID available for this shipment entity.,Brak numeru przesyłki DHL dla tej encji przesyłki.
-Status retrieved,Pobrano status
-Tracking request failed.,Zapytanie o śledzenie nie powiodło się.
-Could not save DHL shipment data: %1,Nie można było zapisać danych przesyłki DHL: %1
+"Package #%1 width must be greater than zero.","Szerokość paczki #%1 musi być większa niż zero."
+"Package #%1 length must be greater than zero.","Długość paczki #%1 musi być większa niż zero."
+"Package #%1 height must be greater than zero.","Wysokość paczki #%1 musi być większa niż zero."
+"Both Courier Pickup Time [From] and [To] must be specified.","Zarówno godzina odbioru przez kuriera [Od] jak i [Do] muszą być określone."
+"Courier Pickup Time [From] must be earlier than Pickup Time [To].","Godzina odbioru przez kuriera [Od] musi być wcześniejsza niż godzina odbioru [Do]."
+"DHL API returned an error during deletion.","API DHL zwróciło błąd podczas usuwania."
+"Failed to delete shipment in DHL: %1","Nie udało się usunąć przesyłki w DHL: %1"
+"No DHL shipment ID available for this shipment entity.","Brak numeru przesyłki DHL dla tej encji przesyłki."
+"Status retrieved","Pobrano status"
+"Tracking request failed.","Zapytanie o śledzenie nie powiodło się."
+"Could not save DHL shipment data: %1","Nie można było zapisać danych przesyłki DHL: %1"
 "DHL shipment data with ID ""%1"" does not exist.","Dane przesyłki DHL o numerze ""%1"" nie istnieją."
-Could not delete DHL shipment data: %1,Nie można było usunąć danych przesyłki DHL: %1
-Sales of Goods (11),Sprzedaż towarów (11)
-Other (9),Inne (9)
-Return of Goods (21),Zwrot towarów (21)
-Gift (31),Prezent (31)
+"Could not delete DHL shipment data: %1","Nie można było usunąć danych przesyłki DHL: %1"
+"Sales of Goods (11)","Sprzedaż towarów (11)"
+"Other (9)","Inne (9)"
+"Return of Goods (21)","Zwrot towarów (21)"
+"Gift (31)","Prezent (31)"
 "Patterns and Samples (32)","Wzory, próbki (32)"
-Documents (91),Dokumenty (91)
-Simplified Clearance (U),Uproszczona (U)
-Individual Clearance (I),Indywidualna (I)
-Short Declaration - IE/UK (S),Skrócona (S)
-DHL Shipment,Przesyłka DHL
-No Customs Clearance configuration found for international shipment. Please configure default Customs.,Nie znaleziono konfiguracji odprawy celnej dla przesyłki międzynarodowej. Prosimy skonfigurować domyślną odprawę celną.
-A VAT Invoice PDF file is required for individual customs clearance (I). Please upload invoice in Customs Template.,Plik PDF z fakturą VAT jest wymagany dla odprawy celnej indywidualnej (I). Prosimy przesłać fakturę w szablonie odprawy celnej.
-ePOD error,Błąd ePOD
-Scan error,Błąd skanu
-PnP report error,Błąd raportu PNP
-Edit,Edytuj
-Delete %1,Usuń %1
-Are you sure you want to delete this customs clearance?,Czy na pewno chcesz usunąć tę odprawę celną?
-Are you sure you want to delete this delivery service?,Czy na pewno chcesz usunąć tę usługę dostawy?
-Are you sure you want to delete this drop-off point?,Czy na pewno chcesz usunąć ten punkt nadania?
-Details,Szczegóły
-Cancel Courier,Anuluj kuriera
-View Order,Zobacz zamówienie
-DHL eCommerce Poland Integration,Integracja DHL eCommerce Polska
+"Documents (91)","Dokumenty (91)"
+"Simplified Clearance (U)","Uproszczona (U)"
+"Individual Clearance (I)","Indywidualna (I)"
+"Short Declaration - IE/UK (S)","Skrócona (S)"
+"DHL Shipment","Przesyłka DHL"
+"No Customs Clearance configuration found for international shipment. Please configure default Customs.","Nie znaleziono konfiguracji odprawy celnej dla przesyłki międzynarodowej. Prosimy skonfigurować domyślną odprawę celną."
+"A VAT Invoice PDF file is required for individual customs clearance (I). Please upload invoice in Customs Template.","Plik PDF z fakturą VAT jest wymagany dla odprawy celnej indywidualnej (I). Prosimy przesłać fakturę w szablonie odprawy celnej."
+"ePOD error","Błąd ePOD"
+"Scan error","Błąd skanu"
+"PnP report error","Błąd raportu PNP"
+"Edit","Edytuj"
+"Delete %1","Usuń %1"
+"Are you sure you want to delete this customs clearance?","Czy na pewno chcesz usunąć tę odprawę celną?"
+"Are you sure you want to delete this delivery service?","Czy na pewno chcesz usunąć tę usługę dostawy?"
+"Are you sure you want to delete this drop-off point?","Czy na pewno chcesz usunąć ten punkt nadania?"
+"Details","Szczegóły"
+"Cancel Courier","Anuluj kuriera"
+"View Order","Zobacz zamówienie"
+"DHL eCommerce Poland Integration","Integracja DHL eCommerce Polska"
 "To configure the plugin, it is necessary to have API keys for either the production or sandbox environment. The module supports all DHL eCommerce Poland products and services via WebAPI v2.","Aby skonfigurować wtyczkę, konieczne jest posiadanie kluczy API dla środowiska produkcyjnego lub testowego (sandbox). Moduł obsługuje wszystkie produkty i usługi DHL eCommerce Polska za pośrednictwem WebAPI v2."
-API keys are generated from your account in the DHL24 application at,Klucze API generowane są z poziomu Twojego konta w aplikacji DHL24 na stronie
+"API keys are generated from your account in the DHL24 application at","Klucze API generowane są z poziomu Twojego konta w aplikacji DHL24 na stronie"
 "with an active customer number, or for a test account registered at","z aktywnym numerem klienta, lub dla konta testowego zarejestrowanego na stronie"
-Information on how to obtain API keys can be found in the user manual on page 10 or in the instructional video.,Informacje dotyczące uzyskania kluczy API znajdują się w instrukcji obsługi na stronie 10 lub w filmie instruktażowym.
-Technical Support,Wsparcie techniczne
-"In case of questions or technical issues with the DHL module, please contact our support team at email:",W razie pytań lub problemów technicznych z modułem DHL prosimy o kontakt z naszym zespołem wsparcia pod adresem e-mail:
-Documentation & Manuals,Dokumentacja i instrukcje
-A detailed user manual for the module is available at:,Szczegółowa instrukcja obsługi modułu jest dostępna pod adresem:
-Open Detailed Module User Manual,Otwórz szczegółową instrukcję obsługi modułu
-Selected Shipments,Wybrane przesyłki
-shipment(s) selected,wybranych przesyłek
-Shipment IDs:,Numery przesyłek:
-Pickup Date,Data odbioru
-Fetching available courier pickup hours...,Pobieranie dostępnych godzin odbioru kuriera...
-Available Courier Pickup Hours,Dostępne godziny odbioru kuriera
-Notes for Courier (Optional),Uwagi dla kuriera (Opcjonalnie)
-Instructions for courier pickup...,Instrukcje dla kuriera przy odbiorze...
-Date,Data
-Package Type,Typ paczki
-Sender Address,Adres nadawcy
-Drop-Off Point Template,Szablon punktu nadania
-Select Template...,Wybierz szablon...
-SAP Number,Numer SAP
-Sender Name,Nazwa nadawcy
-First & Last Name,Imię i nazwisko
-First Name,Imię
-Last Name,Nazwisko
-Street & House No.,Ulica i nr domu
-Street,Ulica
-House No.,Nr domu
+"Information on how to obtain API keys can be found in the user manual on page 10 or in the instructional video.","Informacje dotyczące uzyskania kluczy API znajdują się w instrukcji obsługi na stronie 10 lub w filmie instruktażowym."
+"Technical Support","Wsparcie techniczne"
+"In case of questions or technical issues with the DHL module, please contact our support team at email:","W razie pytań lub problemów technicznych z modułem DHL prosimy o kontakt z naszym zespołem wsparcia pod adresem e-mail:"
+"Documentation & Manuals","Dokumentacja i instrukcje"
+"A detailed user manual for the module is available at:","Szczegółowa instrukcja obsługi modułu jest dostępna pod adresem:"
+"Open Detailed Module User Manual","Otwórz szczegółową instrukcję obsługi modułu"
+"Selected Shipments","Wybrane przesyłki"
+"shipment(s) selected","wybranych przesyłek"
+"Shipment IDs:","Numery przesyłek:"
+"Pickup Date","Data odbioru"
+"Fetching available courier pickup hours...","Pobieranie dostępnych godzin odbioru kuriera..."
+"Available Courier Pickup Hours","Dostępne godziny odbioru kuriera"
+"Notes for Courier (Optional)","Uwagi dla kuriera (Opcjonalnie)"
+"Instructions for courier pickup...","Instrukcje dla kuriera przy odbiorze..."
+"Date","Data"
+"Package Type","Typ paczki"
+"Sender Address","Adres nadawcy"
+"Drop-Off Point Template","Szablon punktu nadania"
+"Select Template...","Wybierz szablon..."
+"SAP Number","Numer SAP"
+"Sender Name","Nazwa nadawcy"
+"First & Last Name","Imię i nazwisko"
+"First Name","Imię"
+"Last Name","Nazwisko"
+"Street & House No.","Ulica i nr domu"
+"Street","Ulica"
+"House No.","Nr domu"
 "Postal Code, City & Country","Kod pocztowy, miejscowość i kraj"
 "Postal Code & City","Kod pocztowy i miejscowość"
-Postal Code,Kod pocztowy
-City,Miejscowość
-Phone & Email,Telefon i e-mail
-Phone,Telefon
-Email,E-mail
-Courier Pickup Time [From - To],Godzina odbioru przez kuriera [Od - Do]
-Recipient Address,Adres odbiorcy
-Address Type,Typ adresu
-Consumer / Private (C),Osoba prywatna / Konsument (C)
-Company / Business (B),Firma / Biznes (B)
-Company Name,Nazwa odbiorcy
-POP Service Point ID,Numer punktu POP / BOX
-POP Service Point Address,Adres punktu POP / BOX
-German Customer Number (Postnummer),Niemiecki numer klienta (Postnummer)
-Shipment Settings,Ustawienia przesyłki
-Delivery Service Template,Szablon usługi dostawy
-Shipment Date,Data wysyłki
-Service & Shipment Label Format,Usługa i format etykiety przesyłki
-Select Service...,Wybierz usługę...
-Package Contents Description,Opis zawartości paczki
-Additional Comments,Uwagi dodatkowe
-Shipment Reference Number & MPK,Numer referencyjny przesyłki i MPK
-Shipment Reference Number,Numer referencyjny przesyłki
-MPK,MPK
-Generate return label automatically when creating shipment,Generuj etykietę zwrotną od razu przy generowaniu przesyłki
-Return Label Format,Format etykiety zwrotnej
-Return QR Code Type,Typ kodu QR zwrotu
-Return Label Expiration Days,Ważność etykiety zwrotnej (7-183 dni)
-Return Dispatch Method,Sposób nadania zwrotu
-Additional Services,Usługi dodatkowe
-Services,Usługi
-Insurance,Ubezpieczenie
-Insurance Value,Wartość ubezpieczenia
-Cash On Delivery,Płatność przy odbiorze (COD)
-COD Amount,Kwota pobrania (COD)
-Evening Delivery (18-22),Doręczenie w godzinach 18-22
-Saturday Delivery,Doręczenie w sobotę
-Saturday Pickup,Nadanie w sobotę
-Pre-delivery Information,Informacje przed doręczeniem
-Return Confirmed Documents,Zwrot potwierdzonych dokumentów (ROD)
-ROD Document Name,Nazwa dokumentu ROD
-Proof of Delivery,Potwierdzenie doręczenia (POD)
-Adult Verification / Delivery,Odbiór przez osobę dorosłą
-Self Pickup,Odbiór własny
-Shipment Packages,Paczki przesyłki
-Qty,Ilość
-Weight [kg],Waga [kg]
-Width [cm],Szerokość [cm]
-Length [cm],Długość [cm]
-Height [cm],Wysokość [cm]
-NST,Przesyłka niest.
-Euro Return,Zwrot palet
-Actions,Akcje
-Non-standard package option,Opcja paczki niestandardowej
-Delete Row,Usuń wiersz
-Add Package,Dodaj paczkę
+"Postal Code","Kod pocztowy"
+"City","Miejscowość"
+"Phone & Email","Telefon i e-mail"
+"Phone","Telefon"
+"Email","E-mail"
+"Courier Pickup Time [From - To]","Godzina odbioru przez kuriera [Od - Do]"
+"Recipient Address","Adres odbiorcy"
+"Address Type","Typ adresu"
+"Consumer / Private (C)","Osoba prywatna / Konsument (C)"
+"Company / Business (B)","Firma / Biznes (B)"
+"Company Name","Nazwa odbiorcy"
+"POP Service Point ID","Numer punktu POP / BOX"
+"POP Service Point Address","Adres punktu POP / BOX"
+"German Customer Number (Postnummer)","Niemiecki numer klienta (Postnummer)"
+"Shipment Settings","Ustawienia przesyłki"
+"Delivery Service Template","Szablon usługi dostawy"
+"Shipment Date","Data wysyłki"
+"Service & Shipment Label Format","Usługa i format etykiety przesyłki"
+"Select Service...","Wybierz usługę..."
+"Package Contents Description","Opis zawartości paczki"
+"Additional Comments","Uwagi dodatkowe"
+"Shipment Reference Number & MPK","Numer referencyjny przesyłki i MPK"
+"Shipment Reference Number","Numer referencyjny przesyłki"
+"MPK","MPK"
+"Generate return label automatically when creating shipment","Generuj etykietę zwrotną od razu przy generowaniu przesyłki"
+"Return Label Format","Format etykiety zwrotnej"
+"Return QR Code Type","Typ kodu QR zwrotu"
+"Return Label Expiration Days","Ważność etykiety zwrotnej (7-183 dni)"
+"Return Dispatch Method","Sposób nadania zwrotu"
+"Additional Services","Usługi dodatkowe"
+"Services","Usługi"
+"Insurance","Ubezpieczenie"
+"Insurance Value","Wartość ubezpieczenia"
+"Cash On Delivery","Płatność przy odbiorze (COD)"
+"COD Amount","Kwota pobrania (COD)"
+"Evening Delivery (18-22)","Doręczenie w godzinach 18-22"
+"Saturday Delivery","Doręczenie w sobotę"
+"Saturday Pickup","Nadanie w sobotę"
+"Pre-delivery Information","Informacje przed doręczeniem"
+"Return Confirmed Documents","Zwrot potwierdzonych dokumentów (ROD)"
+"ROD Document Name","Nazwa dokumentu ROD"
+"Proof of Delivery","Potwierdzenie doręczenia (POD)"
+"Adult Verification / Delivery","Odbiór przez osobę dorosłą"
+"Self Pickup","Odbiór własny"
+"Shipment Packages","Paczki przesyłki"
+"Qty","Ilość"
+"Weight [kg]","Waga [kg]"
+"Width [cm]","Szerokość [cm]"
+"Length [cm]","Długość [cm]"
+"Height [cm]","Wysokość [cm]"
+"NST","Przesyłka niest."
+"Euro Return","Zwrot palet"
+"Actions","Akcje"
+"Non-standard package option","Opcja paczki niestandardowej"
+"Delete Row","Usuń wiersz"
+"Add Package","Dodaj paczkę"
 "Adding additional packages is restricted – ServicePoint, POP point, or selected service allows only 1 package per shipment.","Dodawanie kolejnych paczek jest ograniczone – usługa ServicePoint, punkt POP lub wybrana usługa zezwala na tylko 1 paczkę w przesyłce."
-Track on DHL (https://mojdhl.pl/sprawdz?paczki=%1),Śledź w DHL (https://mojdhl.pl/sprawdz?paczki=%1)
-Date Added,Data dodania
-Status,Status
-Description,Opis
-Terminal,Terminal
-No tracking events recorded yet for this shipment.,Brak zarejestrowanych zdarzeń śledzenia dla tej przesyłki.
-DHL Service Point Pickup,Odbiór w punkcie DHL ServicePoint
-Delivery will automatically be made to the nearest service point based on the entered recipient address.,Dostawa zostanie automatycznie zrealizowana do najbliższego punktu odbioru na podstawie wpisanego adresu odbiorcy.
-Select a DHL pickup point from the map:,Wybierz punkt odbioru DHL z mapy:
-Select DHL pickup point,Wybierz punkt odbioru DHL
-Selected DHL pickup point:,Wybrany punkt odbioru DHL:
-German Customer Number (Postnummer):,Niemiecki numer klienta (Postnummer):
-Change DHL pickup point,Zmień punkt odbioru DHL
-Please select shipments for courier booking.,Prosimy wybrać przesyłki do zamówienia kuriera.
-Select Date,Wybierz datę
-Order Courier for DHL Shipments,Zamów kuriera dla przesyłek DHL
-Cancel,Anuluj
-Please select at least one shipment.,Prosimy wybrać co najmniej jedną przesyłkę.
-Please select an available pickup time window.,Prosimy wybrać dostępny przedział czasowy odbioru.
-Courier Booked,Kurier zamówiony
-Error Booking Courier,Błąd zamawiania kuriera
-Failed to book courier.,Nie udało się zamówić kuriera.
-Error,Błąd
-An unexpected error occurred while contacting the server.,Wystąpił nieoczekiwany błąd podczas połączenia z serwerem.
-PNP Report,Raport PNP
-Generate Report,Generuj raport
-Select Time,Wybierz godzinę
-Create DHL Shipment,Utwórz przesyłkę DHL
-Error creating DHL shipment.,Błąd podczas tworzenia przesyłki DHL.
-Error preparing DHL shipment.,Błąd podczas przygotowywania przesyłki DHL.
-Select DHL Pickup Point,Wybierz punkt odbioru DHL
-DHL Parcel,DHL eCommerce Poland
-General Configuration,Konfiguracja ogólna
-Enabled for Checkout,Włączone w procesie zakupowym
-Sandbox,Sandbox (Środowisko testowe)
-API Login,Login API
-API Password,Hasło API
-API Login Sandbox,Login API Sandbox
-API Password Sandbox,Hasło API Sandbox
-Import Table Rates CSV,Importuj CSV stawek tabelarycznych
-Export Table Rates CSV,Eksportuj CSV stawek tabelarycznych
-Import International Country Rates CSV,Importuj CSV międzynarodowych stawek tabelarycznych
-Export International Country Rates CSV,Eksportuj CSV międzynarodowych stawek tabelarycznych
-Debug Mode,Tryb debugowania
-DHL Parcel Polska,DHL Parcel Polska
-Enabled,Włączone
-Title,Tytuł
-Method Name,Nazwa metody
-Pricing Calculation Type,Sposób obliczania ceny
-Price,Cena
-Enable Free Shipping Threshold,Włącz próg darmowej dostawy
-Free Shipping Amount Threshold,Kwota progu darmowej dostawy
-Ship to Applicable Countries,Wysyłka do dozwolonych krajów
-Ship to Specific Countries,Wysyłka do wybranych krajów
-Show Method if Not Applicable,"Pokaż metodę, jeśli niedostępna"
-Displayed Error Message,Wyświetlana wiadomość o błędzie
-Sort Order,Kolejność sortowania
-DHL Parcel Premium,DHL Parcel Premium
-DHL Parcel 9,DHL Parcel 9
-DHL Parcel 12,DHL Parcel 12
+"Track on DHL (https://mojdhl.pl/sprawdz?paczki=%1)","Śledź w DHL (https://mojdhl.pl/sprawdz?paczki=%1)"
+"Date Added","Data dodania"
+"Status","Status"
+"Description","Opis"
+"Terminal","Terminal"
+"No tracking events recorded yet for this shipment.","Brak zarejestrowanych zdarzeń śledzenia dla tej przesyłki."
+"DHL Service Point Pickup","Odbiór w punkcie DHL ServicePoint"
+"Delivery will automatically be made to the nearest service point based on the entered recipient address.","Dostawa zostanie automatycznie zrealizowana do najbliższego punktu odbioru na podstawie wpisanego adresu odbiorcy."
+"Select a DHL pickup point from the map:","Wybierz punkt odbioru DHL z mapy:"
+"Select DHL pickup point","Wybierz punkt odbioru DHL"
+"Selected DHL pickup point:","Wybrany punkt odbioru DHL:"
+"German Customer Number (Postnummer):","Niemiecki numer klienta (Postnummer):"
+"Change DHL pickup point","Zmień punkt odbioru DHL"
+"Please select shipments for courier booking.","Prosimy wybrać przesyłki do zamówienia kuriera."
+"Select Date","Wybierz datę"
+"Order Courier for DHL Shipments","Zamów kuriera dla przesyłek DHL"
+"Cancel","Anuluj"
+"Please select at least one shipment.","Prosimy wybrać co najmniej jedną przesyłkę."
+"Please select an available pickup time window.","Prosimy wybrać dostępny przedział czasowy odbioru."
+"Courier Booked","Kurier zamówiony"
+"Error Booking Courier","Błąd zamawiania kuriera"
+"Failed to book courier.","Nie udało się zamówić kuriera."
+"Error","Błąd"
+"An unexpected error occurred while contacting the server.","Wystąpił nieoczekiwany błąd podczas połączenia z serwerem."
+"PNP Report","Raport PNP"
+"Generate Report","Generuj raport"
+"Select Time","Wybierz godzinę"
+"Create DHL Shipment","Utwórz przesyłkę DHL"
+"Error creating DHL shipment.","Błąd podczas tworzenia przesyłki DHL."
+"Error preparing DHL shipment.","Błąd podczas przygotowywania przesyłki DHL."
+"Select DHL Pickup Point","Wybierz punkt odbioru DHL"
+"DHL Parcel","DHL eCommerce Poland"
+"General Configuration","Konfiguracja ogólna"
+"Enabled for Checkout","Włączone w procesie zakupowym"
+"Sandbox","Sandbox (Środowisko testowe)"
+"API Login","Login API"
+"API Password","Hasło API"
+"API Login Sandbox","Login API Sandbox"
+"API Password Sandbox","Hasło API Sandbox"
+"Import Table Rates CSV","Importuj CSV stawek tabelarycznych"
+"Export Table Rates CSV","Eksportuj CSV stawek tabelarycznych"
+"Import International Country Rates CSV","Importuj CSV międzynarodowych stawek tabelarycznych"
+"Export International Country Rates CSV","Eksportuj CSV międzynarodowych stawek tabelarycznych"
+"Debug Mode","Tryb debugowania"
+"DHL Parcel Polska","DHL Parcel Polska"
+"Enabled","Włączone"
+"Title","Tytuł"
+"Method Name","Nazwa metody"
+"Pricing Calculation Type","Sposób obliczania ceny"
+"Price","Cena"
+"Enable Free Shipping Threshold","Włącz próg darmowej dostawy"
+"Free Shipping Amount Threshold","Kwota progu darmowej dostawy"
+"Ship to Applicable Countries","Wysyłka do dozwolonych krajów"
+"Ship to Specific Countries","Wysyłka do wybranych krajów"
+"Show Method if Not Applicable","Pokaż metodę, jeśli niedostępna"
+"Displayed Error Message","Wyświetlana wiadomość o błędzie"
+"Sort Order","Kolejność sortowania"
+"DHL Parcel Premium","DHL Parcel Premium"
+"DHL Parcel 9","DHL Parcel 9"
+"DHL Parcel 12","DHL Parcel 12"
 "DHL Parcel Economy - Points and Lockers","DHL Parcel Economy - Punkty i Automaty"
 "DHL Parcel Economy - Points","DHL Parcel Economy - Punkty"
 "DHL Parcel Economy - Lockers","DHL Parcel Economy - Automaty"
-Point Delivery Mode,Tryb dostawy do punktu
-DHL Parcel Max Paleta,DHL Parcel Max Paleta
-DHL Parcel Connect,DHL Parcel Connect
-DHL Parcel Connect Parcelshop,DHL Parcel Connect Parcelshop
-DHL Parcel Connect Packstation,DHL Parcel Connect Packstation
-DHL Parcel Connect Plus,DHL Parcel Connect Plus
-DHL Parcel Connect Pallet - Paleta,DHL Parcel Connect Pallet - Paleta
-Customs Clearance Template Details,Szczegóły szablonu odprawy celnej
-Basic Information,Informacje podstawowe
-Template Name,Nazwa szablonu
-Set as Default Template,Ustaw jako szablon domyślny
-Customs Clearance Type,Typ odprawy celnej
-Category Of Item,Rodzaj towaru
-Currency,Waluta
+"Point Delivery Mode","Tryb dostawy do punktu"
+"DHL Parcel Max Paleta","DHL Parcel Max Paleta"
+"DHL Parcel Connect","DHL Parcel Connect"
+"DHL Parcel Connect Parcelshop","DHL Parcel Connect Parcelshop"
+"DHL Parcel Connect Packstation","DHL Parcel Connect Packstation"
+"DHL Parcel Connect Plus","DHL Parcel Connect Plus"
+"DHL Parcel Connect Pallet - Paleta","DHL Parcel Connect Pallet - Paleta"
+"Customs Clearance Template Details","Szczegóły szablonu odprawy celnej"
+"Basic Information","Informacje podstawowe"
+"Template Name","Nazwa szablonu"
+"Set as Default Template","Ustaw jako szablon domyślny"
+"Customs Clearance Type","Typ odprawy celnej"
+"Category Of Item","Rodzaj towaru"
+"Currency","Waluta"
 "ISO currency code (e.g. PLN, EUR, GBP, USD, CHF)","Kod ISO waluty (np. PLN, EUR, GBP, USD, CHF)"
 "Country of Origin (ISO 3166-1 alpha-2)","Kraj pochodzenia (ISO 3166-1 alfa-2)"
-Default 2-letter ISO country code if not set on product,"Domyślny 2-literowy kod ISO kraju, jeśli nie ustawiono w produkcie"
-Gross Costs of Shipment,Koszty przesyłki brutto
-Gross Weight (kg),Waga brutto (kg)
-Data for Individual Clearance,Dane do odprawy indywidualnej
-Shipper NIP Number,Numer NIP nadawcy
-Shipper EORI Number,Numer EORI nadawcy
-Receiver EORI Number,Numer EORI odbiorcy
-Date of invoice,Data faktury
-VAT Invoice,Faktura VAT
-Allowed file extensions: .pdf (max 10 MB),Dozwolone rozszerzenia plików: .pdf (maks. 10 MB)
-VAT Data,Dane VAT
-Shipper VAT Registration Number,Numer rejestracji VAT nadawcy
-Receiver VAT Registration Number,Numer rejestracji VAT odbiorcy
-Contact Person,Osoba kontaktowa
-Contact First Name,Imię
-Contact Last Name,Nazwisko
-Additional Information,Informacje dodatkowe
-Agreements and Declarations,Zgody i oświadczenia
-Value Does Not Exceed Limit,Wartość nie przekracza limitu
-Shipment Does Not Contain Prohibited Goods,Przesyłka nie zawiera towarów zabronionych
-Shipment Does Not Contain Restricted Goods,Przesyłka nie zawiera towarów objętych ograniczeniami
-Customs Items (Goods),Pozycje celne (Towary)
-Add Goods Item,Dodaj pozycję towaru
-Goods List,Lista towarów
-English Name,Nazwa angielska
-Polish Name,Nazwa polska
-Quantity,Ilość
-Weight (kg),Waga (kg)
-Value,Wartość
-HS Tariff Code,Kod taryfy HS
-Country Of Origin,Kraj pochodzenia
-Add New Customs Clearance Template,Dodaj nowy szablon odprawy celnej
-Are you sure you want to delete the selected customs clearances?,Czy na pewno chcesz usunąć wybrane odprawy celne?
-Delete customs clearances,Usuń odprawy celne
-ID,ID
-Customs Type,Typ odprawy celnej
-Currency,Waluta
-Default HS Tariff Code,Domyślny kod taryfy HS
-Is Default,Czy domyślny?
-Delivery Service Template Details,Szczegóły szablonu usługi dostawy
-Service,Usługa
-Default Drop-Off Point,Domyślny punkt nadania
-Default Drop-Off Point is loaded from the DHL Drop-Off Points grid.,Domyślny punkt nadania jest ładowany z siatki punktów nadania DHL.
-Associated Shipping Method,Powiązana metoda dostawy
-Select DHL methods for this template.,Wybierz metody DHL dla tego szablonu.
-Shipment Label Format,Format etykiety przesyłki
+"Default 2-letter ISO country code if not set on product","Domyślny 2-literowy kod ISO kraju, jeśli nie ustawiono w produkcie"
+"Gross Costs of Shipment","Koszty przesyłki brutto"
+"Gross Weight (kg)","Waga brutto (kg)"
+"Data for Individual Clearance","Dane do odprawy indywidualnej"
+"Shipper NIP Number","Numer NIP nadawcy"
+"Shipper EORI Number","Numer EORI nadawcy"
+"Receiver EORI Number","Numer EORI odbiorcy"
+"Date of invoice","Data faktury"
+"VAT Invoice","Faktura VAT"
+"Allowed file extensions: .pdf (max 10 MB)","Dozwolone rozszerzenia plików: .pdf (maks. 10 MB)"
+"VAT Data","Dane VAT"
+"Shipper VAT Registration Number","Numer rejestracji VAT nadawcy"
+"Receiver VAT Registration Number","Numer rejestracji VAT odbiorcy"
+"Contact Person","Osoba kontaktowa"
+"Contact First Name","Imię"
+"Contact Last Name","Nazwisko"
+"Additional Information","Informacje dodatkowe"
+"Agreements and Declarations","Zgody i oświadczenia"
+"Value Does Not Exceed Limit","Wartość nie przekracza limitu"
+"Shipment Does Not Contain Prohibited Goods","Przesyłka nie zawiera towarów zabronionych"
+"Shipment Does Not Contain Restricted Goods","Przesyłka nie zawiera towarów objętych ograniczeniami"
+"Customs Items (Goods)","Pozycje celne (Towary)"
+"Add Goods Item","Dodaj pozycję towaru"
+"Goods List","Lista towarów"
+"English Name","Nazwa angielska"
+"Polish Name","Nazwa polska"
+"Quantity","Ilość"
+"Weight (kg)","Waga (kg)"
+"Value","Wartość"
+"HS Tariff Code","Kod taryfy HS"
+"Country Of Origin","Kraj pochodzenia"
+"Add New Customs Clearance Template","Dodaj nowy szablon odprawy celnej"
+"Are you sure you want to delete the selected customs clearances?","Czy na pewno chcesz usunąć wybrane odprawy celne?"
+"Delete customs clearances","Usuń odprawy celne"
+"ID","ID"
+"Customs Type","Typ odprawy celnej"
+"Default HS Tariff Code","Domyślny kod taryfy HS"
+"Is Default","Czy domyślny?"
+"Delivery Service Template Details","Szczegóły szablonu usługi dostawy"
+"Service","Usługa"
+"Default Drop-Off Point","Domyślny punkt nadania"
+"Default Drop-Off Point is loaded from the DHL Drop-Off Points grid.","Domyślny punkt nadania jest ładowany z siatki punktów nadania DHL."
+"Associated Shipping Method","Powiązana metoda dostawy"
+"Select DHL methods for this template.","Wybierz metody DHL dla tego szablonu."
+"Shipment Label Format","Format etykiety przesyłki"
 "Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}","Dostępne tagi: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}"
 "Cost center code. Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}","Kod MPK (miejsce powstawania kosztów). Dostępne tagi: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}"
-Return Label Expiration (Days),Ważność etykiety zwrotnej (7-183 dni)
-Package Dimensions,Wymiary paczki
-Shipment Type,Typ przesyłki
-Dimensions are not required for envelope shipments,Wymiary nie są wymagane dla przesyłek kopertowych
-Width (cm),Szerokość (cm)
-Length (cm),Długość (cm)
-Height (cm),Wysokość (cm)
-NST - Non-Standard Package,NST - Paczka niestandardowa
-EURO RETURN - Pallet Return,EURO RETURN - Zwrot palety
-Add New Delivery Service Template,Dodaj nowy szablon usługi dostawy
-Are you sure you want to delete the selected delivery services?,Czy na pewno chcesz usunąć wybrane usługi dostawy?
-Delete delivery services,Usuń usługi dostawy
-Service Code,Kod usługi
-Auto Return,Automatyczny zwrot
-Drop-Off Point Template Details,Szczegóły szablonu punktu nadania
-General Information,Informacje ogólne
-House Number,Numer domu
-Country,Kraj
-Phone Number,Numer telefonu
-Shipment Time Information,Informacja o czasie nadania przesyłki
-Courier Pickup Time [From],Godzina odbioru przez kuriera [Od]
-Courier Pickup Time [To],Godzina odbioru przez kuriera [Do]
-Add New Drop-Off Point Template,Dodaj nowy szablon punktu nadania
-Are you sure you want to delete the selected drop-off points?,Czy na pewno chcesz usunąć wybrane punkty nadania?
-Delete drop-off points,Usuń punkty nadania
-General,Ogólne
-Shipment ID,Numer przesyłki
-Courier Dispatch ID,Numer zlecenia kuriera
-Return Package Number,Numer paczki zwrotnej
-Package Number,Numer paczki
-Packages,Paczki
-Package Number (BLP),Numer paczki (BLP)
-Package Tracking Number,Numer śledzenia paczki
-Shipment Tracking History,Historia śledzenia przesyłki
-Print Labels,Pobierz etykiety
-Download Scans,Pobierz skan LP
-Download ePODs,Pobierz ePOD
-Are you sure you want to delete the selected shipments? They will be cancelled in DHL and removed from Magento.,Czy na pewno chcesz usunąć wybrane przesyłki? Zostaną one anulowane w DHL oraz usunięte z Magento.
-Delete Shipments,Usuń przesyłki
-Created At,Utworzono
-Updated At,Zaktualizowano
-Customs Clearance,Szablony odprawy celnej
-Configuration,Konfiguracja
-Help,Pomoc
+"Return Label Expiration (Days)","Ważność etykiety zwrotnej (7-183 dni)"
+"Package Dimensions","Wymiary paczki"
+"Shipment Type","Typ przesyłki"
+"Dimensions are not required for envelope shipments","Wymiary nie są wymagane dla przesyłek kopertowych"
+"Width (cm)","Szerokość (cm)"
+"Length (cm)","Długość (cm)"
+"Height (cm)","Wysokość (cm)"
+"NST - Non-Standard Package","NST - Paczka niestandardowa"
+"EURO RETURN - Pallet Return","EURO RETURN - Zwrot palety"
+"Add New Delivery Service Template","Dodaj nowy szablon usługi dostawy"
+"Are you sure you want to delete the selected delivery services?","Czy na pewno chcesz usunąć wybrane usługi dostawy?"
+"Delete delivery services","Usuń usługi dostawy"
+"Service Code","Kod usługi"
+"Auto Return","Automatyczny zwrot"
+"Drop-Off Point Template Details","Szczegóły szablonu punktu nadania"
+"General Information","Informacje ogólne"
+"House Number","Numer domu"
+"Country","Kraj"
+"Phone Number","Numer telefonu"
+"Shipment Time Information","Informacja o czasie nadania przesyłki"
+"Courier Pickup Time [From]","Godzina odbioru przez kuriera [Od]"
+"Courier Pickup Time [To]","Godzina odbioru przez kuriera [Do]"
+"Add New Drop-Off Point Template","Dodaj nowy szablon punktu nadania"
+"Are you sure you want to delete the selected drop-off points?","Czy na pewno chcesz usunąć wybrane punkty nadania?"
+"Delete drop-off points","Usuń punkty nadania"
+"General","Ogólne"
+"Shipment ID","Numer przesyłki"
+"Courier Dispatch ID","Numer zlecenia kuriera"
+"Return Package Number","Numer paczki zwrotnej"
+"Package Number","Numer paczki"
+"Packages","Paczki"
+"Package Number (BLP)","Numer paczki (BLP)"
+"Package Tracking Number","Numer śledzenia paczki"
+"Shipment Tracking History","Historia śledzenia przesyłki"
+"Print Labels","Pobierz etykiety"
+"Download Scans","Pobierz skan LP"
+"Download ePODs","Pobierz ePOD"
+"Are you sure you want to delete the selected shipments? They will be cancelled in DHL and removed from Magento.","Czy na pewno chcesz usunąć wybrane przesyłki? Zostaną one anulowane w DHL oraz usunięte z Magento."
+"Delete Shipments","Usuń przesyłki"
+"Created At","Utworzono"
+"Updated At","Zaktualizowano"
+"Customs Clearance","Szablony odprawy celnej"
+"Configuration","Konfiguracja"
+"Help","Pomoc"
 "This list is automatically synchronized from the CSV country rates import.","Lista jest automatycznie synchronizowana na podstawie importu stawek krajów z pliku CSV."
 "Upload CSV with columns: Method Code, Condition Type (weight or subtotal), Value From (kg or order amount), Value To (kg or order amount), Price","Wgraj plik CSV z kolumnami: Method Code, Condition Type (weight lub subtotal), Value From (waga w kg lub kwota zamówienia), Value To (waga w kg lub kwota zamówienia), Price (cena dostawy)"
 "Upload CSV with columns: Method Code, Country, Price. For every method in the file, missing countries will be disabled automatically.","Wgraj plik CSV z kolumnami: Method Code, Country, Price. Dla każdej metody w pliku brakujące kraje zostaną automatycznie wyłączone."
@@ -576,7 +575,6 @@ Help,Pomoc
 "Invoice Number & Date","Numer i data faktury"
 "Date of Invoice (YYYY-MM-DD)","Data faktury (RRRR-MM-DD)"
 "Declarations","Oświadczenia"
-"Shipment Does Not Contain Restricted Goods","Przesyłka nie zawiera towarów objętych ograniczeniami"
 "Add Item","Dodaj pozycję"
 "Tariff Code","Kod taryfy"
 "Country of Origin","Kraj pochodzenia"
@@ -587,9 +585,6 @@ Help,Pomoc
 "Akcje","Akcje"
 "Shipper VAT & Receiver VAT","VAT nadawcy i VAT odbiorcy"
 "Shipper NIP, Shipper EORI & Receiver EORI","NIP nadawcy, EORI nadawcy i EORI odbiorcy"
-"Additional Information","Informacje dodatkowe"
-"Agreements and Declarations","Zgody i oświadczenia"
-"VAT Invoice","Faktura VAT"
 "Upload VAT Invoice","Prześlij fakturę VAT"
 "Only .pdf files allowed","Dozwolone tylko pliki .pdf"
 "Only .pdf files allowed (max 10MB)","Dozwolone tylko pliki .pdf (maks. 10 MB)"
