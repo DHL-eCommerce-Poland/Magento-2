@@ -37,6 +37,7 @@ class CustomsTemplateActions extends Column
      * Prepare Data Source for customs template grid action column.
      *
      * @param array $dataSource
+     *
      * @return array
      */
     public function prepareDataSource(array $dataSource): array
