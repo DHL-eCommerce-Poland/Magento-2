@@ -9,9 +9,10 @@ Oficjalny moduł integracyjny DHL eCommerce (Poland) dla platformy Magento 2. Um
 * **Magento Open Source / Adobe Commerce**: `>= 2.4.4`
 * **PHP**: `>= 8.1`
 * **Wymagane rozszerzenia PHP**:
-  * `ext-soap`
+  * `ext-intl`
   * `ext-json`
   * `ext-mbstring`
+  * `ext-soap`
   * `ext-zip`
 
 ---
