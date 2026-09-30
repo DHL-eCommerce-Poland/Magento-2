@@ -110,6 +110,7 @@ jobs:
             echo "::error::Magento Marketplace credentials (MAGENTO_MARKETPLACE_USERNAME, MAGENTO_MARKETPLACE_PASSWORD) are not set in GitHub Secrets."
             exit 1
           fi
+          composer config -g allow-plugins true
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -123,7 +124,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-8.1-
 
       - name: Install Dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction
+        run: composer install --no-plugins --prefer-dist --no-progress --no-interaction
 
       - name: Run Module Unit Tests
         run: vendor/bin/phpunit -c phpunit.xml.dist --log-junit test-results-8.1.xml Test/Unit
@@ -165,6 +166,7 @@ jobs:
             echo "::error::Magento Marketplace credentials (MAGENTO_MARKETPLACE_USERNAME, MAGENTO_MARKETPLACE_PASSWORD) are not set in GitHub Secrets."
             exit 1
           fi
+          composer config -g allow-plugins true
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -178,7 +180,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-8.2-
 
       - name: Install Dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction
+        run: composer install --no-plugins --prefer-dist --no-progress --no-interaction
 
       - name: Run Module Unit Tests
         run: vendor/bin/phpunit -c phpunit.xml.dist --log-junit test-results-8.2.xml Test/Unit
@@ -220,6 +222,7 @@ jobs:
             echo "::error::Magento Marketplace credentials (MAGENTO_MARKETPLACE_USERNAME, MAGENTO_MARKETPLACE_PASSWORD) are not set in GitHub Secrets."
             exit 1
           fi
+          composer config -g allow-plugins true
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -233,7 +236,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-8.3-
 
       - name: Install Dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction
+        run: composer install --no-plugins --prefer-dist --no-progress --no-interaction
 
       - name: Run Module Unit Tests
         run: vendor/bin/phpunit -c phpunit.xml.dist --log-junit test-results-8.3.xml Test/Unit
@@ -275,6 +278,7 @@ jobs:
             echo "::error::Magento Marketplace credentials (MAGENTO_MARKETPLACE_USERNAME, MAGENTO_MARKETPLACE_PASSWORD) are not set in GitHub Secrets."
             exit 1
           fi
+          composer config -g allow-plugins true
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -288,7 +292,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-8.4-
 
       - name: Install Dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction
+        run: composer install --no-plugins --prefer-dist --no-progress --no-interaction
 
       - name: Run Module Unit Tests
         run: vendor/bin/phpunit -c phpunit.xml.dist --log-junit test-results-8.4.xml Test/Unit
@@ -330,6 +334,7 @@ jobs:
             echo "::error::Magento Marketplace credentials (MAGENTO_MARKETPLACE_USERNAME, MAGENTO_MARKETPLACE_PASSWORD) are not set in GitHub Secrets."
             exit 1
           fi
+          composer config -g allow-plugins true
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -343,7 +348,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-8.5-
 
       - name: Install Dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction
+        run: composer install --no-plugins --prefer-dist --no-progress --no-interaction
 
       - name: Run Module Unit Tests
         run: vendor/bin/phpunit -c phpunit.xml.dist --log-junit test-results-8.5.xml Test/Unit
