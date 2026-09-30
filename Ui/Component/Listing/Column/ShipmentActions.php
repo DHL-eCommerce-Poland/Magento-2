@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Ui\Component\Listing\Column;
 
+use Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
-use Throwable;
 
 class ShipmentActions extends Column
 {
@@ -24,6 +24,7 @@ class ShipmentActions extends Column
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
      * @param UrlInterface $urlBuilder
+     * @param ShipmentDataPayloadReader $payloadReader
      * @param array $components
      * @param array $data
      */
@@ -31,6 +32,7 @@ class ShipmentActions extends Column
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
         private readonly UrlInterface $urlBuilder,
+        private readonly ShipmentDataPayloadReader $payloadReader,
         array $components = [],
         array $data = []
     ) {
@@ -128,6 +130,7 @@ class ShipmentActions extends Column
                                 ['entity_id' => $item['entity_id']]
                             ),
                             'label' => __('Update Status'),
+                            'post' => true,
                         ];
                     }
 
@@ -204,28 +207,14 @@ class ShipmentActions extends Column
      */
     private function hasReturnShipment(array $item): bool
     {
-        if (!empty($item['return_shipment_id'])) {
+        $directReturnId = $item['return_shipment_id'] ?? null;
+        if ((is_string($directReturnId) || is_int($directReturnId) || is_float($directReturnId))
+            && trim((string) $directReturnId) !== ''
+        ) {
             return true;
         }
 
-        $rawPayload = $item['shipment_data'] ?? null;
-        if (empty($rawPayload) || !is_string($rawPayload)) {
-            return false;
-        }
-
-        try {
-            $payload = (array) json_decode($rawPayload, true);
-            $packages = $payload['packages'] ?? ($payload['shipmentSettings']['packages'] ?? []);
-            if (is_array($packages)) {
-                foreach ($packages as $pkg) {
-                    if (is_array($pkg) && !empty($pkg['returnShipmentId'])) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        } catch (Throwable) {
-            return false;
-        }
+        $payload = $this->payloadReader->read($item['shipment_data'] ?? null);
+        return !empty($this->payloadReader->getReturnShipmentIds($payload));
     }
 }

@@ -10,6 +10,7 @@ use Ideo\Dhl\Block\Adminhtml\Button\UpdateStatusShipment;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Escaper;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\UrlInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
@@ -26,7 +27,7 @@ class UpdateStatusShipmentTest extends TestCase
      */
     private $requestMock;
     /**
-     * @var Stub
+     * @var MockObject|Stub
      */
     private $urlBuilderStub;
     /**
@@ -53,12 +54,13 @@ class UpdateStatusShipmentTest extends TestCase
             ->willReturn($this->requestMock);
 
         $this->contextStub->method('getUrlBuilder')
-            ->willReturn($this->urlBuilderStub);
+            ->willReturnCallback(fn () => $this->urlBuilderStub);
 
         $this->button = new UpdateStatusShipment(
             $this->contextStub,
             $escaperStub,
-            $this->shipmentRepositoryStub
+            $this->shipmentRepositoryStub,
+            new Json()
         );
     }
 
@@ -105,13 +107,32 @@ class UpdateStatusShipmentTest extends TestCase
         $this->shipmentRepositoryStub->method('getById')
             ->willReturn($shipmentMock);
 
-        $this->urlBuilderStub->method('getUrl')
+        $this->urlBuilderStub = $this->createMock(UrlInterface::class);
+        $this->urlBuilderStub->expects($this->once())
+            ->method('getUrl')
+            ->with(
+                'dhlparcel/shipment/updateStatus',
+                ['entity_id' => 10, 'redirect_to_edit' => 1]
+            )
             ->willReturn('http://magento.local/admin/dhlparcel/shipment/updateStatus/entity_id/10');
 
         $buttonData = $this->button->getButtonData();
 
         $this->assertNotEmpty($buttonData);
         $this->assertEquals(__('Update Status'), $buttonData['label']);
-        $this->assertStringContainsString('location.href', $buttonData['on_click']);
+        $this->assertStringContainsString("require(['mage/dataPost']", $buttonData['on_click']);
+        $this->assertStringContainsString('dataPost().postData(', $buttonData['on_click']);
+        $this->assertStringNotContainsString('location.href', $buttonData['on_click']);
+
+        $matches = [];
+        $this->assertSame(1, preg_match('/postData\((\{.*?\})\);/', $buttonData['on_click'], $matches));
+        $postData = json_decode($matches[1], true);
+        $this->assertSame(
+            [
+                'action' => 'http://magento.local/admin/dhlparcel/shipment/updateStatus/entity_id/10',
+                'data' => [],
+            ],
+            $postData
+        );
     }
 }

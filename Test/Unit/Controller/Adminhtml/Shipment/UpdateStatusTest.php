@@ -8,6 +8,8 @@ use Ideo\Dhl\Controller\Adminhtml\Shipment\UpdateStatus;
 use Ideo\Dhl\Model\Api\TrackingResult;
 use Ideo\Dhl\Model\Shipment\ShipmentTrackingService;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;
@@ -71,6 +73,12 @@ class UpdateStatusTest extends TestCase
             $this->contextStub,
             $this->trackingServiceStub
         );
+    }
+
+    public function testActionOnlySupportsPostRequests(): void
+    {
+        $this->assertInstanceOf(HttpPostActionInterface::class, $this->controller);
+        $this->assertNotInstanceOf(HttpGetActionInterface::class, $this->controller);
     }
 
     public function testExecuteWithInvalidEntityId(): void

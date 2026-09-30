@@ -4,25 +4,24 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Ui\Component\Listing\Column;
 
-use Magento\Framework\Serialize\SerializerInterface;
+use Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
-use Throwable;
 
 class ReturnShipmentId extends Column
 {
     /**
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
-     * @param SerializerInterface $serializer
+     * @param ShipmentDataPayloadReader $payloadReader
      * @param array $components
      * @param array $data
      */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        private readonly SerializerInterface $serializer,
+        private readonly ShipmentDataPayloadReader $payloadReader,
         array $components = [],
         array $data = []
     ) {
@@ -59,36 +58,15 @@ class ReturnShipmentId extends Column
     public function formatReturnShipmentId(array $item): string
     {
         // 1. Direct return_shipment_id column value
-        if (!empty($item['return_shipment_id'])) {
-            return (string) $item['return_shipment_id'];
+        $direct = $item['return_shipment_id'] ?? null;
+        if ((is_string($direct) || is_int($direct) || is_float($direct)) && !empty($direct)) {
+            return (string) $direct;
         }
 
-        // 2. Fallback to package returnShipmentId in shipment_data JSON
-        $shipmentDataPayload = $item['shipment_data'] ?? null;
-        if (empty($shipmentDataPayload)) {
-            return '';
-        }
-
-        try {
-            $data = is_array($shipmentDataPayload)
-                ? $shipmentDataPayload
-                : $this->serializer->unserialize((string) $shipmentDataPayload);
-
-            $packages = $data['packages'] ?? ($data['shipmentSettings']['packages'] ?? []);
-            if (is_array($packages) && !empty($packages)) {
-                $returnIds = [];
-                foreach ($packages as $pkg) {
-                    if (is_array($pkg) && !empty($pkg['returnShipmentId'])) {
-                        $returnIds[] = (string) $pkg['returnShipmentId'];
-                    }
-                }
-                $filtered = array_values(array_unique(array_filter($returnIds)));
-                if (!empty($filtered)) {
-                    return implode(', ', $filtered);
-                }
-            }
-        } catch (Throwable) {
-            return '';
+        $data = $this->payloadReader->read($item['shipment_data'] ?? null);
+        $returnIds = $this->payloadReader->getReturnShipmentIds($data);
+        if (!empty($returnIds)) {
+            return implode(', ', $returnIds);
         }
 
         return '';

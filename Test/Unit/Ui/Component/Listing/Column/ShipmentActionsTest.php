@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Ui\Component\Listing\Column;
 
+use Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader;
 use Ideo\Dhl\Ui\Component\Listing\Column\ShipmentActions;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
@@ -59,6 +61,7 @@ class ShipmentActionsTest extends TestCase
             $context,
             $uiComponentFactory,
             $urlBuilder,
+            new ShipmentDataPayloadReader(new Json()),
             [],
             ['name' => 'actions']
         );
@@ -103,6 +106,8 @@ class ShipmentActionsTest extends TestCase
             $actions['download_epod']['href']
         );
         $this->assertEquals('Download ePOD', (string)$actions['download_epod']['label']);
+
+        $this->assertTrue($actions['update_status']['post']);
 
         $this->assertEquals('http://example.com/sales/order/view/order_id/100', $actions['view_order']['href']);
         $this->assertEquals('View Order', (string)$actions['view_order']['label']);
@@ -157,6 +162,7 @@ class ShipmentActionsTest extends TestCase
             $context,
             $uiComponentFactory,
             $urlBuilder,
+            new ShipmentDataPayloadReader(new Json()),
             [],
             ['name' => 'actions']
         );
@@ -234,6 +240,7 @@ class ShipmentActionsTest extends TestCase
             $context,
             $uiComponentFactory,
             $urlBuilder,
+            new ShipmentDataPayloadReader(new Json()),
             [],
             ['name' => 'actions']
         );
@@ -267,5 +274,41 @@ class ShipmentActionsTest extends TestCase
             $actions['print_return_qr']['href']
         );
         $this->assertEquals('Print Return QR Code', (string)$actions['print_return_qr']['label']);
+    }
+
+    public function testPrepareDataSourceDetectsReturnShipmentInNestedPackages(): void
+    {
+        $context = $this->createStub(ContextInterface::class);
+        $uiComponentFactory = $this->createStub(UiComponentFactory::class);
+        $urlBuilder = $this->createStub(UrlInterface::class);
+        $urlBuilder->method('getUrl')->willReturnCallback(
+            static fn (string $route, array $params): string => $route . '/' . $params['entity_id']
+        );
+
+        $actionColumn = new ShipmentActions(
+            $context,
+            $uiComponentFactory,
+            $urlBuilder,
+            new ShipmentDataPayloadReader(new Json()),
+            [],
+            ['name' => 'actions']
+        );
+
+        $result = $actionColumn->prepareDataSource([
+            'data' => [
+                'items' => [
+                    [
+                        'entity_id' => 21,
+                        'shipment_id' => '123456789',
+                        'shipment_data' => '{"shipmentSettings":{"packages":[{"returnShipmentId":"987654321"}]}}',
+                    ],
+                ],
+            ],
+        ]);
+
+        $actions = $result['data']['items'][0]['actions'];
+        $this->assertArrayNotHasKey('create_return', $actions);
+        $this->assertArrayHasKey('print_return_label', $actions);
+        $this->assertArrayHasKey('print_return_qr', $actions);
     }
 }

@@ -8,12 +8,11 @@ use Exception;
 use Ideo\Dhl\Model\Shipment\ShipmentTrackingService;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Psr\Log\LoggerInterface;
 
-class UpdateStatus extends Action implements HttpGetActionInterface, HttpPostActionInterface
+class UpdateStatus extends Action implements HttpPostActionInterface
 {
     public const ADMIN_RESOURCE = 'Ideo_Dhl::shipment';
 

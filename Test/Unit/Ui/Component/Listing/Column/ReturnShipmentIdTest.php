@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Test\Unit\Ui\Component\Listing\Column;
 
+use Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader;
 use Ideo\Dhl\Ui\Component\Listing\Column\ReturnShipmentId;
-use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use PHPUnit\Framework\TestCase;
@@ -18,13 +19,11 @@ class ReturnShipmentIdTest extends TestCase
     {
         $contextMock = $this->createStub(ContextInterface::class);
         $uiComponentFactoryMock = $this->createStub(UiComponentFactory::class);
-        $serializerMock = $this->createStub(SerializerInterface::class);
-        $serializerMock->method('unserialize')->willReturnCallback(fn($data) => json_decode($data, true));
 
         $this->column = new ReturnShipmentId(
             $contextMock,
             $uiComponentFactoryMock,
-            $serializerMock,
+            new ShipmentDataPayloadReader(new Json()),
             [],
             ['name' => 'return_shipment_id']
         );
@@ -94,5 +93,32 @@ class ReturnShipmentIdTest extends TestCase
 
         $result = $this->column->prepareDataSource($dataSource);
         $this->assertEquals('', $result['data']['items'][0]['return_shipment_id']);
+    }
+
+    public function testPrepareDataSourceReadsReturnIdsFromNestedPackages(): void
+    {
+        $payload = json_encode([
+            'shipmentSettings' => [
+                'packages' => [
+                    ['returnShipmentId' => '90040025505'],
+                    ['returnShipmentId' => ['invalid']],
+                    ['returnShipmentId' => '90040025505'],
+                ],
+            ],
+        ]);
+
+        $result = $this->column->prepareDataSource([
+            'data' => [
+                'items' => [
+                    [
+                        'entity_id' => 4,
+                        'return_shipment_id' => null,
+                        'shipment_data' => $payload,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame('90040025505', $result['data']['items'][0]['return_shipment_id']);
     }
 }
