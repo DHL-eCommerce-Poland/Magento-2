@@ -154,11 +154,11 @@ class Carrier extends AbstractCarrier implements CarrierInterface
      * Check if a shipping method is restricted for the given destination country.
      *
      * @param string $methodCode
-     * @param string|null $destCountryId
+     * @param string $destCountryId
      *
      * @return bool
      */
-    private function isMethodDestinationRestricted(string $methodCode, ?string $destCountryId): bool
+    private function isMethodDestinationRestricted(string $methodCode, string $destCountryId): bool
     {
         $sallowspecific = (int)$this->getConfigData('method_' . $methodCode . '_sallowspecific');
         if ($sallowspecific === 1) {

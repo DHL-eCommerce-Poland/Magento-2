@@ -21,6 +21,7 @@ class TableRateResolver
      *
      * @param int $websiteId
      * @param string $methodCode
+     * @param string $countryId
      * @param string $conditionType
      * @param float $value
      *
@@ -29,16 +30,20 @@ class TableRateResolver
     public function resolveRate(
         int $websiteId,
         string $methodCode,
+        string $countryId,
         string $conditionType,
         float $value
     ): ?float {
         $connection = $this->resourceConnection->getConnection();
         $tableName = $this->resourceConnection->getTableName('dhlpoland_tablerate');
 
+        $normalizedCountry = strtoupper(trim($countryId));
+
         $select = $connection->select()
             ->from($tableName, ['price'])
             ->where('website_id IN (?)', [0, $websiteId])
             ->where('method_code = ?', $methodCode)
+            ->where('country_id = ?', $normalizedCountry)
             ->where('condition_type = ?', $conditionType)
             ->where('condition_from <= ?', $value)
             ->where('condition_to >= ?', $value)
@@ -71,6 +76,7 @@ class TableRateResolver
             ->from($tableName, [
                 'website_id',
                 'method_code',
+                'country_id',
                 'condition_type',
                 'condition_from',
                 'condition_to',
@@ -84,6 +90,7 @@ class TableRateResolver
                 ->from($tableName, [
                     'website_id',
                     'method_code',
+                    'country_id',
                     'condition_type',
                     'condition_from',
                     'condition_to',

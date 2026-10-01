@@ -8,6 +8,7 @@ use Ideo\Dhl\Model\Config\Backend\Tablerate;
 use Magento\Config\Model\Config\Backend\File\RequestData\RequestDataInterface;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -44,6 +45,7 @@ class TablerateTest extends TestCase
         $uploaderFactory = $this->createStub(UploaderFactory::class);
         $requestData = $this->createStub(RequestDataInterface::class);
         $filesystem = $this->createStub(Filesystem::class);
+        $configWriter = $this->createStub(WriterInterface::class);
 
         $this->backendModel = new Tablerate(
             $context,
@@ -53,7 +55,8 @@ class TablerateTest extends TestCase
             $uploaderFactory,
             $requestData,
             $filesystem,
-            $resourceConnectionStub
+            $resourceConnectionStub,
+            $configWriter
         );
     }
 
@@ -69,9 +72,9 @@ class TablerateTest extends TestCase
 
     public function testParseCsvRowsParsesWithoutWebsiteColumnInDefaultScope(): void
     {
-        $csvContent = "Method Code,Condition Type,Value From,Value To,Price\n" .
-            "parcel_polska,weight,0.0,5.0,15.00\n" .
-            "premium,subtotal,0.0,100.0,10.00";
+        $csvContent = "Method Code,Country,Condition Type,Value From,Value To,Price\n" .
+            "parcel_polska,PL,weight,0.0,5.0,15.00\n" .
+            "premium,PL,subtotal,0.0,100.0,10.00";
 
         $rows = $this->backendModel->parseCsvContent($csvContent);
 
@@ -79,6 +82,7 @@ class TablerateTest extends TestCase
         $this->assertEquals([
             'website_id' => 0,
             'method_code' => 'parcel_polska',
+            'country_id' => 'PL',
             'condition_type' => 'weight',
             'condition_from' => 0.0,
             'condition_to' => 5.0,
@@ -89,8 +93,8 @@ class TablerateTest extends TestCase
 
     public function testParseCsvRowsParsesWithExplicitWebsiteId(): void
     {
-        $csvContent = "Method Code,Condition Type,Value From,Value To,Price\n" .
-            "parcel_polska,weight,0.0,5.0,15.00";
+        $csvContent = "Method Code,Country,Condition Type,Value From,Value To,Price\n" .
+            "parcel_polska,PL,weight,0.0,5.0,15.00";
 
         $rows = $this->backendModel->parseCsvContent($csvContent, 2);
 
@@ -100,9 +104,9 @@ class TablerateTest extends TestCase
 
     public function testParseCsvRowsParsesWithWebsiteColumnForBackwardCompatibility(): void
     {
-        $csvContent = "Website,Method Code,Condition Type,Value From,Value To,Price\n" .
-            "1,parcel_polska,weight,0.0,5.0,15.00\n" .
-            "0,premium,subtotal,0.0,100.0,10.00";
+        $csvContent = "Website,Method Code,Country,Condition Type,Value From,Value To,Price\n" .
+            "1,parcel_polska,PL,weight,0.0,5.0,15.00\n" .
+            "0,premium,PL,subtotal,0.0,100.0,10.00";
 
         $rows = $this->backendModel->parseCsvContent($csvContent);
 
@@ -110,6 +114,7 @@ class TablerateTest extends TestCase
         $this->assertEquals([
             'website_id' => 1,
             'method_code' => 'parcel_polska',
+            'country_id' => 'PL',
             'condition_type' => 'weight',
             'condition_from' => 0.0,
             'condition_to' => 5.0,
