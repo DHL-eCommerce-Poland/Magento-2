@@ -66,7 +66,9 @@ class Tablerate extends File
 
     /**
      * Parse CSV file content into tabular rate rows array.
-     * Expected CSV format: Method Code, Country (optional), Condition Type, Value From, Value To, Price (Website optional).
+     *
+     * Expected CSV format: Method Code, Country (optional), Condition Type,
+     * Value From, Value To, Price (Website optional).
      *
      * @param string $content Raw CSV text content.
      * @param int|null $defaultWebsiteId Optional website ID override.

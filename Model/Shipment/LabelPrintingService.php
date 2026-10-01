@@ -30,8 +30,8 @@ class LabelPrintingService
      * @param ClientInterface $client
      * @param CredentialsProvider $credentialsProvider
      * @param ScopeConfigInterface $scopeConfig
-     * @param LabelGenerator|null $labelGenerator
      * @param LoggerInterface $logger
+     * @param LabelGenerator|null $labelGenerator
      * @param FileDriver|null $fileDriver
      */
     public function __construct(
