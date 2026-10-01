@@ -21,7 +21,7 @@ use ZipArchive;
 
 class DocumentDownloadService
 {
-    private const XML_PATH_SANDBOX = 'carriers/dhlparcel/sandbox';
+    private const XML_PATH_SANDBOX = 'carriers/dhlpoland/sandbox';
 
     /**
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository

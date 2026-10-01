@@ -32,10 +32,10 @@ class ShippingMethod implements OptionSourceInterface
         foreach ($this->methodCatalog->getMethods() as $method) {
             $code = $method['code'];
             $configuredTitle = $this->scopeConfig->getValue(
-                'carriers/dhlparcel/method_' . $code . '_method_name',
+                'carriers/dhlpoland/method_' . $code . '_method_name',
                 ScopeInterface::SCOPE_STORE
             ) ?: $this->scopeConfig->getValue(
-                'carriers/dhlparcel/method_' . $code . '_title',
+                'carriers/dhlpoland/method_' . $code . '_title',
                 ScopeInterface::SCOPE_STORE
             );
 

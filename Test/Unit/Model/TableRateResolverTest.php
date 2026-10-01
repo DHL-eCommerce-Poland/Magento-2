@@ -32,7 +32,7 @@ class TableRateResolverTest extends TestCase
         $resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_tablerate');
 
         $resolver = new TableRateResolver($resourceConnectionStub);
-        $result = $resolver->resolveRate(1, 'parcel_polska', 'weight', 4.5);
+        $result = $resolver->resolveRate(1, 'parcel_polska', 'PL', 'weight', 4.5);
 
         $this->assertSame(18.5, $result);
     }
@@ -57,7 +57,7 @@ class TableRateResolverTest extends TestCase
         $resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_tablerate');
 
         $resolver = new TableRateResolver($resourceConnectionStub);
-        $result = $resolver->resolveRate(1, 'parcel_polska', 'weight', 99.0);
+        $result = $resolver->resolveRate(1, 'parcel_polska', 'PL', 'weight', 99.0);
 
         $this->assertNull($result);
     }
@@ -73,6 +73,7 @@ class TableRateResolverTest extends TestCase
             [
                 'website_id' => 1,
                 'method_code' => 'parcel_polska',
+                'country_id' => 'PL',
                 'condition_type' => 'weight',
                 'condition_from' => 0.0,
                 'condition_to' => 5.0,
@@ -110,6 +111,7 @@ class TableRateResolverTest extends TestCase
             [
                 'website_id' => 0,
                 'method_code' => 'parcel_polska',
+                'country_id' => 'PL',
                 'condition_type' => 'weight',
                 'condition_from' => 0.0,
                 'condition_to' => 10.0,

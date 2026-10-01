@@ -27,7 +27,7 @@ class DataProvider extends AbstractDataProvider
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      * @param array $meta
      * @param array $data
      */
@@ -39,7 +39,7 @@ class DataProvider extends AbstractDataProvider
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
-        private readonly ?LoggerInterface $logger = null,
+        private readonly LoggerInterface $logger,
         array $meta = [],
         array $data = []
     ) {
@@ -69,7 +69,7 @@ class DataProvider extends AbstractDataProvider
                     $payload = $this->serializer->unserialize($rawPayload);
                 } catch (Throwable $e) {
                     $payload = null;
-                    $this->logger?->error(sprintf(
+                    $this->logger->error(sprintf(
                         '[DataProvider] Failed to unserialize payload for shipment entity #%s: %s',
                         $item->getId(),
                         $e->getMessage()
@@ -126,7 +126,7 @@ class DataProvider extends AbstractDataProvider
                                 $data['packages_fieldset'] = ['packages' => $data['packages']];
                             }
                         } catch (Throwable $e) {
-                            $this->logger?->error(sprintf(
+                            $this->logger->error(sprintf(
                                 '[DataProvider] Failed to normalize shipmentSettings for shipment entity #%s: %s',
                                 $item->getId(),
                                 $e->getMessage()
@@ -138,7 +138,7 @@ class DataProvider extends AbstractDataProvider
                             $data['specialServices'] = $this->normalizeSpecialServices($payload['specialServices']);
                             $data['special_services'] = ['specialServices' => $data['specialServices']];
                         } catch (Throwable $e) {
-                            $this->logger?->error(sprintf(
+                            $this->logger->error(sprintf(
                                 '[DataProvider] Failed to normalize specialServices for shipment entity #%s: %s',
                                 $item->getId(),
                                 $e->getMessage()
@@ -156,7 +156,7 @@ class DataProvider extends AbstractDataProvider
                             $data['packages'] = $this->normalizePackages($payload['packages'], $rootPkgNums);
                             $data['packages_fieldset'] = ['packages' => $data['packages']];
                         } catch (Throwable $e) {
-                            $this->logger?->error(sprintf(
+                            $this->logger->error(sprintf(
                                 '[DataProvider] Failed to normalize root packages for shipment entity #%s: %s',
                                 $item->getId(),
                                 $e->getMessage()

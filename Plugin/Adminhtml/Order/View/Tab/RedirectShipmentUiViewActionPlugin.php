@@ -93,7 +93,7 @@ class RedirectShipmentUiViewActionPlugin
             if ($dhlShipment->getEntityId() && isset($item[$columnName]['view']['href'])) {
                 try {
                     $item[$columnName]['view']['href'] = $this->urlBuilder->getUrl(
-                        'dhlparcel/shipment/edit',
+                        'dhlpoland/shipment/edit',
                         ['entity_id' => $dhlShipment->getEntityId()]
                     );
                 } catch (Throwable $exception) {

@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:store:etc/config.xsd">
     <default>
         <carriers>
-            <dhlparcel>
+            <dhlpoland>
                 <model>Ideo\Dhl\Model\Carrier</model>
                 <active>1</active>
                 <sandbox>0</sandbox>
@@ -354,7 +354,7 @@
                 <method_connect_pallet_cod_free_shipping_subtotal>0.00</method_connect_pallet_cod_free_shipping_subtotal>
                 <method_connect_pallet_cod_specificerrmsg>This shipping method is currently unavailable.</method_connect_pallet_cod_specificerrmsg>
                 <method_connect_pallet_cod_showmethod>0</method_connect_pallet_cod_showmethod>
-            </dhlparcel>
+            </dhlpoland>
         </carriers>
     </default>
 </config>

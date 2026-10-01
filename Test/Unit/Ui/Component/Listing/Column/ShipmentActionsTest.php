@@ -23,35 +23,35 @@ class ShipmentActionsTest extends TestCase
         $urlBuilder->expects($this->exactly(8))
             ->method('getUrl')
             ->willReturnMap([
-                ['dhlparcel/shipment/edit', ['entity_id' => 10], 'http://example.com/dhl/shipment/edit/entity_id/10'],
+                ['dhlpoland/shipment/edit', ['entity_id' => 10], 'http://example.com/dhl/shipment/edit/entity_id/10'],
                 [
-                    'dhlparcel/shipment/printLabel',
+                    'dhlpoland/shipment/printLabel',
                     ['entity_id' => 10],
                     'http://example.com/dhl/shipment/printLabel/entity_id/10',
                 ],
                 [
-                    'dhlparcel/shipment/createReturnShipment',
+                    'dhlpoland/shipment/createReturnShipment',
                     ['entity_id' => 10],
                     'http://example.com/dhl/shipment/createReturnShipment/entity_id/10',
                 ],
                 [
-                    'dhlparcel/shipment/downloadScan',
+                    'dhlpoland/shipment/downloadScan',
                     ['entity_id' => 10],
                     'http://example.com/dhl/shipment/downloadScan/entity_id/10',
                 ],
                 [
-                    'dhlparcel/shipment/downloadEpod',
+                    'dhlpoland/shipment/downloadEpod',
                     ['entity_id' => 10],
                     'http://example.com/dhl/shipment/downloadEpod/entity_id/10',
                 ],
                 [
-                    'dhlparcel/shipment/updateStatus',
+                    'dhlpoland/shipment/updateStatus',
                     ['entity_id' => 10],
                     'http://example.com/dhl/shipment/updateStatus/entity_id/10',
                 ],
                 ['sales/order/view', ['order_id' => 100], 'http://example.com/sales/order/view/order_id/100'],
                 [
-                    'dhlparcel/shipment/delete',
+                    'dhlpoland/shipment/delete',
                     ['entity_id' => 10],
                     'http://example.com/dhl/shipment/delete/entity_id/10',
                 ],
@@ -125,34 +125,34 @@ class ShipmentActionsTest extends TestCase
         $urlBuilder->expects($this->exactly(7))
             ->method('getUrl')
             ->willReturnMap([
-                ['dhlparcel/shipment/edit', ['entity_id' => 15], 'http://example.com/dhl/shipment/edit/entity_id/15'],
+                ['dhlpoland/shipment/edit', ['entity_id' => 15], 'http://example.com/dhl/shipment/edit/entity_id/15'],
                 [
-                    'dhlparcel/shipment/printLabel',
+                    'dhlpoland/shipment/printLabel',
                     ['entity_id' => 15],
                     'http://example.com/dhl/shipment/printLabel/entity_id/15',
                 ],
                 [
-                    'dhlparcel/shipment/createReturnShipment',
+                    'dhlpoland/shipment/createReturnShipment',
                     ['entity_id' => 15],
                     'http://example.com/dhl/shipment/createReturnShipment/entity_id/15',
                 ],
                 [
-                    'dhlparcel/shipment/downloadScan',
+                    'dhlpoland/shipment/downloadScan',
                     ['entity_id' => 15],
                     'http://example.com/dhl/shipment/downloadScan/entity_id/15',
                 ],
                 [
-                    'dhlparcel/shipment/downloadEpod',
+                    'dhlpoland/shipment/downloadEpod',
                     ['entity_id' => 15],
                     'http://example.com/dhl/shipment/downloadEpod/entity_id/15',
                 ],
                 [
-                    'dhlparcel/shipment/updateStatus',
+                    'dhlpoland/shipment/updateStatus',
                     ['entity_id' => 15],
                     'http://example.com/dhl/shipment/updateStatus/entity_id/15',
                 ],
                 [
-                    'dhlparcel/shipment/delete',
+                    'dhlpoland/shipment/delete',
                     ['entity_id' => 15],
                     'http://example.com/dhl/shipment/delete/entity_id/15',
                 ],
@@ -198,39 +198,39 @@ class ShipmentActionsTest extends TestCase
         $urlBuilder->expects($this->exactly(8))
             ->method('getUrl')
             ->willReturnMap([
-                ['dhlparcel/shipment/edit', ['entity_id' => 20], 'http://example.com/dhl/shipment/edit/entity_id/20'],
+                ['dhlpoland/shipment/edit', ['entity_id' => 20], 'http://example.com/dhl/shipment/edit/entity_id/20'],
                 [
-                    'dhlparcel/shipment/printLabel',
+                    'dhlpoland/shipment/printLabel',
                     ['entity_id' => 20],
                     'http://example.com/dhl/shipment/printLabel/entity_id/20',
                 ],
                 [
-                    'dhlparcel/shipment/printReturnLabel',
+                    'dhlpoland/shipment/printReturnLabel',
                     ['entity_id' => 20],
                     'http://example.com/dhl/shipment/printReturnLabel/entity_id/20',
                 ],
                 [
-                    'dhlparcel/shipment/printReturnQrCode',
+                    'dhlpoland/shipment/printReturnQrCode',
                     ['entity_id' => 20],
                     'http://example.com/dhl/shipment/printReturnQrCode/entity_id/20',
                 ],
                 [
-                    'dhlparcel/shipment/downloadScan',
+                    'dhlpoland/shipment/downloadScan',
                     ['entity_id' => 20],
                     'http://example.com/dhl/shipment/downloadScan/entity_id/20',
                 ],
                 [
-                    'dhlparcel/shipment/downloadEpod',
+                    'dhlpoland/shipment/downloadEpod',
                     ['entity_id' => 20],
                     'http://example.com/dhl/shipment/downloadEpod/entity_id/20',
                 ],
                 [
-                    'dhlparcel/shipment/updateStatus',
+                    'dhlpoland/shipment/updateStatus',
                     ['entity_id' => 20],
                     'http://example.com/dhl/shipment/updateStatus/entity_id/20',
                 ],
                 [
-                    'dhlparcel/shipment/delete',
+                    'dhlpoland/shipment/delete',
                     ['entity_id' => 20],
                     'http://example.com/dhl/shipment/delete/entity_id/20',
                 ],

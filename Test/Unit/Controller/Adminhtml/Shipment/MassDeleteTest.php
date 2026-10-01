@@ -87,7 +87,8 @@ class MassDeleteTest extends TestCase
             $this->filterMock,
             $this->collectionFactoryMock,
             $this->deletionServiceMock,
-            $this->loggerMock
+            $this->loggerMock,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 

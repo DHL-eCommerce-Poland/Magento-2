@@ -27,7 +27,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
      * @param DropOffPointRepositoryInterface $dropOffPointRepository
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param ScopeConfigInterface $scopeConfig
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -36,7 +36,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
         private readonly DropOffPointRepositoryInterface $dropOffPointRepository,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }
@@ -75,7 +75,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
                         $postalCodes[] = (string) $sender->getPostalCode();
                     }
                 } catch (Exception $e) {
-                    $this->logger?->debug('[GetPickupHours] DropOffPoint fallback failed: ' . $e->getMessage());
+                    $this->logger->debug('[GetPickupHours] DropOffPoint fallback failed: ' . $e->getMessage());
                 }
             }
 
@@ -91,7 +91,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
                             }
                         }
                     } catch (Exception $e) {
-                        $this->logger?->debug(
+                        $this->logger->debug(
                             sprintf('[GetPickupHours] Shipment #%s fallback failed: %s', $sId, $e->getMessage())
                         );
                     }
@@ -112,7 +112,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
                 ]);
             }
 
-            $environment = (string) $this->scopeConfig->getValue('carriers/dhlparcel/environment') ?: 'sandbox';
+            $environment = (string) $this->scopeConfig->getValue('carriers/dhlpoland/environment') ?: 'sandbox';
 
             $resultData = $this->pickupTimeResolver->resolveAvailableHoursForPostalCodes(
                 $postalCodes,
@@ -125,7 +125,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
                 'data' => $resultData,
             ]);
         } catch (Exception $e) {
-            $this->logger?->error('[GetPickupHours Controller] Error: ' . $e->getMessage());
+            $this->logger->error('[GetPickupHours Controller] Error: ' . $e->getMessage());
 
             return $resultJson->setData([
                 'success' => false,

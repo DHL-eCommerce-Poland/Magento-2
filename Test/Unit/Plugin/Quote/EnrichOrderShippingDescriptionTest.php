@@ -47,7 +47,7 @@ class EnrichOrderShippingDescriptionTest extends TestCase
 
         $quoteAddressStub->method('getData')->willReturnCallback(
             static fn (string $key) => match ($key) {
-                'shipping_method' => 'dhlparcel_economy_all',
+                'shipping_method' => 'dhlpoland_economy_all',
                 'dhl_service_point_id' => 'POP-777',
                 'dhl_service_point_name' => 'Żabka Test',
                 'dhl_service_point_street' => 'Kwiatowa 10',
@@ -81,7 +81,7 @@ class EnrichOrderShippingDescriptionTest extends TestCase
 
         $quoteAddressStub->method('getData')->willReturnCallback(
             static fn (string $key) => match ($key) {
-                'shipping_method' => 'dhlparcel_courier',
+                'shipping_method' => 'dhlpoland_courier',
                 default => null,
             }
         );
@@ -101,7 +101,7 @@ class EnrichOrderShippingDescriptionTest extends TestCase
 
         $quoteAddressStub->method('getData')->willReturnCallback(
             static fn (string $key) => match ($key) {
-                'shipping_method' => 'dhlparcel_connect',
+                'shipping_method' => 'dhlpoland_connect',
                 default => null,
             }
         );

@@ -21,12 +21,12 @@ class Delete extends Action implements HttpGetActionInterface, HttpPostActionInt
     /**
      * @param Context $context
      * @param ShipmentDeletionService $shipmentDeletionService
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         private readonly ShipmentDeletionService $shipmentDeletionService,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }
@@ -50,10 +50,10 @@ class Delete extends Action implements HttpGetActionInterface, HttpPostActionInt
             $this->shipmentDeletionService->deleteShipment($entityId);
             $this->messageManager->addSuccessMessage(__('Shipment has been deleted successfully.'));
         } catch (LocalizedException $e) {
-            $this->logger?->error('Error deleting DHL shipment: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error deleting DHL shipment: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage($e->getMessage());
         } catch (Exception $e) {
-            $this->logger?->error('Error deleting DHL shipment: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error deleting DHL shipment: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage(__('Failed to delete shipment: %1', $e->getMessage()));
         }
 

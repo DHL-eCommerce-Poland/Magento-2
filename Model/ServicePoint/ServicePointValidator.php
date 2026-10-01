@@ -14,7 +14,7 @@ use Magento\Store\Model\ScopeInterface;
 
 class ServicePointValidator
 {
-    private const XML_PATH_DELIVERY_MODE = 'carriers/dhlparcel/method_economy_all_point_delivery_mode';
+    private const XML_PATH_DELIVERY_MODE = 'carriers/dhlpoland/method_economy_all_point_delivery_mode';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -109,7 +109,7 @@ class ServicePointValidator
         // Domestic SP (economy) in 'nearest' delivery mode does NOT require map point selection
         if ($cleanMethodCode === MethodCatalog::METHOD_ECONOMY_ALL || $cleanMethodCode === MethodCatalog::METHOD_ECONOMY_ALL_COD) {
             $path = $cleanMethodCode === MethodCatalog::METHOD_ECONOMY_ALL_COD
-                ? 'carriers/dhlparcel/method_economy_all_cod_point_delivery_mode'
+                ? 'carriers/dhlpoland/method_economy_all_cod_point_delivery_mode'
                 : self::XML_PATH_DELIVERY_MODE;
 
             $deliveryMode = (string) $this->scopeConfig->getValue(

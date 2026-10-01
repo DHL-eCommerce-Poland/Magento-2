@@ -3,43 +3,34 @@
       xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">dhlparcel_shipment_form.dhlparcel_shipment_form_data_source</item>
+            <item name="provider" xsi:type="string">dhlpoland_delivery_service_form.dhlpoland_delivery_service_form_data_source</item>
         </item>
-        <item name="label" xsi:type="string" translate="true">DHL Shipment Details</item>
+        <item name="label" xsi:type="string" translate="true">Delivery Service Template Details</item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
     </argument>
     <settings>
         <buttons>
+            <button name="save" class="Ideo\Dhl\Block\Adminhtml\Button\Save"/>
+            <button name="save_and_continue" class="Ideo\Dhl\Block\Adminhtml\Button\SaveAndContinue"/>
+            <button name="delete" class="Ideo\Dhl\Block\Adminhtml\Button\Delete"/>
             <button name="back" class="Ideo\Dhl\Block\Adminhtml\Button\Back"/>
-            <button name="print_label" class="Ideo\Dhl\Block\Adminhtml\Button\PrintLabel"/>
-            <button name="download_scan" class="Ideo\Dhl\Block\Adminhtml\Button\DownloadScan"/>
-            <button name="download_epod" class="Ideo\Dhl\Block\Adminhtml\Button\DownloadEpod"/>
-            <button name="track_shipment" class="Ideo\Dhl\Block\Adminhtml\Button\TrackShipment"/>
-            <button name="update_status" class="Ideo\Dhl\Block\Adminhtml\Button\UpdateStatusShipment"/>
-            <button name="create_return" class="Ideo\Dhl\Block\Adminhtml\Button\CreateReturnShipment"/>
-            <button name="print_return_label" class="Ideo\Dhl\Block\Adminhtml\Button\PrintReturnLabel"/>
-            <button name="print_return_qr" class="Ideo\Dhl\Block\Adminhtml\Button\PrintReturnQrCode"/>
-            <button name="book_courier" class="Ideo\Dhl\Block\Adminhtml\Button\BookCourierShipment"/>
-            <button name="cancel_courier" class="Ideo\Dhl\Block\Adminhtml\Button\CancelCourierShipment"/>
-            <button name="recreate" class="Ideo\Dhl\Block\Adminhtml\Button\RecreateShipment"/>
-            <button name="delete" class="Ideo\Dhl\Block\Adminhtml\Button\DeleteShipment"/>
         </buttons>
-        <namespace>dhlparcel_shipment_form</namespace>
+        <namespace>dhlpoland_delivery_service_form</namespace>
         <dataScope>data</dataScope>
         <deps>
-            <dep>dhlparcel_shipment_form.dhlparcel_shipment_form_data_source</dep>
+            <dep>dhlpoland_delivery_service_form.dhlpoland_delivery_service_form_data_source</dep>
         </deps>
     </settings>
-    <dataSource name="dhlparcel_shipment_form_data_source">
+    <dataSource name="dhlpoland_delivery_service_form_data_source">
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
                 <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
             </item>
         </argument>
         <settings>
-            <submitUrl path="dhlparcel/shipment/save"/>
+            <submitUrl path="dhlpoland/deliveryservice/save"/>
         </settings>
-        <dataProvider class="Ideo\Dhl\Model\Shipment\DataProvider" name="dhlparcel_shipment_form_data_source">
+        <dataProvider class="Ideo\Dhl\Model\DeliveryService\DataProvider" name="dhlpoland_delivery_service_form_data_source">
             <settings>
                 <requestFieldName>entity_id</requestFieldName>
                 <primaryFieldName>entity_id</primaryFieldName>
@@ -48,8 +39,9 @@
     </dataSource>
     <fieldset name="general">
         <settings>
-            <label translate="true">General</label>
-            <visible>false</visible>
+            <label translate="true">General Configuration</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
         </settings>
         <field name="entity_id" formElement="input">
             <settings>
@@ -58,381 +50,61 @@
                 <dataScope>entity_id</dataScope>
             </settings>
         </field>
-    </fieldset>
-
-    <fieldset name="sender">
-        <settings>
-            <label translate="true">Sender Address</label>
-            <collapsible>true</collapsible>
-            <opened>true</opened>
-        </settings>
-        <field name="sender[presetSenderId]" formElement="select">
+        <field name="template_name" formElement="input">
             <settings>
-                <dataType>text</dataType>
-                <label translate="true">Drop-Off Point Template</label>
-                <dataScope>sender.presetSenderId</dataScope>
-            </settings>
-            <formElements>
-                <select>
-                    <settings>
-                        <caption translate="true">Select Template...</caption>
-                        <options class="Ideo\Dhl\Model\Config\Source\DropOffPoint"/>
-                    </settings>
-                </select>
-            </formElements>
-        </field>
-        <field name="sender[sapNumber]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">SAP Number</label>
-                <dataScope>sender.sapNumber</dataScope>
-            </settings>
-        </field>
-        <field name="sender[name]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Sender Name</label>
-                <dataScope>sender.name</dataScope>
-            </settings>
-        </field>
-        <field name="sender[firstName]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">First Name</label>
-                <dataScope>sender.firstName</dataScope>
-            </settings>
-        </field>
-        <field name="sender[lastName]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Last Name</label>
-                <dataScope>sender.lastName</dataScope>
-            </settings>
-        </field>
-        <field name="sender[street]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Street</label>
-                <dataScope>sender.street</dataScope>
-            </settings>
-        </field>
-        <field name="sender[houseNumber]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">House No.</label>
-                <dataScope>sender.houseNumber</dataScope>
-            </settings>
-        </field>
-        <field name="sender[postalCode]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Postal Code</label>
-                <dataScope>sender.postalCode</dataScope>
-            </settings>
-        </field>
-        <field name="sender[city]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">City</label>
-                <dataScope>sender.city</dataScope>
-            </settings>
-        </field>
-        <field name="sender[phone]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Phone</label>
-                <dataScope>sender.phone</dataScope>
-            </settings>
-        </field>
-        <field name="sender[email]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Email</label>
-                <dataScope>sender.email</dataScope>
-            </settings>
-        </field>
-    </fieldset>
-
-    <fieldset name="shipment_time_information">
-        <settings>
-            <label translate="true">Shipment Time Information</label>
-            <collapsible>true</collapsible>
-            <opened>true</opened>
-        </settings>
-        <field name="shipmentSettings[shipmentDate]" formElement="date">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Shipment Date</label>
-                <dataScope>shipmentSettings.shipmentDate</dataScope>
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
-            </settings>
-            <formElements>
-                <date>
-                    <settings>
-                        <options>
-                            <option name="dateFormat" xsi:type="string">y-MM-dd</option>
-                            <option name="outputFormat" xsi:type="string">y-MM-dd</option>
-                            <option name="minDate" xsi:type="string">today</option>
-                        </options>
-                    </settings>
-                </date>
-            </formElements>
-        </field>
-        <field name="shipmentSettings[pickupHourFrom]" formElement="date">
-            <settings>
                 <dataType>text</dataType>
-                <label translate="true">Courier Pickup Time [From]</label>
-                <dataScope>shipmentSettings.pickupHourFrom</dataScope>
+                <label translate="true">Template Name</label>
+                <dataScope>template_name</dataScope>
             </settings>
-            <formElements>
-                <date>
-                    <settings>
-                        <options>
-                            <option name="showsTime" xsi:type="boolean">true</option>
-                            <option name="timeOnly" xsi:type="boolean">true</option>
-                            <option name="timeFormat" xsi:type="string">HH:mm</option>
-                        </options>
-                    </settings>
-                </date>
-            </formElements>
         </field>
-        <field name="shipmentSettings[pickupHourTo]" formElement="date">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Courier Pickup Time [To]</label>
-                <dataScope>shipmentSettings.pickupHourTo</dataScope>
-            </settings>
-            <formElements>
-                <date>
-                    <settings>
-                        <options>
-                            <option name="showsTime" xsi:type="boolean">true</option>
-                            <option name="timeOnly" xsi:type="boolean">true</option>
-                            <option name="timeFormat" xsi:type="string">HH:mm</option>
-                        </options>
-                    </settings>
-                </date>
-            </formElements>
-        </field>
-    </fieldset>
-
-    <fieldset name="recipient">
-        <settings>
-            <label translate="true">Recipient Address</label>
-            <collapsible>true</collapsible>
-            <opened>true</opened>
-        </settings>
-        <field name="recipient[type]" formElement="select">
+        <field name="address_type" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">N</item>
+                </item>
+            </argument>
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Address Type</label>
-                <dataScope>recipient.type</dataScope>
+                <dataScope>address_type</dataScope>
             </settings>
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Config\Source\ShipmentAddressType"/>
+                        <options class="Ideo\Dhl\Model\Config\Source\AddressType"/>
                     </settings>
                 </select>
             </formElements>
         </field>
-        <field name="recipient[name]" formElement="input">
+        <field name="method_code" formElement="multiselect">
             <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
                 <dataType>text</dataType>
-                <label translate="true">Company Name</label>
-                <dataScope>recipient.name</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[firstName]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">First Name</label>
-                <dataScope>recipient.firstName</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[lastName]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Last Name</label>
-                <dataScope>recipient.lastName</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[street]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Street</label>
-                <dataScope>recipient.street</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[houseNumber]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">House No.</label>
-                <dataScope>recipient.houseNumber</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[postalCode]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Postal Code</label>
-                <dataScope>recipient.postalCode</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[city]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">City</label>
-                <dataScope>recipient.city</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[country]" formElement="select">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Country</label>
-                <dataScope>recipient.country</dataScope>
+                <label translate="true">Associated Shipping Method</label>
+                <dataScope>method_code</dataScope>
+                <notice translate="true">Select DHL methods for this template.</notice>
             </settings>
             <formElements>
-                <select>
+                <multiselect>
                     <settings>
-                        <options class="Magento\Directory\Model\Config\Source\Country"/>
+                        <options class="Ideo\Dhl\Model\Config\Source\ShippingMethod"/>
                     </settings>
-                </select>
+                </multiselect>
             </formElements>
         </field>
-        <field name="recipient[phone]" formElement="input">
+        <field name="label_type" formElement="select">
             <settings>
-                <dataType>text</dataType>
-                <label translate="true">Phone</label>
-                <dataScope>recipient.phone</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[email]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Email</label>
-                <dataScope>recipient.email</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[mapPointType]" formElement="select" component="Ideo_Dhl/js/form/element/international-map-point-type">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">International Point Type</label>
-                <dataScope>recipient.mapPointType</dataScope>
-            </settings>
-            <formElements>
-                <select>
-                    <settings>
-                        <options class="Ideo\Dhl\Model\Config\Source\InternationalMapPointType"/>
-                    </settings>
-                </select>
-            </formElements>
-        </field>
-        <button name="select_point_button" component="Ideo_Dhl/js/form/element/map-point-selector">
-            <settings>
-                <title translate="true">Select delivery point from map</title>
-            </settings>
-        </button>
-        <field name="recipient[popId]" formElement="input" component="Ideo_Dhl/js/form/element/sp-dependent-field">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">POP Service Point ID</label>
-                <dataScope>recipient.popId</dataScope>
-                <disabled>true</disabled>
-            </settings>
-        </field>
-        <field name="recipient[popName]" formElement="input" component="Ideo_Dhl/js/form/element/sp-dependent-field">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">POP Service Point Address</label>
-                <dataScope>recipient.popName</dataScope>
-                <disabled>true</disabled>
-            </settings>
-        </field>
-        <field name="recipient[postnummer]" formElement="input" component="Ideo_Dhl/js/form/element/postnummer">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">German Customer Number (Postnummer)</label>
-                <dataScope>recipient.postnummer</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[popStreet]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <visible>false</visible>
-                <dataScope>recipient.popStreet</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[popCity]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <visible>false</visible>
-                <dataScope>recipient.popCity</dataScope>
-            </settings>
-        </field>
-        <field name="recipient[popPostcode]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <visible>false</visible>
-                <dataScope>recipient.popPostcode</dataScope>
-            </settings>
-        </field>
-    </fieldset>
-
-    <fieldset name="shipment_settings">
-        <settings>
-            <label translate="true">Shipment Settings</label>
-            <collapsible>true</collapsible>
-            <opened>true</opened>
-        </settings>
-        <field name="shipmentSettings[status]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Status</label>
-                <dataScope>shipmentSettings.status</dataScope>
-                <disabled>true</disabled>
-            </settings>
-        </field>
-        <field name="shipmentSettings[shipmentId]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Shipment ID</label>
-                <dataScope>shipmentSettings.shipmentId</dataScope>
-                <disabled>true</disabled>
-            </settings>
-        </field>
-        <field name="shipmentSettings[dispatchNumber]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Courier Dispatch ID</label>
-                <dataScope>shipmentSettings.dispatchNumber</dataScope>
-                <disabled>true</disabled>
-                <imports>
-                    <link name="visible">${$.provider}:data.shipmentSettings.dispatchNumber</link>
-                </imports>
-            </settings>
-        </field>
-        <field name="shipmentSettings[serviceType]" formElement="select">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Service</label>
-                <dataScope>shipmentSettings.serviceType</dataScope>
-            </settings>
-            <formElements>
-                <select>
-                    <settings>
-                        <caption translate="true">Select Service...</caption>
-                        <options class="Ideo\Dhl\Model\Config\Source\ServiceCode"/>
-                    </settings>
-                </select>
-            </formElements>
-        </field>
-        <field name="shipmentSettings[labelType]" formElement="select">
-            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
                 <dataType>text</dataType>
                 <label translate="true">Shipment Label Format</label>
-                <dataScope>shipmentSettings.labelType</dataScope>
+                <dataScope>label_type</dataScope>
             </settings>
             <formElements>
                 <select>
@@ -442,35 +114,42 @@
                 </select>
             </formElements>
         </field>
-        <field name="shipmentSettings[content]" formElement="input">
+        <field name="content" formElement="input">
             <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
                 <dataType>text</dataType>
                 <label translate="true">Package Contents Description</label>
-                <dataScope>shipmentSettings.content</dataScope>
+                <notice translate="true">Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}</notice>
+                <dataScope>content</dataScope>
             </settings>
         </field>
-        <field name="shipmentSettings[comment]" formElement="textarea">
+        <field name="comment" formElement="input">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Additional Comments</label>
-                <dataScope>shipmentSettings.comment</dataScope>
+                <notice translate="true">Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}</notice>
+                <dataScope>comment</dataScope>
             </settings>
         </field>
-        <field name="shipmentSettings[reference]" formElement="input">
+        <field name="reference" formElement="input">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Shipment Reference Number</label>
-                <dataScope>shipmentSettings.reference</dataScope>
+                <notice translate="true">Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}</notice>
+                <dataScope>reference</dataScope>
             </settings>
         </field>
-        <field name="shipmentSettings[mpk]" formElement="input">
+        <field name="mpk" formElement="input">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">MPK</label>
-                <dataScope>shipmentSettings.mpk</dataScope>
+                <notice translate="true">Cost center code. Available tags: {item_id}, {order_id}, {quote_item_id}, {product_id}, {sku}, {product_name}, {order_description}</notice>
+                <dataScope>mpk</dataScope>
             </settings>
         </field>
-        <field name="shipmentSettings[autoCreateReturnShipment]" formElement="checkbox">
+        <field name="auto_create_return_shipment" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -479,26 +158,26 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Generate return label automatically when creating shipment</label>
-                <dataScope>shipmentSettings.autoCreateReturnShipment</dataScope>
+                <dataScope>auto_create_return_shipment</dataScope>
                 <switcherConfig>
                     <rules>
                         <rule name="0">
                             <value>0</value>
                             <actions>
                                 <action name="0">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnLabelType]</target>
+                                    <target>dhlpoland_delivery_service_form.dhlpoland_delivery_service_form.general.return_label_type</target>
                                     <callback>hide</callback>
                                 </action>
                                 <action name="1">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnQrCodeType]</target>
+                                    <target>dhlpoland_delivery_service_form.dhlpoland_delivery_service_form.general.return_qr_code_type</target>
                                     <callback>hide</callback>
                                 </action>
                                 <action name="2">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnLabelExpDays]</target>
+                                    <target>dhlpoland_delivery_service_form.dhlpoland_delivery_service_form.general.return_label_exp_days</target>
                                     <callback>hide</callback>
                                 </action>
                                 <action name="3">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnBookCourier]</target>
+                                    <target>dhlpoland_delivery_service_form.dhlpoland_delivery_service_form.general.return_book_courier</target>
                                     <callback>hide</callback>
                                 </action>
                             </actions>
@@ -507,19 +186,19 @@
                             <value>1</value>
                             <actions>
                                 <action name="0">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnLabelType]</target>
+                                    <target>dhlpoland_delivery_service_form.dhlpoland_delivery_service_form.general.return_label_type</target>
                                     <callback>show</callback>
                                 </action>
                                 <action name="1">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnQrCodeType]</target>
+                                    <target>dhlpoland_delivery_service_form.dhlpoland_delivery_service_form.general.return_qr_code_type</target>
                                     <callback>show</callback>
                                 </action>
                                 <action name="2">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnLabelExpDays]</target>
+                                    <target>dhlpoland_delivery_service_form.dhlpoland_delivery_service_form.general.return_label_exp_days</target>
                                     <callback>show</callback>
                                 </action>
                                 <action name="3">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.shipment_settings.shipmentSettings[returnBookCourier]</target>
+                                    <target>dhlpoland_delivery_service_form.dhlpoland_delivery_service_form.general.return_book_courier</target>
                                     <callback>show</callback>
                                 </action>
                             </actions>
@@ -540,13 +219,13 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="shipmentSettings[returnLabelType]" formElement="select">
+        <field name="return_label_type" formElement="select">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Return Label Format</label>
-                <dataScope>shipmentSettings.returnLabelType</dataScope>
+                <dataScope>return_label_type</dataScope>
                 <imports>
-                    <link name="visible">${$.provider}:data.shipmentSettings.autoCreateReturnShipment</link>
+                    <link name="visible">${$.provider}:data.auto_create_return_shipment</link>
                 </imports>
             </settings>
             <formElements>
@@ -557,13 +236,13 @@
                 </select>
             </formElements>
         </field>
-        <field name="shipmentSettings[returnQrCodeType]" formElement="select">
+        <field name="return_qr_code_type" formElement="select">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Return QR Code Type</label>
-                <dataScope>shipmentSettings.returnQrCodeType</dataScope>
+                <dataScope>return_qr_code_type</dataScope>
                 <imports>
-                    <link name="visible">${$.provider}:data.shipmentSettings.autoCreateReturnShipment</link>
+                    <link name="visible">${$.provider}:data.auto_create_return_shipment</link>
                 </imports>
             </settings>
             <formElements>
@@ -574,21 +253,21 @@
                 </select>
             </formElements>
         </field>
-        <field name="shipmentSettings[returnLabelExpDays]" formElement="input">
+        <field name="return_label_exp_days" formElement="input">
             <settings>
                 <validation>
                     <rule name="validate-digits" xsi:type="boolean">true</rule>
-                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
                 </validation>
                 <dataType>text</dataType>
                 <label translate="true">Return Label Expiration (7-183 Days)</label>
-                <dataScope>shipmentSettings.returnLabelExpDays</dataScope>
+                <dataScope>return_label_exp_days</dataScope>
                 <imports>
-                    <link name="visible">${$.provider}:data.shipmentSettings.autoCreateReturnShipment</link>
+                    <link name="visible">${$.provider}:data.auto_create_return_shipment</link>
                 </imports>
             </settings>
         </field>
-        <field name="shipmentSettings[returnBookCourier]" formElement="select">
+        <field name="return_book_courier" formElement="select">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="string">0</item>
@@ -598,9 +277,9 @@
                 <dataType>text</dataType>
                 <label translate="true">Return Dispatch Method</label>
                 <notice translate="true">Applies to domestic returns only. Foreign shipping is only possible at a service point.</notice>
-                <dataScope>shipmentSettings.returnBookCourier</dataScope>
+                <dataScope>return_book_courier</dataScope>
                 <imports>
-                    <link name="visible">${$.provider}:data.shipmentSettings.autoCreateReturnShipment</link>
+                    <link name="visible">${$.provider}:data.auto_create_return_shipment</link>
                 </imports>
             </settings>
             <formElements>
@@ -612,14 +291,13 @@
             </formElements>
         </field>
     </fieldset>
-
-    <fieldset name="special_services">
+    <fieldset name="additional_services">
         <settings>
             <label translate="true">Additional Services</label>
             <collapsible>true</collapsible>
             <opened>true</opened>
         </settings>
-        <field name="specialServices[insurance]" formElement="checkbox">
+        <field name="additional_services[insurance]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -628,30 +306,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Insurance</label>
-                <dataScope>specialServices.insurance</dataScope>
-                <switcherConfig>
-                    <rules>
-                        <rule name="0">
-                            <value>0</value>
-                            <actions>
-                                <action name="0">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[insuranceValue]</target>
-                                    <callback>hide</callback>
-                                </action>
-                            </actions>
-                        </rule>
-                        <rule name="1">
-                            <value>1</value>
-                            <actions>
-                                <action name="0">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[insuranceValue]</target>
-                                    <callback>show</callback>
-                                </action>
-                            </actions>
-                        </rule>
-                    </rules>
-                    <enabled>true</enabled>
-                </switcherConfig>
+                <dataScope>additional_services.insurance</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -665,22 +320,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[insuranceValue]" formElement="input">
-            <settings>
-                <validation>
-                    <rule name="validate-number" xsi:type="boolean">true</rule>
-                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
-                </validation>
-                <dataType>text</dataType>
-                <label translate="true">Insurance Value</label>
-                <notice translate="true">Amount in PLN</notice>
-                <dataScope>specialServices.insuranceValue</dataScope>
-                <imports>
-                    <link name="visible">${$.provider}:data.specialServices.insurance</link>
-                </imports>
-            </settings>
-        </field>
-        <field name="specialServices[collectOnDelivery]" formElement="checkbox">
+        <field name="additional_services[collectOnDelivery]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -689,30 +329,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Cash On Delivery</label>
-                <dataScope>specialServices.collectOnDelivery</dataScope>
-                <switcherConfig>
-                    <rules>
-                        <rule name="0">
-                            <value>0</value>
-                            <actions>
-                                <action name="0">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[collectOnDeliveryValue]</target>
-                                    <callback>hide</callback>
-                                </action>
-                            </actions>
-                        </rule>
-                        <rule name="1">
-                            <value>1</value>
-                            <actions>
-                                <action name="0">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[collectOnDeliveryValue]</target>
-                                    <callback>show</callback>
-                                </action>
-                            </actions>
-                        </rule>
-                    </rules>
-                    <enabled>true</enabled>
-                </switcherConfig>
+                <dataScope>additional_services.collectOnDelivery</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -726,22 +343,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[collectOnDeliveryValue]" formElement="input">
-            <settings>
-                <validation>
-                    <rule name="validate-number" xsi:type="boolean">true</rule>
-                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
-                </validation>
-                <dataType>text</dataType>
-                <label translate="true">COD Amount</label>
-                <notice translate="true">Amount in destination country's currency</notice>
-                <dataScope>specialServices.collectOnDeliveryValue</dataScope>
-                <imports>
-                    <link name="visible">${$.provider}:data.specialServices.collectOnDelivery</link>
-                </imports>
-            </settings>
-        </field>
-        <field name="specialServices[deliveryEvening]" formElement="checkbox">
+        <field name="additional_services[deliveryEvening]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -750,7 +352,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Evening Delivery (18-22)</label>
-                <dataScope>specialServices.deliveryEvening</dataScope>
+                <dataScope>additional_services.deliveryEvening</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -764,7 +366,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[deliveryOnSaturday]" formElement="checkbox">
+        <field name="additional_services[deliveryOnSaturday]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -773,7 +375,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Saturday Delivery</label>
-                <dataScope>specialServices.deliveryOnSaturday</dataScope>
+                <dataScope>additional_services.deliveryOnSaturday</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -787,7 +389,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[pickupOnSaturday]" formElement="checkbox">
+        <field name="additional_services[pickupOnSaturday]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -796,7 +398,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Saturday Pickup</label>
-                <dataScope>specialServices.pickupOnSaturday</dataScope>
+                <dataScope>additional_services.pickupOnSaturday</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -810,7 +412,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[predeliveryInformation]" formElement="checkbox">
+        <field name="additional_services[predeliveryInformation]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -819,7 +421,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Pre-delivery Information</label>
-                <dataScope>specialServices.predeliveryInformation</dataScope>
+                <dataScope>additional_services.predeliveryInformation</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -833,7 +435,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[returnOnDelivery]" formElement="checkbox">
+        <field name="additional_services[returnOnDelivery]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -842,30 +444,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Return Confirmed Documents</label>
-                <dataScope>specialServices.returnOnDelivery</dataScope>
-                <switcherConfig>
-                    <rules>
-                        <rule name="0">
-                            <value>0</value>
-                            <actions>
-                                <action name="0">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[returnOnDeliveryReference]</target>
-                                    <callback>hide</callback>
-                                </action>
-                            </actions>
-                        </rule>
-                        <rule name="1">
-                            <value>1</value>
-                            <actions>
-                                <action name="0">
-                                    <target>dhlparcel_shipment_form.dhlparcel_shipment_form.special_services.specialServices[returnOnDeliveryReference]</target>
-                                    <callback>show</callback>
-                                </action>
-                            </actions>
-                        </rule>
-                    </rules>
-                    <enabled>true</enabled>
-                </switcherConfig>
+                <dataScope>additional_services.returnOnDelivery</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -879,17 +458,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[returnOnDeliveryReference]" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">ROD Document Name</label>
-                <dataScope>specialServices.returnOnDeliveryReference</dataScope>
-                <imports>
-                    <link name="visible">${$.provider}:data.specialServices.returnOnDelivery</link>
-                </imports>
-            </settings>
-        </field>
-        <field name="specialServices[proofOfDelivery]" formElement="checkbox">
+        <field name="additional_services[proofOfDelivery]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -898,7 +467,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Proof of Delivery</label>
-                <dataScope>specialServices.proofOfDelivery</dataScope>
+                <dataScope>additional_services.proofOfDelivery</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -912,7 +481,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[ageVer]" formElement="checkbox">
+        <field name="additional_services[ageVer]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -921,7 +490,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Adult Verification / Delivery</label>
-                <dataScope>specialServices.ageVer</dataScope>
+                <dataScope>additional_services.ageVer</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -935,7 +504,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="specialServices[selfCollect]" formElement="checkbox">
+        <field name="additional_services[selfCollect]" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -944,7 +513,7 @@
             <settings>
                 <dataType>boolean</dataType>
                 <label translate="true">Self Pickup</label>
-                <dataScope>specialServices.selfCollect</dataScope>
+                <dataScope>additional_services.selfCollect</dataScope>
             </settings>
             <formElements>
                 <checkbox>
@@ -959,10 +528,9 @@
             </formElements>
         </field>
     </fieldset>
-
-    <fieldset name="packages_fieldset">
+    <fieldset name="dimensions">
         <settings>
-            <label translate="true">Packages</label>
+            <label translate="true">Package Dimensions</label>
             <collapsible>true</collapsible>
             <opened>true</opened>
         </settings>
@@ -991,49 +559,7 @@
                         <item name="componentType" xsi:type="string">container</item>
                     </item>
                 </argument>
-                <field name="packageNumber" formElement="input">
-                    <argument name="data" xsi:type="array">
-                        <item name="config" xsi:type="array">
-                            <item name="fit" xsi:type="boolean">true</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
-                        </item>
-                    </argument>
-                    <settings>
-                        <dataType>text</dataType>
-                        <label translate="true">Package Number</label>
-                        <dataScope>packageNumber</dataScope>
-                        <disabled>true</disabled>
-                    </settings>
-                </field>
-                <field name="returnShipmentId" formElement="input">
-                    <argument name="data" xsi:type="array">
-                        <item name="config" xsi:type="array">
-                            <item name="fit" xsi:type="boolean">true</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
-                        </item>
-                    </argument>
-                    <settings>
-                        <dataType>text</dataType>
-                        <label translate="true">Return Package Number</label>
-                        <dataScope>returnShipmentId</dataScope>
-                        <disabled>true</disabled>
-                    </settings>
-                </field>
-                <field name="packagesTrackingNumbers" formElement="input">
-                    <argument name="data" xsi:type="array">
-                        <item name="config" xsi:type="array">
-                            <item name="fit" xsi:type="boolean">true</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
-                        </item>
-                    </argument>
-                    <settings>
-                        <dataType>text</dataType>
-                        <label translate="true">Package Tracking Number</label>
-                        <dataScope>packagesTrackingNumbers</dataScope>
-                        <disabled>true</disabled>
-                    </settings>
-                </field>
-                <field name="packageType" formElement="select">
+                <field name="package_type" formElement="select">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
                             <item name="fit" xsi:type="boolean">true</item>
@@ -1042,7 +568,7 @@
                     <settings>
                         <dataType>text</dataType>
                         <label translate="true">Package Type</label>
-                        <dataScope>packageType</dataScope>
+                        <dataScope>package_type</dataScope>
                         <switcherConfig>
                             <rules>
                                 <rule name="0">
@@ -1061,11 +587,11 @@
                                             <callback>enable</callback>
                                         </action>
                                         <action name="3">
-                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <target>${ $.parentName }.has_euro_return</target>
                                             <callback>disable</callback>
                                         </action>
                                         <action name="4">
-                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <target>${ $.parentName }.has_euro_return</target>
                                             <callback>value</callback>
                                             <params>
                                                 <param name="0" xsi:type="number">0</param>
@@ -1110,11 +636,11 @@
                                             </params>
                                         </action>
                                         <action name="6">
-                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <target>${ $.parentName }.has_euro_return</target>
                                             <callback>disable</callback>
                                         </action>
                                         <action name="7">
-                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <target>${ $.parentName }.has_euro_return</target>
                                             <callback>value</callback>
                                             <params>
                                                 <param name="0" xsi:type="number">0</param>
@@ -1138,7 +664,7 @@
                                             <callback>enable</callback>
                                         </action>
                                         <action name="3">
-                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <target>${ $.parentName }.has_euro_return</target>
                                             <callback>enable</callback>
                                         </action>
                                     </actions>
@@ -1158,8 +684,9 @@
                 <field name="quantity" formElement="input">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
-                            <item name="default" xsi:type="number">1</item>
                             <item name="fit" xsi:type="boolean">true</item>
+                            <item name="cols" xsi:type="number">3</item>
+                            <item name="size" xsi:type="number">3</item>
                             <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
                         </item>
                     </argument>
@@ -1172,7 +699,6 @@
                 <field name="weight" formElement="input">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
-                            <item name="default" xsi:type="string">1.0000</item>
                             <item name="fit" xsi:type="boolean">true</item>
                             <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
                         </item>
@@ -1222,7 +748,7 @@
                         <dataScope>height</dataScope>
                     </settings>
                 </field>
-                <field name="isNonStandard" formElement="checkbox">
+                <field name="is_non_standard" formElement="checkbox">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
                             <item name="default" xsi:type="number">0</item>
@@ -1232,7 +758,7 @@
                     <settings>
                         <dataType>boolean</dataType>
                         <label translate="true">NST</label>
-                        <dataScope>isNonStandard</dataScope>
+                        <dataScope>is_non_standard</dataScope>
                     </settings>
                     <formElements>
                         <checkbox>
@@ -1245,7 +771,7 @@
                         </checkbox>
                     </formElements>
                 </field>
-                <field name="hasEuroReturn" formElement="checkbox">
+                <field name="has_euro_return" formElement="checkbox">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
                             <item name="default" xsi:type="number">0</item>
@@ -1255,8 +781,7 @@
                     <settings>
                         <dataType>boolean</dataType>
                         <label translate="true">Euro Return</label>
-                        <dataScope>hasEuroReturn</dataScope>
-                        <disabled>true</disabled>
+                        <dataScope>has_euro_return</dataScope>
                     </settings>
                     <formElements>
                         <checkbox>
@@ -1286,16 +811,5 @@
                 </actionDelete>
             </container>
         </dynamicRows>
-    </fieldset>
-
-    <fieldset name="tracking_history_fieldset">
-        <settings>
-            <label translate="true">Shipment Tracking History</label>
-            <collapsible>true</collapsible>
-            <opened>true</opened>
-        </settings>
-        <htmlContent name="tracking_history_content">
-            <block class="Ideo\Dhl\Block\Adminhtml\Shipment\Edit\TrackingHistory" name="tracking_history_block" template="Ideo_Dhl::shipment/tracking_history.phtml"/>
-        </htmlContent>
     </fieldset>
 </form>

@@ -71,7 +71,8 @@ class UpdateStatusTest extends TestCase
 
         $this->controller = new UpdateStatus(
             $this->contextStub,
-            $this->trackingServiceStub
+            $this->trackingServiceStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 

@@ -51,7 +51,8 @@ class OrderToShipmentDataMapperTest extends TestCase
             $serializer,
             $timezoneMock,
             $this->nearestPointResolverMock,
-            new \Ideo\Dhl\Model\MethodCatalog()
+            new \Ideo\Dhl\Model\MethodCatalog(),
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 
@@ -125,7 +126,7 @@ class OrderToShipmentDataMapperTest extends TestCase
         $order->method('getEntityId')->willReturn(102);
         $order->method('getIncrementId')->willReturn('100000102');
         $order->method('getShippingAddress')->willReturn($address);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska_cod');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_parcel_polska_cod');
         $order->method('getPayment')->willReturn($payment);
         $order->method('getItems')->willReturn([]);
         $order->method('getGrandTotal')->willReturn(299.99);
@@ -159,7 +160,7 @@ class OrderToShipmentDataMapperTest extends TestCase
         $order->method('getEntityId')->willReturn(103);
         $order->method('getShippingAddress')->willReturn($address);
         $order->method('getPayment')->willReturn($payment);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_premium');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_premium');
 
         $shipmentData = $this->mapper->map($order);
 
@@ -186,7 +187,7 @@ class OrderToShipmentDataMapperTest extends TestCase
         $order->method('getEntityId')->willReturn(104);
         $order->method('getShippingAddress')->willReturn($address);
         $order->method('getPayment')->willReturn($payment);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska_cod');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_parcel_polska_cod');
         $order->method('getGrandTotal')->willReturn(450.50);
 
         $shipmentData = $this->mapper->map($order);
@@ -293,7 +294,7 @@ class OrderToShipmentDataMapperTest extends TestCase
         $order->method('getIsVirtual')->willReturn(false);
         $order->method('getEntityId')->willReturn(107);
         $order->method('getShippingAddress')->willReturn($address);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_parcel_polska');
         $order->method('getPayment')->willReturn($payment);
         $order->method('getItems')->willReturn([]);
         $order->method('getGrandTotal')->willReturn(100.00);
@@ -324,7 +325,7 @@ class OrderToShipmentDataMapperTest extends TestCase
         $order->method('getEntityId')->willReturn(108);
         $order->method('getShippingAddress')->willReturn($address);
         $order->method('getPayment')->willReturn($payment);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_parcel_polska');
         $order->method('getGrandTotal')->willReturn(350.75);
 
         $shipmentDefaults = [
@@ -363,7 +364,7 @@ class OrderToShipmentDataMapperTest extends TestCase
         $order->method('getEntityId')->willReturn(109);
         $order->method('getShippingAddress')->willReturn($address);
         $order->method('getPayment')->willReturn($payment);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_parcel_polska');
 
         $shipmentData = $this->mapper->map($order);
 
@@ -394,7 +395,7 @@ class OrderToShipmentDataMapperTest extends TestCase
         $order->method('getEntityId')->willReturn(110);
         $order->method('getShippingAddress')->willReturn($address);
         $order->method('getPayment')->willReturn($payment);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_parcel_polska');
 
         $shipmentData = $this->mapper->map($order);
 
@@ -432,7 +433,7 @@ class OrderToShipmentDataMapperTest extends TestCase
         $order->method('getEntityId')->willReturn(111);
         $order->method('getShippingAddress')->willReturn($address);
         $order->method('getPayment')->willReturn($payment);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_connect');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_connect');
 
         $shipmentData = $this->mapper->map($order);
 

@@ -51,14 +51,15 @@ class AddDhlPrepareButtonPluginTest extends TestCase
             $this->urlBuilder,
             $this->serializer,
             $this->orderRepository,
-            $this->shipmentDataRepository
+            $this->shipmentDataRepository,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 
     public function testBeforeSetLayoutAddsButtonForDhlShippingMethod(): void
     {
         $order = $this->createStub(Order::class);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_standard');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_standard');
         $order->method('getState')->willReturn(Order::STATE_PROCESSING);
         $order->method('getStatus')->willReturn('processing');
         $order->method('hasShipments')->willReturn(false);
@@ -71,7 +72,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
         $block->expects($this->once())
             ->method('addButton')
             ->with(
-                'dhlparcel_prepare_shipment',
+                'dhlpoland_prepare_shipment',
                 self::callback(fn ($arg) => is_array($arg) && isset($arg['label'])),
                 0,
                 95
@@ -83,7 +84,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
     public function testBeforeSetLayoutSkipsWhenShipmentAlreadyExists(): void
     {
         $order = $this->createStub(Order::class);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_standard');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_standard');
         $order->method('getState')->willReturn(Order::STATE_PROCESSING);
 
         $this->orderRepository->method('get')->willReturn($order);
@@ -112,7 +113,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
         $block->expects($this->once())
             ->method('addButton')
             ->with(
-                'dhlparcel_prepare_shipment',
+                'dhlpoland_prepare_shipment',
                 self::callback(fn ($arg) => is_array($arg) && isset($arg['label'])),
                 0,
                 95
@@ -124,7 +125,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
     public function testBeforeSetLayoutSkipsCanceledOrClosedOrder(): void
     {
         $order = $this->createStub(Order::class);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_standard');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_standard');
         $order->method('getState')->willReturn(Order::STATE_CANCELED);
 
         $this->orderRepository->method('get')->willReturn($order);
@@ -139,7 +140,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
     public function testBeforeSetLayoutSkipsCompleteOrder(): void
     {
         $order = $this->createStub(Order::class);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_standard');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_standard');
         $order->method('getState')->willReturn(Order::STATE_COMPLETE);
 
         $this->orderRepository->method('get')->willReturn($order);
@@ -169,7 +170,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
         $block->expects($this->once())
             ->method('addButton')
             ->with(
-                'dhlparcel_prepare_shipment',
+                'dhlpoland_prepare_shipment',
                 $this->callback(static function (array $button) use ($safeUrl): bool {
                     return $button['onclick'] === sprintf(
                         'window.ideoDhlOpenPrepareModal && window.ideoDhlOpenPrepareModal(10, %s)',

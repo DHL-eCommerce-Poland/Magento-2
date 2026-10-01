@@ -33,7 +33,7 @@ class OrderToShipmentDataMapper
      * @param TimezoneInterface $timezone
      * @param NearestPointResolver $nearestPointResolver
      * @param MethodCatalog $methodCatalog
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly StreetAddressParser $streetAddressParser,
@@ -43,7 +43,7 @@ class OrderToShipmentDataMapper
         private readonly TimezoneInterface $timezone,
         private readonly NearestPointResolver $nearestPointResolver,
         private readonly MethodCatalog $methodCatalog,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -345,7 +345,7 @@ class OrderToShipmentDataMapper
             try {
                 $recipientData = $this->nearestPointResolver->resolveForRecipient($recipientData);
             } catch (Throwable $e) {
-                $this->logger?->warning('Could not resolve nearest point during OrderToShipmentDataMapper::map: ' . $e->getMessage());
+                $this->logger->warning('Could not resolve nearest point during OrderToShipmentDataMapper::map: ' . $e->getMessage());
             }
         }
 

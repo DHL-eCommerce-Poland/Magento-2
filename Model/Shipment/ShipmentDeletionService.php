@@ -14,7 +14,7 @@ use Throwable;
 
 class ShipmentDeletionService
 {
-    private const XML_PATH_SANDBOX = 'carriers/dhlparcel/sandbox';
+    private const XML_PATH_SANDBOX = 'carriers/dhlpoland/sandbox';
 
     /**
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
@@ -22,7 +22,7 @@ class ShipmentDeletionService
      * @param CredentialsProvider $credentialsProvider
      * @param ScopeConfigInterface $scopeConfig
      * @param MagentoShipmentSyncService $magentoShipmentSyncService
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
@@ -30,7 +30,7 @@ class ShipmentDeletionService
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly MagentoShipmentSyncService $magentoShipmentSyncService,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -56,7 +56,7 @@ class ShipmentDeletionService
 
             if (!$result->isSuccess()) {
                 $errorMsg = $result->getErrorMessage() ?? __('DHL API returned an error during deletion.')->render();
-                $this->logger?->error(sprintf(
+                $this->logger->error(sprintf(
                     '[DHL] Failed to delete shipment #%s (entity #%d) in DHL API: %s',
                     $shipmentId,
                     $entityId,
@@ -72,7 +72,7 @@ class ShipmentDeletionService
             try {
                 $this->magentoShipmentSyncService->cancelDhlTracking((int)$magentoShipmentId);
             } catch (Throwable $e) {
-                $this->logger?->error(sprintf(
+                $this->logger->error(sprintf(
                     '[DHL] Failed to cancel tracking on Magento shipment #%d: %s',
                     $magentoShipmentId,
                     $e->getMessage()

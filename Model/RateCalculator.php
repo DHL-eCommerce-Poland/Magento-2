@@ -13,11 +13,9 @@ class RateCalculator
 
     /**
      * @param TableRateResolver $tableRateResolver
-     * @param CountryRateResolver $countryRateResolver
      */
     public function __construct(
-        private readonly TableRateResolver $tableRateResolver,
-        private readonly CountryRateResolver $countryRateResolver
+        private readonly TableRateResolver $tableRateResolver
     ) {
     }
 
@@ -33,7 +31,7 @@ class RateCalculator
      * @param bool $isFreeShippingEnabled
      * @param float $freeShippingSubtotal
      * @param bool $isFreeShipping
-     * @param string|null $destCountryId
+     * @param string $destCountryId
      *
      * @return float|null Null when shipping method is unavailable for the destination.
      */
@@ -47,40 +45,34 @@ class RateCalculator
         bool $isFreeShippingEnabled,
         float $freeShippingSubtotal,
         bool $isFreeShipping,
-        ?string $destCountryId = null
+        string $destCountryId = '*'
     ): ?float {
         if ($isFreeShipping || ($isFreeShippingEnabled && $packageValue >= $freeShippingSubtotal)) {
             return 0.00;
         }
 
-        if ($pricingType === self::PRICING_TYPE_COUNTRY) {
-            if (empty($destCountryId)) {
-                return null;
-            }
-
-            return $this->countryRateResolver->resolveRate($websiteId, $methodCode, $destCountryId);
+        if ($pricingType === self::PRICING_TYPE_FIXED) {
+            return $flatPrice;
         }
 
-        if ($pricingType === self::PRICING_TYPE_WEIGHT) {
-            $ratePrice = $this->tableRateResolver->resolveRate(
+        if ($pricingType === self::PRICING_TYPE_WEIGHT || $pricingType === self::PRICING_TYPE_COUNTRY) {
+            return $this->tableRateResolver->resolveRate(
                 $websiteId,
                 $methodCode,
+                $destCountryId,
                 self::PRICING_TYPE_WEIGHT,
                 $packageWeight
             );
-
-            return $ratePrice ?? 0.00;
         }
 
         if ($pricingType === self::PRICING_TYPE_SUBTOTAL) {
-            $ratePrice = $this->tableRateResolver->resolveRate(
+            return $this->tableRateResolver->resolveRate(
                 $websiteId,
                 $methodCode,
+                $destCountryId,
                 self::PRICING_TYPE_SUBTOTAL,
                 $packageValue
             );
-
-            return $ratePrice ?? 0.00;
         }
 
         return $flatPrice;

@@ -83,7 +83,7 @@ class ShipmentDeletionServiceTest extends TestCase
 
         $this->scopeConfigMock->expects($this->once())
             ->method('getValue')
-            ->with('carriers/dhlparcel/sandbox')
+            ->with('carriers/dhlpoland/sandbox')
             ->willReturn(1);
 
         $this->credentialsProviderMock->expects($this->once())
@@ -124,7 +124,7 @@ class ShipmentDeletionServiceTest extends TestCase
 
         $this->scopeConfigMock->expects($this->once())
             ->method('getValue')
-            ->with('carriers/dhlparcel/sandbox')
+            ->with('carriers/dhlpoland/sandbox')
             ->willReturn(0);
 
         $this->credentialsProviderMock->expects($this->once())

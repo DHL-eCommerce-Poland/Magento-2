@@ -21,14 +21,14 @@ class CourierBookingCancellationService
      * @param CredentialsProvider $credentialsProvider
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param ShipmentDataCollectionFactory $collectionFactory
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ShipmentDataCollectionFactory $collectionFactory,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -68,7 +68,7 @@ class CourierBookingCancellationService
                         $affectedEntities[(int) $id] = $entity;
                     }
                 } catch (Throwable $e) {
-                    $this->logger?->warning(sprintf(
+                    $this->logger->warning(sprintf(
                         '[CourierBookingCancellationService] Could not load shipment entity #%s: %s',
                         $id,
                         $e->getMessage()
@@ -103,7 +103,7 @@ class CourierBookingCancellationService
                         $entitiesToUpdate[(int) $entity->getEntityId()] = $entity;
                     }
                 } catch (Throwable $e) {
-                    $this->logger?->warning(sprintf(
+                    $this->logger->warning(sprintf(
                         '[CourierBookingCancellationService] Failed to query entities by dispatch number: %s',
                         $e->getMessage()
                     ));
@@ -120,7 +120,7 @@ class CourierBookingCancellationService
                     $entity->setStatus($resetStatus);
                     $this->shipmentDataRepository->save($entity);
                 } catch (Throwable $e) {
-                    $this->logger?->warning(sprintf(
+                    $this->logger->warning(sprintf(
                         '[CourierBookingCancellationService] Failed to reset dispatch number for entity #%d: %s',
                         $entity->getEntityId(),
                         $e->getMessage()

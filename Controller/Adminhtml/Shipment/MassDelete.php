@@ -23,14 +23,14 @@ class MassDelete extends Action implements HttpPostActionInterface
      * @param Filter $filter
      * @param CollectionFactory $collectionFactory
      * @param ShipmentDeletionService $shipmentDeletionService
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         private readonly Filter $filter,
         private readonly CollectionFactory $collectionFactory,
         private readonly ShipmentDeletionService $shipmentDeletionService,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }
@@ -60,7 +60,7 @@ class MassDelete extends Action implements HttpPostActionInterface
                     $deletedCount++;
                 } catch (Exception $e) {
                     $errorCount++;
-                    $this->logger?->error(
+                    $this->logger->error(
                         sprintf('Error deleting shipment #%d during mass delete: %s', $entityId, $e->getMessage()),
                         ['exception' => $e]
                     );

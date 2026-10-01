@@ -21,7 +21,7 @@ class CourierBookingService
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly ClientInterface $client,
@@ -29,7 +29,7 @@ class CourierBookingService
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -62,7 +62,7 @@ class CourierBookingService
             $formattedPickupDate = $this->dateSanitizer->sanitize($pickupDate, null, false);
         } catch (Throwable $e) {
             $formattedPickupDate = $this->timezone->scopeDate()->format('Y-m-d');
-            $this->logger?->warning(sprintf(
+            $this->logger->warning(sprintf(
                 '[CourierBookingService] Could not parse pickup date "%s": %s',
                 $pickupDate,
                 $e->getMessage()
@@ -80,7 +80,7 @@ class CourierBookingService
                         $dhlShipmentIds[] = (string) $dhlId;
                     }
                 } catch (Throwable $e) {
-                    $this->logger?->warning(sprintf(
+                    $this->logger->warning(sprintf(
                         '[CourierBookingService] Could not load shipment entity #%s: %s',
                         $id,
                         $e->getMessage()
@@ -124,7 +124,7 @@ class CourierBookingService
                         }
                         $this->shipmentDataRepository->save($entity);
                     } catch (Throwable $e) {
-                        $this->logger?->warning(sprintf(
+                        $this->logger->warning(sprintf(
                             '[CourierBookingService] Failed to update status for shipment entity #%s: %s',
                             $id,
                             $e->getMessage()

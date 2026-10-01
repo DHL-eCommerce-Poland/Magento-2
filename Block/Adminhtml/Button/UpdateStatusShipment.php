@@ -48,7 +48,7 @@ class UpdateStatusShipment extends Generic implements ButtonProviderInterface
         $postData = $this->serializer->serialize(
             [
                 'action' => $this->getUrl(
-                    'dhlparcel/shipment/updateStatus',
+                    'dhlpoland/shipment/updateStatus',
                     ['entity_id' => $entityId]
                 ),
                 'data' => ['redirect_to_edit' => 1],

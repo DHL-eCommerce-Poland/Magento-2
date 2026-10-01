@@ -14,7 +14,7 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class PnpReportService
 {
-    private const XML_PATH_SANDBOX = 'carriers/dhlparcel/sandbox';
+    private const XML_PATH_SANDBOX = 'carriers/dhlpoland/sandbox';
     private const ALLOWED_PACKAGE_TYPES = [
         PnpPackageType::TYPE_EX,
         PnpPackageType::TYPE_DR,

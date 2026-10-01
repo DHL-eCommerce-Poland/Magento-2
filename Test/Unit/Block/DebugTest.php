@@ -19,7 +19,7 @@ class DebugTest extends TestCase
 
         $scopeConfig->expects($this->once())
             ->method('isSetFlag')
-            ->with('carriers/dhlparcel/debug', ScopeInterface::SCOPE_STORE)
+            ->with('carriers/dhlpoland/debug', ScopeInterface::SCOPE_STORE)
             ->willReturn(true);
 
         $block = new Debug($context, $scopeConfig);
@@ -33,7 +33,7 @@ class DebugTest extends TestCase
 
         $scopeConfig->expects($this->once())
             ->method('isSetFlag')
-            ->with('carriers/dhlparcel/debug', ScopeInterface::SCOPE_STORE)
+            ->with('carriers/dhlpoland/debug', ScopeInterface::SCOPE_STORE)
             ->willReturn(false);
 
         $block = new Debug($context, $scopeConfig);

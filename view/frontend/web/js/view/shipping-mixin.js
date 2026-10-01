@@ -90,7 +90,7 @@ define([
 
                 var defaultLogoUrl = require.toUrl('Ideo_Dhl/images/logo_dhl.png');
                 var boxPopLogoUrl = require.toUrl('Ideo_Dhl/images/logo_dhl_box_pop.png');
-                var dhlConfig = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) || {};
+                var dhlConfig = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlpoland) || {};
                 var configuredLogos = dhlConfig.logos || {};
 
                 $dhlInputs.each(function () {

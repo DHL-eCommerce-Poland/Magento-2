@@ -54,7 +54,7 @@ class EnrichOrderShippingDescription
             ?? $parts[0]
             ?? '');
 
-        if ($carrierCode !== 'dhlparcel') {
+        if ($carrierCode !== 'dhlpoland') {
             return $result;
         }
 

@@ -51,7 +51,8 @@ class ShipmentTrackingServiceTest extends TestCase
             $this->shipmentDataRepositoryMock,
             $this->clientStub,
             $this->credentialsProviderStub,
-            $this->scopeConfigMock
+            $this->scopeConfigMock,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 

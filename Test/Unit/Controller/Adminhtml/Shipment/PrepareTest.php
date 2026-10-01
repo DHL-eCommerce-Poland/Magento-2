@@ -78,7 +78,8 @@ class PrepareTest extends TestCase
             $this->orderRepository,
             $this->templateManager,
             $this->jsonFactory,
-            $this->shipmentDataService
+            $this->shipmentDataService,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 
@@ -119,12 +120,12 @@ class PrepareTest extends TestCase
             ->willReturn(false);
 
         $order = $this->createStub(Order::class);
-        $order->method('getShippingMethod')->willReturn('dhlparcel_parcel_polska');
+        $order->method('getShippingMethod')->willReturn('dhlpoland_parcel_polska');
         $this->orderRepository->method('get')->willReturn($order);
 
         $this->templateManager->expects($this->once())
             ->method('getShipmentTemplatesOptions')
-            ->with('dhlparcel_parcel_polska')
+            ->with('dhlpoland_parcel_polska')
             ->willReturn([['value' => 1, 'label' => 'Template Polska']]);
 
         $shipmentData = new DhlShipmentData(orderId: 102);

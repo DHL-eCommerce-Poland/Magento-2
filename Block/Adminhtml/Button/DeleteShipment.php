@@ -46,7 +46,7 @@ class DeleteShipment extends Generic implements ButtonProviderInterface
             'Are you sure you want to delete this shipment?'
             . ' It will be cancelled in DHL and removed from Magento.'
         ));
-        $url = $this->escapeJs($this->getUrl('dhlparcel/shipment/delete', ['entity_id' => $entityId]));
+        $url = $this->escapeJs($this->getUrl('dhlpoland/shipment/delete', ['entity_id' => $entityId]));
 
         return [
             'label' => __('Delete Shipment'),

@@ -60,13 +60,14 @@ class DataProviderTest extends TestCase
         $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
 
         $dataProvider = new DataProvider(
-            'dhlparcel_shipment_form_data_source',
+            'dhlpoland_shipment_form_data_source',
             'entity_id',
             'entity_id',
             $collectionFactory,
             $serializer,
             $timezoneStub,
-            $dateSanitizer
+            $dateSanitizer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $data = $dataProvider->getData();
@@ -115,13 +116,14 @@ class DataProviderTest extends TestCase
         $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
 
         $dataProvider = new DataProvider(
-            'dhlparcel_shipment_form_data_source',
+            'dhlpoland_shipment_form_data_source',
             'entity_id',
             'entity_id',
             $collectionFactory,
             $serializer,
             $timezoneStub,
-            $dateSanitizer
+            $dateSanitizer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $data = $dataProvider->getData();

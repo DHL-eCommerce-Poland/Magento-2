@@ -10,30 +10,30 @@ use SimpleXMLElement;
 class SystemXmlTest extends TestCase
 {
     /**
-     * Verify general group and method groups under dhlparcel carrier group.
+     * Verify general group and method groups under dhlpoland carrier group.
      */
     public function testDhlSystemXmlStructure(): void
     {
         $xml = simplexml_load_file(__DIR__ . '/../../../etc/adminhtml/system.xml');
         self::assertInstanceOf(SimpleXMLElement::class, $xml);
 
-        $groups = $xml->xpath('/config/system/section[@id="carriers"]/group[@id="dhlparcel"]/group');
+        $groups = $xml->xpath('/config/system/section[@id="carriers"]/group[@id="dhlpoland"]/group');
         self::assertIsArray($groups);
         self::assertCount(5, $groups);
 
         // General group assertion
         $generalGroups = $xml->xpath(
-            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]/group[@id="general"]'
+            '/config/system/section[@id="carriers"]/group[@id="dhlpoland"]/group[@id="general"]'
         );
         self::assertCount(1, $generalGroups);
         $generalFields = [
-            'active' => 'carriers/dhlparcel/active',
-            'sandbox' => 'carriers/dhlparcel/sandbox',
-            'api_login' => 'carriers/dhlparcel/api_login',
-            'api_password' => 'carriers/dhlparcel/api_password',
-            'api_login_sandbox' => 'carriers/dhlparcel/api_login_sandbox',
-            'api_password_sandbox' => 'carriers/dhlparcel/api_password_sandbox',
-            'import_tablerates' => 'carriers/dhlparcel/import_tablerates',
+            'active' => 'carriers/dhlpoland/active',
+            'sandbox' => 'carriers/dhlpoland/sandbox',
+            'api_login' => 'carriers/dhlpoland/api_login',
+            'api_password' => 'carriers/dhlpoland/api_password',
+            'api_login_sandbox' => 'carriers/dhlpoland/api_login_sandbox',
+            'api_password_sandbox' => 'carriers/dhlpoland/api_password_sandbox',
+            'import_tablerates' => 'carriers/dhlpoland/import_tablerates',
             'export_tablerates' => '',
         ];
         foreach ($generalFields as $fieldId => $expectedPath) {
@@ -93,7 +93,7 @@ class SystemXmlTest extends TestCase
 
         foreach ($methodCodes as $groupId => $methodCode) {
             $methodGroups = $xml->xpath(
-                '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="' . $groupId . '"]'
+                '/config/system/section[@id="carriers"]/group[@id="dhlpoland"]//group[@id="' . $groupId . '"]'
             );
             self::assertCount(1, $methodGroups);
             self::assertFalse(isset($methodGroups[0]['expanded']));
@@ -115,19 +115,19 @@ class SystemXmlTest extends TestCase
                 $fields = $methodGroups[0]->xpath('./field[@id="' . $field . '"]');
                 self::assertCount(1, $fields);
                 self::assertSame(
-                    'carriers/dhlparcel/method_' . $methodCode . '_' . $field,
+                    'carriers/dhlpoland/method_' . $methodCode . '_' . $field,
                     (string)$fields[0]->config_path
                 );
             }
         }
 
-        $oldEconomyXpath = '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="economy"]';
+        $oldEconomyXpath = '/config/system/section[@id="carriers"]/group[@id="dhlpoland"]//group[@id="economy"]';
         self::assertCount(0, $xml->xpath($oldEconomyXpath));
-        $oldEconomyCodXpath = '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="economy_cod"]';
+        $oldEconomyCodXpath = '/config/system/section[@id="carriers"]/group[@id="dhlpoland"]//group[@id="economy_cod"]';
         self::assertCount(0, $xml->xpath($oldEconomyCodXpath));
 
         $economyAllGroup = $xml->xpath(
-            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="economy_all"]'
+            '/config/system/section[@id="carriers"]/group[@id="dhlpoland"]//group[@id="economy_all"]'
         );
         self::assertCount(1, $economyAllGroup);
         self::assertCount(1, $economyAllGroup[0]->xpath('./field[@id="point_delivery_mode"]'));
@@ -135,17 +135,17 @@ class SystemXmlTest extends TestCase
         self::assertCount(0, $xml->xpath('//field[@id="point_map_type"]'));
 
         $connectGroup = $xml->xpath(
-            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="connect"]'
+            '/config/system/section[@id="carriers"]/group[@id="dhlpoland"]//group[@id="connect"]'
         );
         self::assertCount(1, $connectGroup);
 
         $connectParcelShopGroup = $xml->xpath(
-            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="connect_parcelshop"]'
+            '/config/system/section[@id="carriers"]/group[@id="dhlpoland"]//group[@id="connect_parcelshop"]'
         );
         self::assertCount(1, $connectParcelShopGroup);
 
         $connectPackstationGroup = $xml->xpath(
-            '/config/system/section[@id="carriers"]/group[@id="dhlparcel"]//group[@id="connect_packstation"]'
+            '/config/system/section[@id="carriers"]/group[@id="dhlpoland"]//group[@id="connect_packstation"]'
         );
         self::assertCount(1, $connectPackstationGroup);
     }

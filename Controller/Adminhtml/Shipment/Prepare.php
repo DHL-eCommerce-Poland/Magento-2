@@ -27,7 +27,7 @@ class Prepare extends Action
      * @param TemplateManager $templateManager
      * @param JsonFactory $jsonFactory
      * @param ShipmentDataService $shipmentDataService
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -35,7 +35,7 @@ class Prepare extends Action
         private readonly TemplateManager $templateManager,
         private readonly JsonFactory $jsonFactory,
         private readonly ShipmentDataService $shipmentDataService,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }
@@ -109,7 +109,7 @@ class Prepare extends Action
                 'internationalMapPointTypeOptions' => $this->templateManager->getInternationalMapPointTypeOptions(),
             ]);
         } catch (Exception $e) {
-            $this->logger?->error('Error preparing DHL shipment data: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error preparing DHL shipment data: ' . $e->getMessage(), ['exception' => $e]);
             return $resultJson->setData([
                 'success' => false,
                 'message' => $e->getMessage(),

@@ -205,7 +205,8 @@ class TemplateManagerTest extends TestCase
             $this->customsTypeSource,
             $this->categoryOfItemSource,
             $this->customsCurrencySource,
-            $this->internationalMapPointTypeSource
+            $this->internationalMapPointTypeSource,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 
@@ -220,18 +221,18 @@ class TemplateManagerTest extends TestCase
     {
         return [
             'exact match without prefix' => ['parcel_polska', 'parcel_polska', true],
-            'exact match with order dhlparcel prefix' => ['parcel_polska', 'dhlparcel_parcel_polska', true],
-            'template has dhlparcel prefix' => ['dhlparcel_parcel_polska', 'dhlparcel_parcel_polska', true],
-            'template list first matches' => ['parcel_polska,premium', 'dhlparcel_parcel_polska', true],
-            'template list second matches' => ['parcel_polska,premium', 'dhlparcel_premium', true],
-            'case insensitive matching' => ['Parcel_Polska', 'DHLPARCEL_PARCEL_POLSKA', true],
-            'reject partial match connect vs connect_plus' => ['connect', 'dhlparcel_connect_plus', false],
-            'reject partial match connect_plus vs connect' => ['connect_plus', 'dhlparcel_connect', false],
-            'reject partial match parcel_polska vs cod' => ['parcel_polska', 'dhlparcel_parcel_polska_cod', false],
-            'match cod method when template has cod' => ['parcel_polska_cod', 'dhlparcel_parcel_polska_cod', true],
+            'exact match with order dhlpoland prefix' => ['parcel_polska', 'dhlpoland_parcel_polska', true],
+            'template has dhlpoland prefix' => ['dhlpoland_parcel_polska', 'dhlpoland_parcel_polska', true],
+            'template list first matches' => ['parcel_polska,premium', 'dhlpoland_parcel_polska', true],
+            'template list second matches' => ['parcel_polska,premium', 'dhlpoland_premium', true],
+            'case insensitive matching' => ['Parcel_Polska', 'DHLPOLAND_PARCEL_POLSKA', true],
+            'reject partial match connect vs connect_plus' => ['connect', 'dhlpoland_connect_plus', false],
+            'reject partial match connect_plus vs connect' => ['connect_plus', 'dhlpoland_connect', false],
+            'reject partial match parcel_polska vs cod' => ['parcel_polska', 'dhlpoland_parcel_polska_cod', false],
+            'match cod method when template has cod' => ['parcel_polska_cod', 'dhlpoland_parcel_polska_cod', true],
             'reject non dhl method' => ['parcel_polska', 'flatrate_flatrate', false],
             'reject empty order shipping method' => ['parcel_polska', '', false],
-            'reject empty template method' => ['', 'dhlparcel_parcel_polska', false],
+            'reject empty template method' => ['', 'dhlpoland_parcel_polska', false],
         ];
     }
 
@@ -288,7 +289,7 @@ class TemplateManagerTest extends TestCase
             ->method('create')
             ->willReturn($collection);
 
-        $options = $this->templateManager->getShipmentTemplatesOptions('dhlparcel_parcel_polska');
+        $options = $this->templateManager->getShipmentTemplatesOptions('dhlpoland_parcel_polska');
 
         $expected = [
             ['value' => 1, 'label' => 'Standard POLSKA'],
@@ -313,7 +314,7 @@ class TemplateManagerTest extends TestCase
             ->willReturn($collection);
 
         $order = $this->createConfiguredMock(Order::class, [
-            'getShippingMethod' => 'dhlparcel_parcel_polska',
+            'getShippingMethod' => 'dhlpoland_parcel_polska',
         ]);
 
         $matchedId = $this->templateManager->getMatchingDeliveryServiceIdForOrder($order);
@@ -365,7 +366,8 @@ class TemplateManagerTest extends TestCase
             $typeSource,
             $catSource,
             $currSource,
-            $this->internationalMapPointTypeSource
+            $this->internationalMapPointTypeSource,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $options = $manager->getCustomsTemplatesOptions();
@@ -413,7 +415,8 @@ class TemplateManagerTest extends TestCase
             $this->createStub(\Ideo\Dhl\Model\Source\CustomsType::class),
             $this->createStub(\Ideo\Dhl\Model\Source\CategoryOfItem::class),
             $this->createStub(\Ideo\Dhl\Model\Source\CustomsCurrency::class),
-            $this->internationalMapPointTypeSource
+            $this->internationalMapPointTypeSource,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         // GB matches template1 first -> returns 10
@@ -466,7 +469,8 @@ class TemplateManagerTest extends TestCase
             $this->createStub(\Ideo\Dhl\Model\Source\CustomsType::class),
             $this->createStub(\Ideo\Dhl\Model\Source\CategoryOfItem::class),
             $this->createStub(\Ideo\Dhl\Model\Source\CustomsCurrency::class),
-            $this->internationalMapPointTypeSource
+            $this->internationalMapPointTypeSource,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $address = $this->createStub(\Magento\Sales\Model\Order\Address::class);

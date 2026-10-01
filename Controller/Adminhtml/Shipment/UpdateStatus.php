@@ -19,12 +19,12 @@ class UpdateStatus extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param ShipmentTrackingService $shipmentTrackingService
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         private readonly ShipmentTrackingService $shipmentTrackingService,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }
@@ -70,7 +70,7 @@ class UpdateStatus extends Action implements HttpPostActionInterface
                 $this->messageManager->addErrorMessage(__('DHL status update failed: %1', $errorMsg));
             }
         } catch (Exception $e) {
-            $this->logger?->error('Error updating DHL shipment status: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error updating DHL shipment status: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage(__('Failed to update shipment status: %1', $e->getMessage()));
         }
 

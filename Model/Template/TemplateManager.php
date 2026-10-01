@@ -60,7 +60,7 @@ class TemplateManager
      * @param CategoryOfItem $categoryOfItemSource
      * @param CustomsCurrency $customsCurrencySource
      * @param InternationalMapPointType $internationalMapPointTypeSource
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly DropOffPointCollectionFactory $dropOffPointCollectionFactory,
@@ -85,7 +85,7 @@ class TemplateManager
         private readonly CategoryOfItem $categoryOfItemSource,
         private readonly CustomsCurrency $customsCurrencySource,
         private readonly InternationalMapPointType $internationalMapPointTypeSource,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -477,7 +477,7 @@ class TemplateManager
                 email: (string)($point->getEmail() ?? '')
             );
         } catch (Exception $e) {
-            $this->logger?->error('Error loading sender template: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error loading sender template: ' . $e->getMessage(), ['exception' => $e]);
             return null;
         }
     }
@@ -564,7 +564,7 @@ class TemplateManager
                 packages: $packagesData
             );
         } catch (Exception $e) {
-            $this->logger?->error('Error loading shipment template: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error loading shipment template: ' . $e->getMessage(), ['exception' => $e]);
             return null;
         }
     }
@@ -622,7 +622,7 @@ class TemplateManager
                 'selfCollect' => $isOdbVal,
             ];
         } catch (Exception $e) {
-            $this->logger?->error('Error loading special services template: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error loading special services template: ' . $e->getMessage(), ['exception' => $e]);
             return null;
         }
     }

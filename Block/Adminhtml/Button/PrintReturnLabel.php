@@ -37,7 +37,7 @@ class PrintReturnLabel extends Generic implements ButtonProviderInterface
             return [];
         }
 
-        $printUrl = $this->getUrl('dhlparcel/shipment/printReturnLabel', ['entity_id' => $entityId]);
+        $printUrl = $this->getUrl('dhlpoland/shipment/printReturnLabel', ['entity_id' => $entityId]);
 
         return [
             'label' => __('Print Return Label'),

@@ -38,7 +38,7 @@ class Save extends Action implements HttpPostActionInterface
      * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
      * @param ShipmentDataValidator $shipmentDataValidator
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -49,7 +49,7 @@ class Save extends Action implements HttpPostActionInterface
         private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
         private readonly ShipmentDataValidator $shipmentDataValidator,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }
@@ -170,7 +170,7 @@ class Save extends Action implements HttpPostActionInterface
                 : null;
 
             // 1. Resolve environment configuration (sandbox vs production)
-            $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlparcel/sandbox');
+            $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlpoland/sandbox');
             $environment = $isSandbox ? 'sandbox' : 'production';
 
             if ($entityId > 0) {
@@ -241,7 +241,7 @@ class Save extends Action implements HttpPostActionInterface
 
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
         } catch (Exception $e) {
-            $this->logger?->error(
+            $this->logger->error(
                 'Error saving and dispatching DHL shipment: ' . $e->getMessage(),
                 ['exception' => $e]
             );

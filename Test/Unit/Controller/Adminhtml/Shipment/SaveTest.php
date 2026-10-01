@@ -176,7 +176,7 @@ class SaveTest extends TestCase
 
         $this->scopeConfigMock->expects(self::once())
             ->method('getValue')
-            ->with('carriers/dhlparcel/sandbox')
+            ->with('carriers/dhlpoland/sandbox')
             ->willReturn('1');
 
         $apiResult = new CreateShipmentResult(true, false, '90039521201');
@@ -224,7 +224,7 @@ class SaveTest extends TestCase
 
         $this->scopeConfigMock->expects(self::once())
             ->method('getValue')
-            ->with('carriers/dhlparcel/sandbox')
+            ->with('carriers/dhlpoland/sandbox')
             ->willReturn('0');
 
         $apiResult = new CreateShipmentResult(false, false, null, null, [], 'ERR_01', 'Nieprawidłowy kod pocztowy');
@@ -271,7 +271,7 @@ class SaveTest extends TestCase
 
         $this->scopeConfigMock->expects(self::once())
             ->method('getValue')
-            ->with('carriers/dhlparcel/sandbox')
+            ->with('carriers/dhlpoland/sandbox')
             ->willReturn('1');
 
         $this->shipmentCreationServiceMock->expects(self::once())

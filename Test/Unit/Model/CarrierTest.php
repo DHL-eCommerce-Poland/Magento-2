@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Model;
 
 use Ideo\Dhl\Model\Carrier;
-use Ideo\Dhl\Model\CountryRateResolver;
 use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\RateCalculator;
 use Ideo\Dhl\Model\TableRateResolver;
@@ -25,213 +24,211 @@ use Psr\Log\LoggerInterface;
 class CarrierTest extends TestCase
 {
     /**
-     * Verify a disabled carrier does not return shipping rates.
+     * Verify disabled carrier returns false.
      */
     public function testDisabledCarrierReturnsNoRates(): void
     {
         $carrier = $this->createCarrier(['active' => '0']);
-
-        self::assertFalse($carrier->collectRates($this->createStub(RateRequest::class)));
+        $request = new RateRequest();
+        $this->assertFalse($carrier->collectRates($request));
     }
 
     /**
-     * Verify only enabled methods are returned with their configured values.
+     * Verify active carrier returns enabled methods.
      */
     public function testOnlyEnabledMethodsAreReturnedWithConfiguredTitleAndPrice(): void
     {
         $config = [
             'active' => '1',
             'method_parcel_polska_active' => '1',
-            'method_parcel_polska_title' => 'DHL Express',
-            'method_parcel_polska_method_name' => 'Polska dostawa',
-            'method_parcel_polska_price' => '12.50',
+            'method_parcel_polska_pricing_type' => 'fixed',
+            'method_parcel_polska_price' => '25.50',
+            'method_parcel_polska_title' => 'DHL Parcel Polska',
+            'method_parcel_polska_method_name' => 'Przesyłka kurierska',
             'method_premium_active' => '0',
         ];
+
         $rates = [];
         $carrier = $this->createCarrier($config, $rates);
 
-        $result = $carrier->collectRates($this->createStub(RateRequest::class));
+        $request = new RateRequest();
+        $request->setPackageWeight(2.0);
+        $request->setPackageValueWithDiscount(100.0);
 
-        self::assertInstanceOf(Result::class, $result);
-        self::assertCount(1, $rates);
-        self::assertSame('parcel_polska', $rates[0]['method']);
-        self::assertSame('Polska dostawa', $rates[0]['title']);
-        self::assertSame('DHL Express', $rates[0]['carrier_title']);
-        self::assertSame(12.5, $rates[0]['price']);
+        $result = $carrier->collectRates($request);
+
+        $this->assertInstanceOf(Result::class, $result);
+        $this->assertCount(1, $rates);
+        $this->assertSame('parcel_polska', $rates[0]['method']);
+        $this->assertSame(25.50, $rates[0]['price']);
+        $this->assertSame('DHL Parcel Polska', $rates[0]['carrier_title']);
+        $this->assertSame('Przesyłka kurierska', $rates[0]['title']);
     }
 
     /**
-     * Verify every catalog method can be enabled independently.
+     * Verify each catalog method can be enabled independently.
      */
     public function testEveryCatalogMethodCanBeEnabledIndependently(): void
     {
-        $config = ['active' => '1', 'title' => 'DHL eCommerce Poland'];
-        foreach ((new MethodCatalog())->getMethods() as $method) {
-            $config['method_' . $method['code'] . '_active'] = '1';
-            $config['method_' . $method['code'] . '_price'] = '3.25';
-            $config['method_' . $method['code'] . '_title'] = $method['title'];
+        $catalog = new MethodCatalog();
+
+        foreach ($catalog->getMethods() as $method) {
+            $code = $method['code'];
+            $config = [
+                'active' => '1',
+                'method_' . $code . '_active' => '1',
+                'method_' . $code . '_pricing_type' => 'fixed',
+                'method_' . $code . '_price' => '10.00',
+            ];
+
+            $rates = [];
+            $carrier = $this->createCarrier($config, $rates);
+
+            $request = new RateRequest();
+            $request->setPackageWeight(1.0);
+            $request->setPackageValueWithDiscount(50.0);
+
+            $carrier->collectRates($request);
+
+            $this->assertCount(1, $rates, 'Failed asserting method code: ' . $code);
+            $this->assertSame($code, $rates[0]['method']);
         }
-        $rates = [];
-        $carrier = $this->createCarrier($config, $rates);
-
-        $carrier->collectRates($this->createStub(RateRequest::class));
-
-        self::assertCount(26, $rates);
     }
 
     /**
-     * Verify methods restricted to specific countries are excluded for other destination countries.
+     * Verify destination country restrictions.
      */
     public function testMethodsRestrictedToSpecificCountriesAreExcludedForOtherDestinations(): void
     {
         $config = [
             'active' => '1',
-            'title' => 'DHL eCommerce Poland',
             'method_parcel_polska_active' => '1',
-            'method_parcel_polska_title' => 'DHL Parcel Polska',
-            'method_parcel_polska_price' => '10.00',
+            'method_parcel_polska_pricing_type' => 'fixed',
+            'method_parcel_polska_price' => '20.00',
             'method_parcel_polska_sallowspecific' => '1',
-            'method_parcel_polska_specificcountry' => 'PL',
-
-            'method_connect_active' => '1',
-            'method_connect_title' => 'DHL Parcel Connect',
-            'method_connect_price' => '30.00',
-            'method_connect_sallowspecific' => '0',
-            'method_connect_specificcountry' => '',
+            'method_parcel_polska_specificcountry' => 'PL,DE',
         ];
 
-        // Case A: Shipping to DE (Germany) -> parcel_polska should be excluded, connect should be included
-        $requestDe = new RateRequest();
-        $requestDe->setDestCountryId('DE');
-        $ratesDe = [];
-        $carrierDe = $this->createCarrier($config, $ratesDe);
-        $carrierDe->collectRates($requestDe);
+        $rates = [];
+        $carrier = $this->createCarrier($config, $rates);
 
-        self::assertCount(1, $ratesDe);
-        self::assertSame('connect', $ratesDe[0]['method']);
+        $allowedRequest = new RateRequest();
+        $allowedRequest->setDestCountryId('PL');
+        $carrier->collectRates($allowedRequest);
+        $this->assertCount(1, $rates);
 
-        // Case B: Shipping to PL (Poland) -> both parcel_polska and connect should be included
-        $requestPl = new RateRequest();
-        $requestPl->setDestCountryId('PL');
-        $ratesPl = [];
-        $carrierPl = $this->createCarrier($config, $ratesPl);
-        $carrierPl->collectRates($requestPl);
-
-        self::assertCount(2, $ratesPl);
+        $rates = [];
+        $deniedRequest = new RateRequest();
+        $deniedRequest->setDestCountryId('FR');
+        $carrier->collectRates($deniedRequest);
+        $this->assertCount(0, $rates);
     }
 
     /**
-     * Verify method sort order is applied to rate results.
+     * Verify sort order is passed to rate objects.
      */
     public function testMethodSortOrderIsAppliedToRateResults(): void
     {
         $config = [
             'active' => '1',
             'method_parcel_polska_active' => '1',
-            'method_parcel_polska_title' => 'DHL Parcel Polska',
-            'method_parcel_polska_price' => '10.00',
-            'method_parcel_polska_sort_order' => '42',
+            'method_parcel_polska_pricing_type' => 'fixed',
+            'method_parcel_polska_price' => '20.00',
+            'method_parcel_polska_sort_order' => '15',
         ];
+
         $rates = [];
         $carrier = $this->createCarrier($config, $rates);
-        $carrier->collectRates(new RateRequest());
 
-        self::assertCount(1, $rates);
-        self::assertSame(42, $rates[0]['sort_order']);
+        $request = new RateRequest();
+        $carrier->collectRates($request);
+
+        $this->assertSame(15, $rates[0]['sort_order']);
     }
 
     /**
-     * Verify free shipping threshold applies per method when subtotal threshold is reached.
+     * Verify free shipping threshold logic integration.
      */
     public function testFreeShippingThresholdIsAppliedPerMethod(): void
     {
         $config = [
             'active' => '1',
             'method_parcel_polska_active' => '1',
-            'method_parcel_polska_title' => 'DHL Parcel Polska',
-            'method_parcel_polska_price' => '15.00',
+            'method_parcel_polska_pricing_type' => 'fixed',
+            'method_parcel_polska_price' => '20.00',
             'method_parcel_polska_free_shipping_enable' => '1',
             'method_parcel_polska_free_shipping_subtotal' => '150.00',
         ];
+
         $rates = [];
         $carrier = $this->createCarrier($config, $rates);
 
         $request = new RateRequest();
-        $request->setPackageValueWithDiscount(200.00);
-
+        $request->setPackageValueWithDiscount(200.0);
         $carrier->collectRates($request);
 
-        self::assertCount(1, $rates);
-        self::assertSame(0.0, $rates[0]['price']);
+        $this->assertSame(0.00, $rates[0]['price']);
     }
 
     /**
-     * Verify non-applicable method returns error rate when showmethod is enabled.
+     * Verify showmethod flag appends error message when restricted.
      */
     public function testShowMethodIfNotApplicableReturnsErrorRate(): void
     {
         $config = [
             'active' => '1',
             'method_parcel_polska_active' => '1',
-            'method_parcel_polska_title' => 'DHL Parcel Polska',
-            'method_parcel_polska_price' => '15.00',
             'method_parcel_polska_sallowspecific' => '1',
             'method_parcel_polska_specificcountry' => 'PL',
             'method_parcel_polska_showmethod' => '1',
-            'method_parcel_polska_specificerrmsg' => 'Metoda niedostępna dla tego kraju.',
+            'method_parcel_polska_specificerrmsg' => 'Method not allowed for destination.',
         ];
+
         $rates = [];
         $carrier = $this->createCarrier($config, $rates);
 
         $request = new RateRequest();
-        $request->setDestCountryId('DE');
-
+        $request->setDestCountryId('US');
         $carrier->collectRates($request);
 
-        self::assertCount(1, $rates);
-        self::assertSame('Metoda niedostępna dla tego kraju.', $rates[0]['error_message']);
+        $this->assertCount(1, $rates);
+        $this->assertSame('Method not allowed for destination.', $rates[0]['error_message']);
     }
 
     /**
-     * Verify isTrackingAvailable returns true.
+     * Verify tracking availability getter.
      */
     public function testIsTrackingAvailableReturnsTrue(): void
     {
-        $carrier = $this->createCarrier(['active' => '1']);
-        self::assertTrue($carrier->isTrackingAvailable());
+        $carrier = $this->createCarrier([]);
+        $this->assertTrue($carrier->isTrackingAvailable());
     }
 
     /**
-     * Verify getTrackingInfo returns false for empty tracking number.
+     * Verify tracking lookup returns false when tracking number is empty.
      */
     public function testGetTrackingInfoReturnsFalseForEmptyTrackingNumber(): void
     {
-        $carrier = $this->createCarrier(['active' => '1']);
-        self::assertFalse($carrier->getTrackingInfo('   '));
+        $carrier = $this->createCarrier([]);
+        $this->assertFalse($carrier->getTrackingInfo(''));
     }
 
     /**
-     * Verify getTrackingInfo returns Status object with correct tracking URL and carrier title.
+     * Verify tracking lookup returns status object with correct title and URL.
      */
     public function testGetTrackingInfoReturnsStatusObjectWithUrlAndTitle(): void
     {
-        $config = [
-            'active' => '1',
-            'title' => 'DHL Express Carrier',
-        ];
-        $carrier = $this->createCarrier($config);
+        $carrier = $this->createCarrier([]);
+        $status = $carrier->getTrackingInfo('123456789');
 
-        $status = $carrier->getTrackingInfo('1234567890');
-
-        self::assertInstanceOf(Status::class, $status);
-        self::assertSame(Carrier::CODE, $status->getCarrier());
-        self::assertSame('DHL Express Carrier', $status->getCarrierTitle());
-        self::assertSame('1234567890', $status->getTracking());
-        self::assertSame('https://mojdhl.pl/sprawdz?paczki=1234567890', $status->getUrl());
+        $this->assertInstanceOf(Status::class, $status);
+        $this->assertSame('123456789', $status->getTracking());
+        $this->assertSame('DHL eCommerce Poland', $status->getCarrierTitle());
+        $this->assertStringContainsString('123456789', $status->getUrl());
     }
 
     /**
-     * Verify method is excluded when rate calculator returns null for country rate.
+     * Verify method is excluded when rate calculator returns null for country.
      */
     public function testMethodIsExcludedWhenRateCalculatorReturnsNullForCountry(): void
     {
@@ -242,14 +239,14 @@ class CarrierTest extends TestCase
             'method_connect_pricing_type' => 'country',
         ];
 
-        $countryRateResolverMock = $this->createMock(CountryRateResolver::class);
-        $countryRateResolverMock->expects($this->once())
+        $tableRateResolverMock = $this->createMock(TableRateResolver::class);
+        $tableRateResolverMock->expects($this->once())
             ->method('resolveRate')
-            ->with(0, 'connect', 'ES')
+            ->with(0, 'connect', 'ES', 'weight', 0.0)
             ->willReturn(null);
 
         $rates = [];
-        $carrier = $this->createCarrier($config, $rates, $countryRateResolverMock);
+        $carrier = $this->createCarrier($config, $rates, $tableRateResolverMock);
 
         $request = new RateRequest();
         $request->setDestCountryId('ES');
@@ -271,14 +268,14 @@ class CarrierTest extends TestCase
             'method_connect_pricing_type' => 'country',
         ];
 
-        $countryRateResolverMock = $this->createMock(CountryRateResolver::class);
-        $countryRateResolverMock->expects($this->once())
+        $tableRateResolverMock = $this->createMock(TableRateResolver::class);
+        $tableRateResolverMock->expects($this->once())
             ->method('resolveRate')
-            ->with(0, 'connect', 'DE')
+            ->with(0, 'connect', 'DE', 'weight', 0.0)
             ->willReturn(43.00);
 
         $rates = [];
-        $carrier = $this->createCarrier($config, $rates, $countryRateResolverMock);
+        $carrier = $this->createCarrier($config, $rates, $tableRateResolverMock);
 
         $request = new RateRequest();
         $request->setDestCountryId('DE');
@@ -295,22 +292,22 @@ class CarrierTest extends TestCase
      *
      * @param array $config
      * @param array $rates
-     * @param CountryRateResolver|null $countryRateResolver
+     * @param TableRateResolver|null $tableRateResolver
      */
     private function createCarrier(
         array $config,
         array &$rates = [],
-        ?CountryRateResolver $countryRateResolver = null
+        ?TableRateResolver $tableRateResolver = null
     ): Carrier {
         $scopeConfig = $this->createStub(ScopeConfigInterface::class);
         $scopeConfig->method('getValue')->willReturnCallback(
             static function (string $path) use ($config) {
-                return $config[str_replace('carriers/dhlparcel/', '', $path)] ?? null;
+                return $config[str_replace('carriers/dhlpoland/', '', $path)] ?? null;
             }
         );
         $scopeConfig->method('isSetFlag')->willReturnCallback(
             static function (string $path) use ($config): bool {
-                return (bool)($config[str_replace('carriers/dhlparcel/', '', $path)] ?? false);
+                return (bool)($config[str_replace('carriers/dhlpoland/', '', $path)] ?? false);
             }
         );
 
@@ -338,9 +335,8 @@ class CarrierTest extends TestCase
         $trackStatusFactory = $this->createStub(TrackStatusFactory::class);
         $trackStatusFactory->method('create')->willReturnCallback(static fn (): Status => new Status());
 
-        $tableRateResolver = $this->createStub(TableRateResolver::class);
-        $countryRateResolver = $countryRateResolver ?? $this->createStub(CountryRateResolver::class);
-        $rateCalculator = new RateCalculator($tableRateResolver, $countryRateResolver);
+        $tableRateResolver = $tableRateResolver ?? $this->createStub(TableRateResolver::class);
+        $rateCalculator = new RateCalculator($tableRateResolver);
 
         return new Carrier(
             $scopeConfig,

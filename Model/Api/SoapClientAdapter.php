@@ -1595,7 +1595,7 @@ class SoapClientAdapter implements ClientInterface
         try {
             $isDebug = false;
             if ($this->scopeConfig !== null) {
-                $isDebug = (bool) $this->scopeConfig->getValue('carriers/dhlparcel/debug');
+                $isDebug = (bool) $this->scopeConfig->getValue('carriers/dhlpoland/debug');
             }
 
             if ($isDebug) {

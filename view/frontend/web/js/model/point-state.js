@@ -54,7 +54,7 @@ define([
     }
 
     /**
-     * Helper to get full normalized method key string (e.g. 'dhlparcel_economy_all_cod').
+     * Helper to get full normalized method key string (e.g. 'dhlpoland_economy_all_cod').
      *
      * @param {Object|string|null} method Shipping method object or code.
      *
@@ -87,7 +87,7 @@ define([
      * @param {string|null} methodKey Full carrier and method code, or null to clear any configured point.
      */
     function clearConfiguredPoint(methodKey) {
-        var config = window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel;
+        var config = window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlpoland;
         var configuredPoint = config && config.selectedPoint;
         var configuredMethodKey;
 
@@ -208,7 +208,7 @@ define([
             return false;
         }
 
-        var config = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) || {};
+        var config = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlpoland) || {};
         var pointMethods = config.pointMethods || [
             methodCodes.FULL_ECONOMY_ALL,
             methodCodes.FULL_ECONOMY_ALL_COD,
@@ -366,8 +366,8 @@ define([
     }
 
     // Initialize initial point state from checkoutConfig
-    if (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel && window.checkoutConfig.shipping.dhlparcel.selectedPoint) {
-        var initPoint = window.checkoutConfig.shipping.dhlparcel.selectedPoint;
+    if (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlpoland && window.checkoutConfig.shipping.dhlpoland.selectedPoint) {
+        var initPoint = window.checkoutConfig.shipping.dhlpoland.selectedPoint;
         if (initPoint && initPoint.sap) {
             var initKey = initPoint.methodCode || getMethodKey(quote.shippingMethod());
             if (initKey) {
@@ -458,7 +458,7 @@ define([
                 return false;
             }
             var methodCode = method.method_code || method.methodCode || '';
-            var config = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) || {};
+            var config = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlpoland) || {};
             return (methodCode === methodCodes.METHOD_ECONOMY_ALL || methodCode === methodCodes.FULL_ECONOMY_ALL) && config.deliveryMode === 'nearest';
         },
 

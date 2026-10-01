@@ -37,7 +37,7 @@ class PrintReturnQrCode extends Generic implements ButtonProviderInterface
             return [];
         }
 
-        $printUrl = $this->getUrl('dhlparcel/shipment/printReturnQrCode', ['entity_id' => $entityId]);
+        $printUrl = $this->getUrl('dhlpoland/shipment/printReturnQrCode', ['entity_id' => $entityId]);
 
         return [
             'label' => __('Print Return QR Code'),

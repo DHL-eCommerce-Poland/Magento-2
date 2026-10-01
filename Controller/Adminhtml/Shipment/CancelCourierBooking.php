@@ -19,12 +19,12 @@ class CancelCourierBooking extends Action implements HttpGetActionInterface, Htt
     /**
      * @param Context $context
      * @param CourierBookingCancellationService $cancellationService
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         private readonly CourierBookingCancellationService $cancellationService,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }
@@ -49,7 +49,7 @@ class CancelCourierBooking extends Action implements HttpGetActionInterface, Htt
             $this->messageManager->addErrorMessage(
                 __('Please select at least one shipment to cancel courier booking.')
             );
-            return $resultRedirect->setPath('dhlparcel/shipment/index');
+            return $resultRedirect->setPath('dhlpoland/shipment/index');
         }
 
         try {
@@ -65,7 +65,7 @@ class CancelCourierBooking extends Action implements HttpGetActionInterface, Htt
                 );
             }
         } catch (\Throwable $e) {
-            $this->logger?->error(
+            $this->logger->error(
                 '[CancelCourierBooking] Exception during courier cancellation: ' . $e->getMessage(),
                 ['exception' => $e]
             );
@@ -79,6 +79,6 @@ class CancelCourierBooking extends Action implements HttpGetActionInterface, Htt
             return $resultRedirect->setUrl($referer);
         }
 
-        return $resultRedirect->setPath('dhlparcel/shipment/index');
+        return $resultRedirect->setPath('dhlpoland/shipment/index');
     }
 }

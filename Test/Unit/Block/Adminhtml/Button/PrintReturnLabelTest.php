@@ -24,7 +24,7 @@ class PrintReturnLabelTest extends TestCase
 
         $urlBuilder = $this->createMock(UrlInterface::class);
         $urlBuilder->method('getUrl')
-            ->with('dhlparcel/shipment/printReturnLabel', ['entity_id' => 10])
+            ->with('dhlpoland/shipment/printReturnLabel', ['entity_id' => 10])
             ->willReturn("http://example.com/printReturnLabel');alert(1);//");
 
         $button = $this->createButton($shipmentData, $urlBuilder);

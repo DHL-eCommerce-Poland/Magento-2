@@ -23,14 +23,14 @@ class AddDhlPrepareButtonPlugin
      * @param JsonHexTag $serializer
      * @param OrderRepositoryInterface $orderRepository
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly UrlInterface $urlBuilder,
         private readonly JsonHexTag $serializer,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -72,7 +72,7 @@ class AddDhlPrepareButtonPlugin
                 return;
             }
 
-            $prepareUrl = $this->urlBuilder->getUrl('dhlparcel/shipment/prepare', ['order_id' => $orderId]);
+            $prepareUrl = $this->urlBuilder->getUrl('dhlpoland/shipment/prepare', ['order_id' => $orderId]);
             $prepareUrlLiteral = $this->serializer->serialize($prepareUrl);
             $onClickJs = sprintf(
                 'window.ideoDhlOpenPrepareModal && window.ideoDhlOpenPrepareModal(%d, %s)',
@@ -81,7 +81,7 @@ class AddDhlPrepareButtonPlugin
             );
 
             $subject->addButton(
-                'dhlparcel_prepare_shipment',
+                'dhlpoland_prepare_shipment',
                 [
                     'label' => __('DHL Shipment'),
                     'class' => 'action-secondary dhl-prepare-shipment-btn',
@@ -91,7 +91,7 @@ class AddDhlPrepareButtonPlugin
                 95
             );
         } catch (Exception $e) {
-            $this->logger?->error('Error adding DHL prepare shipment button: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error adding DHL prepare shipment button: ' . $e->getMessage(), ['exception' => $e]);
         }
     }
 }

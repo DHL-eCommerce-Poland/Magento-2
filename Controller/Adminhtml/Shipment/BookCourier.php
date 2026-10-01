@@ -23,14 +23,14 @@ class BookCourier extends Action implements HttpPostActionInterface
      * @param JsonFactory $jsonFactory
      * @param CourierBookingService $courierBookingService
      * @param ScopeConfigInterface $scopeConfig
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         private readonly JsonFactory $jsonFactory,
         private readonly CourierBookingService $courierBookingService,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }
@@ -65,7 +65,7 @@ class BookCourier extends Action implements HttpPostActionInterface
                 ]);
             }
 
-            $environment = (string) $this->scopeConfig->getValue('carriers/dhlparcel/environment') ?: 'sandbox';
+            $environment = (string) $this->scopeConfig->getValue('carriers/dhlpoland/environment') ?: 'sandbox';
 
             $bookingResult = $this->courierBookingService->bookCourier(
                 $shipmentIds,
@@ -99,7 +99,7 @@ class BookCourier extends Action implements HttpPostActionInterface
                 'message' => $errMsg,
             ]);
         } catch (Exception $e) {
-            $this->logger?->error('[BookCourier Controller] Error: ' . $e->getMessage());
+            $this->logger->error('[BookCourier Controller] Error: ' . $e->getMessage());
 
             return $resultJson->setData([
                 'success' => false,

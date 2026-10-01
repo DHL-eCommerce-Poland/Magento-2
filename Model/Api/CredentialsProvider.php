@@ -10,10 +10,10 @@ use Throwable;
 
 class CredentialsProvider
 {
-    private const XML_PATH_API_LOGIN = 'carriers/dhlparcel/api_login';
-    private const XML_PATH_API_PASSWORD = 'carriers/dhlparcel/api_password';
-    private const XML_PATH_API_LOGIN_SANDBOX = 'carriers/dhlparcel/api_login_sandbox';
-    private const XML_PATH_API_PASSWORD_SANDBOX = 'carriers/dhlparcel/api_password_sandbox';
+    private const XML_PATH_API_LOGIN = 'carriers/dhlpoland/api_login';
+    private const XML_PATH_API_PASSWORD = 'carriers/dhlpoland/api_password';
+    private const XML_PATH_API_LOGIN_SANDBOX = 'carriers/dhlpoland/api_login_sandbox';
+    private const XML_PATH_API_PASSWORD_SANDBOX = 'carriers/dhlpoland/api_password_sandbox';
 
     /**
      * @param ScopeConfigInterface $scopeConfig

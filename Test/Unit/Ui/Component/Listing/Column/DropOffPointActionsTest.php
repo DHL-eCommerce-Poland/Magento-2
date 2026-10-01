@@ -21,8 +21,8 @@ class DropOffPointActionsTest extends TestCase
         $urlBuilder->expects($this->exactly(2))
             ->method('getUrl')
             ->willReturnMap([
-                ['dhlparcel/dropoffpoint/edit', ['entity_id' => 1], 'http://example.com/edit/1'],
-                ['dhlparcel/dropoffpoint/delete', ['entity_id' => 1], 'http://example.com/delete/1'],
+                ['dhlpoland/dropoffpoint/edit', ['entity_id' => 1], 'http://example.com/edit/1'],
+                ['dhlpoland/dropoffpoint/delete', ['entity_id' => 1], 'http://example.com/delete/1'],
             ]);
 
         $actionColumn = new DropOffPointActions(

@@ -52,8 +52,8 @@ define([
          * @return {Object} DHL configuration object.
          */
         getDhlConfig: function () {
-            return (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel)
-                ? window.checkoutConfig.shipping.dhlparcel
+            return (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlpoland)
+                ? window.checkoutConfig.shipping.dhlpoland
                 : {
                     mapUrl: methodCodes.DEFAULT_MAP_URL,
                     pointMapType: 'all',

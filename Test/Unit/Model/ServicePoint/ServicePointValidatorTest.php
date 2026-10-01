@@ -234,8 +234,8 @@ class ServicePointValidatorTest extends TestCase
         $this->expectNotToPerformAssertions();
         $validator->validate(Carrier::CODE, 'connect', null);
         $validator->validate(Carrier::CODE, 'connect_cod', null);
-        $validator->validate(Carrier::CODE, 'dhlparcel_connect', null);
-        $validator->validate(Carrier::CODE, 'dhlparcel_connect_cod', null);
+        $validator->validate(Carrier::CODE, 'dhlpoland_connect', null);
+        $validator->validate(Carrier::CODE, 'dhlpoland_connect_cod', null);
     }
 
     public function testIsPointSelectionRequiredReturnsFalseForConnectDoorToDoor(): void
@@ -245,8 +245,8 @@ class ServicePointValidatorTest extends TestCase
 
         $this->assertFalse($validator->isPointSelectionRequired(Carrier::CODE, 'connect'));
         $this->assertFalse($validator->isPointSelectionRequired(Carrier::CODE, 'connect_cod'));
-        $this->assertFalse($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect'));
-        $this->assertFalse($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_cod'));
+        $this->assertFalse($validator->isPointSelectionRequired(Carrier::CODE, 'dhlpoland_connect'));
+        $this->assertFalse($validator->isPointSelectionRequired(Carrier::CODE, 'dhlpoland_connect_cod'));
     }
 
     public function testIsPointSelectionRequiredReturnsTrueForConnectPointMethods(): void
@@ -258,10 +258,10 @@ class ServicePointValidatorTest extends TestCase
         $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'connect_parcelshop_cod'));
         $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'connect_packstation'));
         $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'connect_packstation_cod'));
-        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_parcelshop'));
-        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_parcelshop_cod'));
-        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_packstation'));
-        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlparcel_connect_packstation_cod'));
+        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlpoland_connect_parcelshop'));
+        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlpoland_connect_parcelshop_cod'));
+        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlpoland_connect_packstation'));
+        $this->assertTrue($validator->isPointSelectionRequired(Carrier::CODE, 'dhlpoland_connect_packstation_cod'));
     }
 
     /**

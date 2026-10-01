@@ -60,14 +60,14 @@ class MethodCatalogTest extends TestCase
         $catalog = new MethodCatalog();
 
         self::assertTrue($catalog->isCodMethod('parcel_polska_cod'));
-        self::assertTrue($catalog->isCodMethod('dhlparcel_parcel_polska_cod'));
-        self::assertTrue($catalog->isCodMethod('dhlparcel_economy_all_cod'));
-        self::assertTrue($catalog->isCodMethod('dhlparcel_economy_pop_cod'));
-        self::assertTrue($catalog->isCodMethod('dhlparcel_economy_box_cod'));
+        self::assertTrue($catalog->isCodMethod('dhlpoland_parcel_polska_cod'));
+        self::assertTrue($catalog->isCodMethod('dhlpoland_economy_all_cod'));
+        self::assertTrue($catalog->isCodMethod('dhlpoland_economy_pop_cod'));
+        self::assertTrue($catalog->isCodMethod('dhlpoland_economy_box_cod'));
 
         self::assertFalse($catalog->isCodMethod('parcel_polska'));
-        self::assertFalse($catalog->isCodMethod('dhlparcel_parcel_polska'));
-        self::assertFalse($catalog->isCodMethod('dhlparcel_economy_all'));
+        self::assertFalse($catalog->isCodMethod('dhlpoland_parcel_polska'));
+        self::assertFalse($catalog->isCodMethod('dhlpoland_economy_all'));
         self::assertFalse($catalog->isCodMethod(null));
         self::assertFalse($catalog->isCodMethod(''));
     }
@@ -80,21 +80,21 @@ class MethodCatalogTest extends TestCase
         $catalog = new MethodCatalog();
 
         self::assertSame('AH', $catalog->getServiceCodeForMethod('parcel_polska_cod'));
-        self::assertSame('AH', $catalog->getServiceCodeForMethod('dhlparcel_parcel_polska_cod'));
-        self::assertSame('PR', $catalog->getServiceCodeForMethod('dhlparcel_premium_cod'));
-        self::assertSame('09', $catalog->getServiceCodeForMethod('dhlparcel_parcel_9_cod'));
-        self::assertSame('12', $catalog->getServiceCodeForMethod('dhlparcel_parcel_12_cod'));
-        self::assertSame('SP', $catalog->getServiceCodeForMethod('dhlparcel_economy_all'));
-        self::assertSame('SP', $catalog->getServiceCodeForMethod('dhlparcel_economy_all_cod'));
-        self::assertSame('SP', $catalog->getServiceCodeForMethod('dhlparcel_economy_pop'));
-        self::assertSame('SP', $catalog->getServiceCodeForMethod('dhlparcel_economy_pop_cod'));
-        self::assertSame('SP', $catalog->getServiceCodeForMethod('dhlparcel_economy_box'));
-        self::assertSame('SP', $catalog->getServiceCodeForMethod('dhlparcel_economy_box_cod'));
-        self::assertSame('EK', $catalog->getServiceCodeForMethod('dhlparcel_connect_cod'));
-        self::assertSame('EK', $catalog->getServiceCodeForMethod('dhlparcel_connect_parcelshop_cod'));
-        self::assertSame('EK', $catalog->getServiceCodeForMethod('dhlparcel_connect_packstation_cod'));
-        self::assertSame('CP', $catalog->getServiceCodeForMethod('dhlparcel_connect_plus_cod'));
-        self::assertSame('CM', $catalog->getServiceCodeForMethod('dhlparcel_connect_pallet_cod'));
+        self::assertSame('AH', $catalog->getServiceCodeForMethod('dhlpoland_parcel_polska_cod'));
+        self::assertSame('PR', $catalog->getServiceCodeForMethod('dhlpoland_premium_cod'));
+        self::assertSame('09', $catalog->getServiceCodeForMethod('dhlpoland_parcel_9_cod'));
+        self::assertSame('12', $catalog->getServiceCodeForMethod('dhlpoland_parcel_12_cod'));
+        self::assertSame('SP', $catalog->getServiceCodeForMethod('dhlpoland_economy_all'));
+        self::assertSame('SP', $catalog->getServiceCodeForMethod('dhlpoland_economy_all_cod'));
+        self::assertSame('SP', $catalog->getServiceCodeForMethod('dhlpoland_economy_pop'));
+        self::assertSame('SP', $catalog->getServiceCodeForMethod('dhlpoland_economy_pop_cod'));
+        self::assertSame('SP', $catalog->getServiceCodeForMethod('dhlpoland_economy_box'));
+        self::assertSame('SP', $catalog->getServiceCodeForMethod('dhlpoland_economy_box_cod'));
+        self::assertSame('EK', $catalog->getServiceCodeForMethod('dhlpoland_connect_cod'));
+        self::assertSame('EK', $catalog->getServiceCodeForMethod('dhlpoland_connect_parcelshop_cod'));
+        self::assertSame('EK', $catalog->getServiceCodeForMethod('dhlpoland_connect_packstation_cod'));
+        self::assertSame('CP', $catalog->getServiceCodeForMethod('dhlpoland_connect_plus_cod'));
+        self::assertSame('CM', $catalog->getServiceCodeForMethod('dhlpoland_connect_pallet_cod'));
     }
 
     /**

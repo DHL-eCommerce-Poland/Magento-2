@@ -36,7 +36,7 @@ class TestProductionConnection extends Field
      */
     protected function _getElementHtml(AbstractElement $element): string
     {
-        $url = $this->getUrl('dhlparcel/system_config/testConnection');
+        $url = $this->getUrl('dhlpoland/system_config/testConnection');
 
         $button = $this->getLayout()->createBlock(Button::class)->setData([
             'id' => 'dhl_test_connection_production_button',
@@ -57,12 +57,12 @@ class TestProductionConnection extends Field
 <script type="text/javascript">
 require(['jquery', 'Magento_Ui/js/modal/alert'], function($, alert) {
     window.testDhlConnection = function(env, url) {
-        var loginInput = $('#carriers_dhlparcel_general_api_login').val();
-        var passwordInput = $('#carriers_dhlparcel_general_api_password').val();
+        var loginInput = $('#carriers_dhlpoland_general_api_login').val();
+        var passwordInput = $('#carriers_dhlpoland_general_api_password').val();
 
         if (env === 'sandbox') {
-            loginInput = $('#carriers_dhlparcel_general_api_login_sandbox').val();
-            passwordInput = $('#carriers_dhlparcel_general_api_password_sandbox').val();
+            loginInput = $('#carriers_dhlpoland_general_api_login_sandbox').val();
+            passwordInput = $('#carriers_dhlpoland_general_api_password_sandbox').val();
         }
 
         var postData = {

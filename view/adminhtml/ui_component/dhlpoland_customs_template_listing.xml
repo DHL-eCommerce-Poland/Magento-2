@@ -3,7 +3,7 @@
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">dhlparcel_customs_template_listing.dhlparcel_customs_template_listing_data_source</item>
+            <item name="provider" xsi:type="string">dhlpoland_customs_template_listing.dhlpoland_customs_template_listing_data_source</item>
         </item>
     </argument>
     <settings>
@@ -14,19 +14,19 @@
                 <label translate="true">Add New Customs Clearance Template</label>
             </button>
         </buttons>
-        <spinner>dhlparcel_customs_template_columns</spinner>
+        <spinner>dhlpoland_customs_template_columns</spinner>
         <deps>
-            <dep>dhlparcel_customs_template_listing.dhlparcel_customs_template_listing_data_source</dep>
+            <dep>dhlpoland_customs_template_listing.dhlpoland_customs_template_listing_data_source</dep>
         </deps>
     </settings>
-    <dataSource name="dhlparcel_customs_template_listing_data_source" component="Magento_Ui/js/grid/provider">
+    <dataSource name="dhlpoland_customs_template_listing_data_source" component="Magento_Ui/js/grid/provider">
         <settings>
             <storageConfig>
                 <param name="indexField" xsi:type="string">entity_id</param>
             </storageConfig>
             <updateUrl path="mui/index/render"/>
         </settings>
-        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="dhlparcel_customs_template_listing_data_source">
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="dhlpoland_customs_template_listing_data_source">
             <settings>
                 <requestFieldName>entity_id</requestFieldName>
                 <primaryFieldName>entity_id</primaryFieldName>
@@ -48,7 +48,7 @@
                         <message translate="true">Are you sure you want to delete the selected customs clearances?</message>
                         <title translate="true">Delete customs clearances</title>
                     </confirm>
-                    <url path="dhlparcel/customstemplate/massDelete"/>
+                    <url path="dhlpoland/customstemplate/massDelete"/>
                     <type>delete</type>
                     <label translate="true">Delete</label>
                 </settings>
@@ -56,7 +56,7 @@
         </massaction>
         <paging name="listing_paging"/>
     </listingToolbar>
-    <columns name="dhlparcel_customs_template_columns">
+    <columns name="dhlpoland_customs_template_columns">
         <selectionsColumn name="ids">
             <settings>
                 <indexField>entity_id</indexField>

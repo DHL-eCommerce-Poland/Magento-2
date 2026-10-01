@@ -26,7 +26,7 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
      * @param ReturnShipmentDataBuilder $returnBuilder
      * @param ReturnShipmentCreationService $returnCreationService
      * @param ScopeConfigInterface $scopeConfig
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -34,7 +34,7 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
         private readonly ReturnShipmentDataBuilder $returnBuilder,
         private readonly ReturnShipmentCreationService $returnCreationService,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }
@@ -68,7 +68,7 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
             $returnShipmentData = $this->returnBuilder->buildReturnShipmentData($shipmentData);
             $primaryWaybill = $existingEntity->getShipmentId();
 
-            $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlparcel/sandbox');
+            $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlpoland/sandbox');
             $environment = $isSandbox ? 'sandbox' : 'production';
 
             $result = $this->returnCreationService->createReturnShipment(
@@ -89,7 +89,7 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
                 );
             }
         } catch (Exception $e) {
-            $this->logger?->error('Error creating DHL return shipment: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error creating DHL return shipment: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage(__('Failed to create return shipment: %1', $e->getMessage()));
         }
 

@@ -54,8 +54,8 @@ class CredentialsProviderTest extends TestCase
         $this->scopeConfigMock->expects(self::exactly(2))
             ->method('getValue')
             ->willReturnCallback(fn(string $path) => match ($path) {
-                'carriers/dhlparcel/api_login' => '0:3:encrypted_user',
-                'carriers/dhlparcel/api_password' => '0:3:encrypted_pass',
+                'carriers/dhlpoland/api_login' => '0:3:encrypted_user',
+                'carriers/dhlpoland/api_password' => '0:3:encrypted_pass',
                 default => null,
             });
 
@@ -84,8 +84,8 @@ class CredentialsProviderTest extends TestCase
         $this->scopeConfigMock->expects(self::exactly(2))
             ->method('getValue')
             ->willReturnCallback(fn(string $path) => match ($path) {
-                'carriers/dhlparcel/api_login_sandbox' => '0:3:enc_sb_user',
-                'carriers/dhlparcel/api_password_sandbox' => '0:3:enc_sb_pass',
+                'carriers/dhlpoland/api_login_sandbox' => '0:3:enc_sb_user',
+                'carriers/dhlpoland/api_password_sandbox' => '0:3:enc_sb_pass',
                 default => null,
             });
 
@@ -131,8 +131,8 @@ class CredentialsProviderTest extends TestCase
         $this->scopeConfigMock->expects(self::exactly(2))
             ->method('getValue')
             ->willReturnCallback(fn(string $path) => match ($path) {
-                'carriers/dhlparcel/api_login' => '0:3:encrypted_user',
-                'carriers/dhlparcel/api_password' => '0:3:encrypted_pass',
+                'carriers/dhlpoland/api_login' => '0:3:encrypted_user',
+                'carriers/dhlpoland/api_password' => '0:3:encrypted_pass',
                 default => null,
             });
 

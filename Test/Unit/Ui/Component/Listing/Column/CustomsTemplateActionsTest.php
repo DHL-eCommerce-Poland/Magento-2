@@ -21,8 +21,8 @@ class CustomsTemplateActionsTest extends TestCase
         $urlBuilder->expects($this->exactly(2))
             ->method('getUrl')
             ->willReturnMap([
-                ['dhlparcel/customstemplate/edit', ['entity_id' => 1], 'http://example.com/customs/edit/1'],
-                ['dhlparcel/customstemplate/delete', ['entity_id' => 1], 'http://example.com/customs/delete/1'],
+                ['dhlpoland/customstemplate/edit', ['entity_id' => 1], 'http://example.com/customs/edit/1'],
+                ['dhlpoland/customstemplate/delete', ['entity_id' => 1], 'http://example.com/customs/delete/1'],
             ]);
 
         $actionColumn = new CustomsTemplateActions(

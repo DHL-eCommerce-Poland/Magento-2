@@ -23,14 +23,14 @@ class MassUpdateStatus extends Action implements HttpPostActionInterface
      * @param Filter $filter
      * @param CollectionFactory $collectionFactory
      * @param ShipmentTrackingService $shipmentTrackingService
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         private readonly Filter $filter,
         private readonly CollectionFactory $collectionFactory,
         private readonly ShipmentTrackingService $shipmentTrackingService,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }
@@ -76,7 +76,7 @@ class MassUpdateStatus extends Action implements HttpPostActionInterface
                 );
             }
         } catch (Exception $e) {
-            $this->logger?->error('Error during mass status update: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error during mass status update: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage(__('Error during status update: %1', $e->getMessage()));
         }
 

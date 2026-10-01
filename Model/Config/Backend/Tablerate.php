@@ -8,6 +8,7 @@ use Magento\Config\Model\Config\Backend\File;
 use Magento\Config\Model\Config\Backend\File\RequestData\RequestDataInterface;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\LocalizedException;
@@ -17,6 +18,7 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Magento\MediaStorage\Model\File\UploaderFactory;
 use Magento\Store\Model\ScopeInterface;
+use Throwable;
 
 class Tablerate extends File
 {
@@ -29,6 +31,7 @@ class Tablerate extends File
      * @param RequestDataInterface $requestData
      * @param Filesystem $filesystem
      * @param ResourceConnection $resourceConnection
+     * @param WriterInterface $configWriter
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -42,6 +45,7 @@ class Tablerate extends File
         RequestDataInterface $requestData,
         Filesystem $filesystem,
         private readonly ResourceConnection $resourceConnection,
+        private readonly WriterInterface $configWriter,
         ?AbstractResource $resource = null,
         ?AbstractDb $resourceCollection = null,
         array $data = []
@@ -63,6 +67,9 @@ class Tablerate extends File
     /**
      * Parse CSV file content into tabular rate rows array.
      *
+     * Expected CSV format: Method Code, Country (optional), Condition Type,
+     * Value From, Value To, Price (Website optional).
+     *
      * @param string $content Raw CSV text content.
      * @param int|null $defaultWebsiteId Optional website ID override.
      *
@@ -82,21 +89,21 @@ class Tablerate extends File
 
         $header = str_getcsv((string)$headerLine, $delimiter, '"', '\\');
         $normalizedHeader = array_map(static fn ($col) => strtolower(trim((string)$col)), $header);
-
-        $expectedColumns = ['method code', 'condition type', 'value from', 'value to', 'price'];
+        $colMap = array_flip($normalizedHeader);
+        $expectedColumns = ['method code', 'country', 'condition type', 'value from', 'value to', 'price'];
         foreach ($expectedColumns as $col) {
-            if (!in_array($col, $normalizedHeader, true)) {
+            if (!isset($colMap[$col])) {
                 throw new LocalizedException(
                     __(
                         'Invalid CSV header structure. ' .
-                        'Expected columns: Method Code, Condition Type, Value From, Value To, Price.'
+                        'Expected columns: Method Code, Country, Condition Type, Value From, Value To, Price.'
                     )
                 );
             }
         }
 
-        $colMap = array_flip($normalizedHeader);
-        $hasWebsite = in_array('website', $normalizedHeader, true);
+        $hasWebsite = isset($colMap['website']);
+
         $currentScopeWebsiteId = $defaultWebsiteId ?? $this->resolveCurrentWebsiteId();
         $rows = [];
 
@@ -121,6 +128,13 @@ class Tablerate extends File
             }
 
             $methodCode = trim((string)$data[$colMap['method code']]);
+            $country = isset($data[$colMap['country']]) ? strtoupper(trim((string)$data[$colMap['country']])) : '';
+            if ($country === '' || $country === '*') {
+                throw new LocalizedException(
+                    __('Invalid country code on line %1.', $index + 2)
+                );
+            }
+
             $conditionType = strtolower(trim((string)$data[$colMap['condition type']]));
             $from = (float)trim((string)$data[$colMap['value from']]);
             $to = (float)trim((string)$data[$colMap['value to']]);
@@ -135,6 +149,7 @@ class Tablerate extends File
             $rows[] = [
                 'website_id' => $websiteId,
                 'method_code' => $methodCode,
+                'country_id' => $country,
                 'condition_type' => $conditionType,
                 'condition_from' => $from,
                 'condition_to' => $to,
@@ -168,6 +183,7 @@ class Tablerate extends File
                 $websiteId = $this->resolveCurrentWebsiteId();
                 $rows = $this->parseCsvContent($content, $websiteId);
                 $this->saveTableRates($rows, $websiteId);
+                $this->syncConfigSpecificCountries($rows);
 
                 $dateStr = date('Y-m-d_H-i-s');
                 $timestampedFileName = sprintf('dhl_tablerates_%s.csv', $dateStr);
@@ -184,6 +200,43 @@ class Tablerate extends File
         }
 
         return $this;
+    }
+
+    /**
+     * Synchronize specificcountry configuration for methods present in the imported file.
+     *
+     * @param array $rows
+     *
+     * @return void
+     */
+    public function syncConfigSpecificCountries(array $rows): void
+    {
+        $scope = $this->getScope() ?: ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+        $scopeId = (int)($this->getScopeId() ?: 0);
+
+        $methodCountries = [];
+        foreach ($rows as $row) {
+            $country = strtoupper(trim((string)($row['country_id'] ?? '*')));
+            if ($country !== '*' && $country !== '') {
+                $methodCountries[$row['method_code']][$country] = true;
+            }
+        }
+
+        foreach ($methodCountries as $methodCode => $countries) {
+            $countryList = implode(',', array_keys($countries));
+            $this->configWriter->save(
+                'carriers/dhlpoland/method_' . $methodCode . '_sallowspecific',
+                '1',
+                $scope,
+                $scopeId
+            );
+            $this->configWriter->save(
+                'carriers/dhlpoland/method_' . $methodCode . '_specificcountry',
+                $countryList,
+                $scope,
+                $scopeId
+            );
+        }
     }
 
     /**
@@ -246,7 +299,7 @@ class Tablerate extends File
                 $connection->insertMultiple($tableName, $rows);
             }
             $connection->commit();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $connection->rollBack();
             throw new LocalizedException(__('Failed to save table rates: %1', $e->getMessage()), $e);
         }

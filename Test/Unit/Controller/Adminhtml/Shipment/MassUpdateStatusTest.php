@@ -81,7 +81,8 @@ class MassUpdateStatusTest extends TestCase
             $this->contextStub,
             $this->filterMock,
             $this->collectionFactoryMock,
-            $this->trackingServiceMock
+            $this->trackingServiceMock,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 

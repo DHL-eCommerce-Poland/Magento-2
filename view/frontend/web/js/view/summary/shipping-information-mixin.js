@@ -53,8 +53,8 @@ define([
                     }
                 }
 
-                if (!pointData && window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlparcel) {
-                    var cfg = window.checkoutConfig.shipping.dhlparcel;
+                if (!pointData && window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlpoland) {
+                    var cfg = window.checkoutConfig.shipping.dhlpoland;
                     if (cfg.selectedPoint && cfg.selectedPoint.sap) {
                         pointData = cfg.selectedPoint;
                     }

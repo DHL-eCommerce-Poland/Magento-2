@@ -55,7 +55,8 @@ class CourierBookingCancellationServiceTest extends TestCase
             $this->clientStub,
             $this->credentialsProviderStub,
             $this->shipmentDataRepositoryStub,
-            $this->collectionFactoryStub
+            $this->collectionFactoryStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 
@@ -142,7 +143,8 @@ class CourierBookingCancellationServiceTest extends TestCase
             $this->clientStub,
             $this->credentialsProviderStub,
             $this->shipmentDataRepositoryStub,
-            $collectionFactoryStub
+            $collectionFactoryStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $result = $serviceWithCollection->cancelCourierBooking([10]);
