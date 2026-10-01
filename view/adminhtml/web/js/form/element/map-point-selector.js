@@ -9,7 +9,7 @@ define([
 
     return Button.extend({
         defaults: {
-            provider: 'dhlparcel_shipment_form.dhlparcel_shipment_form_data_source',
+            provider: 'dhlpoland_shipment_form.dhlpoland_shipment_form_data_source',
             template: 'ui/form/components/button/container',
             elementTmpl: 'Ideo_Dhl/form/element/map-point-button',
             buttonClasses: 'action-secondary',
@@ -36,7 +36,7 @@ define([
             this.country = '';
 
             var self = this;
-            var providerName = this.provider || 'dhlparcel_shipment_form.dhlparcel_shipment_form_data_source';
+            var providerName = this.provider || 'dhlpoland_shipment_form.dhlpoland_shipment_form_data_source';
 
             registry.get(providerName, function (source) {
                 self.source = source;

@@ -40,7 +40,7 @@ class TestProductionConnectionTest extends TestCase
         $escaper->method('escapeJs')->willReturnCallback(static fn (string $value): string => addslashes($value));
 
         $urlBuilder->method('getUrl')
-            ->with('dhlparcel/system_config/testConnection')
+            ->with('dhlpoland/system_config/testConnection')
             ->willReturn("http://example.com/testConnection');alert(1);//");
 
         $button = $this->createMock(Button::class);

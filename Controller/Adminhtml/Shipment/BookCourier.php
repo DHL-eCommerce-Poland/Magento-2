@@ -65,7 +65,7 @@ class BookCourier extends Action implements HttpPostActionInterface
                 ]);
             }
 
-            $environment = (string) $this->scopeConfig->getValue('carriers/dhlparcel/environment') ?: 'sandbox';
+            $environment = (string) $this->scopeConfig->getValue('carriers/dhlpoland/environment') ?: 'sandbox';
 
             $bookingResult = $this->courierBookingService->bookCourier(
                 $shipmentIds,

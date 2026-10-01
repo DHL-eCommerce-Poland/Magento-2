@@ -13,8 +13,8 @@ use Magento\Ui\Component\Listing\Columns\Column;
 
 class CustomsTemplateActions extends Column
 {
-    private const URL_PATH_EDIT = 'dhlparcel/customstemplate/edit';
-    private const URL_PATH_DELETE = 'dhlparcel/customstemplate/delete';
+    private const URL_PATH_EDIT = 'dhlpoland/customstemplate/edit';
+    private const URL_PATH_DELETE = 'dhlpoland/customstemplate/delete';
 
     /**
      * @param ContextInterface $context

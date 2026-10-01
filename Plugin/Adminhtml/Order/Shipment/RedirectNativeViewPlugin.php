@@ -46,7 +46,7 @@ class RedirectNativeViewPlugin
                 $dhlShipment = $this->shipmentDataRepository->getByMagentoShipmentId($magentoShipmentId);
                 if ($dhlShipment && $dhlShipment->getEntityId()) {
                     $dhlEditUrl = $this->urlBuilder->getUrl(
-                        'dhlparcel/shipment/edit',
+                        'dhlpoland/shipment/edit',
                         ['entity_id' => $dhlShipment->getEntityId()]
                     );
                     $this->response->setRedirect($dhlEditUrl);

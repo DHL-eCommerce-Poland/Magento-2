@@ -33,30 +33,30 @@
     </type>
 
     <type name="Magento\Checkout\Api\ShippingInformationManagementInterface">
-        <plugin name="dhlparcel_save_service_point_to_quote_address"
+        <plugin name="dhlpoland_save_service_point_to_quote_address"
                 type="Ideo\Dhl\Plugin\Checkout\SaveServicePointToQuoteAddress"
                 sortOrder="10" />
     </type>
     <type name="Magento\Quote\Model\Quote\Address\ToOrderAddress">
-        <plugin name="dhlparcel_copy_service_point_to_order_address"
+        <plugin name="dhlpoland_copy_service_point_to_order_address"
                 type="Ideo\Dhl\Plugin\Quote\CopyServicePointToOrderAddress"
                 sortOrder="10" />
     </type>
     <type name="Magento\Quote\Model\Quote\Address\ToOrder">
-        <plugin name="dhlparcel_enrich_order_shipping_description"
+        <plugin name="dhlpoland_enrich_order_shipping_description"
                 type="Ideo\Dhl\Plugin\Quote\EnrichOrderShippingDescription"
                 sortOrder="10" />
     </type>
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
-                <item name="dhlparcel_drop_off_point_listing_data_source"
+                <item name="dhlpoland_drop_off_point_listing_data_source"
                       xsi:type="string">Ideo\Dhl\Model\ResourceModel\DropOffPoint\Grid\Collection</item>
-                <item name="dhlparcel_delivery_service_listing_data_source"
+                <item name="dhlpoland_delivery_service_listing_data_source"
                       xsi:type="string">Ideo\Dhl\Model\ResourceModel\DeliveryService\Grid\Collection</item>
-                <item name="dhlparcel_shipment_listing_data_source"
+                <item name="dhlpoland_shipment_listing_data_source"
                       xsi:type="string">Ideo\Dhl\Model\ResourceModel\ShipmentData\Grid\Collection</item>
-                <item name="dhlparcel_customs_template_listing_data_source"
+                <item name="dhlpoland_customs_template_listing_data_source"
                       xsi:type="string">Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Grid\Collection</item>
             </argument>
         </arguments>

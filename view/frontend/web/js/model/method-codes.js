@@ -2,7 +2,7 @@ define([], function () {
     'use strict';
 
     return Object.freeze({
-        CARRIER_CODE: 'dhlparcel',
+        CARRIER_CODE: 'dhlpoland',
         DEFAULT_MAP_URL: 'https://parcelshop.dhl.pl/mapa',
 
         // Method codes
@@ -34,15 +34,15 @@ define([], function () {
         METHOD_CONNECT_PALLET_COD: 'connect_pallet_cod',
 
         // Full method codes (carrier_method)
-        FULL_ECONOMY_ALL: 'dhlparcel_economy_all',
-        FULL_ECONOMY_ALL_COD: 'dhlparcel_economy_all_cod',
-        FULL_ECONOMY_POP: 'dhlparcel_economy_pop',
-        FULL_ECONOMY_POP_COD: 'dhlparcel_economy_pop_cod',
-        FULL_ECONOMY_BOX: 'dhlparcel_economy_box',
-        FULL_ECONOMY_BOX_COD: 'dhlparcel_economy_box_cod',
-        FULL_CONNECT_PARCELSHOP: 'dhlparcel_connect_parcelshop',
-        FULL_CONNECT_PARCELSHOP_COD: 'dhlparcel_connect_parcelshop_cod',
-        FULL_CONNECT_PACKSTATION: 'dhlparcel_connect_packstation',
-        FULL_CONNECT_PACKSTATION_COD: 'dhlparcel_connect_packstation_cod'
+        FULL_ECONOMY_ALL: 'dhlpoland_economy_all',
+        FULL_ECONOMY_ALL_COD: 'dhlpoland_economy_all_cod',
+        FULL_ECONOMY_POP: 'dhlpoland_economy_pop',
+        FULL_ECONOMY_POP_COD: 'dhlpoland_economy_pop_cod',
+        FULL_ECONOMY_BOX: 'dhlpoland_economy_box',
+        FULL_ECONOMY_BOX_COD: 'dhlpoland_economy_box_cod',
+        FULL_CONNECT_PARCELSHOP: 'dhlpoland_connect_parcelshop',
+        FULL_CONNECT_PARCELSHOP_COD: 'dhlpoland_connect_parcelshop_cod',
+        FULL_CONNECT_PACKSTATION: 'dhlpoland_connect_packstation',
+        FULL_CONNECT_PACKSTATION_COD: 'dhlpoland_connect_packstation_cod'
     });
 });

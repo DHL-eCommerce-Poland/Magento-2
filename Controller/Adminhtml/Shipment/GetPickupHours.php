@@ -112,7 +112,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
                 ]);
             }
 
-            $environment = (string) $this->scopeConfig->getValue('carriers/dhlparcel/environment') ?: 'sandbox';
+            $environment = (string) $this->scopeConfig->getValue('carriers/dhlpoland/environment') ?: 'sandbox';
 
             $resultData = $this->pickupTimeResolver->resolveAvailableHoursForPostalCodes(
                 $postalCodes,

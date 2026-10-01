@@ -3,7 +3,7 @@
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">dhlparcel_delivery_service_listing.dhlparcel_delivery_service_listing_data_source</item>
+            <item name="provider" xsi:type="string">dhlpoland_drop_off_point_listing.dhlpoland_drop_off_point_listing_data_source</item>
         </item>
     </argument>
     <settings>
@@ -11,22 +11,22 @@
             <button name="add">
                 <url path="*/*/new"/>
                 <class>primary</class>
-                <label translate="true">Add New Delivery Service Template</label>
+                <label translate="true">Add New Drop-Off Point Template</label>
             </button>
         </buttons>
-        <spinner>dhlparcel_delivery_service_columns</spinner>
+        <spinner>dhlpoland_drop_off_point_columns</spinner>
         <deps>
-            <dep>dhlparcel_delivery_service_listing.dhlparcel_delivery_service_listing_data_source</dep>
+            <dep>dhlpoland_drop_off_point_listing.dhlpoland_drop_off_point_listing_data_source</dep>
         </deps>
     </settings>
-    <dataSource name="dhlparcel_delivery_service_listing_data_source" component="Magento_Ui/js/grid/provider">
+    <dataSource name="dhlpoland_drop_off_point_listing_data_source" component="Magento_Ui/js/grid/provider">
         <settings>
             <storageConfig>
                 <param name="indexField" xsi:type="string">entity_id</param>
             </storageConfig>
             <updateUrl path="mui/index/render"/>
         </settings>
-        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="dhlparcel_delivery_service_listing_data_source">
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="dhlpoland_drop_off_point_listing_data_source">
             <settings>
                 <requestFieldName>entity_id</requestFieldName>
                 <primaryFieldName>entity_id</primaryFieldName>
@@ -45,10 +45,10 @@
             <action name="delete">
                 <settings>
                     <confirm>
-                        <message translate="true">Are you sure you want to delete the selected delivery services?</message>
-                        <title translate="true">Delete delivery services</title>
+                        <message translate="true">Are you sure you want to delete the selected drop-off points?</message>
+                        <title translate="true">Delete drop-off points</title>
                     </confirm>
-                    <url path="dhlparcel/deliveryservice/massDelete"/>
+                    <url path="dhlpoland/dropoffpoint/massDelete"/>
                     <type>delete</type>
                     <label translate="true">Delete</label>
                 </settings>
@@ -56,7 +56,7 @@
         </massaction>
         <paging name="listing_paging"/>
     </listingToolbar>
-    <columns name="dhlparcel_delivery_service_columns">
+    <columns name="dhlpoland_drop_off_point_columns">
         <selectionsColumn name="ids">
             <settings>
                 <indexField>entity_id</indexField>
@@ -75,23 +75,33 @@
                 <label translate="true">Template Name</label>
             </settings>
         </column>
-        <column name="method_code" component="Magento_Ui/js/grid/columns/select">
+        <column name="sap_number">
             <settings>
-                <options class="Ideo\Dhl\Model\Config\Source\ShippingMethod"/>
-                <filter>select</filter>
-                <dataType>select</dataType>
-                <label translate="true">Associated Shipping Method</label>
+                <filter>text</filter>
+                <label translate="true">SAP Number</label>
             </settings>
         </column>
-        <column name="auto_create_return_shipment" component="Magento_Ui/js/grid/columns/select">
+        <column name="sender_name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Sender Name</label>
+            </settings>
+        </column>
+        <column name="city">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">City</label>
+            </settings>
+        </column>
+        <column name="is_default" component="Magento_Ui/js/grid/columns/select">
             <settings>
                 <options class="Magento\Config\Model\Config\Source\Yesno"/>
                 <filter>select</filter>
                 <dataType>select</dataType>
-                <label translate="true">Auto Return</label>
+                <label translate="true">Is Default</label>
             </settings>
         </column>
-        <actionsColumn name="actions" class="Ideo\Dhl\Ui\Component\Listing\Column\DeliveryServiceActions">
+        <actionsColumn name="actions" class="Ideo\Dhl\Ui\Component\Listing\Column\DropOffPointActions">
             <settings>
                 <indexField>entity_id</indexField>
             </settings>

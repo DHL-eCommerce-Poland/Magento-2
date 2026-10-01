@@ -49,7 +49,7 @@ class CancelCourierBooking extends Action implements HttpGetActionInterface, Htt
             $this->messageManager->addErrorMessage(
                 __('Please select at least one shipment to cancel courier booking.')
             );
-            return $resultRedirect->setPath('dhlparcel/shipment/index');
+            return $resultRedirect->setPath('dhlpoland/shipment/index');
         }
 
         try {
@@ -79,6 +79,6 @@ class CancelCourierBooking extends Action implements HttpGetActionInterface, Htt
             return $resultRedirect->setUrl($referer);
         }
 
-        return $resultRedirect->setPath('dhlparcel/shipment/index');
+        return $resultRedirect->setPath('dhlpoland/shipment/index');
     }
 }

@@ -37,7 +37,7 @@ class DownloadScan extends Generic implements ButtonProviderInterface
             return [];
         }
 
-        $downloadUrl = $this->getUrl('dhlparcel/shipment/downloadScan', ['entity_id' => $entityId]);
+        $downloadUrl = $this->getUrl('dhlpoland/shipment/downloadScan', ['entity_id' => $entityId]);
 
         return [
             'label' => __('Download Scan'),

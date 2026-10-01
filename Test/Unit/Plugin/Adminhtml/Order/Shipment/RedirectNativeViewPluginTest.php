@@ -91,12 +91,12 @@ class RedirectNativeViewPluginTest extends TestCase
 
         $this->urlBuilder->expects($this->once())
             ->method('getUrl')
-            ->with('dhlparcel/shipment/edit', ['entity_id' => 3])
-            ->willReturn('http://example.com/admin/dhlparcel/shipment/edit/entity_id/3');
+            ->with('dhlpoland/shipment/edit', ['entity_id' => 3])
+            ->willReturn('http://example.com/admin/dhlpoland/shipment/edit/entity_id/3');
 
         $this->response->expects($this->once())
             ->method('setRedirect')
-            ->with('http://example.com/admin/dhlparcel/shipment/edit/entity_id/3');
+            ->with('http://example.com/admin/dhlpoland/shipment/edit/entity_id/3');
 
         $subject = $this->createMock(NativeShipmentViewController::class);
         $proceed = fn () => $this->fail('Proceed should not be called when redirecting');

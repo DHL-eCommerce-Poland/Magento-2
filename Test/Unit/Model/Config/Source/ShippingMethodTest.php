@@ -40,7 +40,7 @@ class ShippingMethodTest extends TestCase
         $scopeConfigMock = $this->createStub(ScopeConfigInterface::class);
         $scopeConfigMock->method('getValue')->willReturnCallback(
             static function (string $path) {
-                if ($path === 'carriers/dhlparcel/method_parcel_polska_method_name') {
+                if ($path === 'carriers/dhlpoland/method_parcel_polska_method_name') {
                     return 'Custom Courier Name';
                 }
                 return null;

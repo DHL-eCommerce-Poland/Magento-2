@@ -92,10 +92,10 @@ class UpdateStatusShipmentTest extends TestCase
         $this->urlBuilderStub->expects($this->once())
             ->method('getUrl')
             ->with(
-                'dhlparcel/shipment/updateStatus',
+                'dhlpoland/shipment/updateStatus',
                 ['entity_id' => 10]
             )
-            ->willReturn('http://magento.local/admin/dhlparcel/shipment/updateStatus/entity_id/10');
+            ->willReturn('http://magento.local/admin/dhlpoland/shipment/updateStatus/entity_id/10');
 
         $buttonData = $this->button->getButtonData();
 
@@ -110,7 +110,7 @@ class UpdateStatusShipmentTest extends TestCase
         $postData = json_decode($matches[1], true);
         $this->assertSame(
             [
-                'action' => 'http://magento.local/admin/dhlparcel/shipment/updateStatus/entity_id/10',
+                'action' => 'http://magento.local/admin/dhlpoland/shipment/updateStatus/entity_id/10',
                 'data' => ['redirect_to_edit' => 1],
             ],
             $postData

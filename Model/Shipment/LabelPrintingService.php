@@ -22,8 +22,8 @@ use Zend_Pdf;
 
 class LabelPrintingService
 {
-    private const XML_PATH_SANDBOX = 'carriers/dhlparcel/sandbox';
-    private const XML_PATH_DEFAULT_LABEL_TYPE = 'carriers/dhlparcel/label_type';
+    private const XML_PATH_SANDBOX = 'carriers/dhlpoland/sandbox';
+    private const XML_PATH_DEFAULT_LABEL_TYPE = 'carriers/dhlpoland/label_type';
 
     /**
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository

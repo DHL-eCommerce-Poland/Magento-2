@@ -63,7 +63,7 @@ class DeleteTest extends TestCase
         $this->urlBuilderMock->expects($this->once())
             ->method('getUrl')
             ->with('*/*/delete', ['entity_id' => 12])
-            ->willReturn('http://localhost/admin/dhlparcel/customstemplate/delete/entity_id/12');
+            ->willReturn('http://localhost/admin/dhlpoland/customstemplate/delete/entity_id/12');
 
         $button = new Delete($this->contextMock, $this->escaperMock);
         $data = $button->getButtonData();
@@ -73,7 +73,7 @@ class DeleteTest extends TestCase
         $this->assertSame('delete', $data['class']);
         $this->assertSame(20, $data['sort_order']);
         $expectedOnClick = "deleteConfirm('Are you sure you want to delete this record?', "
-            . "'http://localhost/admin/dhlparcel/customstemplate/delete/entity_id/12', {data: {}})";
+            . "'http://localhost/admin/dhlpoland/customstemplate/delete/entity_id/12', {data: {}})";
         $this->assertSame($expectedOnClick, $data['on_click']);
     }
 }

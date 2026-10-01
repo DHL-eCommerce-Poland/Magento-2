@@ -155,7 +155,7 @@ class CreateReturnShipmentTest extends TestCase
 
         $this->scopeConfigMock->expects($this->once())
             ->method('getValue')
-            ->with('carriers/dhlparcel/sandbox')
+            ->with('carriers/dhlpoland/sandbox')
             ->willReturn('1');
 
         $apiResult = new CreateShipmentReturnResult(

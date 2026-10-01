@@ -93,8 +93,8 @@ class RedirectShipmentUiViewActionPluginTest extends TestCase
 
         $this->urlBuilder->expects($this->once())
             ->method('getUrl')
-            ->with('dhlparcel/shipment/edit', ['entity_id' => 5])
-            ->willReturn('http://example.com/admin/dhlparcel/shipment/edit/entity_id/5');
+            ->with('dhlpoland/shipment/edit', ['entity_id' => 5])
+            ->willReturn('http://example.com/admin/dhlpoland/shipment/edit/entity_id/5');
 
         $dataSource = [
             'data' => [
@@ -116,7 +116,7 @@ class RedirectShipmentUiViewActionPluginTest extends TestCase
         $result = $this->plugin->afterPrepareDataSource($viewAction, $dataSource);
 
         $this->assertEquals(
-            'http://example.com/admin/dhlparcel/shipment/edit/entity_id/5',
+            'http://example.com/admin/dhlpoland/shipment/edit/entity_id/5',
             $result['data']['items'][0]['actions']['view']['href']
         );
         $this->assertSame(
@@ -149,8 +149,8 @@ class RedirectShipmentUiViewActionPluginTest extends TestCase
             ->willReturn([$newestShipment, $olderShipment]);
         $this->urlBuilder->expects($this->once())
             ->method('getUrl')
-            ->with('dhlparcel/shipment/edit', ['entity_id' => 9])
-            ->willReturn('http://example.com/admin/dhlparcel/shipment/edit/entity_id/9');
+            ->with('dhlpoland/shipment/edit', ['entity_id' => 9])
+            ->willReturn('http://example.com/admin/dhlpoland/shipment/edit/entity_id/9');
 
         $dataSource = [
             'data' => [
@@ -167,7 +167,7 @@ class RedirectShipmentUiViewActionPluginTest extends TestCase
         $result = $this->plugin->afterPrepareDataSource($viewAction, $dataSource);
 
         $this->assertSame(
-            'http://example.com/admin/dhlparcel/shipment/edit/entity_id/9',
+            'http://example.com/admin/dhlpoland/shipment/edit/entity_id/9',
             $result['data']['items'][0]['actions']['view']['href']
         );
     }

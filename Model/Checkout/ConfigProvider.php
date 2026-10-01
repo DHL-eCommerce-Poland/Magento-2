@@ -18,8 +18,8 @@ use Throwable;
 
 class ConfigProvider implements ConfigProviderInterface
 {
-    private const XML_PATH_DELIVERY_MODE = 'carriers/dhlparcel/method_economy_all_point_delivery_mode';
-    private const XML_PATH_DEBUG = 'carriers/dhlparcel/debug';
+    private const XML_PATH_DELIVERY_MODE = 'carriers/dhlpoland/method_economy_all_point_delivery_mode';
+    private const XML_PATH_DEBUG = 'carriers/dhlpoland/debug';
     public const DEFAULT_MAP_URL = 'https://parcelshop.dhl.pl/mapa';
 
     /**
@@ -105,7 +105,7 @@ class ConfigProvider implements ConfigProviderInterface
 
         return [
             'shipping' => [
-                'dhlparcel' => [
+                'dhlpoland' => [
                     'mapUrl' => self::DEFAULT_MAP_URL,
                     'pointMapType' => MapPointType::TYPE_ALL,
                     'pointMapTypes' => $pointMapTypes,

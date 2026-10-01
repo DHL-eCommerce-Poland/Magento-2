@@ -302,12 +302,12 @@ class CarrierTest extends TestCase
         $scopeConfig = $this->createStub(ScopeConfigInterface::class);
         $scopeConfig->method('getValue')->willReturnCallback(
             static function (string $path) use ($config) {
-                return $config[str_replace('carriers/dhlparcel/', '', $path)] ?? null;
+                return $config[str_replace('carriers/dhlpoland/', '', $path)] ?? null;
             }
         );
         $scopeConfig->method('isSetFlag')->willReturnCallback(
             static function (string $path) use ($config): bool {
-                return (bool)($config[str_replace('carriers/dhlparcel/', '', $path)] ?? false);
+                return (bool)($config[str_replace('carriers/dhlpoland/', '', $path)] ?? false);
             }
         );
 

@@ -77,6 +77,6 @@ class RecreateShipmentTest extends TestCase
         $this->assertEquals(__('Save & Resend to DHL'), $buttonData['label']);
         $this->assertEquals('save primary', $buttonData['class']);
         $this->assertEquals(70, $buttonData['sort_order']);
-        $this->assertStringContainsString('dhlparcel_shipment_form', $buttonData['on_click']);
+        $this->assertStringContainsString('dhlpoland_shipment_form', $buttonData['on_click']);
     }
 }

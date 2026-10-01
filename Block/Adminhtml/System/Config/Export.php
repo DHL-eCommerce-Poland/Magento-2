@@ -43,8 +43,8 @@ class Export extends Field
             $params['website'] = $website;
         }
         $url = empty($params)
-            ? $this->getUrl('dhlparcel/system_config/exportTablerates')
-            : $this->getUrl('dhlparcel/system_config/exportTablerates', $params);
+            ? $this->getUrl('dhlpoland/system_config/exportTablerates')
+            : $this->getUrl('dhlpoland/system_config/exportTablerates', $params);
 
         $button = $this->getLayout()->createBlock(Button::class)->setData([
             'id' => 'export_dhl_tablerates_button',

@@ -75,7 +75,7 @@ define([
                     warningMessage: ''
                 });
 
-            this.pickupDate = ko.observable($('#dhlparcel_pickup_date').val() || '');
+            this.pickupDate = ko.observable($('#dhlpoland_pickup_date').val() || '');
             this.value = this.pickupDate;
             this.isUpdatingDate = false;
             this.hoursCache = {};
@@ -131,7 +131,7 @@ define([
             self.warningMessage('');
             self.additionalInfo('');
 
-            var $dateInput = $('#dhlparcel_pickup_date');
+            var $dateInput = $('#dhlpoland_pickup_date');
             if ($dateInput.length && ($dateInput.data('datepicker') || $dateInput.hasClass('_has-datepicker'))) {
                 $dateInput.datepicker('option', 'minDate', 0);
                 $dateInput.datepicker('setDate', new Date());
@@ -169,7 +169,7 @@ define([
         },
 
         onDateChange: function () {
-            var $dateInput = $('#dhlparcel_pickup_date');
+            var $dateInput = $('#dhlpoland_pickup_date');
             if ($dateInput.length) {
                 this.pickupDate($dateInput.val());
             }
@@ -180,7 +180,7 @@ define([
             var self = this;
             var ids = self.selectedShipmentIds();
             var firstId = (ids && ids.length) ? ids[0] : null;
-            var date = self.pickupDate() || $('#dhlparcel_pickup_date').val();
+            var date = self.pickupDate() || $('#dhlpoland_pickup_date').val();
 
             if (!ids || !ids.length) {
                 return;
@@ -301,7 +301,7 @@ define([
                 type: 'POST',
                 data: {
                     shipment_ids: ids,
-                    pickup_date: self.pickupDate() || $('#dhlparcel_pickup_date').val(),
+                    pickup_date: self.pickupDate() || $('#dhlpoland_pickup_date').val(),
                     pickup_time_from: timeFrom,
                     pickup_time_to: timeTo,
                     additional_info: self.additionalInfo(),

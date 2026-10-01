@@ -36,7 +36,7 @@ class TestSandboxConnection extends Field
      */
     protected function _getElementHtml(AbstractElement $element): string
     {
-        $url = $this->getUrl('dhlparcel/system_config/testConnection');
+        $url = $this->getUrl('dhlpoland/system_config/testConnection');
 
         $button = $this->getLayout()->createBlock(Button::class)->setData([
             'id' => 'dhl_test_connection_sandbox_button',

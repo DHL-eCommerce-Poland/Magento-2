@@ -46,7 +46,7 @@ class CreateReturnShipment extends Generic implements ButtonProviderInterface
             (string) __('Are you sure you want to create a return shipment for this parcel?')
         );
         $url = $this->escapeJs($this->getUrl(
-            'dhlparcel/shipment/createReturnShipment',
+            'dhlpoland/shipment/createReturnShipment',
             ['entity_id' => $entityId]
         ));
 

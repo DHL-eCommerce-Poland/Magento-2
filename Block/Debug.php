@@ -11,7 +11,7 @@ use Magento\Store\Model\ScopeInterface;
 
 class Debug extends Template
 {
-    private const XML_PATH_DEBUG = 'carriers/dhlparcel/debug';
+    private const XML_PATH_DEBUG = 'carriers/dhlpoland/debug';
 
     /**
      * @param Context $context

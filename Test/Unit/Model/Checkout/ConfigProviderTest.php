@@ -20,12 +20,12 @@ class ConfigProviderTest extends TestCase
         $scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $scopeConfig->expects(self::once())
             ->method('getValue')
-            ->with('carriers/dhlparcel/method_economy_all_point_delivery_mode', ScopeInterface::SCOPE_STORE)
+            ->with('carriers/dhlpoland/method_economy_all_point_delivery_mode', ScopeInterface::SCOPE_STORE)
             ->willReturn('map');
 
         $scopeConfig->expects(self::once())
             ->method('isSetFlag')
-            ->with('carriers/dhlparcel/debug', ScopeInterface::SCOPE_STORE)
+            ->with('carriers/dhlpoland/debug', ScopeInterface::SCOPE_STORE)
             ->willReturn(true);
 
         $checkoutSession = $this->createMock(CheckoutSession::class);
@@ -50,36 +50,36 @@ class ConfigProviderTest extends TestCase
         $config = $provider->getConfig();
 
         $this->assertArrayHasKey('shipping', $config);
-        $this->assertArrayHasKey('dhlparcel', $config['shipping']);
+        $this->assertArrayHasKey('dhlpoland', $config['shipping']);
 
-        $dhlConfig = $config['shipping']['dhlparcel'];
+        $dhlConfig = $config['shipping']['dhlpoland'];
         $this->assertEquals('https://parcelshop.dhl.pl/mapa', $dhlConfig['mapUrl']);
         $this->assertEquals('all', $dhlConfig['pointMapType']);
         $this->assertEquals('map', $dhlConfig['deliveryMode']);
         $this->assertTrue($dhlConfig['debug']);
         $this->assertNull($dhlConfig['selectedPoint']);
-        $this->assertEquals('https://example.com/logo_dhl_box_pop.png', $dhlConfig['logos']['dhlparcel_economy_all']);
-        $this->assertEquals('https://example.com/logo_dhl_pop.png', $dhlConfig['logos']['dhlparcel_economy_pop']);
-        $this->assertEquals('https://example.com/logo_dhl_box.png', $dhlConfig['logos']['dhlparcel_economy_box']);
-        $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['dhlparcel_connect_parcelshop']);
-        $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['dhlparcel_connect_packstation']);
+        $this->assertEquals('https://example.com/logo_dhl_box_pop.png', $dhlConfig['logos']['dhlpoland_economy_all']);
+        $this->assertEquals('https://example.com/logo_dhl_pop.png', $dhlConfig['logos']['dhlpoland_economy_pop']);
+        $this->assertEquals('https://example.com/logo_dhl_box.png', $dhlConfig['logos']['dhlpoland_economy_box']);
+        $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['dhlpoland_connect_parcelshop']);
+        $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['dhlpoland_connect_packstation']);
         $this->assertEquals('https://example.com/logo_dhl.png', $dhlConfig['logos']['default']);
-        $this->assertContainsEquals('dhlparcel_economy_all', $dhlConfig['pointMethods']);
-        $this->assertContainsEquals('dhlparcel_economy_pop', $dhlConfig['pointMethods']);
-        $this->assertContainsEquals('dhlparcel_economy_box', $dhlConfig['pointMethods']);
-        $this->assertNotContains('dhlparcel_connect', $dhlConfig['pointMethods']);
-        $this->assertContainsEquals('dhlparcel_connect_parcelshop', $dhlConfig['pointMethods']);
-        $this->assertContainsEquals('dhlparcel_connect_packstation', $dhlConfig['pointMethods']);
+        $this->assertContainsEquals('dhlpoland_economy_all', $dhlConfig['pointMethods']);
+        $this->assertContainsEquals('dhlpoland_economy_pop', $dhlConfig['pointMethods']);
+        $this->assertContainsEquals('dhlpoland_economy_box', $dhlConfig['pointMethods']);
+        $this->assertNotContains('dhlpoland_connect', $dhlConfig['pointMethods']);
+        $this->assertContainsEquals('dhlpoland_connect_parcelshop', $dhlConfig['pointMethods']);
+        $this->assertContainsEquals('dhlpoland_connect_packstation', $dhlConfig['pointMethods']);
         $this->assertEquals('all', $dhlConfig['pointMapTypes']['economy_all']);
-        $this->assertEquals('all', $dhlConfig['pointMapTypes']['dhlparcel_economy_all']);
+        $this->assertEquals('all', $dhlConfig['pointMapTypes']['dhlpoland_economy_all']);
         $this->assertEquals('pop', $dhlConfig['pointMapTypes']['economy_pop']);
-        $this->assertEquals('pop', $dhlConfig['pointMapTypes']['dhlparcel_economy_pop']);
+        $this->assertEquals('pop', $dhlConfig['pointMapTypes']['dhlpoland_economy_pop']);
         $this->assertEquals('box', $dhlConfig['pointMapTypes']['economy_box']);
-        $this->assertEquals('box', $dhlConfig['pointMapTypes']['dhlparcel_economy_box']);
+        $this->assertEquals('box', $dhlConfig['pointMapTypes']['dhlpoland_economy_box']);
         $this->assertEquals('pop', $dhlConfig['pointMapTypes']['connect_parcelshop']);
-        $this->assertEquals('pop', $dhlConfig['pointMapTypes']['dhlparcel_connect_parcelshop']);
+        $this->assertEquals('pop', $dhlConfig['pointMapTypes']['dhlpoland_connect_parcelshop']);
         $this->assertEquals('box', $dhlConfig['pointMapTypes']['connect_packstation']);
-        $this->assertEquals('box', $dhlConfig['pointMapTypes']['dhlparcel_connect_packstation']);
+        $this->assertEquals('box', $dhlConfig['pointMapTypes']['dhlpoland_connect_packstation']);
     }
 
     public function testGetConfigReturnsQuoteSelectedPointWhenPresent(): void
@@ -111,7 +111,7 @@ class ConfigProviderTest extends TestCase
         $provider = new ConfigProvider($scopeConfig, $checkoutSession, $assetRepository);
         $config = $provider->getConfig();
 
-        $selectedPoint = $config['shipping']['dhlparcel']['selectedPoint'];
+        $selectedPoint = $config['shipping']['dhlpoland']['selectedPoint'];
         $this->assertIsArray($selectedPoint);
         $this->assertEquals('POP-123', $selectedPoint['sap']);
         $this->assertEquals('DHL Point 123', $selectedPoint['name']);

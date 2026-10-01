@@ -63,7 +63,7 @@ class ExportTest extends TestCase
         $this->urlBuilderMock
             ->expects($this->once())
             ->method('getUrl')
-            ->with('dhlparcel/system_config/exportTablerates')
+            ->with('dhlpoland/system_config/exportTablerates')
             ->willReturn("http://example.com/admin/exportTablerates');alert(1);//");
 
         $buttonMock = $this->createMock(Button::class);

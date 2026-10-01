@@ -223,13 +223,13 @@ class Tablerate extends File
         foreach ($methodCountries as $methodCode => $countries) {
             $countryList = implode(',', array_keys($countries));
             $this->configWriter->save(
-                'carriers/dhlparcel/method_' . $methodCode . '_sallowspecific',
+                'carriers/dhlpoland/method_' . $methodCode . '_sallowspecific',
                 '1',
                 $scope,
                 $scopeId
             );
             $this->configWriter->save(
-                'carriers/dhlparcel/method_' . $methodCode . '_specificcountry',
+                'carriers/dhlpoland/method_' . $methodCode . '_specificcountry',
                 $countryList,
                 $scope,
                 $scopeId

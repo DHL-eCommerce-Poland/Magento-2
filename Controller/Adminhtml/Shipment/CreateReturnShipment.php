@@ -68,7 +68,7 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
             $returnShipmentData = $this->returnBuilder->buildReturnShipmentData($shipmentData);
             $primaryWaybill = $existingEntity->getShipmentId();
 
-            $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlparcel/sandbox');
+            $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlpoland/sandbox');
             $environment = $isSandbox ? 'sandbox' : 'production';
 
             $result = $this->returnCreationService->createReturnShipment(

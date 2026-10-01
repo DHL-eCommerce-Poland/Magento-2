@@ -4,8 +4,7 @@
     <update handle="styles"/>
     <body>
         <referenceContainer name="content">
-            <block name="dhlparcel_help"
-                   template="Ideo_Dhl::help.phtml" />
+            <uiComponent name="dhlpoland_delivery_service_form"/>
         </referenceContainer>
     </body>
 </page>

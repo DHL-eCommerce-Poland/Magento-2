@@ -46,7 +46,7 @@ class CancelCourierShipment extends Generic implements ButtonProviderInterface
             (string) __('Are you sure you want to cancel courier booking for this shipment?')
         );
         $url = $this->escapeJs($this->getUrl(
-            'dhlparcel/shipment/cancelCourierBooking',
+            'dhlpoland/shipment/cancelCourierBooking',
             ['entity_id' => $entityId]
         ));
 

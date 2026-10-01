@@ -35,7 +35,7 @@ class DataProviderTest extends TestCase
         $serializer = new \Magento\Framework\Serialize\Serializer\Json();
 
         $dataProvider = new DataProvider(
-            'dhlparcel_delivery_service_form_data_source',
+            'dhlpoland_delivery_service_form_data_source',
             'entity_id',
             'entity_id',
             $collectionFactory,

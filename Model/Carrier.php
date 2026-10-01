@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 
 class Carrier extends AbstractCarrier implements CarrierInterface
 {
-    public const CODE = 'dhlparcel';
+    public const CODE = 'dhlpoland';
     public const CODE_PREFIX = self::CODE . '_';
 
     /**

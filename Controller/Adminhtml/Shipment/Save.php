@@ -170,7 +170,7 @@ class Save extends Action implements HttpPostActionInterface
                 : null;
 
             // 1. Resolve environment configuration (sandbox vs production)
-            $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlparcel/sandbox');
+            $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlpoland/sandbox');
             $environment = $isSandbox ? 'sandbox' : 'production';
 
             if ($entityId > 0) {

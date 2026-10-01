@@ -48,7 +48,7 @@ class SaveServicePointToQuoteAddressTest extends TestCase
         );
 
         $informationStub->method('getShippingAddress')->willReturn($addressMock);
-        $informationStub->method('getShippingCarrierCode')->willReturn('dhlparcel');
+        $informationStub->method('getShippingCarrierCode')->willReturn('dhlpoland');
         $informationStub->method('getShippingMethodCode')->willReturn(MethodCatalog::METHOD_CONNECT_PACKSTATION);
 
         $result = $plugin->beforeSaveAddressInformation($managementStub, 1, $informationStub);
@@ -104,7 +104,7 @@ class SaveServicePointToQuoteAddressTest extends TestCase
         );
 
         $informationStub->method('getShippingAddress')->willReturn($addressMock);
-        $informationStub->method('getShippingCarrierCode')->willReturn('dhlparcel');
+        $informationStub->method('getShippingCarrierCode')->willReturn('dhlpoland');
         $informationStub->method('getShippingMethodCode')->willReturn(MethodCatalog::METHOD_ECONOMY_ALL);
 
         $result = $plugin->beforeSaveAddressInformation($managementStub, 1, $informationStub);
@@ -141,7 +141,7 @@ class SaveServicePointToQuoteAddressTest extends TestCase
         );
 
         $informationStub->method('getShippingAddress')->willReturn($addressMock);
-        $informationStub->method('getShippingCarrierCode')->willReturn('dhlparcel');
+        $informationStub->method('getShippingCarrierCode')->willReturn('dhlpoland');
         $informationStub->method('getShippingMethodCode')->willReturn('courier');
 
         $result = $plugin->beforeSaveAddressInformation($managementStub, 1, $informationStub);
@@ -184,7 +184,7 @@ class SaveServicePointToQuoteAddressTest extends TestCase
         );
 
         $informationStub->method('getShippingAddress')->willReturn($addressMock);
-        $informationStub->method('getShippingCarrierCode')->willReturn('dhlparcel');
+        $informationStub->method('getShippingCarrierCode')->willReturn('dhlpoland');
         $informationStub->method('getShippingMethodCode')->willReturn(MethodCatalog::METHOD_CONNECT_PARCELSHOP);
 
         $plugin->beforeSaveAddressInformation($managementStub, 1, $informationStub);
@@ -226,7 +226,7 @@ class SaveServicePointToQuoteAddressTest extends TestCase
         );
 
         $informationStub->method('getShippingAddress')->willReturn($addressMock);
-        $informationStub->method('getShippingCarrierCode')->willReturn('dhlparcel');
+        $informationStub->method('getShippingCarrierCode')->willReturn('dhlpoland');
         $informationStub->method('getShippingMethodCode')->willReturn(MethodCatalog::METHOD_ECONOMY_POP);
 
         $plugin->beforeSaveAddressInformation($managementStub, 1, $informationStub);

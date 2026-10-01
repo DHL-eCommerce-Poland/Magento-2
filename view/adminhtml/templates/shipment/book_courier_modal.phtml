@@ -16,8 +16,8 @@ $viewModel = $block->getViewModel();
 $dateFormat = $viewModel->getDateFormat();
 $todayDate = $viewModel->getFormattedDate();
 
-$hoursUrl = $block->getUrl('dhlparcel/shipment/getPickupHours');
-$bookUrl = $block->getUrl('dhlparcel/shipment/bookCourier');
+$hoursUrl = $block->getUrl('dhlpoland/shipment/getPickupHours');
+$bookUrl = $block->getUrl('dhlpoland/shipment/bookCourier');
 ?>
 <div id="ideo-dhl-book-courier-modal" style="display: none;" data-bind="scope: 'dhlBookCourierModal'">
     <form id="ideo-dhl-book-courier-form" onsubmit="return false;">
@@ -49,7 +49,7 @@ $bookUrl = $block->getUrl('dhlparcel/shipment/bookCourier');
                 <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Pickup Date')) ?></span></label>
                 <div class="admin__field-control">
                     <input type="text"
-                           id="dhlparcel_pickup_date"
+                           id="dhlpoland_pickup_date"
                            class="admin__control-text"
                            value="<?= $escaper->escapeHtmlAttr($todayDate) ?>"
                            data-bind="dhlDatepicker: pickupDate, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', minDate: 0 }"

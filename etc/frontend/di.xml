@@ -4,7 +4,7 @@
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="dhlparcel_config_provider" xsi:type="object">Ideo\Dhl\Model\Checkout\ConfigProvider</item>
+                <item name="dhlpoland_config_provider" xsi:type="object">Ideo\Dhl\Model\Checkout\ConfigProvider</item>
             </argument>
         </arguments>
     </type>

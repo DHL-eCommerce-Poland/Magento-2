@@ -37,7 +37,7 @@ class DownloadEpod extends Generic implements ButtonProviderInterface
             return [];
         }
 
-        $downloadUrl = $this->getUrl('dhlparcel/shipment/downloadEpod', ['entity_id' => $entityId]);
+        $downloadUrl = $this->getUrl('dhlpoland/shipment/downloadEpod', ['entity_id' => $entityId]);
 
         return [
             'label' => __('Download ePOD'),

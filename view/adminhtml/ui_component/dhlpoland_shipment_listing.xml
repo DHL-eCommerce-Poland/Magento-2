@@ -3,26 +3,26 @@
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">dhlparcel_shipment_listing.dhlparcel_shipment_listing_data_source</item>
+            <item name="provider" xsi:type="string">dhlpoland_shipment_listing.dhlpoland_shipment_listing_data_source</item>
         </item>
     </argument>
     <settings>
         <buttons>
             <button name="generate_pnp" class="Ideo\Dhl\Block\Adminhtml\Button\GeneratePnp"/>
         </buttons>
-        <spinner>dhlparcel_shipment_columns</spinner>
+        <spinner>dhlpoland_shipment_columns</spinner>
         <deps>
-            <dep>dhlparcel_shipment_listing.dhlparcel_shipment_listing_data_source</dep>
+            <dep>dhlpoland_shipment_listing.dhlpoland_shipment_listing_data_source</dep>
         </deps>
     </settings>
-    <dataSource name="dhlparcel_shipment_listing_data_source" component="Magento_Ui/js/grid/provider">
+    <dataSource name="dhlpoland_shipment_listing_data_source" component="Magento_Ui/js/grid/provider">
         <settings>
             <storageConfig>
                 <param name="indexField" xsi:type="string">entity_id</param>
             </storageConfig>
             <updateUrl path="mui/index/render"/>
         </settings>
-        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="dhlparcel_shipment_listing_data_source">
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="dhlpoland_shipment_listing_data_source">
             <settings>
                 <requestFieldName>entity_id</requestFieldName>
                 <primaryFieldName>entity_id</primaryFieldName>
@@ -40,28 +40,28 @@
         <massaction name="listing_massaction">
             <action name="print_label">
                 <settings>
-                    <url path="dhlparcel/shipment/massPrintLabel"/>
+                    <url path="dhlpoland/shipment/massPrintLabel"/>
                     <type>print_label</type>
                     <label translate="true">Print Labels</label>
                 </settings>
             </action>
             <action name="download_scan">
                 <settings>
-                    <url path="dhlparcel/shipment/massDownloadScan"/>
+                    <url path="dhlpoland/shipment/massDownloadScan"/>
                     <type>download_scan</type>
                     <label translate="true">Download Scans</label>
                 </settings>
             </action>
             <action name="download_epod">
                 <settings>
-                    <url path="dhlparcel/shipment/massDownloadEpod"/>
+                    <url path="dhlpoland/shipment/massDownloadEpod"/>
                     <type>download_epod</type>
                     <label translate="true">Download ePODs</label>
                 </settings>
             </action>
             <action name="update_status">
                 <settings>
-                    <url path="dhlparcel/shipment/massUpdateStatus"/>
+                    <url path="dhlpoland/shipment/massUpdateStatus"/>
                     <type>update_status</type>
                     <label translate="true">Update Status</label>
                 </settings>
@@ -70,9 +70,9 @@
                 <settings>
                     <type>book_courier</type>
                     <label translate="true">Order Courier</label>
-                    <url path="dhlparcel/shipment/bookCourier"/>
+                    <url path="dhlpoland/shipment/bookCourier"/>
                     <callback>
-                        <provider>dhlparcel_shipment_listing.dhlparcel_shipment_listing.dhlparcel_shipment_columns.actions</provider>
+                        <provider>dhlpoland_shipment_listing.dhlpoland_shipment_listing.dhlpoland_shipment_columns.actions</provider>
                         <target>bookCourierSelected</target>
                     </callback>
                 </settings>
@@ -83,7 +83,7 @@
                         <message translate="true">Are you sure you want to cancel courier booking for the selected shipments?</message>
                         <title translate="true">Cancel Courier Booking</title>
                     </confirm>
-                    <url path="dhlparcel/shipment/massCancelCourierBooking"/>
+                    <url path="dhlpoland/shipment/massCancelCourierBooking"/>
                     <type>cancel_courier</type>
                     <label translate="true">Cancel Courier Booking</label>
                 </settings>
@@ -94,7 +94,7 @@
                         <message translate="true">Are you sure you want to delete the selected shipments? They will be cancelled in DHL and removed from Magento.</message>
                         <title translate="true">Delete Shipments</title>
                     </confirm>
-                    <url path="dhlparcel/shipment/massDelete"/>
+                    <url path="dhlpoland/shipment/massDelete"/>
                     <type>delete</type>
                     <label translate="true">Delete Shipments</label>
                 </settings>
@@ -102,7 +102,7 @@
         </massaction>
         <paging name="listing_paging"/>
     </listingToolbar>
-    <columns name="dhlparcel_shipment_columns">
+    <columns name="dhlpoland_shipment_columns">
         <selectionsColumn name="ids">
             <settings>
                 <indexField>entity_id</indexField>

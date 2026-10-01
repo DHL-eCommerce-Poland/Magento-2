@@ -49,7 +49,7 @@ class DataProviderTest extends TestCase
         $this->collectionFactoryMock->method('create')->willReturn($this->collectionMock);
 
         $this->dataProvider = new DataProvider(
-            'dhlparcel_customs_template_form_data_source',
+            'dhlpoland_customs_template_form_data_source',
             'entity_id',
             'entity_id',
             $this->collectionFactoryMock,
