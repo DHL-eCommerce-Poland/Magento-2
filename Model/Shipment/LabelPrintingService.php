@@ -31,7 +31,7 @@ class LabelPrintingService
      * @param CredentialsProvider $credentialsProvider
      * @param ScopeConfigInterface $scopeConfig
      * @param LabelGenerator|null $labelGenerator
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      * @param FileDriver|null $fileDriver
      */
     public function __construct(
@@ -39,8 +39,8 @@ class LabelPrintingService
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ScopeConfigInterface $scopeConfig,
+        private readonly LoggerInterface $logger,
         private readonly ?LabelGenerator $labelGenerator = null,
-        private readonly ?LoggerInterface $logger = null,
         private ?FileDriver $fileDriver = null
     ) {
         $this->fileDriver = $fileDriver ?? new FileDriver();

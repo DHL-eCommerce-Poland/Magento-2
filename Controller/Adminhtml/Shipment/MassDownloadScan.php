@@ -27,7 +27,7 @@ class MassDownloadScan extends Action implements HttpGetActionInterface, HttpPos
      * @param CollectionFactory $collectionFactory
      * @param DocumentDownloadService $documentDownloadService
      * @param FileFactory $fileFactory
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -35,7 +35,7 @@ class MassDownloadScan extends Action implements HttpGetActionInterface, HttpPos
         private readonly CollectionFactory $collectionFactory,
         private readonly DocumentDownloadService $documentDownloadService,
         private readonly FileFactory $fileFactory,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }

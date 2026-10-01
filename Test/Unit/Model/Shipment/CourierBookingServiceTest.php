@@ -68,7 +68,8 @@ class CourierBookingServiceTest extends TestCase
             $this->credentialsProviderStub,
             $this->shipmentDataRepositoryStub,
             $this->timezoneMock,
-            $dateSanitizer
+            $dateSanitizer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 
@@ -151,7 +152,8 @@ class CourierBookingServiceTest extends TestCase
             $this->credentialsProviderStub,
             $this->shipmentDataRepositoryStub,
             $this->timezoneMock,
-            new ShipmentDateSanitizer($this->timezoneMock)
+            new ShipmentDateSanitizer($this->timezoneMock),
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $result = $service->bookCourier([10], '2028-09-26', '10:00', '14:00');

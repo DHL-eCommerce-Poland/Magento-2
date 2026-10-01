@@ -205,7 +205,8 @@ class TemplateManagerTest extends TestCase
             $this->customsTypeSource,
             $this->categoryOfItemSource,
             $this->customsCurrencySource,
-            $this->internationalMapPointTypeSource
+            $this->internationalMapPointTypeSource,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 
@@ -365,7 +366,8 @@ class TemplateManagerTest extends TestCase
             $typeSource,
             $catSource,
             $currSource,
-            $this->internationalMapPointTypeSource
+            $this->internationalMapPointTypeSource,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $options = $manager->getCustomsTemplatesOptions();
@@ -413,7 +415,8 @@ class TemplateManagerTest extends TestCase
             $this->createStub(\Ideo\Dhl\Model\Source\CustomsType::class),
             $this->createStub(\Ideo\Dhl\Model\Source\CategoryOfItem::class),
             $this->createStub(\Ideo\Dhl\Model\Source\CustomsCurrency::class),
-            $this->internationalMapPointTypeSource
+            $this->internationalMapPointTypeSource,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         // GB matches template1 first -> returns 10
@@ -466,7 +469,8 @@ class TemplateManagerTest extends TestCase
             $this->createStub(\Ideo\Dhl\Model\Source\CustomsType::class),
             $this->createStub(\Ideo\Dhl\Model\Source\CategoryOfItem::class),
             $this->createStub(\Ideo\Dhl\Model\Source\CustomsCurrency::class),
-            $this->internationalMapPointTypeSource
+            $this->internationalMapPointTypeSource,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $address = $this->createStub(\Magento\Sales\Model\Order\Address::class);

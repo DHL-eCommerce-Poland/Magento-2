@@ -27,7 +27,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
      * @param DropOffPointRepositoryInterface $dropOffPointRepository
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param ScopeConfigInterface $scopeConfig
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -36,7 +36,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
         private readonly DropOffPointRepositoryInterface $dropOffPointRepository,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }

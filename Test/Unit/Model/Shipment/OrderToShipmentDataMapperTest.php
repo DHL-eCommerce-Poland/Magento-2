@@ -51,7 +51,8 @@ class OrderToShipmentDataMapperTest extends TestCase
             $serializer,
             $timezoneMock,
             $this->nearestPointResolverMock,
-            new \Ideo\Dhl\Model\MethodCatalog()
+            new \Ideo\Dhl\Model\MethodCatalog(),
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 

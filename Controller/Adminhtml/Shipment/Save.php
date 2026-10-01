@@ -38,7 +38,7 @@ class Save extends Action implements HttpPostActionInterface
      * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
      * @param ShipmentDataValidator $shipmentDataValidator
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -49,7 +49,7 @@ class Save extends Action implements HttpPostActionInterface
         private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
         private readonly ShipmentDataValidator $shipmentDataValidator,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }

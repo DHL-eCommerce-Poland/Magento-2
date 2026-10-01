@@ -120,7 +120,7 @@ class LoadTemplateTest extends TestCase
             $this->methodCatalog,
             $this->customsTemplateRepository,
             $this->serializer,
-            null
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 

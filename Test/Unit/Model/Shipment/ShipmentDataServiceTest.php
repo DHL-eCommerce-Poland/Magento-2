@@ -54,7 +54,8 @@ class ShipmentDataServiceTest extends TestCase
             $deliveryServiceRepository,
             $shipmentDataRepository,
             $shipmentDataFactory,
-            $serializer
+            $serializer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $result = $service->prepareShipmentData(101);
@@ -96,7 +97,8 @@ class ShipmentDataServiceTest extends TestCase
             $deliveryServiceRepository,
             $shipmentDataRepository,
             $shipmentDataFactory,
-            $serializer
+            $serializer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $saved = $service->saveShipmentData($shipmentData);
@@ -135,7 +137,8 @@ class ShipmentDataServiceTest extends TestCase
             $deliveryServiceRepository,
             $shipmentDataRepository,
             $shipmentDataFactory,
-            $serializer
+            $serializer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $results = $service->getAllShipmentsByOrderId(105);
@@ -174,7 +177,8 @@ class ShipmentDataServiceTest extends TestCase
             $deliveryServiceRepository,
             $shipmentDataRepository,
             $shipmentDataFactory,
-            $serializer
+            $serializer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $result = $service->loadShipmentData(5);
@@ -211,7 +215,8 @@ class ShipmentDataServiceTest extends TestCase
             $deliveryServiceRepository,
             $shipmentDataRepository,
             $shipmentDataFactory,
-            $serializer
+            $serializer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $this->assertTrue($service->hasShipmentForOrder(101));
@@ -246,7 +251,8 @@ class ShipmentDataServiceTest extends TestCase
             $deliveryServiceRepository,
             $shipmentDataRepository,
             $shipmentDataFactory,
-            $serializer
+            $serializer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $this->assertFalse($service->hasShipmentForOrder(102));
@@ -300,7 +306,8 @@ class ShipmentDataServiceTest extends TestCase
             $deliveryServiceRepository,
             $shipmentDataRepository,
             $shipmentDataFactory,
-            $serializer
+            $serializer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $packageNumbers = ['JJD000030025688110000001106', 'JJD000030025688110000001117'];
@@ -384,7 +391,8 @@ class ShipmentDataServiceTest extends TestCase
             $deliveryServiceRepository,
             $shipmentDataRepository,
             $shipmentDataFactory,
-            $serializer
+            $serializer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $service->updateExistingShipmentPayload(15, $shipmentData, 'Utworzono', '90040027899');

@@ -27,7 +27,7 @@ class MassPrintLabel extends Action implements HttpGetActionInterface, HttpPostA
      * @param CollectionFactory $collectionFactory
      * @param LabelPrintingService $labelPrintingService
      * @param FileFactory $fileFactory
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -35,7 +35,7 @@ class MassPrintLabel extends Action implements HttpGetActionInterface, HttpPostA
         private readonly CollectionFactory $collectionFactory,
         private readonly LabelPrintingService $labelPrintingService,
         private readonly FileFactory $fileFactory,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }

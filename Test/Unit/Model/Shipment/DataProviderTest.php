@@ -66,7 +66,8 @@ class DataProviderTest extends TestCase
             $collectionFactory,
             $serializer,
             $timezoneStub,
-            $dateSanitizer
+            $dateSanitizer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $data = $dataProvider->getData();
@@ -121,7 +122,8 @@ class DataProviderTest extends TestCase
             $collectionFactory,
             $serializer,
             $timezoneStub,
-            $dateSanitizer
+            $dateSanitizer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $data = $dataProvider->getData();

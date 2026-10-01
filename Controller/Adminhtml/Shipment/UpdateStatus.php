@@ -19,12 +19,12 @@ class UpdateStatus extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param ShipmentTrackingService $shipmentTrackingService
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         private readonly ShipmentTrackingService $shipmentTrackingService,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }

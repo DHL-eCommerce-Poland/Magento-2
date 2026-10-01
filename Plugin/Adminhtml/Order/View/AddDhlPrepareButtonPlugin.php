@@ -23,14 +23,14 @@ class AddDhlPrepareButtonPlugin
      * @param JsonHexTag $serializer
      * @param OrderRepositoryInterface $orderRepository
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly UrlInterface $urlBuilder,
         private readonly JsonHexTag $serializer,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 

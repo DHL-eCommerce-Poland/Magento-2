@@ -22,14 +22,14 @@ class ShipmentTrackingService
      * @param ClientInterface $client
      * @param CredentialsProvider $credentialsProvider
      * @param ScopeConfigInterface $scopeConfig
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 

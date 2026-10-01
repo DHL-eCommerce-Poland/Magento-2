@@ -50,7 +50,8 @@ class LabelPrintingServiceTest extends TestCase
             $this->repositoryStub,
             $this->clientStub,
             $this->credentialsProviderStub,
-            $this->scopeConfigStub
+            $this->scopeConfigStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 
@@ -154,6 +155,7 @@ class LabelPrintingServiceTest extends TestCase
             $this->clientStub,
             $this->credentialsProviderStub,
             $this->scopeConfigStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class),
             $labelGeneratorStub
         );
 
@@ -281,6 +283,7 @@ class LabelPrintingServiceTest extends TestCase
             $clientMock,
             $this->credentialsProviderStub,
             $this->scopeConfigStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class),
             $labelGeneratorStub
         );
 
@@ -323,7 +326,8 @@ class LabelPrintingServiceTest extends TestCase
             $this->repositoryStub,
             $clientMock,
             $this->credentialsProviderStub,
-            $this->scopeConfigStub
+            $this->scopeConfigStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $result = $service->getReturnLabelContent([1]);
@@ -376,7 +380,7 @@ class LabelPrintingServiceTest extends TestCase
             $clientMock,
             $this->credentialsProviderStub,
             $this->scopeConfigStub,
-            null,
+            $this->createStub(\Psr\Log\LoggerInterface::class),
             null,
             $fileDriverMock
         );

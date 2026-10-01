@@ -82,7 +82,8 @@ class MassCancelCourierBookingTest extends TestCase
             $this->contextStub,
             $this->filterMock,
             $this->collectionFactoryMock,
-            $this->cancellationServiceMock
+            $this->cancellationServiceMock,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 

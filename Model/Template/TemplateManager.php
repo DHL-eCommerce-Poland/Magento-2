@@ -60,7 +60,7 @@ class TemplateManager
      * @param CategoryOfItem $categoryOfItemSource
      * @param CustomsCurrency $customsCurrencySource
      * @param InternationalMapPointType $internationalMapPointTypeSource
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly DropOffPointCollectionFactory $dropOffPointCollectionFactory,
@@ -85,7 +85,7 @@ class TemplateManager
         private readonly CategoryOfItem $categoryOfItemSource,
         private readonly CustomsCurrency $customsCurrencySource,
         private readonly InternationalMapPointType $internationalMapPointTypeSource,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 

@@ -23,14 +23,14 @@ class BookCourier extends Action implements HttpPostActionInterface
      * @param JsonFactory $jsonFactory
      * @param CourierBookingService $courierBookingService
      * @param ScopeConfigInterface $scopeConfig
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         private readonly JsonFactory $jsonFactory,
         private readonly CourierBookingService $courierBookingService,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }

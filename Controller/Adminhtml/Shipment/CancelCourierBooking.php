@@ -19,12 +19,12 @@ class CancelCourierBooking extends Action implements HttpGetActionInterface, Htt
     /**
      * @param Context $context
      * @param CourierBookingCancellationService $cancellationService
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         private readonly CourierBookingCancellationService $cancellationService,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }

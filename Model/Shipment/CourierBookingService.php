@@ -21,7 +21,7 @@ class CourierBookingService
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly ClientInterface $client,
@@ -29,7 +29,7 @@ class CourierBookingService
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 

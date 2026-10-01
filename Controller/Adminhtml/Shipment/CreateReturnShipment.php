@@ -26,7 +26,7 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
      * @param ReturnShipmentDataBuilder $returnBuilder
      * @param ReturnShipmentCreationService $returnCreationService
      * @param ScopeConfigInterface $scopeConfig
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -34,7 +34,7 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
         private readonly ReturnShipmentDataBuilder $returnBuilder,
         private readonly ReturnShipmentCreationService $returnCreationService,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }

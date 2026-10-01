@@ -22,7 +22,7 @@ class ShipmentDeletionService
      * @param CredentialsProvider $credentialsProvider
      * @param ScopeConfigInterface $scopeConfig
      * @param MagentoShipmentSyncService $magentoShipmentSyncService
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
@@ -30,7 +30,7 @@ class ShipmentDeletionService
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly MagentoShipmentSyncService $magentoShipmentSyncService,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 

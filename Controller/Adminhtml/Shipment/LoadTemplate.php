@@ -38,7 +38,7 @@ class LoadTemplate extends Action
      * @param MethodCatalog $methodCatalog
      * @param CustomsTemplateRepository $customsTemplateRepository
      * @param SerializerInterface $serializer
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -51,7 +51,7 @@ class LoadTemplate extends Action
         private readonly MethodCatalog $methodCatalog,
         private readonly CustomsTemplateRepository $customsTemplateRepository,
         private readonly SerializerInterface $serializer,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
     }

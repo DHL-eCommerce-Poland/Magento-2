@@ -51,7 +51,8 @@ class AddDhlPrepareButtonPluginTest extends TestCase
             $this->urlBuilder,
             $this->serializer,
             $this->orderRepository,
-            $this->shipmentDataRepository
+            $this->shipmentDataRepository,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 

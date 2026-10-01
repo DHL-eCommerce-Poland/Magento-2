@@ -78,7 +78,8 @@ class PrepareTest extends TestCase
             $this->orderRepository,
             $this->templateManager,
             $this->jsonFactory,
-            $this->shipmentDataService
+            $this->shipmentDataService,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 

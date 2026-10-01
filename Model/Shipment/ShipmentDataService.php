@@ -29,7 +29,7 @@ class ShipmentDataService
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param ShipmentDataFactory $shipmentDataFactory
      * @param SerializerInterface $serializer
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly OrderRepositoryInterface $orderRepository,
@@ -40,7 +40,7 @@ class ShipmentDataService
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ShipmentDataFactory $shipmentDataFactory,
         private readonly SerializerInterface $serializer,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 

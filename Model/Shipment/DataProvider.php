@@ -27,7 +27,7 @@ class DataProvider extends AbstractDataProvider
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      * @param array $meta
      * @param array $data
      */
@@ -39,7 +39,7 @@ class DataProvider extends AbstractDataProvider
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
-        private readonly ?LoggerInterface $logger = null,
+        private readonly LoggerInterface $logger,
         array $meta = [],
         array $data = []
     ) {

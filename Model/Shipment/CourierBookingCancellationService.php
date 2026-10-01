@@ -21,14 +21,14 @@ class CourierBookingCancellationService
      * @param CredentialsProvider $credentialsProvider
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param ShipmentDataCollectionFactory $collectionFactory
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ShipmentDataCollectionFactory $collectionFactory,
-        private readonly ?LoggerInterface $logger = null
+        private readonly LoggerInterface $logger
     ) {
     }
 
