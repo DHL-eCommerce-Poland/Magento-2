@@ -132,7 +132,7 @@ class LoadTemplate extends Action
                             ? $this->variableResolver->resolve($resolvedMpk, $order)
                             : '';
                     } catch (Exception $e) {
-                        $this->logger?->warning(
+                        $this->logger->warning(
                             'Could not resolve order content for template: ' . $e->getMessage(),
                             ['exception' => $e]
                         );
@@ -291,7 +291,7 @@ class LoadTemplate extends Action
                 'message' => __('Invalid template type specified.')->render(),
             ]);
         } catch (Exception $e) {
-            $this->logger?->error('Error loading DHL template: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error loading DHL template: ' . $e->getMessage(), ['exception' => $e]);
             return $resultJson->setData([
                 'success' => false,
                 'message' => $e->getMessage(),

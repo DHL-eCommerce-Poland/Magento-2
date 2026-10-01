@@ -78,7 +78,7 @@ class ShipmentTrackingService
             $shipment->setShipmentData((string) json_encode($payload));
             $this->shipmentDataRepository->save($shipment);
         } else {
-            $this->logger?->warning(sprintf(
+            $this->logger->warning(sprintf(
                 '[DHL] Failed to update tracking status for shipment #%s (entity #%d): %s',
                 $shipmentId,
                 $entityId,

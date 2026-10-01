@@ -84,7 +84,7 @@ class MassDownloadScan extends Action implements HttpGetActionInterface, HttpPos
                 $scanData['mimeType']
             );
         } catch (Exception $e) {
-            $this->logger?->error('[MassDownloadScan] Error: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('[MassDownloadScan] Error: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage(
                 __('Could not download waybill scans: %1', $e->getMessage())
             );

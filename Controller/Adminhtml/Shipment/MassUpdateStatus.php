@@ -76,7 +76,7 @@ class MassUpdateStatus extends Action implements HttpPostActionInterface
                 );
             }
         } catch (Exception $e) {
-            $this->logger?->error('Error during mass status update: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error during mass status update: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage(__('Error during status update: %1', $e->getMessage()));
         }
 

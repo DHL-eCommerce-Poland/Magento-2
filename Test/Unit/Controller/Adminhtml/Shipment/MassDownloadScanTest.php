@@ -92,7 +92,8 @@ class MassDownloadScanTest extends TestCase
             $this->filterStub,
             $this->collectionFactoryStub,
             $this->serviceStub,
-            $this->fileFactoryStub
+            $this->fileFactoryStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
 

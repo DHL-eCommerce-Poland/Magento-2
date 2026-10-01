@@ -83,7 +83,7 @@ class MassPrintLabel extends Action implements HttpGetActionInterface, HttpPostA
                 $labelData['mimeType']
             );
         } catch (Exception $e) {
-            $this->logger?->error('[MassPrintLabel] Error: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('[MassPrintLabel] Error: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage(
                 __('Could not print labels: %1', $e->getMessage())
             );

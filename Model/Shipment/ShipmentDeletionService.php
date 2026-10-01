@@ -56,7 +56,7 @@ class ShipmentDeletionService
 
             if (!$result->isSuccess()) {
                 $errorMsg = $result->getErrorMessage() ?? __('DHL API returned an error during deletion.')->render();
-                $this->logger?->error(sprintf(
+                $this->logger->error(sprintf(
                     '[DHL] Failed to delete shipment #%s (entity #%d) in DHL API: %s',
                     $shipmentId,
                     $entityId,
@@ -72,7 +72,7 @@ class ShipmentDeletionService
             try {
                 $this->magentoShipmentSyncService->cancelDhlTracking((int)$magentoShipmentId);
             } catch (Throwable $e) {
-                $this->logger?->error(sprintf(
+                $this->logger->error(sprintf(
                     '[DHL] Failed to cancel tracking on Magento shipment #%d: %s',
                     $magentoShipmentId,
                     $e->getMessage()

@@ -60,7 +60,7 @@ class MassDelete extends Action implements HttpPostActionInterface
                     $deletedCount++;
                 } catch (Exception $e) {
                     $errorCount++;
-                    $this->logger?->error(
+                    $this->logger->error(
                         sprintf('Error deleting shipment #%d during mass delete: %s', $entityId, $e->getMessage()),
                         ['exception' => $e]
                     );

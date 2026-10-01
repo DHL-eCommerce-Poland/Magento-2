@@ -477,7 +477,7 @@ class TemplateManager
                 email: (string)($point->getEmail() ?? '')
             );
         } catch (Exception $e) {
-            $this->logger?->error('Error loading sender template: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error loading sender template: ' . $e->getMessage(), ['exception' => $e]);
             return null;
         }
     }
@@ -564,7 +564,7 @@ class TemplateManager
                 packages: $packagesData
             );
         } catch (Exception $e) {
-            $this->logger?->error('Error loading shipment template: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error loading shipment template: ' . $e->getMessage(), ['exception' => $e]);
             return null;
         }
     }
@@ -622,7 +622,7 @@ class TemplateManager
                 'selfCollect' => $isOdbVal,
             ];
         } catch (Exception $e) {
-            $this->logger?->error('Error loading special services template: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error loading special services template: ' . $e->getMessage(), ['exception' => $e]);
             return null;
         }
     }

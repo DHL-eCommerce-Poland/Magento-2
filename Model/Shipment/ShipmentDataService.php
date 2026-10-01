@@ -123,7 +123,7 @@ class ShipmentDataService
                 $senderEntity = $this->dropOffPointRepository->getById($dropOffPointTemplateId);
                 $senderDefaults = $senderEntity->getData();
             } catch (NoSuchEntityException $e) {
-                $this->logger?->warning(
+                $this->logger->warning(
                     'Specified sender preset not found: ' . $dropOffPointTemplateId,
                     ['exception' => $e]
                 );
@@ -148,7 +148,7 @@ class ShipmentDataService
                 }
                 $shipmentDefaults['packages'] = $serviceEntity->getPackages();
             } catch (NoSuchEntityException $e) {
-                $this->logger?->warning(
+                $this->logger->warning(
                     'Specified shipment preset not found: ' . $deliveryServiceTemplateId,
                     ['exception' => $e]
                 );
@@ -309,7 +309,7 @@ class ShipmentDataService
                     }
                 }
             } catch (Throwable $e) {
-                $this->logger?->warning(sprintf(
+                $this->logger->warning(sprintf(
                     '[ShipmentDataService] Failed to update package return tracking data for entity #%d: %s',
                     $entityId,
                     $e->getMessage()
@@ -425,7 +425,7 @@ class ShipmentDataService
                 }
                 $entity->setShipmentData($this->serializer->serialize($payloadArr));
             } catch (Throwable $e) {
-                $this->logger?->warning(sprintf(
+                $this->logger->warning(sprintf(
                     '[ShipmentDataService] Failed to clear payload tracking data for entity #%d: %s',
                     $entityId,
                     $e->getMessage()

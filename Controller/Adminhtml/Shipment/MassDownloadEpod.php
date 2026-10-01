@@ -84,7 +84,7 @@ class MassDownloadEpod extends Action implements HttpGetActionInterface, HttpPos
                 $epodData['mimeType']
             );
         } catch (Exception $e) {
-            $this->logger?->error('[MassDownloadEpod] Error: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('[MassDownloadEpod] Error: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage(
                 __('Could not download ePODs: %1', $e->getMessage())
             );

@@ -93,7 +93,7 @@ class LabelPrintingService
                     'labelType' => $labelType ?: $defaultConfigLabelType,
                 ];
             } catch (Throwable $e) {
-                $this->logger?->warning(sprintf(
+                $this->logger->warning(sprintf(
                     '[LabelPrintingService] Could not load shipment entity #%d: %s',
                     $id,
                     $e->getMessage()
@@ -189,7 +189,7 @@ class LabelPrintingService
                     }
                 }
             } catch (Throwable $e) {
-                $this->logger?->warning(sprintf(
+                $this->logger->warning(sprintf(
                     '[LabelPrintingService] Could not load shipment entity #%d for return label: %s',
                     $id,
                     $e->getMessage()
@@ -270,7 +270,7 @@ class LabelPrintingService
                     }
                 }
             } catch (Throwable $e) {
-                $this->logger?->warning(sprintf(
+                $this->logger->warning(sprintf(
                     '[LabelPrintingService] Could not load shipment entity #%d for return QR code: %s',
                     $id,
                     $e->getMessage()
@@ -347,7 +347,7 @@ class LabelPrintingService
                 try {
                     $zipContent = $this->fileDriver->fileGetContents($tempFile);
                 } catch (FileSystemException $e) {
-                    $this->logger?->warning(sprintf('Failed to read temporary ZIP label file: %s', $e->getMessage()));
+                    $this->logger->warning(sprintf('Failed to read temporary ZIP label file: %s', $e->getMessage()));
                 }
 
                 try {
@@ -355,7 +355,7 @@ class LabelPrintingService
                         $this->fileDriver->deleteFile($tempFile);
                     }
                 } catch (FileSystemException $e) {
-                    $this->logger?->warning(sprintf('Failed to clean up temporary ZIP label file: %s', $e->getMessage()));
+                    $this->logger->warning(sprintf('Failed to clean up temporary ZIP label file: %s', $e->getMessage()));
                 }
 
                 if ($zipContent !== null) {
@@ -404,7 +404,7 @@ class LabelPrintingService
                 $combinedPdf = $this->labelGenerator->combineLabelsPdf($pdfStrings);
                 return $combinedPdf->render();
             } catch (Throwable $e) {
-                $this->logger?->warning('[LabelPrintingService] Magento LabelGenerator PDF merge failed: ' . $e->getMessage());
+                $this->logger->warning('[LabelPrintingService] Magento LabelGenerator PDF merge failed: ' . $e->getMessage());
             }
         }
 
@@ -421,7 +421,7 @@ class LabelPrintingService
                 }
                 return $targetPdf->render();
             } catch (Throwable $e) {
-                $this->logger?->warning('[LabelPrintingService] Zend PDF merge failed: ' . $e->getMessage());
+                $this->logger->warning('[LabelPrintingService] Zend PDF merge failed: ' . $e->getMessage());
             }
         }
 

@@ -65,7 +65,7 @@ class CancelCourierBooking extends Action implements HttpGetActionInterface, Htt
                 );
             }
         } catch (\Throwable $e) {
-            $this->logger?->error(
+            $this->logger->error(
                 '[CancelCourierBooking] Exception during courier cancellation: ' . $e->getMessage(),
                 ['exception' => $e]
             );

@@ -99,7 +99,7 @@ class BookCourier extends Action implements HttpPostActionInterface
                 'message' => $errMsg,
             ]);
         } catch (Exception $e) {
-            $this->logger?->error('[BookCourier Controller] Error: ' . $e->getMessage());
+            $this->logger->error('[BookCourier Controller] Error: ' . $e->getMessage());
 
             return $resultJson->setData([
                 'success' => false,

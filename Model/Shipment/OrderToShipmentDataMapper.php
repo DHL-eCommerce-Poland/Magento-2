@@ -345,7 +345,7 @@ class OrderToShipmentDataMapper
             try {
                 $recipientData = $this->nearestPointResolver->resolveForRecipient($recipientData);
             } catch (Throwable $e) {
-                $this->logger?->warning('Could not resolve nearest point during OrderToShipmentDataMapper::map: ' . $e->getMessage());
+                $this->logger->warning('Could not resolve nearest point during OrderToShipmentDataMapper::map: ' . $e->getMessage());
             }
         }
 

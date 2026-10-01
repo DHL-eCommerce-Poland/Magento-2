@@ -241,7 +241,7 @@ class Save extends Action implements HttpPostActionInterface
 
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
         } catch (Exception $e) {
-            $this->logger?->error(
+            $this->logger->error(
                 'Error saving and dispatching DHL shipment: ' . $e->getMessage(),
                 ['exception' => $e]
             );

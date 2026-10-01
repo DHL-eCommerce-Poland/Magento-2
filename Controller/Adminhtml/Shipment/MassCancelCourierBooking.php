@@ -74,7 +74,7 @@ class MassCancelCourierBooking extends Action implements HttpPostActionInterface
                 );
             }
         } catch (Throwable $e) {
-            $this->logger?->error(
+            $this->logger->error(
                 '[MassCancelCourierBooking] Exception during mass courier cancellation: ' . $e->getMessage(),
                 ['exception' => $e]
             );

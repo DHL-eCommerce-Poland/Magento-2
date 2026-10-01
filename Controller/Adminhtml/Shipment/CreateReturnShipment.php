@@ -89,7 +89,7 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
                 );
             }
         } catch (Exception $e) {
-            $this->logger?->error('Error creating DHL return shipment: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error creating DHL return shipment: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage(__('Failed to create return shipment: %1', $e->getMessage()));
         }
 

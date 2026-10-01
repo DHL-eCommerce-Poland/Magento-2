@@ -70,7 +70,7 @@ class UpdateStatus extends Action implements HttpPostActionInterface
                 $this->messageManager->addErrorMessage(__('DHL status update failed: %1', $errorMsg));
             }
         } catch (Exception $e) {
-            $this->logger?->error('Error updating DHL shipment status: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error updating DHL shipment status: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage(__('Failed to update shipment status: %1', $e->getMessage()));
         }
 

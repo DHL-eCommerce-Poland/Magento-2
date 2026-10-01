@@ -91,7 +91,7 @@ class AddDhlPrepareButtonPlugin
                 95
             );
         } catch (Exception $e) {
-            $this->logger?->error('Error adding DHL prepare shipment button: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error adding DHL prepare shipment button: ' . $e->getMessage(), ['exception' => $e]);
         }
     }
 }

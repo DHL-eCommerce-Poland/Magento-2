@@ -75,7 +75,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
                         $postalCodes[] = (string) $sender->getPostalCode();
                     }
                 } catch (Exception $e) {
-                    $this->logger?->debug('[GetPickupHours] DropOffPoint fallback failed: ' . $e->getMessage());
+                    $this->logger->debug('[GetPickupHours] DropOffPoint fallback failed: ' . $e->getMessage());
                 }
             }
 
@@ -91,7 +91,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
                             }
                         }
                     } catch (Exception $e) {
-                        $this->logger?->debug(
+                        $this->logger->debug(
                             sprintf('[GetPickupHours] Shipment #%s fallback failed: %s', $sId, $e->getMessage())
                         );
                     }
@@ -125,7 +125,7 @@ class GetPickupHours extends Action implements HttpGetActionInterface
                 'data' => $resultData,
             ]);
         } catch (Exception $e) {
-            $this->logger?->error('[GetPickupHours Controller] Error: ' . $e->getMessage());
+            $this->logger->error('[GetPickupHours Controller] Error: ' . $e->getMessage());
 
             return $resultJson->setData([
                 'success' => false,

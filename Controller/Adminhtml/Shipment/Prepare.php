@@ -109,7 +109,7 @@ class Prepare extends Action
                 'internationalMapPointTypeOptions' => $this->templateManager->getInternationalMapPointTypeOptions(),
             ]);
         } catch (Exception $e) {
-            $this->logger?->error('Error preparing DHL shipment data: ' . $e->getMessage(), ['exception' => $e]);
+            $this->logger->error('Error preparing DHL shipment data: ' . $e->getMessage(), ['exception' => $e]);
             return $resultJson->setData([
                 'success' => false,
                 'message' => $e->getMessage(),
