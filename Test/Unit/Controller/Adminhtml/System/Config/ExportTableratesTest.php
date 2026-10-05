@@ -79,6 +79,7 @@ class ExportTableratesTest extends TestCase
                 [
                     'website_id' => 1,
                     'method_code' => 'parcel_polska',
+                    'country_id' => 'PL',
                     'condition_type' => 'weight',
                     'condition_from' => 0.0,
                     'condition_to' => 5.0,
@@ -87,6 +88,7 @@ class ExportTableratesTest extends TestCase
                 [
                     'website_id' => 1,
                     'method_code' => 'unknown_custom_method',
+                    'country_id' => 'DE',
                     'condition_type' => 'weight',
                     'condition_from' => 0.0,
                     'condition_to' => 5.0,
@@ -95,9 +97,9 @@ class ExportTableratesTest extends TestCase
             ]);
 
         $responseStub = $this->createStub(ResponseInterface::class);
-        $expectedCsvContent = "Method Code,Condition Type,Value From,Value To,Price\n"
-            . "parcel_polska,weight,0.0000,5.0000,15.0000\n"
-            . "unknown_custom_method,weight,0.0000,5.0000,20.0000\n";
+        $expectedCsvContent = "Method Code,Country,Condition Type,Value From,Value To,Price\n"
+            . "parcel_polska,PL,weight,0.0000,5.0000,15.0000\n"
+            . "unknown_custom_method,DE,weight,0.0000,5.0000,20.0000\n";
 
         $this->fileFactoryMock
             ->expects($this->once())
@@ -147,5 +149,66 @@ class ExportTableratesTest extends TestCase
             ->willReturn($responseStub);
 
         $this->assertSame($responseStub, $this->controller->execute());
+    }
+
+    public function testExportedCsvCanBeParsedByTablerateBackend(): void
+    {
+        $this->requestMock->expects($this->once())
+            ->method('getParam')
+            ->with('website')
+            ->willReturn(null);
+
+        $this->storeManagerMock->expects($this->never())
+            ->method('getWebsite');
+
+        $this->tableRateResolverMock->expects($this->once())
+            ->method('getRatesForExport')
+            ->with(0)
+            ->willReturn([
+                [
+                    'website_id' => 0,
+                    'method_code' => 'parcel_polska',
+                    'country_id' => 'PL',
+                    'condition_type' => 'weight',
+                    'condition_from' => 0.0,
+                    'condition_to' => 5.0,
+                    'price' => 15.0,
+                ],
+            ]);
+
+        $exportedCsvContent = '';
+        $this->fileFactoryMock
+            ->expects($this->once())
+            ->method('create')
+            ->willReturnCallback(function ($fileName, $content) use (&$exportedCsvContent) {
+                $exportedCsvContent = $content['value'];
+                return $this->createStub(ResponseInterface::class);
+            });
+
+        $this->controller->execute();
+
+        $connectionStub = $this->createStub(\Magento\Framework\DB\Adapter\AdapterInterface::class);
+        $resourceConnectionStub = $this->createStub(\Magento\Framework\App\ResourceConnection::class);
+        $resourceConnectionStub->method('getConnection')->willReturn($connectionStub);
+        $resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_tablerate');
+
+        $tablerateBackend = new \Ideo\Dhl\Model\Config\Backend\Tablerate(
+            $this->createStub(\Magento\Framework\Model\Context::class),
+            $this->createStub(\Magento\Framework\Registry::class),
+            $this->createStub(\Magento\Framework\App\Config\ScopeConfigInterface::class),
+            $this->createStub(\Magento\Framework\App\Cache\TypeListInterface::class),
+            $this->createStub(\Magento\MediaStorage\Model\File\UploaderFactory::class),
+            $this->createStub(\Magento\Config\Model\Config\Backend\File\RequestData\RequestDataInterface::class),
+            $this->createStub(\Magento\Framework\Filesystem::class),
+            $resourceConnectionStub,
+            $this->createStub(\Magento\Framework\App\Config\Storage\WriterInterface::class)
+        );
+
+        $parsedRows = $tablerateBackend->parseCsvContent($exportedCsvContent, 0);
+        $this->assertCount(1, $parsedRows);
+        $this->assertSame('parcel_polska', $parsedRows[0]['method_code']);
+        $this->assertSame('PL', $parsedRows[0]['country_id']);
+        $this->assertSame('weight', $parsedRows[0]['condition_type']);
+        $this->assertSame(15.0, $parsedRows[0]['price']);
     }
 }

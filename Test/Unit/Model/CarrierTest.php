@@ -196,6 +196,99 @@ class CarrierTest extends TestCase
     }
 
     /**
+     * Verify showmethod appends error rate when table rate is out of range.
+     */
+    public function testShowMethodWhenPriceIsNullDueToOutOfRangeAppendsErrorRate(): void
+    {
+        $config = [
+            'active' => '1',
+            'method_parcel_polska_active' => '1',
+            'method_parcel_polska_title' => 'DHL eCommerce Poland',
+            'method_parcel_polska_method_name' => 'DHL Parcel Polska',
+            'method_parcel_polska_pricing_type' => 'weight',
+            'method_parcel_polska_showmethod' => '1',
+            'method_parcel_polska_specificerrmsg' => 'Waga poza zakresem dostawy.',
+        ];
+
+        $tableRateResolverMock = $this->createMock(TableRateResolver::class);
+        $tableRateResolverMock->expects($this->once())
+            ->method('resolveRate')
+            ->willReturn(null);
+
+        $rates = [];
+        $carrier = $this->createCarrier($config, $rates, $tableRateResolverMock);
+
+        $request = new RateRequest();
+        $request->setPackageWeight(0.5);
+        $request->setDestCountryId('PL');
+        $carrier->collectRates($request);
+
+        $this->assertCount(1, $rates);
+        $this->assertSame('parcel_polska', $rates[0]['method']);
+        $this->assertSame('DHL Parcel Polska', $rates[0]['carrier_title']);
+        $this->assertSame('DHL Parcel Polska', $rates[0]['title']);
+        $this->assertSame('Waga poza zakresem dostawy.', $rates[0]['error_message']);
+    }
+
+    /**
+     * Verify showmethod false skips method completely when rate is out of range.
+     */
+    public function testShowMethodDisabledWhenPriceIsNullSkipsMethod(): void
+    {
+        $config = [
+            'active' => '1',
+            'method_parcel_polska_active' => '1',
+            'method_parcel_polska_pricing_type' => 'weight',
+            'method_parcel_polska_showmethod' => '0',
+        ];
+
+        $tableRateResolverMock = $this->createMock(TableRateResolver::class);
+        $tableRateResolverMock->expects($this->once())
+            ->method('resolveRate')
+            ->willReturn(null);
+
+        $rates = [];
+        $carrier = $this->createCarrier($config, $rates, $tableRateResolverMock);
+
+        $request = new RateRequest();
+        $request->setPackageWeight(0.5);
+        $request->setDestCountryId('PL');
+        $carrier->collectRates($request);
+
+        $this->assertCount(0, $rates);
+    }
+
+    /**
+     * Verify getConfigData showmethod returns 1 when any active method has showmethod enabled.
+     */
+    public function testGetConfigDataShowmethodReturnsOneWhenAnyActiveMethodHasShowmethodEnabled(): void
+    {
+        $config = [
+            'active' => '1',
+            'method_parcel_polska_active' => '1',
+            'method_parcel_polska_showmethod' => '1',
+        ];
+
+        $carrier = $this->createCarrier($config);
+        $this->assertSame(1, $carrier->getConfigData('showmethod'));
+    }
+
+    /**
+     * Verify getConfigData showmethod returns 0 when no active method has showmethod enabled.
+     */
+    public function testGetConfigDataShowmethodReturnsZeroWhenNoActiveMethodHasShowmethodEnabled(): void
+    {
+        $config = [
+            'active' => '1',
+            'method_parcel_polska_active' => '1',
+            'method_parcel_polska_showmethod' => '0',
+        ];
+
+        $carrier = $this->createCarrier($config);
+        $this->assertSame(0, $carrier->getConfigData('showmethod'));
+    }
+
+    /**
      * Verify tracking availability getter.
      */
     public function testIsTrackingAvailableReturnsTrue(): void

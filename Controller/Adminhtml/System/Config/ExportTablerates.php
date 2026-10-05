@@ -64,17 +64,24 @@ class ExportTablerates extends Action
             if ($orderA !== $orderB) {
                 return $orderA <=> $orderB;
             }
+            $countryA = (string)($a['country_id'] ?? '');
+            $countryB = (string)($b['country_id'] ?? '');
+            if ($countryA !== $countryB) {
+                return strcmp($countryA, $countryB);
+            }
             if ($a['condition_type'] !== $b['condition_type']) {
                 return strcmp((string)$a['condition_type'], (string)$b['condition_type']);
             }
             return (float)$a['condition_from'] <=> (float)$b['condition_from'];
         });
 
-        $content = "Method Code,Condition Type,Value From,Value To,Price\n";
+        $content = "Method Code,Country,Condition Type,Value From,Value To,Price\n";
         foreach ($rows as $row) {
+            $country = !empty($row['country_id']) ? strtoupper((string)$row['country_id']) : 'PL';
             $content .= sprintf(
-                "%s,%s,%.4f,%.4f,%.4f\n",
+                "%s,%s,%s,%.4f,%.4f,%.4f\n",
                 $row['method_code'],
+                $country,
                 $row['condition_type'],
                 (float)$row['condition_from'],
                 (float)$row['condition_to'],
