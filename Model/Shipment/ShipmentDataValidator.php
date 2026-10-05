@@ -92,10 +92,6 @@ class ShipmentDataValidator
         } else {
             foreach ($packages as $index => $pkg) {
                 $rowNum = $index + 1;
-                if ($pkg->getWeight() <= 0) {
-                    $errors[] = __('Package #%1 weight must be greater than zero.', $rowNum)->render();
-                }
-
                 if ($pkg->getPackageType() !== 'ENVELOPE') {
                     if ($pkg->getWidth() !== null && $pkg->getWidth() <= 0) {
                         $errors[] = __('Package #%1 width must be greater than zero.', $rowNum)->render();

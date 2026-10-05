@@ -139,11 +139,11 @@ class ShipmentDataValidatorTest extends TestCase
     }
 
     /**
-     * Test validation throws LocalizedException when package weight is zero.
+     * Test validation does not throw exception when package weight is zero.
      *
      * @return void
      */
-    public function testValidateInvalidWeightThrowsException(): void
+    public function testValidateAllowsZeroWeightPackage(): void
     {
         $sender = new SenderData(
             name: 'Sender',
@@ -160,8 +160,8 @@ class ShipmentDataValidatorTest extends TestCase
             postalCode: '00-000',
             city: 'City'
         );
-        $invalidPackage = new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 0.0);
-        $settings = new ShipmentSettingsData(content: 'Test', packages: [$invalidPackage]);
+        $package = new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 0.0);
+        $settings = new ShipmentSettingsData(content: 'Test', packages: [$package]);
 
         $shipmentData = new DhlShipmentData(
             orderId: 1,
@@ -170,9 +170,8 @@ class ShipmentDataValidatorTest extends TestCase
             shipmentSettings: $settings
         );
 
-        $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('Package #1 weight must be greater than zero.');
         $this->validator->validate($shipmentData);
+        $this->addToAssertionCount(1);
     }
 
     /**

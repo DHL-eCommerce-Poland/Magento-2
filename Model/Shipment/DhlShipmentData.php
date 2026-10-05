@@ -187,11 +187,17 @@ class DhlShipmentData
             $customs = CustomsData::fromArray($data['customs']);
         }
 
+        $specialServicesRaw = $data['specialServices']
+            ?? ($data['special_services']['specialServices'] ?? ($data['special_services'] ?? []));
+        if (!is_array($specialServicesRaw)) {
+            $specialServicesRaw = [];
+        }
+
         return new self(
             isset($data['orderId']) ? (int)$data['orderId'] : null,
             SenderData::fromArray($data['sender'] ?? []),
             RecipientData::fromArray($data['recipient'] ?? []),
-            SpecialServicesData::fromArray($data['specialServices'] ?? []),
+            SpecialServicesData::fromArray($specialServicesRaw),
             ShipmentSettingsData::fromArray($shipmentSettings),
             is_array($data['itemsQty'] ?? null) ? $data['itemsQty'] : [],
             $customs,

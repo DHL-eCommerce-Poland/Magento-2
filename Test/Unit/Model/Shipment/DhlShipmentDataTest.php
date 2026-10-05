@@ -167,4 +167,28 @@ class DhlShipmentDataTest extends TestCase
         $this->assertEquals(10.0, $shipmentData2->getShipmentSettings()->getPackages()[0]->getWeight());
         $this->assertEquals(5.0, $shipmentData2->getShipmentSettings()->getPackages()[1]->getWeight());
     }
+
+    /**
+     * Test fromArray mapping when specialServices are under special_services.specialServices.
+     *
+     * @return void
+     */
+    public function testFromArrayWithNestedSpecialServicesFieldset(): void
+    {
+        $dataNested = [
+            'orderId' => 501,
+            'special_services' => [
+                'specialServices' => [
+                    'insurance' => true,
+                    'insuranceValue' => 350.0,
+                    'deliveryEvening' => true,
+                ],
+            ],
+        ];
+
+        $shipmentData = DhlShipmentData::fromArray($dataNested);
+        $this->assertTrue($shipmentData->getSpecialServices()->isInsurance());
+        $this->assertEquals(350.0, $shipmentData->getSpecialServices()->getInsuranceValue());
+        $this->assertTrue($shipmentData->getSpecialServices()->isDeliveryEvening());
+    }
 }

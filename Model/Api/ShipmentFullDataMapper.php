@@ -46,46 +46,7 @@ class ShipmentFullDataMapper
             ? $deliveryHours
             : $settings->getServiceType();
 
-        $serviceDef = [
-            'product' => $product,
-            'deliveryEvening' => $isEvening,
-            'pickupOnSaturday' => $services->isPickupOnSaturday(),
-            'deliveryOnSaturday' => $services->isDeliveryOnSaturday(),
-        ];
-
-        if ($services->isCollectOnDelivery()) {
-            $serviceDef['collectOnDelivery'] = true;
-            $serviceDef['collectOnDeliveryValue'] = $services->getCollectOnDeliveryValue();
-            $serviceDef['collectOnDeliveryForm'] = $services->getCollectOnDeliveryForm();
-        }
-
-        if ($services->isInsurance()) {
-            $serviceDef['insurance'] = true;
-            $serviceDef['insuranceValue'] = $services->getInsuranceValue();
-        }
-
-        if ($services->isPredeliveryInformation()) {
-            $serviceDef['predeliveryInformation'] = true;
-        }
-
-        if ($services->isReturnOnDelivery()) {
-            $serviceDef['returnOnDelivery'] = true;
-            if ($services->getReturnOnDeliveryReference() !== '') {
-                $serviceDef['returnOnDeliveryReference'] = $services->getReturnOnDeliveryReference();
-            }
-        }
-
-        if ($services->isProofOfDelivery()) {
-            $serviceDef['proofOfDelivery'] = true;
-        }
-
-        if ($services->isAgeVer()) {
-            $serviceDef['ageVer'] = true;
-        }
-
-        if ($services->isSelfCollect()) {
-            $serviceDef['selfCollect'] = true;
-        }
+        $specialServices = $this->mapSpecialServices($services);
 
         $senderCompanyName = trim($sender->getName());
         $senderFullName = trim($sender->getFirstName() . ' ' . $sender->getLastName());
@@ -234,7 +195,7 @@ class ShipmentFullDataMapper
                 'paymentType' => SpecialServicesData::PAYMENT_METHOD_BANK_TRANSFER,
                 'costsCenter' => $this->sanitizeString($settings->getMpk()),
             ],
-            'specialServices' => $serviceDef,
+            'specialServices' => $specialServices,
             'shipmentTime' => $shipmentTime,
             'labelType' => $settings->getLabelType(),
         ];
@@ -444,4 +405,58 @@ class ShipmentFullDataMapper
 
         return $result;
     }
+
+    /**
+     * Map special services to DHL WebAPI2 Service structures.
+     *
+     * @param SpecialServicesData $services
+     *
+     * @return array
+     */
+    private function mapSpecialServices(SpecialServicesData $services): array
+    {
+        $items = [];
+
+        if ($services->isInsurance()) {
+            $items[] = [
+                'serviceType' => 'UBEZP',
+                'serviceValue' => $services->getInsuranceValue(),
+            ];
+        }
+
+        if ($services->isCollectOnDelivery()) {
+            $items[] = [
+                'serviceType' => 'COD',
+                'serviceValue' => $services->getCollectOnDeliveryValue(),
+                'collectOnDeliveryForm' => $services->getCollectOnDeliveryForm() ?: SpecialServicesData::PAYMENT_METHOD_BANK_TRANSFER,
+            ];
+        }
+
+        if ($services->isReturnOnDelivery()) {
+            $rodItem = ['serviceType' => 'ROD'];
+            if ($services->getReturnOnDeliveryReference() !== '') {
+                $rodItem['textInstruction'] = mb_substr($services->getReturnOnDeliveryReference(), 0, 32);
+            }
+            $items[] = $rodItem;
+        }
+
+        $flagServices = [
+            '1722' => $services->isDeliveryEvening(),
+            'SOBOTA' => $services->isDeliveryOnSaturday(),
+            'NAD_SOBOTA' => $services->isPickupOnSaturday(),
+            'PDI' => $services->isPredeliveryInformation(),
+            'POD' => $services->isProofOfDelivery(),
+            'AGEVER' => $services->isAgeVer(),
+            'ODB' => $services->isSelfCollect(),
+        ];
+
+        foreach ($flagServices as $code => $isEnabled) {
+            if ($isEnabled) {
+                $items[] = ['serviceType' => $code];
+            }
+        }
+
+        return !empty($items) ? ['item' => $items] : [];
+    }
 }
+

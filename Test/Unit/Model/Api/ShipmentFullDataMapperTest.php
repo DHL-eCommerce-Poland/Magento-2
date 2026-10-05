@@ -143,8 +143,17 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('1234567', $mapped['shipmentInfo']['billing']['billingAccountNumber']);
         $this->assertEquals('MPK123', $mapped['shipmentInfo']['billing']['costsCenter']);
         $this->assertEquals('AH', $mapped['shipmentInfo']['serviceType']);
-        $this->assertTrue($mapped['shipmentInfo']['specialServices']['collectOnDelivery']);
-        $this->assertEquals(150.0, $mapped['shipmentInfo']['specialServices']['collectOnDeliveryValue']);
+        $this->assertNotEmpty($mapped['shipmentInfo']['specialServices']['item']);
+        $items = $mapped['shipmentInfo']['specialServices']['item'];
+        $servicesByType = [];
+        foreach ($items as $item) {
+            $servicesByType[$item['serviceType']] = $item;
+        }
+        $this->assertArrayHasKey('UBEZP', $servicesByType);
+        $this->assertEquals(200.0, $servicesByType['UBEZP']['serviceValue']);
+        $this->assertArrayHasKey('COD', $servicesByType);
+        $this->assertEquals(150.0, $servicesByType['COD']['serviceValue']);
+        $this->assertEquals('BANK_TRANSFER', $servicesByType['COD']['collectOnDeliveryForm']);
 
         // Check control character sanitization
         $this->assertNull($mapped['ship']['servicePointAccountNumber']);
@@ -244,17 +253,47 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $mapped = $this->mapper->map($shipmentData);
 
-        $service = $mapped['shipmentInfo']['specialServices'];
         $this->assertEquals('AH', $mapped['shipmentInfo']['serviceType']);
-        $this->assertTrue($service['deliveryEvening']);
-        $this->assertTrue($service['deliveryOnSaturday']);
-        $this->assertTrue($service['pickupOnSaturday']);
-        $this->assertTrue($service['predeliveryInformation']);
-        $this->assertTrue($service['returnOnDelivery']);
-        $this->assertEquals('REF123', $service['returnOnDeliveryReference']);
-        $this->assertTrue($service['proofOfDelivery']);
-        $this->assertTrue($service['ageVer']);
-        $this->assertTrue($service['selfCollect']);
+        $this->assertNotEmpty($mapped['shipmentInfo']['specialServices']['item']);
+        $items = $mapped['shipmentInfo']['specialServices']['item'];
+        $servicesByType = [];
+        foreach ($items as $item) {
+            $servicesByType[$item['serviceType']] = $item;
+        }
+        $this->assertArrayHasKey('1722', $servicesByType);
+        $this->assertArrayHasKey('SOBOTA', $servicesByType);
+        $this->assertArrayHasKey('NAD_SOBOTA', $servicesByType);
+        $this->assertArrayHasKey('PDI', $servicesByType);
+        $this->assertArrayHasKey('ROD', $servicesByType);
+        $this->assertEquals('REF123', $servicesByType['ROD']['textInstruction']);
+        $this->assertArrayHasKey('POD', $servicesByType);
+        $this->assertArrayHasKey('AGEVER', $servicesByType);
+        $this->assertArrayHasKey('ODB', $servicesByType);
+    }
+
+    /**
+     * Test mapping when no special services are enabled.
+     *
+     * @return void
+     */
+    public function testMapWithNoSpecialServicesReturnsEmptyArray(): void
+    {
+        $sender = new SenderData();
+        $recipient = new RecipientData(name: 'Test Recipient');
+        $specialServices = new SpecialServicesData();
+        $settings = new ShipmentSettingsData(serviceType: 'AH', packages: [new PackageData()]);
+
+        $shipmentData = new DhlShipmentData(
+            sender: $sender,
+            recipient: $recipient,
+            specialServices: $specialServices,
+            shipmentSettings: $settings
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertIsArray($mapped['shipmentInfo']['specialServices']);
+        $this->assertEmpty($mapped['shipmentInfo']['specialServices']);
     }
 
     /**
