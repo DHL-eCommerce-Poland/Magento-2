@@ -18,6 +18,7 @@ class SoapClientAdapter implements ClientInterface
     private const WSDL_URL_SANDBOX = 'https://sandbox.dhl24.com.pl/webapi2';
     private const CONNECTION_TIMEOUT = 10;
     private const API_ORIGIN = 'Ideo_M2';
+    private const MAX_ITEMS_TO_PRINT_PER_REQUEST = 3;
 
     /**
      * @param LoggerInterface $logger
@@ -691,53 +692,60 @@ class SoapClientAdapter implements ClientInterface
                 );
             }
 
-            $params = [
-                'authData' => [
-                    'username' => $this->ensureUtf8($credentials->getUsername()),
-                    'password' => $this->ensureUtf8($credentials->getPassword()),
-                ],
-                'itemsToPrint' => $formattedItems,
-            ];
-
-            $response = $client->getLabels($params);
-            $this->logSoapCommunication($client, 'getLabels');
-
-            $result = $response->getLabelsResult ?? null;
-
-            if ($result === null) {
-                return new GetLabelsResult(
-                    false,
-                    [],
-                    'INVALID_RESPONSE',
-                    'DHL WebAPI2 returned invalid response for getLabels.'
-                );
-            }
-
-            $itemsRaw = [];
-            if (isset($result->item)) {
-                $itemsRaw = is_array($result->item) ? $result->item : [$result->item];
-            }
-
+            $chunks = array_chunk($formattedItems, self::MAX_ITEMS_TO_PRINT_PER_REQUEST);
             $parsedItems = [];
-            foreach ($itemsRaw as $itemObj) {
-                $shipmentId = (string) ($itemObj->shipmentId ?? '');
-                $labelType = (string) ($itemObj->labelType ?? GetLabelsResult::LABEL_TYPE_BLP);
-                $rawBase64 = (string) ($itemObj->labelData ?? '');
-                // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
-                $labelBinary = !empty($rawBase64) ? base64_decode($rawBase64) : '';
 
-                $defaultMime = str_contains($labelType, GetLabelsResult::LABEL_TYPE_ZBLP)
-                    ? 'text/plain'
-                    : (str_contains($labelType, 'IMG') ? 'image/png' : 'application/pdf');
-                $mimeType = (string) ($itemObj->labelMimeType ?? ($itemObj->mimeType ?? $defaultMime));
+            foreach ($chunks as $chunkIndex => $chunk) {
+                $params = [
+                    'authData' => [
+                        'username' => $this->ensureUtf8($credentials->getUsername()),
+                        'password' => $this->ensureUtf8($credentials->getPassword()),
+                    ],
+                    'itemsToPrint' => $chunk,
+                ];
 
-                if (!empty($labelBinary)) {
-                    $parsedItems[] = [
-                        'shipmentId' => $shipmentId,
-                        'labelType' => $labelType,
-                        'labelData' => $labelBinary,
-                        'mimeType' => $mimeType,
-                    ];
+                $response = $client->getLabels($params);
+                $this->logSoapCommunication(
+                    $client,
+                    count($chunks) > 1 ? sprintf('getLabels_batch_%d', $chunkIndex + 1) : 'getLabels'
+                );
+
+                $result = $response->getLabelsResult ?? null;
+
+                if ($result === null) {
+                    return new GetLabelsResult(
+                        false,
+                        [],
+                        'INVALID_RESPONSE',
+                        'DHL WebAPI2 returned invalid response for getLabels.'
+                    );
+                }
+
+                $itemsRaw = [];
+                if (isset($result->item)) {
+                    $itemsRaw = is_array($result->item) ? $result->item : [$result->item];
+                }
+
+                foreach ($itemsRaw as $itemObj) {
+                    $shipmentId = (string) ($itemObj->shipmentId ?? '');
+                    $labelType = (string) ($itemObj->labelType ?? GetLabelsResult::LABEL_TYPE_BLP);
+                    $rawBase64 = (string) ($itemObj->labelData ?? '');
+                    // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
+                    $labelBinary = !empty($rawBase64) ? base64_decode($rawBase64) : '';
+
+                    $defaultMime = str_contains($labelType, GetLabelsResult::LABEL_TYPE_ZBLP)
+                        ? 'text/plain'
+                        : (str_contains($labelType, 'IMG') ? 'image/png' : 'application/pdf');
+                    $mimeType = (string) ($itemObj->labelMimeType ?? ($itemObj->mimeType ?? $defaultMime));
+
+                    if (!empty($labelBinary)) {
+                        $parsedItems[] = [
+                            'shipmentId' => $shipmentId,
+                            'labelType' => $labelType,
+                            'labelData' => $labelBinary,
+                            'mimeType' => $mimeType,
+                        ];
+                    }
                 }
             }
 

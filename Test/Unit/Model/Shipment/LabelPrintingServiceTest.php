@@ -294,6 +294,57 @@ class LabelPrintingServiceTest extends TestCase
         $this->assertStringContainsString('dhl_labels_', $result['filename']);
     }
 
+    public function testGetReturnLabelContentSuccessFivePackagesCombinesAllLabels(): void
+    {
+        $shipmentStub = $this->createStub(ShipmentDataInterface::class);
+        $shipmentStub->method('getReturnShipmentId')->willReturn('90040025501, 90040025502, 90040025503, 90040025504, 90040025505');
+
+        $this->repositoryStub->method('getById')->willReturn($shipmentStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->expects($this->once())
+            ->method('getLabels')
+            ->with($credentials, [
+                ['shipmentId' => '90040025501', 'labelType' => 'BLP'],
+                ['shipmentId' => '90040025502', 'labelType' => 'BLP'],
+                ['shipmentId' => '90040025503', 'labelType' => 'BLP'],
+                ['shipmentId' => '90040025504', 'labelType' => 'BLP'],
+                ['shipmentId' => '90040025505', 'labelType' => 'BLP'],
+            ])
+            ->willReturn(new GetLabelsResult(true, [
+                ['shipmentId' => '90040025501', 'labelType' => 'BLP', 'labelData' => 'PDF1', 'mimeType' => 'application/pdf'],
+                ['shipmentId' => '90040025502', 'labelType' => 'BLP', 'labelData' => 'PDF2', 'mimeType' => 'application/pdf'],
+                ['shipmentId' => '90040025503', 'labelType' => 'BLP', 'labelData' => 'PDF3', 'mimeType' => 'application/pdf'],
+                ['shipmentId' => '90040025504', 'labelType' => 'BLP', 'labelData' => 'PDF4', 'mimeType' => 'application/pdf'],
+                ['shipmentId' => '90040025505', 'labelType' => 'BLP', 'labelData' => 'PDF5', 'mimeType' => 'application/pdf'],
+            ]));
+
+        $labelGeneratorMock = $this->createMock(\Magento\Shipping\Model\Shipping\LabelGenerator::class);
+        $zendPdfMock = new \Zend_Pdf();
+        $labelGeneratorMock->expects($this->once())
+            ->method('combineLabelsPdf')
+            ->with(['PDF1', 'PDF2', 'PDF3', 'PDF4', 'PDF5'])
+            ->willReturn($zendPdfMock);
+
+        $service = new LabelPrintingService(
+            $this->repositoryStub,
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->scopeConfigStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            $labelGeneratorMock
+        );
+
+        $result = $service->getReturnLabelContent([1]);
+
+        $this->assertEquals('application/pdf', $result['mimeType']);
+        $this->assertNotEmpty($result['content']);
+        $this->assertStringContainsString('dhl_labels_', $result['filename']);
+    }
+
     public function testGetReturnLabelContentSuccessMultiplePngLabelsZipped(): void
     {
         $shipmentStub = $this->createStub(ShipmentDataInterface::class);

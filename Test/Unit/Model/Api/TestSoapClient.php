@@ -9,9 +9,13 @@ use SoapFault;
 
 class TestSoapClient extends SoapClient
 {
+    public int $getLabelsCallCount = 0;
+    public array $getLabelsCalls = [];
+
     /**
      * @param bool $shouldThrowFault
      * @param string $faultMessage
+     * @throws SoapFault
      */
     public function __construct(
         private readonly bool $shouldThrowFault = false,
@@ -23,6 +27,7 @@ class TestSoapClient extends SoapClient
             'exceptions' => true,
         ]);
     }
+
 
     /**
      * Dummy getInternationalParams2 method for SoapClient mocking.
@@ -313,6 +318,46 @@ class TestSoapClient extends SoapClient
                         ],
                     ],
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * Dummy getLabels method for SoapClient mocking.
+     *
+     * @param mixed $args
+     * @return mixed
+     * @throws SoapFault
+     */
+    public function getLabels(mixed $args): mixed
+    {
+        $this->getLabelsCallCount++;
+        $this->getLabelsCalls[] = $args;
+
+        if ($this->shouldThrowFault) {
+            throw new SoapFault('GET_LABELS_ERR', $this->faultMessage);
+        }
+
+        $items = [];
+        $itemsToPrint = $args['itemsToPrint'] ?? [];
+        if (!is_array($itemsToPrint)) {
+            $itemsToPrint = [$itemsToPrint];
+        }
+
+        foreach ($itemsToPrint as $item) {
+            $shipmentId = is_array($item) ? ($item['shipmentId'] ?? '1234567890') : ($item->shipmentId ?? '1234567890');
+            $labelType = is_array($item) ? ($item['labelType'] ?? 'BLP') : ($item->labelType ?? 'BLP');
+            $items[] = (object) [
+                'shipmentId' => (string) $shipmentId,
+                'labelType' => (string) $labelType,
+                'labelData' => base64_encode('%PDF-1.4 dummy label for ' . $shipmentId),
+                'labelMimeType' => 'application/pdf',
+            ];
+        }
+
+        return (object) [
+            'getLabelsResult' => (object) [
+                'item' => $items,
             ],
         ];
     }
