@@ -1158,10 +1158,6 @@ class SoapClientAdapter implements ClientInterface
                         ? (string) $itemObj->shipmentTrackingNumber
                         : $shipmentId);
 
-                $packageTrackingNumber = !empty($itemObj->packagesTrackingNumbers)
-                    ? (string) $itemObj->packagesTrackingNumbers
-                    : null;
-
                 $labelData = null;
                 $labelMimeType = null;
 
@@ -1179,7 +1175,6 @@ class SoapClientAdapter implements ClientInterface
                 $parsedItems[] = [
                     'shipmentId' => $shipmentId,
                     'waybill' => $waybill,
-                    'packageTrackingNumber' => $packageTrackingNumber,
                     'labelData' => $labelData,
                     'labelMimeType' => $labelMimeType,
                 ];

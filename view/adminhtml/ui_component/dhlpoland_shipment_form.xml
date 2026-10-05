@@ -991,48 +991,6 @@
                         <item name="componentType" xsi:type="string">container</item>
                     </item>
                 </argument>
-                <field name="packageNumber" formElement="input">
-                    <argument name="data" xsi:type="array">
-                        <item name="config" xsi:type="array">
-                            <item name="fit" xsi:type="boolean">true</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
-                        </item>
-                    </argument>
-                    <settings>
-                        <dataType>text</dataType>
-                        <label translate="true">Package Number</label>
-                        <dataScope>packageNumber</dataScope>
-                        <disabled>true</disabled>
-                    </settings>
-                </field>
-                <field name="returnShipmentId" formElement="input">
-                    <argument name="data" xsi:type="array">
-                        <item name="config" xsi:type="array">
-                            <item name="fit" xsi:type="boolean">true</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
-                        </item>
-                    </argument>
-                    <settings>
-                        <dataType>text</dataType>
-                        <label translate="true">Return Package Number</label>
-                        <dataScope>returnShipmentId</dataScope>
-                        <disabled>true</disabled>
-                    </settings>
-                </field>
-                <field name="packagesTrackingNumbers" formElement="input">
-                    <argument name="data" xsi:type="array">
-                        <item name="config" xsi:type="array">
-                            <item name="fit" xsi:type="boolean">true</item>
-                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
-                        </item>
-                    </argument>
-                    <settings>
-                        <dataType>text</dataType>
-                        <label translate="true">Package Tracking Number</label>
-                        <dataScope>packagesTrackingNumbers</dataScope>
-                        <disabled>true</disabled>
-                    </settings>
-                </field>
                 <field name="packageType" formElement="select">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
@@ -1287,6 +1245,34 @@
                             </settings>
                         </checkbox>
                     </formElements>
+                </field>
+                <field name="packageNumber" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Package Number</label>
+                        <dataScope>packageNumber</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
+                </field>
+                <field name="returnShipmentId" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Return Package Number</label>
+                        <dataScope>returnShipmentId</dataScope>
+                        <disabled>true</disabled>
+                    </settings>
                 </field>
                 <actionDelete name="actionDelete">
                     <argument name="data" xsi:type="array">

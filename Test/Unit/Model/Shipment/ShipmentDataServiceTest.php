@@ -360,7 +360,6 @@ class ShipmentDataServiceTest extends TestCase
                     'packageType' => 'PACKAGE',
                     'weight' => 2.5,
                     'returnShipmentId' => 'OLD_RET_123',
-                    'packagesTrackingNumbers' => 'OLD_RET_123',
                 ],
             ]
         );
@@ -401,6 +400,5 @@ class ShipmentDataServiceTest extends TestCase
         $decoded = json_decode($capturedJson, true);
 
         $this->assertNull($decoded['shipmentSettings']['packages'][0]['returnShipmentId']);
-        $this->assertNull($decoded['shipmentSettings']['packages'][0]['packagesTrackingNumbers']);
     }
 }

@@ -212,7 +212,7 @@ class ShipmentDataService
             $payloadArr['shipmentId'] = (string)$shipmentId;
         }
         if ($packageNumbers !== null && !empty($packageNumbers)) {
-            $this->mapPackageTrackingNumbers($payloadArr, $packageNumbers);
+            $this->mapPackageNumbers($payloadArr, $packageNumbers);
             $pkgStr = implode(', ', array_values(array_unique(array_filter(array_map('trim', $packageNumbers)))));
             if ($pkgStr !== '') {
                 $entity->setPackageNumbers($pkgStr);
@@ -289,12 +289,8 @@ class ShipmentDataService
                             $item = $returnItems[$idx] ?? null;
                             if ($item && is_array($item)) {
                                 $retId = (string) ($item['waybill'] ?? ($item['shipmentId'] ?? ''));
-                                $pkgTrackNum = (string) (
-                                    $item['packageTrackingNumber'] ?? ($item['packagesTrackingNumbers'] ?? '')
-                                );
 
                                 $packages[$idx]['returnShipmentId'] = $retId;
-                                $packages[$idx]['packagesTrackingNumbers'] = $pkgTrackNum;
                                 $hasChanged = true;
                             }
                         }
@@ -351,7 +347,6 @@ class ShipmentDataService
         if (isset($payloadArr['packages']) && is_array($payloadArr['packages'])) {
             foreach ($payloadArr['packages'] as $idx => $pkg) {
                 $payloadArr['packages'][$idx]['returnShipmentId'] = null;
-                $payloadArr['packages'][$idx]['packagesTrackingNumbers'] = null;
             }
         }
         if (isset($payloadArr['shipmentSettings']['packages'])
@@ -359,7 +354,6 @@ class ShipmentDataService
         ) {
             foreach ($payloadArr['shipmentSettings']['packages'] as $idx => $pkg) {
                 $payloadArr['shipmentSettings']['packages'][$idx]['returnShipmentId'] = null;
-                $payloadArr['shipmentSettings']['packages'][$idx]['packagesTrackingNumbers'] = null;
             }
         }
 
@@ -368,7 +362,7 @@ class ShipmentDataService
             $entity->setShipmentId($shipmentId);
         }
         if ($packageNumbers !== null && !empty($packageNumbers)) {
-            $this->mapPackageTrackingNumbers($payloadArr, $packageNumbers);
+            $this->mapPackageNumbers($payloadArr, $packageNumbers);
             $pkgStr = implode(', ', array_values(array_unique(array_filter(array_map('trim', $packageNumbers)))));
             if ($pkgStr !== '') {
                 $entity->setPackageNumbers($pkgStr);
@@ -408,7 +402,7 @@ class ShipmentDataService
                 if (isset($payloadArr['packages']) && is_array($payloadArr['packages'])) {
                     foreach ($payloadArr['packages'] as $idx => &$pkg) {
                         if (is_array($pkg)) {
-                            unset($pkg['packageNumber'], $pkg['returnShipmentId'], $pkg['packagesTrackingNumbers']);
+                            unset($pkg['packageNumber'], $pkg['returnShipmentId']);
                         }
                     }
                     unset($pkg);
@@ -418,7 +412,7 @@ class ShipmentDataService
                 ) {
                     foreach ($payloadArr['shipmentSettings']['packages'] as $idx => &$pkg) {
                         if (is_array($pkg)) {
-                            unset($pkg['packageNumber'], $pkg['returnShipmentId'], $pkg['packagesTrackingNumbers']);
+                            unset($pkg['packageNumber'], $pkg['returnShipmentId']);
                         }
                     }
                     unset($pkg);
@@ -510,14 +504,14 @@ class ShipmentDataService
     }
 
     /**
-     * Map package tracking numbers into individual package elements in payload array.
+     * Map package numbers into individual package elements in payload array.
      *
      * @param array $payloadArr
      * @param array $packageNumbers
      *
      * @return void
      */
-    private function mapPackageTrackingNumbers(array &$payloadArr, array $packageNumbers): void
+    private function mapPackageNumbers(array &$payloadArr, array $packageNumbers): void
     {
         $pkgNums = array_values($packageNumbers);
         $payloadArr['packageNumbers'] = $pkgNums;

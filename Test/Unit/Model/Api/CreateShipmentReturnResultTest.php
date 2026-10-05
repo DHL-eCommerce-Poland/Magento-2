@@ -15,7 +15,6 @@ class CreateShipmentReturnResultTest extends TestCase
             [
                 'shipmentId' => '90040025505',
                 'waybill' => '90040025505',
-                'packageTrackingNumber' => 'JJD000030025688110000000807',
                 'labelData' => 'PDF_CONTENT_1',
                 'labelMimeType' => 'application/pdf',
             ],
@@ -46,21 +45,18 @@ class CreateShipmentReturnResultTest extends TestCase
             [
                 'shipmentId' => '90040025505',
                 'waybill' => '90040025505',
-                'packageTrackingNumber' => 'JJD000030025688110000000807',
                 'labelData' => 'PDF_CONTENT_1',
                 'labelMimeType' => 'application/pdf',
             ],
             [
                 'shipmentId' => '90040025516',
                 'waybill' => '90040025516',
-                'packageTrackingNumber' => 'JJD000030025688110000000818',
                 'labelData' => 'PDF_CONTENT_2',
                 'labelMimeType' => 'application/pdf',
             ],
             [
                 'shipmentId' => '90040025527',
                 'waybill' => '90040025527',
-                'packageTrackingNumber' => 'JJD000030025688110000000829',
                 'labelData' => 'PDF_CONTENT_3',
                 'labelMimeType' => 'application/pdf',
             ],

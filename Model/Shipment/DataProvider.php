@@ -278,7 +278,7 @@ class DataProvider extends AbstractDataProvider
     }
 
     /**
-     * Normalize packages array flags to string '1'/'0', record_id, returnShipmentId, and packagesTrackingNumbers.
+     * Normalize packages array flags to string '1'/'0', record_id, and returnShipmentId.
      *
      * @param array $packages
      * @param array $rootPackageNumbers
@@ -299,12 +299,6 @@ class DataProvider extends AbstractDataProvider
                     $pkgNumber = $rootPackageNumbers[$index];
                 }
                 $pkg['packageNumber'] = (string)($pkgNumber ?? '');
-
-                $trackNum = $pkg['packagesTrackingNumbers'] ?? $pkg['packageTrackingNumber'] ?? null;
-                if (empty($trackNum) && isset($rootPackageNumbers[$index])) {
-                    $trackNum = $rootPackageNumbers[$index];
-                }
-                $pkg['packagesTrackingNumbers'] = (string)($trackNum ?? '');
                 $result[$index] = $pkg;
             }
         }

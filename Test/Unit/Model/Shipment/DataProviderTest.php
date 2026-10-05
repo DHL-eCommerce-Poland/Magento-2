@@ -44,7 +44,6 @@ class DataProviderTest extends TestCase
                     [
                         'weight' => 2.5,
                         'returnShipmentId' => 'RET554433',
-                        'packagesTrackingNumbers' => 'JJD000030025688110000000925',
                     ]
                 ]
             ],
@@ -81,7 +80,6 @@ class DataProviderTest extends TestCase
         $this->assertArrayNotHasKey('packages', $data[42]['shipmentSettings']);
         $this->assertCount(1, $data[42]['packages']);
         $this->assertEquals('RET554433', $data[42]['packages'][0]['returnShipmentId']);
-        $this->assertEquals('JJD000030025688110000000925', $data[42]['packages'][0]['packagesTrackingNumbers']);
         $this->assertArrayHasKey('packages_fieldset', $data[42]);
         $this->assertCount(1, $data[42]['packages_fieldset']['packages']);
     }
