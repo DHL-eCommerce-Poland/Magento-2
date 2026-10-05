@@ -1061,10 +1061,14 @@
                                             <callback>enable</callback>
                                         </action>
                                         <action name="3">
+                                            <target>${ $.parentName }.weight</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="4">
                                             <target>${ $.parentName }.hasEuroReturn</target>
                                             <callback>disable</callback>
                                         </action>
-                                        <action name="4">
+                                        <action name="5">
                                             <target>${ $.parentName }.hasEuroReturn</target>
                                             <callback>value</callback>
                                             <params>
@@ -1110,10 +1114,21 @@
                                             </params>
                                         </action>
                                         <action name="6">
-                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <target>${ $.parentName }.weight</target>
                                             <callback>disable</callback>
                                         </action>
                                         <action name="7">
+                                            <target>${ $.parentName }.weight</target>
+                                            <callback>value</callback>
+                                            <params>
+                                                <param name="0" xsi:type="string"></param>
+                                            </params>
+                                        </action>
+                                        <action name="8">
+                                            <target>${ $.parentName }.hasEuroReturn</target>
+                                            <callback>disable</callback>
+                                        </action>
+                                        <action name="9">
                                             <target>${ $.parentName }.hasEuroReturn</target>
                                             <callback>value</callback>
                                             <params>
@@ -1138,6 +1153,10 @@
                                             <callback>enable</callback>
                                         </action>
                                         <action name="3">
+                                            <target>${ $.parentName }.weight</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="4">
                                             <target>${ $.parentName }.hasEuroReturn</target>
                                             <callback>enable</callback>
                                         </action>

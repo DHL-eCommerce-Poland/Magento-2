@@ -400,7 +400,7 @@ $todayIsoDate = $viewModel->getIsoDate();
                                                 <input type="text" class="admin__control-text" data-bind="value: quantity" style="width: 100%; box-sizing: border-box;" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true, 'validate-no-comma':true}" required />
                                             </td>
                                             <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" class="admin__control-text" data-bind="value: weight" style="width: 100%; box-sizing: border-box;" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true, 'validate-no-comma':true}" required />
+                                                <input type="text" class="admin__control-text" data-bind="value: weight, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" style="width: 100%; box-sizing: border-box;" />
                                             </td>
                                             <td style="padding: 6px 4px; vertical-align: top;">
                                                 <input type="text" class="admin__control-text" data-bind="value: width, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" style="width: 100%; box-sizing: border-box;" />

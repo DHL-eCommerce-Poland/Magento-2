@@ -141,22 +141,33 @@ define([
         var isEuro = p.hasEuroReturn !== undefined ? p.hasEuroReturn : p.has_euro_return;
         var euroReturnObs = ko.observable(pkgTypeObs() === 'PALLET' ? isTruthy(isEuro) : false);
 
+        var isNonStd = p.isNonStandard !== undefined ? p.isNonStandard : p.is_non_standard;
+        var qtyVal = (p.quantity !== undefined && p.quantity !== null && p.quantity !== '') ? String(p.quantity).replace(',', '.') : '';
+
+        var weightObs = ko.observable(formatDecimal4(p.weight));
+        var widthObs = ko.observable(formatDecimal4(p.width));
+        var lengthObs = ko.observable(formatDecimal4(p.length));
+        var heightObs = ko.observable(formatDecimal4(p.height));
+
         pkgTypeObs.subscribe(function (newType) {
             if (newType !== 'PALLET') {
                 euroReturnObs(false);
             }
+            if (newType === 'ENVELOPE') {
+                weightObs('');
+                widthObs('');
+                lengthObs('');
+                heightObs('');
+            }
         });
-
-        var isNonStd = p.isNonStandard !== undefined ? p.isNonStandard : p.is_non_standard;
-        var qtyVal = (p.quantity !== undefined && p.quantity !== null && p.quantity !== '') ? String(p.quantity).replace(',', '.') : '';
 
         return {
             packageType: pkgTypeObs,
             quantity: ko.observable(qtyVal),
-            weight: ko.observable(formatDecimal4(p.weight)),
-            width: ko.observable(formatDecimal4(p.width)),
-            length: ko.observable(formatDecimal4(p.length)),
-            height: ko.observable(formatDecimal4(p.height)),
+            weight: weightObs,
+            width: widthObs,
+            length: lengthObs,
+            height: heightObs,
             isNonStandard: ko.observable(isTruthy(isNonStd)),
             hasEuroReturn: euroReturnObs
         };
