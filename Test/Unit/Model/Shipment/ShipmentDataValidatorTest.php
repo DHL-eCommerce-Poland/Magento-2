@@ -305,6 +305,28 @@ class ShipmentDataValidatorTest extends TestCase
     }
 
     /**
+     * Test validateRawPayload throws LocalizedException when package inside packages_fieldset contains a comma.
+     *
+     * @return void
+     */
+    public function testValidateRawPayloadWithCommaInPackagesFieldsetThrowsException(): void
+    {
+        $payload = [
+            'packages_fieldset' => [
+                'packages' => [
+                    ['weight' => '3,5', 'quantity' => '1']
+                ]
+            ]
+        ];
+
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage(
+            'Field "Package #1 weight" cannot contain a comma. Please use a dot (.) as decimal separator.'
+        );
+        $this->validator->validateRawPayload($payload);
+    }
+
+    /**
      * Test validateRawPayload throws LocalizedException when insurance value contains a comma.
      *
      * @return void

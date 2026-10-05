@@ -152,7 +152,9 @@ class ShipmentDataValidator
         $errors = [];
 
         // 1. Packages
-        $packages = $payload['shipmentSettings']['packages'] ?? ($payload['packages'] ?? []);
+        $packages = $payload['packages']
+            ?? ($payload['packages_fieldset']['packages']
+            ?? ($payload['shipmentSettings']['packages'] ?? []));
         if (is_array($packages)) {
             foreach ($packages as $index => $pkg) {
                 if (!is_array($pkg)) {

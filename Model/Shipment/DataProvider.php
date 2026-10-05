@@ -272,6 +272,8 @@ class DataProvider extends AbstractDataProvider
             $settings['pickupHourTo'] = null;
         }
 
+        unset($settings['packages']);
+
         return $settings;
     }
 

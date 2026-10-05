@@ -78,10 +78,12 @@ class DataProviderTest extends TestCase
         $this->assertEquals('AH', $data[42]['shipmentSettings']['serviceType']);
         $this->assertEquals('CREATED', $data[42]['shipmentSettings']['status']);
         $this->assertEquals('RET554433', $data[42]['shipmentSettings']['returnShipmentId']);
-        $this->assertEquals('1', $data[42]['specialServices']['insurance']);
+        $this->assertArrayNotHasKey('packages', $data[42]['shipmentSettings']);
         $this->assertCount(1, $data[42]['packages']);
         $this->assertEquals('RET554433', $data[42]['packages'][0]['returnShipmentId']);
         $this->assertEquals('JJD000030025688110000000925', $data[42]['packages'][0]['packagesTrackingNumbers']);
+        $this->assertArrayHasKey('packages_fieldset', $data[42]);
+        $this->assertCount(1, $data[42]['packages_fieldset']['packages']);
     }
 
     public function testGetDataNormalizesPackagesWithFallbackFromRootPackageNumbers(): void

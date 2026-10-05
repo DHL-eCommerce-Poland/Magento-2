@@ -109,4 +109,62 @@ class DhlShipmentDataTest extends TestCase
         $this->assertCount(1, $shipmentData2->getShipmentSettings()->getPackages());
         $this->assertEquals(2, $shipmentData2->getShipmentSettings()->getPackageQuantity());
     }
+
+    /**
+     * Test fromArray prioritizes packages from packages_fieldset or packages over stale shipmentSettings.packages.
+     *
+     * @return void
+     */
+    public function testFromArrayPrioritizesPackagesFromDynamicRowsOverStaleShipmentSettingsPackages(): void
+    {
+        $pkgOld = [
+            'packageType' => 'PACKAGE',
+            'quantity' => 1,
+            'weight' => 10.0,
+        ];
+        $pkgNew1 = [
+            'packageType' => 'PACKAGE',
+            'quantity' => 1,
+            'weight' => 10.0,
+        ];
+        $pkgNew2 = [
+            'packageType' => 'PACKAGE',
+            'quantity' => 1,
+            'weight' => 5.0,
+        ];
+
+        // Case 1: packages_fieldset with 2 packages overrides shipmentSettings with 1 stale package
+        $dataFieldset = [
+            'orderId' => 401,
+            'shipmentSettings' => [
+                'serviceType' => 'AH',
+                'packages' => [$pkgOld],
+            ],
+            'packages_fieldset' => [
+                'packages' => [$pkgNew1, $pkgNew2],
+            ],
+        ];
+
+        $shipmentData1 = DhlShipmentData::fromArray($dataFieldset);
+        $this->assertCount(2, $shipmentData1->getShipmentSettings()->getPackages());
+        $this->assertEquals(2, $shipmentData1->getShipmentSettings()->getPackageQuantity());
+        $this->assertEquals(10.0, $shipmentData1->getShipmentSettings()->getPackages()[0]->getWeight());
+        $this->assertEquals(5.0, $shipmentData1->getShipmentSettings()->getPackages()[1]->getWeight());
+
+        // Case 2: root packages with 2 packages overrides shipmentSettings with 1 stale package
+        $dataRoot = [
+            'orderId' => 402,
+            'shipmentSettings' => [
+                'serviceType' => 'AH',
+                'packages' => [$pkgOld],
+            ],
+            'packages' => [$pkgNew1, $pkgNew2],
+        ];
+
+        $shipmentData2 = DhlShipmentData::fromArray($dataRoot);
+        $this->assertCount(2, $shipmentData2->getShipmentSettings()->getPackages());
+        $this->assertEquals(2, $shipmentData2->getShipmentSettings()->getPackageQuantity());
+        $this->assertEquals(10.0, $shipmentData2->getShipmentSettings()->getPackages()[0]->getWeight());
+        $this->assertEquals(5.0, $shipmentData2->getShipmentSettings()->getPackages()[1]->getWeight());
+    }
 }
