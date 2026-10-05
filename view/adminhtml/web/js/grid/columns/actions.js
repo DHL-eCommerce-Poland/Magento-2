@@ -7,6 +7,20 @@ define([
 
     return Actions.extend({
         /**
+         * Checks if specified action requires a handler function.
+         *
+         * @param {String} actionIndex - Actions' identifier.
+         * @param {Number} rowIndex - Index of a row.
+         *
+         * @returns {Boolean}
+         */
+        isHandlerRequired: function (actionIndex, rowIndex) {
+            var action = this.getAction(rowIndex, actionIndex);
+
+            return this._super(actionIndex, rowIndex) || Boolean(action && action.post);
+        },
+
+        /**
          * Callback for single row action 'Order Courier' on shipment grid.
          *
          * @param {String} actionIndex
