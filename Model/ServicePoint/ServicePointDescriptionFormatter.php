@@ -38,7 +38,7 @@ class ServicePointDescriptionFormatter
             $pointDetails .= ', ' . $formattedAddress;
         }
 
-        if ($point->getPostnummer()) {
+        if ($point->isPackstation() && strtoupper((string)$point->getCountry()) === 'DE' && $point->getPostnummer()) {
             $pointDetails .= ', Postnummer: ' . $point->getPostnummer();
         }
 

@@ -172,7 +172,8 @@ class ConfigProvider implements ConfigProviderInterface
             $country = (string) ($shippingAddress->getCountryId() ?: $shippingAddress->getData('country_id'));
             $isPackstation = (bool) $shippingAddress->getData('dhl_is_packstation');
             $isPostfiliale = (bool) $shippingAddress->getData('dhl_is_postfiliale');
-            $postnummer = (string) $shippingAddress->getData('dhl_postnummer');
+            $countryUpper = strtoupper((string) ($shippingAddress->getCountryId() ?: $shippingAddress->getData('country_id')));
+            $postnummer = ($isPackstation && $countryUpper === 'DE') ? (string) $shippingAddress->getData('dhl_postnummer') : '';
             $shippingMethod = (string) $shippingAddress->getShippingMethod();
 
             return [

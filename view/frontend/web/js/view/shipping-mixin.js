@@ -211,9 +211,6 @@ define([
                         isDePackstationSelected: ko.computed(function () {
                             return pointState.isDePackstationSelected();
                         }),
-                        isDePointSelected: ko.computed(function () {
-                            return pointState.isDePointSelected();
-                        }),
                         postnummerInput: ko.computed({
                             read: function () {
                                 var pt = pointState.selectedPoint();
@@ -285,7 +282,7 @@ define([
                     if (!pointState.validatePointSelection(method)) {
                         var msg = pointState.pointErrorMessage() || pointState.postnummerErrorMessage() || $t('Please select a DHL pickup point on the map.');
                         this.errorValidationMessage(msg);
-                        var $input = $('#dhl_postnummer_inline:visible, #dhl_postnummer_inline_opt:visible');
+                        var $input = $('#dhl_postnummer_inline:visible');
                         if (pointState.postnummerErrorMessage() && $input.length) {
                             $input.first().focus();
                             $('html, body').stop().animate({ scrollTop: $input.first().offset().top - 120 }, 300);

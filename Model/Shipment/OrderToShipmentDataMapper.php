@@ -182,8 +182,9 @@ class OrderToShipmentDataMapper
         if ($shippingAddress && $isInternationalPointMethod) {
             $isPackstation = (bool)($shippingAddress->getData('dhl_is_packstation') ?? false);
             $isPostfiliale = (bool)($shippingAddress->getData('dhl_is_postfiliale') ?? false);
+            $countryUpper = strtoupper((string)($shippingAddress->getCountryId() ?? ''));
             $postnummerVal = (string)($shippingAddress->getData('dhl_postnummer') ?? '');
-            $postnummer = $postnummerVal !== '' ? $postnummerVal : null;
+            $postnummer = ($isPackstation && $countryUpper === 'DE' && $postnummerVal !== '') ? $postnummerVal : null;
         }
 
         $recipientData = new RecipientData(

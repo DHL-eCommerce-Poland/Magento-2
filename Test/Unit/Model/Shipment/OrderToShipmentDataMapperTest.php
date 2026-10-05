@@ -440,4 +440,37 @@ class OrderToShipmentDataMapperTest extends TestCase
         $this->assertFalse($shipmentData->getRecipient()->isPostfiliale());
         $this->assertFalse($shipmentData->getRecipient()->isPackstation());
     }
+
+    public function testConnectParcelshopSetsPostnummerToNullEvenIfAddressDataHasPostnummer(): void
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getFirstname')->willReturn('Hans');
+        $address->method('getLastname')->willReturn('Schmidt');
+        $address->method('getStreet')->willReturn(['Hauptstrasse 1']);
+        $address->method('getCity')->willReturn('Berlin');
+        $address->method('getPostcode')->willReturn('10115');
+        $address->method('getCountryId')->willReturn('DE');
+        $address->method('getData')->willReturnMap([
+            ['dhl_is_postfiliale', null, 1],
+            ['dhl_is_packstation', null, 0],
+            ['dhl_postnummer', null, '123456'],
+            ['dhl_service_point_id', null, 'DE123'],
+        ]);
+
+        $payment = $this->createStub(Payment::class);
+        $payment->method('getMethod')->willReturn('checkmo');
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getEntityId')->willReturn(112);
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getPayment')->willReturn($payment);
+        $order->method('getShippingMethod')->willReturn('dhlpoland_connect_parcelshop');
+
+        $shipmentData = $this->mapper->map($order);
+
+        $this->assertTrue($shipmentData->getRecipient()->isPostfiliale());
+        $this->assertFalse($shipmentData->getRecipient()->isPackstation());
+        $this->assertNull($shipmentData->getRecipient()->getPostnummer());
+    }
 }

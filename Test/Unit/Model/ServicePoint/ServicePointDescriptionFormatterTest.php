@@ -64,4 +64,58 @@ class ServicePointDescriptionFormatterTest extends TestCase
         $this->assertLessThanOrEqual(255, mb_strlen($result));
         $this->assertStringEndsWith('...', $result);
     }
+
+    public function testFormatIncludesPostnummerForGermanPackstation(): void
+    {
+        $point = new ServicePointValueObject(
+            'PACK-101',
+            'Packstation 101',
+            'Keetstr. 1',
+            '49393',
+            'Lohne',
+            true,
+            false,
+            '12345678',
+            'DE'
+        );
+
+        $result = $this->formatter->format('DHL Connect Packstation', $point);
+        $this->assertStringContainsString('Postnummer: 12345678', $result);
+    }
+
+    public function testFormatExcludesPostnummerForNonGermanPackstation(): void
+    {
+        $point = new ServicePointValueObject(
+            'PACK-202',
+            'Poststation Wien',
+            'Hauptstr. 10',
+            '1010',
+            'Wien',
+            true,
+            false,
+            '12345678',
+            'AT'
+        );
+
+        $result = $this->formatter->format('DHL Connect Packstation', $point);
+        $this->assertStringNotContainsString('Postnummer', $result);
+    }
+
+    public function testFormatExcludesPostnummerForGermanParcelshop(): void
+    {
+        $point = new ServicePointValueObject(
+            'SHOP-303',
+            'ParcelShop 501',
+            'Keetstr. 20',
+            '49393',
+            'Lohne',
+            false,
+            true,
+            '12345678',
+            'DE'
+        );
+
+        $result = $this->formatter->format('DHL Connect ParcelShop', $point);
+        $this->assertStringNotContainsString('Postnummer', $result);
+    }
 }
