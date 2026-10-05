@@ -400,37 +400,6 @@ class SoapClientAdapterTest extends TestCase
         $this->assertEquals('DELETE_ERR', $result->getErrorCode());
     }
 
-    /**
-     * Test successful getPostalCodeServices via mocked SoapClient.
-     *
-     * @return void
-     */
-    public function testGetPostalCodeServicesSuccess(): void
-    {
-        $soapClientStub = new TestSoapClient(false);
-
-        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
-            ->setConstructorArgs([
-                $this->loggerStub,
-                $this->scopeConfigStub,
-                $this->dateSanitizer,
-                $this->fileDriverStub,
-            ])
-            ->onlyMethods(['createSoapClient'])
-            ->getMock();
-
-        $adapter->expects($this->once())
-            ->method('createSoapClient')
-            ->willReturn($soapClientStub);
-
-        $credentials = new Credentials('user', 'pass', true);
-        $result = $adapter->getPostalCodeServices($credentials, '00-001', '2026-08-28');
-
-        $this->assertTrue($result->isSuccess());
-        $this->assertEquals('10:00', $result->getDrPickupFrom());
-        $this->assertEquals('16:00', $result->getDrPickupTo());
-        $this->assertTrue($result->isPickupOnSaturday());
-    }
 
     /**
      * Test successful bookCourier via mocked SoapClient.

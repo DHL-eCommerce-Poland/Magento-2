@@ -49,16 +49,57 @@ define([
                 var value = ko.unwrap(valueAccessor());
                 var $el = $(element);
                 if ($el.val() !== (value || '')) {
-                    $el.val(value || '');
+                    $el.val(value || '').trigger('change');
                 }
             }
         };
     }
     ko.bindingHandlers.dhlBookCourierDatepicker = ko.bindingHandlers.dhlDatepicker;
 
+    if (!ko.bindingHandlers.dhlTimepicker) {
+        ko.bindingHandlers.dhlTimepicker = {
+            init: function (element, valueAccessor) {
+                var value = valueAccessor();
+                require(['jquery', 'mage/calendar', 'mage/translate'], function ($) {
+                    var $el = $(element);
+                    if ($el.hasClass('_has-datepicker')) {
+                        return;
+                    }
+
+                    $el.calendar({
+                        showsTime: true,
+                        timeOnly: true,
+                        timeFormat: 'HH:mm',
+                        buttonText: $.mage.__('Select Time')
+                    });
+                    $el.next('.ui-datepicker-trigger').addClass('v-middle').empty();
+
+                    $el.on('change.dhltimepicker', function () {
+                        if (ko.isObservable(value)) {
+                            value($el.val());
+                        }
+                    });
+
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                        $el.off('.dhltimepicker');
+                        $el.next('.ui-datepicker-trigger').remove();
+                        $el.removeClass('_has-datepicker');
+                    });
+                });
+            },
+            update: function (element, valueAccessor) {
+                var value = ko.unwrap(valueAccessor());
+                var $el = $(element);
+                if ($el.val() !== (value || '')) {
+                    $el.val(value || '').trigger('change');
+                }
+            }
+        };
+    }
+
     return Component.extend({
         defaults: {
-            hoursUrl: '',
+            infoUrl: '',
             bookUrl: '',
             dateFormat: ''
         },
@@ -68,19 +109,15 @@ define([
                 .observe({
                     selectedShipmentIds: [],
                     selectedShipmentNumbers: [],
-                    availableHours: [],
-                    selectedHourSlot: '',
+                    pickupTimeFrom: '',
+                    pickupTimeTo: '',
                     additionalInfo: '',
-                    isLoading: false,
                     warningMessage: ''
                 });
 
             this.pickupDate = ko.observable($('#dhlpoland_pickup_date').val() || '');
             this.value = this.pickupDate;
             this.isUpdatingDate = false;
-            this.hoursCache = {};
-            this.currentXhr = null;
-            this.debounceTimer = null;
 
             return this;
         },
@@ -89,12 +126,6 @@ define([
             this._super();
 
             var self = this;
-
-            this.pickupDate.subscribe(function (newVal) {
-                if (!self.isUpdatingDate && newVal) {
-                    self.loadPickupHours();
-                }
-            });
 
             var openHandler = function (ids, numbers) {
                 self.openModal(ids, numbers);
@@ -117,19 +148,22 @@ define([
             self.selectedShipmentIds(ids);
             self.selectedShipmentNumbers(numbers);
 
-            self.hoursCache = {};
-            if (self.currentXhr) {
-                self.currentXhr.abort();
-                self.currentXhr = null;
-            }
-            if (self.debounceTimer) {
-                clearTimeout(self.debounceTimer);
-                self.debounceTimer = null;
-            }
-
             self.isUpdatingDate = true;
             self.warningMessage('');
             self.additionalInfo('');
+            self.pickupTimeFrom('');
+            self.pickupTimeTo('');
+
+            // 1. Try reading directly from form elements on current edit page if available
+            var $pageFrom = $('input[name="shipmentSettings[pickupHourFrom]"], input[name="sender[pickupHourFrom]"], input[name*="pickupHourFrom"]');
+            var $pageTo = $('input[name="shipmentSettings[pickupHourTo]"], input[name="sender[pickupHourTo]"], input[name*="pickupHourTo"]');
+
+            if ($pageFrom.length && $pageFrom.val()) {
+                self.pickupTimeFrom($pageFrom.val().substring(0, 5));
+            }
+            if ($pageTo.length && $pageTo.val()) {
+                self.pickupTimeTo($pageTo.val().substring(0, 5));
+            }
 
             var $dateInput = $('#dhlpoland_pickup_date');
             if ($dateInput.length && ($dateInput.data('datepicker') || $dateInput.hasClass('_has-datepicker'))) {
@@ -142,6 +176,30 @@ define([
             }
 
             self.isUpdatingDate = false;
+
+            // 2. Fetch saved pickup info from backend for the shipment ID(s)
+            if (self.infoUrl && ids && ids.length) {
+                $.ajax({
+                    url: self.infoUrl,
+                    type: 'GET',
+                    data: {
+                        shipment_id: ids[0],
+                        shipment_ids: ids
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response && response.success && response.data) {
+                            if (response.data.pickup_time_from !== undefined && response.data.pickup_time_from !== null) {
+                                self.pickupTimeFrom(response.data.pickup_time_from.substring(0, 5));
+                            }
+                            if (response.data.pickup_time_to !== undefined && response.data.pickup_time_to !== null) {
+                                self.pickupTimeTo(response.data.pickup_time_to.substring(0, 5));
+                            }
+
+                        }
+                    }
+                });
+            }
 
             var $modal = $('#ideo-dhl-book-courier-modal');
             if (!$modal.data('mageModal')) {
@@ -165,7 +223,6 @@ define([
             }
 
             $modal.modal('openModal');
-            self.loadPickupHours(true);
         },
 
         onDateChange: function () {
@@ -173,126 +230,23 @@ define([
             if ($dateInput.length) {
                 this.pickupDate($dateInput.val());
             }
-            this.loadPickupHours();
-        },
-
-        loadPickupHours: function (immediate) {
-            var self = this;
-            var ids = self.selectedShipmentIds();
-            var firstId = (ids && ids.length) ? ids[0] : null;
-            var date = self.pickupDate() || $('#dhlpoland_pickup_date').val();
-
-            if (!ids || !ids.length) {
-                return;
-            }
-
-            if (self.debounceTimer) {
-                clearTimeout(self.debounceTimer);
-                self.debounceTimer = null;
-            }
-
-            if (self.currentXhr) {
-                self.currentXhr.abort();
-                self.currentXhr = null;
-            }
-
-            var cacheKey = date + '_' + ids.join('_');
-            if (self.hoursCache[cacheKey]) {
-                self.applyPickupHoursResponse(self.hoursCache[cacheKey]);
-                return;
-            }
-
-            self.isLoading(true);
-            self.availableHours([]);
-            self.selectedHourSlot('');
-            self.warningMessage('');
-
-            var doRequest = function () {
-                self.currentXhr = $.ajax({
-                    url: self.hoursUrl,
-                    type: 'GET',
-                    data: {
-                        date: date,
-                        shipment_id: firstId,
-                        shipment_ids: ids
-                    },
-                    dataType: 'json',
-                    success: function (response) {
-                        self.currentXhr = null;
-                        self.isLoading(false);
-                        if (response && response.success) {
-                            self.hoursCache[cacheKey] = response;
-                        }
-                        self.applyPickupHoursResponse(response);
-                    },
-                    error: function (xhr, status) {
-                        self.currentXhr = null;
-                        if (status === 'abort') {
-                            return;
-                        }
-                        self.isLoading(false);
-                        self.warningMessage($t('Courier pickup is not available for the selected date. Please select another date in the calendar.'));
-                    }
-                });
-            };
-
-            if (immediate) {
-                doRequest();
-            } else {
-                self.debounceTimer = setTimeout(doRequest, 300);
-            }
-        },
-
-        applyPickupHoursResponse: function (response) {
-            var self = this;
-            self.isLoading(false);
-            self.availableHours([]);
-            self.selectedHourSlot('');
-
-            if (response && response.success && response.data) {
-                var data = response.data;
-                if (data.message) {
-                    self.warningMessage(data.message);
-                } else {
-                    self.warningMessage('');
-                }
-
-                if (data.available_hours && data.available_hours.length > 0) {
-                    var formattedSlots = data.available_hours.map(function (slot) {
-                        return {
-                            label: slot.label,
-                            value: slot.from + '|' + slot.to
-                        };
-                    });
-                    self.availableHours(formattedSlots);
-                    if (formattedSlots.length > 0) {
-                        self.selectedHourSlot(formattedSlots[0].value);
-                    }
-                }
-            } else {
-                var msg = (response && response.message) ? response.message : $t('Courier pickup is not available for the selected date. Please select another date in the calendar.');
-                self.warningMessage(msg);
-            }
         },
 
         submitBooking: function () {
             var self = this;
-            var hourSlot = self.selectedHourSlot();
             var ids = self.selectedShipmentIds();
+            var timeFrom = (self.pickupTimeFrom() || '').trim();
+            var timeTo = (self.pickupTimeTo() || '').trim();
 
             if (!ids.length) {
                 alert({ content: $t('Please select at least one shipment.') });
                 return;
             }
 
-            if (!hourSlot || hourSlot.indexOf('|') === -1) {
-                alert({ content: $t('Please select an available pickup time window.') });
+            if (!timeFrom || !timeTo) {
+                alert({ content: $t('Both Courier Pickup Time [From] and [To] must be specified.') });
                 return;
             }
-
-            var times = hourSlot.split('|');
-            var timeFrom = times[0];
-            var timeTo = times[1];
 
             $('body').trigger('processStart');
 
@@ -312,15 +266,7 @@ define([
                     $('body').trigger('processStop');
                     if (response.success) {
                         $('#ideo-dhl-book-courier-modal').modal('closeModal');
-                        alert({
-                            title: $t('Courier Booked'),
-                            content: createSafeMessageContent(response.message),
-                            actions: {
-                                always: function () {
-                                    window.location.reload();
-                                }
-                            }
-                        });
+                        window.location.reload();
                     } else {
                         alert({
                             title: $t('Error Booking Courier'),

@@ -46,29 +46,6 @@ class TestSoapClient extends SoapClient
         ];
     }
 
-    /**
-     * Dummy getPostalCodeServices method for SoapClient mocking.
-     *
-     * @param mixed $args
-     * @return mixed
-     * @throws SoapFault
-     */
-    public function getPostalCodeServices(mixed $args): mixed
-    {
-        if ($this->shouldThrowFault) {
-            throw new SoapFault('AUTH_ERR', 'Invalid credentials');
-        }
-
-        return (object) [
-            'getPostalCodeServicesResult' => (object) [
-                'drPickupFrom' => '10:00',
-                'drPickupTo' => '16:00',
-                'exPickupFrom' => '10:00',
-                'exPickupTo' => '15:00',
-                'pickupOnSaturday' => true,
-            ],
-        ];
-    }
 
     /**
      * Dummy bookCourier method for SoapClient mocking.

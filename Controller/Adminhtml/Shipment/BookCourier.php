@@ -79,10 +79,12 @@ class BookCourier extends Action implements HttpPostActionInterface
             if ($bookingResult->isSuccess()) {
                 $orderMsg = $bookingResult->getCourierOrderId()
                     ? __(
-                        'Courier booked successfully. Confirmation / Order ID: %1',
+                        'Courier booked successfully. Courier order number: %1',
                         $bookingResult->getCourierOrderId()
                     )
                     : __('Courier booked successfully.');
+
+                $this->messageManager->addSuccessMessage($orderMsg);
 
                 return $resultJson->setData([
                     'success' => true,

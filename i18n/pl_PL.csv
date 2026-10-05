@@ -57,7 +57,7 @@
 "DHL eCommerce Poland - Help & Support","DHL eCommerce Poland - Pomoc i wsparcie"
 "Please select at least one shipment for courier booking.","Prosimy wybrać co najmniej jedną przesyłkę do zamówienia kuriera."
 "Pickup date and time window (From - To) must be specified.","Data odbioru oraz przedział godzinowy (Od - Do) muszą zostać określone."
-"Courier booked successfully. Confirmation / Order ID: %1","Kurier został pomyślnie zamówiony. Potwierdzenie / Numer zamówienia: %1"
+"Courier booked successfully. Courier order number: %1","Kurier został pomyślnie zamówiony. Numer zlecenia kuriera: %1"
 "Courier booked successfully.","Kurier został pomyślnie zamówiony."
 "Failed to book courier via DHL WebAPI2.","Nie udało się zamówić kuriera przez DHL WebAPI2."
 "Error while booking courier: %1","Błąd podczas zamawiania kuriera: %1"

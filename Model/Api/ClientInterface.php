@@ -52,20 +52,6 @@ interface ClientInterface
         string $shipmentId
     ): DeleteShipmentResult;
 
-    /**
-     * Get postal code services and pickup windows via DHL WebAPI2 API.
-     *
-     * @param Credentials $credentials
-     * @param string $postCode
-     * @param string $pickupDate Format YYYY-MM-DD
-     *
-     * @return PostalCodeServicesResult
-     */
-    public function getPostalCodeServices(
-        Credentials $credentials,
-        string $postCode,
-        string $pickupDate
-    ): PostalCodeServicesResult;
 
     /**
      * Book courier for existing generated shipments via DHL WebAPI2 API.
