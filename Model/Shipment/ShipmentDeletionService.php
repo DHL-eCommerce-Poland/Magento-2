@@ -23,6 +23,7 @@ class ShipmentDeletionService
      * @param ScopeConfigInterface $scopeConfig
      * @param MagentoShipmentSyncService $magentoShipmentSyncService
      * @param LoggerInterface $logger
+     * @param ShipmentDataPayloadReader $payloadReader
      */
     public function __construct(
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
@@ -30,7 +31,8 @@ class ShipmentDeletionService
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly MagentoShipmentSyncService $magentoShipmentSyncService,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly ShipmentDataPayloadReader $payloadReader
     ) {
     }
 
@@ -52,7 +54,8 @@ class ShipmentDeletionService
             $environment = $isSandbox ? 'sandbox' : 'production';
             $credentials = $this->credentialsProvider->getCredentials($environment);
 
-            $result = $this->client->deleteShipment($credentials, $shipmentId);
+            $returnShipmentIds = $this->payloadReader->getReturnShipmentIdsFromEntity($shipment);
+            $result = $this->client->deleteShipment($credentials, $shipmentId, $returnShipmentIds);
 
             if (!$result->isSuccess()) {
                 $errorMsg = $result->getErrorMessage() ?? __('DHL API returned an error during deletion.')->render();

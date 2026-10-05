@@ -217,21 +217,33 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
-     * Delete shipment via DHL WebAPI2 API.
+     * Delete shipment and optional return shipments via DHL WebAPI2 API.
      *
      * @param Credentials $credentials
      * @param string $shipmentId
+     * @param string[] $returnShipmentIds
      *
      * @return DeleteShipmentResult
      */
     public function deleteShipment(
         Credentials $credentials,
-        string $shipmentId
+        string $shipmentId,
+        array $returnShipmentIds = []
     ): DeleteShipmentResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
+
+            $rawShipmentIds = array_merge([$shipmentId], $returnShipmentIds);
+            $cleanShipmentIds = [];
+            foreach ($rawShipmentIds as $id) {
+                if (is_string($id) && trim($id) !== '') {
+                    $cleanShipmentIds[] = trim($id);
+                }
+            }
+            $cleanShipmentIds = array_values(array_unique($cleanShipmentIds));
+            $formattedShipmentIds = array_map([$this, 'ensureUtf8'], $cleanShipmentIds);
 
             $params = [
                 'authData' => [
@@ -239,7 +251,9 @@ class SoapClientAdapter implements ClientInterface
                     'password' => $this->ensureUtf8($credentials->getPassword()),
                 ],
                 'shipments' => [
-                    'item' => $this->ensureUtf8($shipmentId),
+                    'item' => count($formattedShipmentIds) === 1
+                        ? $formattedShipmentIds[0]
+                        : $formattedShipmentIds,
                 ],
             ];
 
@@ -247,34 +261,41 @@ class SoapClientAdapter implements ClientInterface
             $this->logSoapCommunication($client, 'deleteShipments');
 
             $resultItem = $response->deleteShipmentsResult->item ?? $response->deleteShipmentsResult ?? null;
-            if (is_array($resultItem)) {
-                $resultItem = $resultItem[0] ?? null;
+            $items = is_array($resultItem) ? $resultItem : ($resultItem !== null ? [$resultItem] : []);
+
+            $errors = [];
+            $hasSuccess = false;
+            $allSuccess = !empty($items);
+
+            foreach ($items as $item) {
+                if (is_object($item)) {
+                    if (!empty($item->error)) {
+                        $allSuccess = false;
+                        $ident = $item->shipmentIdentification ?? $item->id ?? null;
+                        $errors[] = $ident ? sprintf('[%s] %s', $ident, $item->error) : (string) $item->error;
+                    } else {
+                        $hasId = !empty($item->id)
+                            || !empty($item->shipmentIdentification)
+                            || (isset($item->result) && (bool) $item->result === true);
+                        if ($hasId) {
+                            $hasSuccess = true;
+                        } else {
+                            $allSuccess = false;
+                        }
+                    }
+                } elseif (is_bool($item) && $item === true) {
+                    $hasSuccess = true;
+                } else {
+                    $allSuccess = false;
+                }
             }
 
-            if (is_object($resultItem)) {
-                if (!empty($resultItem->error)) {
-                    return new DeleteShipmentResult(
-                        false,
-                        $shipmentId,
-                        'DELETE_SHIPMENT_ERROR',
-                        (string) $resultItem->error
-                    );
-                }
-
-                $hasId = !empty($resultItem->id)
-                    || !empty($resultItem->shipmentIdentification)
-                    || (isset($resultItem->result) && (bool) $resultItem->result === true);
-                if ($hasId) {
-                    return new DeleteShipmentResult(true, $shipmentId);
-                }
-            }
-
-            if (is_bool($resultItem) && $resultItem === true) {
+            if ($allSuccess && $hasSuccess) {
                 return new DeleteShipmentResult(true, $shipmentId);
             }
 
-            $errorMsg = is_object($resultItem) && !empty($resultItem->error)
-                ? (string) $resultItem->error
+            $errorMsg = !empty($errors)
+                ? implode('; ', $errors)
                 : 'DHL API returned an error or invalid response during deleteShipments.';
 
             return new DeleteShipmentResult(false, $shipmentId, 'DELETE_SHIPMENT_ERROR', $errorMsg);

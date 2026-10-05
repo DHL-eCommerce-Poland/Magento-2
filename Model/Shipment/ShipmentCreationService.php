@@ -34,6 +34,7 @@ class ShipmentCreationService
      * @param ReturnShipmentCreationService $returnCreationService
      * @param MagentoShipmentSyncService $magentoShipmentSyncService
      * @param NearestPointResolver $nearestPointResolver
+     * @param ShipmentDataPayloadReader $payloadReader
      */
     public function __construct(
         private readonly ShipmentDataService $shipmentDataService,
@@ -47,7 +48,8 @@ class ShipmentCreationService
         private readonly ReturnShipmentDataBuilder $returnBuilder,
         private readonly ReturnShipmentCreationService $returnCreationService,
         private readonly MagentoShipmentSyncService $magentoShipmentSyncService,
-        private readonly NearestPointResolver $nearestPointResolver
+        private readonly NearestPointResolver $nearestPointResolver,
+        private readonly ShipmentDataPayloadReader $payloadReader
     ) {
     }
 
@@ -229,7 +231,8 @@ class ShipmentCreationService
 
             if (!empty($oldShipmentId)) {
                 try {
-                    $deleteResult = $this->client->deleteShipment($credentials, $oldShipmentId);
+                    $returnShipmentIds = $this->payloadReader->getReturnShipmentIdsFromEntity($existingEntity);
+                    $deleteResult = $this->client->deleteShipment($credentials, $oldShipmentId, $returnShipmentIds);
                     if ($deleteResult->isSuccess()) {
                         $this->shipmentDataService->clearShipmentId($entityId);
 

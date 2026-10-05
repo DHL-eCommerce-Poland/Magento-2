@@ -400,6 +400,102 @@ class SoapClientAdapterTest extends TestCase
         $this->assertEquals('DELETE_ERR', $result->getErrorCode());
     }
 
+    /**
+     * Test deleteShipment with return shipment IDs passes multiple items to SOAP shipments.
+     *
+     * @return void
+     */
+    public function testDeleteShipmentWithReturnShipmentIdsSuccess(): void
+    {
+        $soapClientMock = $this->createPartialMock(TestSoapClient::class, ['deleteShipments']);
+        $soapClientMock->expects($this->once())
+            ->method('deleteShipments')
+            ->with([
+                'authData' => [
+                    'username' => 'user',
+                    'password' => 'pass',
+                ],
+                'shipments' => [
+                    'item' => ['1234567890', '90040146098', '90040146099'],
+                ],
+            ])
+            ->willReturn((object) [
+                'deleteShipmentsResult' => (object) [
+                    'item' => [
+                        (object) ['shipmentIdentification' => '1234567890', 'result' => true],
+                        (object) ['shipmentIdentification' => '90040146098', 'result' => true],
+                        (object) ['shipmentIdentification' => '90040146099', 'result' => true],
+                    ],
+                ],
+            ]);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([
+                $this->loggerStub,
+                $this->scopeConfigStub,
+                $this->dateSanitizer,
+                $this->fileDriverStub,
+            ])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientMock);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->deleteShipment($credentials, '1234567890', ['90040146098', '90040146099']);
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals('1234567890', $result->getShipmentId());
+    }
+
+    /**
+     * Test deleteShipment with return shipment IDs reports error when one item fails.
+     *
+     * @return void
+     */
+    public function testDeleteShipmentWithReturnShipmentIdsPartialFailure(): void
+    {
+        $soapClientMock = $this->createPartialMock(TestSoapClient::class, ['deleteShipments']);
+        $soapClientMock->expects($this->once())
+            ->method('deleteShipments')
+            ->willReturn((object) [
+                'deleteShipmentsResult' => (object) [
+                    'item' => [
+                        (object) ['shipmentIdentification' => '1234567890', 'result' => true],
+                        (object) [
+                            'shipmentIdentification' => '90040146098',
+                            'result' => false,
+                            'error' => 'Przesylka nie istnieje',
+                        ],
+                    ],
+                ],
+            ]);
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([
+                $this->loggerStub,
+                $this->scopeConfigStub,
+                $this->dateSanitizer,
+                $this->fileDriverStub,
+            ])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClientMock);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $result = $adapter->deleteShipment($credentials, '1234567890', ['90040146098']);
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertEquals('DELETE_SHIPMENT_ERROR', $result->getErrorCode());
+        $this->assertStringContainsString('[90040146098] Przesylka nie istnieje', (string) $result->getErrorMessage());
+    }
+
+
 
     /**
      * Test successful bookCourier via mocked SoapClient.

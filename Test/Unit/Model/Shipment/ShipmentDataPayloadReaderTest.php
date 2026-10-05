@@ -92,4 +92,32 @@ class ShipmentDataPayloadReaderTest extends TestCase
 
         $this->assertSame(['90040025505', '90040025516'], $returnIds);
     }
+
+    public function testGetReturnShipmentIdsFromEntityCombinesAndDeduplicatesDirectAndPayload(): void
+    {
+        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub->method('getReturnShipmentId')->willReturn('90040025505, 90040025506');
+        $entityStub->method('getShipmentData')->willReturn(json_encode([
+            'packages' => [
+                ['returnShipmentId' => '90040025506'],
+                ['returnShipmentId' => '90040025507'],
+            ],
+        ]));
+
+        $result = $this->reader->getReturnShipmentIdsFromEntity($entityStub);
+
+        $this->assertSame(['90040025505', '90040025506', '90040025507'], $result);
+    }
+
+    public function testGetReturnShipmentIdsFromEntityReturnsEmptyArrayWhenNoReturnIds(): void
+    {
+        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub->method('getReturnShipmentId')->willReturn(null);
+        $entityStub->method('getShipmentData')->willReturn(null);
+
+        $result = $this->reader->getReturnShipmentIdsFromEntity($entityStub);
+
+        $this->assertSame([], $result);
+    }
 }
+
