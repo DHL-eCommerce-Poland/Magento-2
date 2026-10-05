@@ -124,7 +124,6 @@
             "PRIMARY": true
         }
     },
-
     "dhlpoland_customs_template": {
         "column": {
             "entity_id": true,
