@@ -59,11 +59,15 @@ class ShipmentReturnDataMapper
         $customerFullName = trim($customerSender->getFirstName() . ' ' . $customerSender->getLastName());
 
         $customerName = $customerCompanyName !== '' ? $customerCompanyName : $customerFullName;
-        $customerContact = $customerFullName;
+        $customerContact = $customerFullName !== '' ? $customerFullName : $customerCompanyName;
 
         $merchantContact = $merchantRecipient->getContactPerson() !== ''
             ? $merchantRecipient->getContactPerson()
-            : ($merchantRecipient->getFirstName() . ' ' . $merchantRecipient->getLastName());
+            : trim($merchantRecipient->getFirstName() . ' ' . $merchantRecipient->getLastName());
+
+        if ($merchantContact === '') {
+            $merchantContact = $merchantRecipient->getName();
+        }
 
         $merchantName = $merchantRecipient->getName() !== ''
             ? $merchantRecipient->getName()
@@ -122,11 +126,25 @@ class ShipmentReturnDataMapper
 
         $customerCountry = strtoupper($customerSender->getCountry() ?: 'PL');
 
+        $customerContactInfo = [
+            'personName' => $this->sanitizeString($customerContact),
+            'phoneNumber' => $this->sanitizeString($customerSender->getPhone()),
+            'emailAddress' => $this->sanitizeString($customerSender->getEmail()),
+        ];
+
+        $merchantContactInfo = [
+            'personName' => $this->sanitizeString($merchantContact),
+            'phoneNumber' => $this->sanitizeString($merchantRecipient->getPhone()),
+            'emailAddress' => $this->sanitizeString($merchantRecipient->getEmail()),
+        ];
+
         $result = [
             'shipmentInfo' => $shipmentInfo,
-            'content' => $this->sanitizeString($settings->getContent() ?: __('Order Return')),
+            'content' => $this->sanitizeString($settings->getContent() ?: (string) __('Order Return')),
             'ship' => [
                 'shipper' => [
+                    'preaviso' => $customerContactInfo,
+                    'contact' => $customerContactInfo,
                     'address' => [
                         'country' => $customerCountry,
                         'name' => $this->sanitizeString($customerName),
@@ -136,13 +154,10 @@ class ShipmentReturnDataMapper
                         'houseNumber' => $this->sanitizeString($customerSender->getHouseNumber()),
                         'apartmentNumber' => $this->sanitizeString($customerSender->getFlatNumber()),
                     ],
-                    'contact' => [
-                        'personName' => $this->sanitizeString($customerContact),
-                        'phoneNumber' => $this->sanitizeString($customerSender->getPhone()),
-                        'emailAddress' => $this->sanitizeString($customerSender->getEmail()),
-                    ],
                 ],
                 'receiver' => [
+                    'preaviso' => $merchantContactInfo,
+                    'contact' => $merchantContactInfo,
                     'address' => [
                         'country' => $countryCode,
                         'name' => $this->sanitizeString($merchantName),
@@ -151,11 +166,6 @@ class ShipmentReturnDataMapper
                         'street' => $this->sanitizeString($merchantRecipient->getStreet()),
                         'houseNumber' => $this->sanitizeString($merchantRecipient->getHouseNumber()),
                         'apartmentNumber' => $this->sanitizeString($merchantRecipient->getFlatNumber()),
-                    ],
-                    'contact' => [
-                        'personName' => $this->sanitizeString($merchantContact),
-                        'phoneNumber' => $this->sanitizeString($merchantRecipient->getPhone()),
-                        'emailAddress' => $this->sanitizeString($merchantRecipient->getEmail()),
                     ],
                 ],
             ],

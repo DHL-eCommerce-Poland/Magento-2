@@ -89,11 +89,22 @@ class ShipmentReturnDataMapperTest extends TestCase
         // Check Shipper (customer)
         $this->assertEquals('Firma Klienta', $mapped['ship']['shipper']['address']['name']);
         $this->assertEquals('Jan Kowalski', $mapped['ship']['shipper']['contact']['personName']);
+        $this->assertEquals('500600700', $mapped['ship']['shipper']['contact']['phoneNumber']);
+        $this->assertEquals('jan@example.com', $mapped['ship']['shipper']['contact']['emailAddress']);
+        $this->assertEquals('Jan Kowalski', $mapped['ship']['shipper']['preaviso']['personName']);
+        $this->assertEquals('500600700', $mapped['ship']['shipper']['preaviso']['phoneNumber']);
+        $this->assertEquals('jan@example.com', $mapped['ship']['shipper']['preaviso']['emailAddress']);
         $this->assertEquals('00001', $mapped['ship']['shipper']['address']['postalCode']);
         $this->assertEquals('Warszawa', $mapped['ship']['shipper']['address']['city']);
 
         // Check Receiver (merchant Sklep Internetowy)
         $this->assertEquals('Sklep Internetowy Sp. z o.o.', $mapped['ship']['receiver']['address']['name']);
+        $this->assertEquals('Sklep Internetowy Sp. z o.o.', $mapped['ship']['receiver']['contact']['personName']);
+        $this->assertEquals('123456789', $mapped['ship']['receiver']['contact']['phoneNumber']);
+        $this->assertEquals('kontakt@sklep.pl', $mapped['ship']['receiver']['contact']['emailAddress']);
+        $this->assertEquals('Sklep Internetowy Sp. z o.o.', $mapped['ship']['receiver']['preaviso']['personName']);
+        $this->assertEquals('123456789', $mapped['ship']['receiver']['preaviso']['phoneNumber']);
+        $this->assertEquals('kontakt@sklep.pl', $mapped['ship']['receiver']['preaviso']['emailAddress']);
         $this->assertEquals('31000', $mapped['ship']['receiver']['address']['postalCode']);
         $this->assertEquals('Kraków', $mapped['ship']['receiver']['address']['city']);
 
@@ -104,6 +115,59 @@ class ShipmentReturnDataMapperTest extends TestCase
         $this->assertNotEmpty($mapped['shipmentInfo']['specialServices']['item']);
         $this->assertEquals('UBEZP', $mapped['shipmentInfo']['specialServices']['item'][0]['serviceType']);
         $this->assertEquals(150.0, $mapped['shipmentInfo']['specialServices']['item'][0]['serviceValue']);
+    }
+
+    public function testMapReturnShipmentWithExplicitContactPersons(): void
+    {
+        $sender = new SenderData(
+            name: 'Company Without Person',
+            postalCode: '00-001',
+            city: 'Warszawa',
+            street: 'Marszałkowska',
+            houseNumber: '10',
+            email: 'company@example.com',
+            phone: '500111222'
+        );
+
+        $recipient = new RecipientData(
+            name: 'Warehouse Corp',
+            postalCode: '31-000',
+            city: 'Kraków',
+            street: 'Floriańska',
+            houseNumber: '1',
+            contactPerson: 'Marek Magazynier',
+            email: 'magazyn@example.com',
+            phone: '123444555',
+            country: 'PL'
+        );
+
+        $pkg = new PackageData('PACKAGE', 1, 1.0, 10.0, 10.0, 10.0, false);
+        $settings = new ShipmentSettingsData(
+            serviceType: 'AH',
+            packages: [$pkg]
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 2002,
+            sender: $sender,
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: $settings
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        // Shipper fallback to company name
+        $this->assertEquals('Company Without Person', $mapped['ship']['shipper']['contact']['personName']);
+        $this->assertEquals('Company Without Person', $mapped['ship']['shipper']['preaviso']['personName']);
+        $this->assertEquals('500111222', $mapped['ship']['shipper']['preaviso']['phoneNumber']);
+        $this->assertEquals('company@example.com', $mapped['ship']['shipper']['preaviso']['emailAddress']);
+
+        // Receiver uses explicit contactPerson
+        $this->assertEquals('Marek Magazynier', $mapped['ship']['receiver']['contact']['personName']);
+        $this->assertEquals('Marek Magazynier', $mapped['ship']['receiver']['preaviso']['personName']);
+        $this->assertEquals('123444555', $mapped['ship']['receiver']['preaviso']['phoneNumber']);
+        $this->assertEquals('magazyn@example.com', $mapped['ship']['receiver']['preaviso']['emailAddress']);
     }
 
     public function testSanitizeString(): void
