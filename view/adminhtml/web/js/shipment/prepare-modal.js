@@ -1292,6 +1292,7 @@ define([
                         var modalOptions = {
                             type: 'slide',
                             title: $.mage.__('Create DHL Shipment'),
+                            modalClass: 'dhl-prepare-shipment-modal',
                             buttons: [{
                                 text: $.mage.__('Create DHL Shipment'),
                                 class: 'action-primary',

@@ -23,6 +23,7 @@
     }
 
     .modal-content {
+        margin-top: 20px;
         padding: 0 !important;
         overflow: hidden !important;
     }
@@ -35,3 +36,27 @@
         display: block !important;
     }
 }
+
+.dhl-prepare-shipment-modal {
+    &.modal-slide {
+        .modal-inner-wrap {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: #fff;
+            border-bottom: 1px solid #e3e3e3;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .modal-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+    }
+}
+
