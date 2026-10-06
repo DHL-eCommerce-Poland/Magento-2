@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
+use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
@@ -28,6 +30,7 @@ class DataProvider extends AbstractDataProvider
      * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
      * @param LoggerInterface $logger
+     * @param DeliveryServiceRepositoryInterface $deliveryServiceRepository
      * @param array $meta
      * @param array $data
      */
@@ -40,6 +43,7 @@ class DataProvider extends AbstractDataProvider
         private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
         private readonly LoggerInterface $logger,
+        private readonly DeliveryServiceRepositoryInterface $deliveryServiceRepository,
         array $meta = [],
         array $data = []
     ) {
@@ -104,6 +108,9 @@ class DataProvider extends AbstractDataProvider
                             $createdAt = (string) ($item->getCreatedAt() ?? '');
                             $dispatchNumber = (string) ($item->getDispatchNumber() ?? '');
                             $returnShipmentId = (string) ($item->getReturnShipmentId() ?? '');
+                            $deliveryServiceTemplateId = (string) ($item->getDeliveryServiceTemplateId()
+                                ?? ($payload['deliveryServiceTemplateId']
+                                ?? ($payload['shipmentSettings']['selectedDeliveryServiceId'] ?? '')));
                             $data['shipmentSettings'] = $this->normalizeShipmentSettings(
                                 $payload['shipmentSettings'],
                                 $shipmentId,
@@ -111,7 +118,8 @@ class DataProvider extends AbstractDataProvider
                                 $createdAt,
                                 $payload['sender'] ?? [],
                                 $dispatchNumber,
-                                $returnShipmentId
+                                $returnShipmentId,
+                                $deliveryServiceTemplateId
                             );
                             $hasPackages = isset($payload['shipmentSettings']['packages'])
                                 && is_array($payload['shipmentSettings']['packages']);
@@ -222,9 +230,35 @@ class DataProvider extends AbstractDataProvider
         string $createdAt = '',
         array $sender = [],
         string $dispatchNumber = '',
-        string $returnShipmentId = ''
+        string $returnShipmentId = '',
+        string $deliveryServiceTemplateId = ''
     ): array {
         $settings['autoCreateReturnShipment'] = !empty($settings['autoCreateReturnShipment']) ? '1' : '0';
+
+        $tpl = null;
+        if (!empty($deliveryServiceTemplateId)) {
+            try {
+                $tpl = $this->deliveryServiceRepository->getById((int)$deliveryServiceTemplateId);
+            } catch (Throwable) {
+            }
+        }
+
+        if (empty($settings['returnLabelExpDays']) || (int)$settings['returnLabelExpDays'] <= 0) {
+            $settings['returnLabelExpDays'] = $tpl?->getReturnLabelExpDays()
+                ?: ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS;
+        }
+
+        if (empty($settings['returnLabelType'])) {
+            $settings['returnLabelType'] = $tpl?->getReturnLabelType() ?: 'BLP';
+        }
+
+        if (empty($settings['returnQrCodeType'])) {
+            $settings['returnQrCodeType'] = $tpl?->getReturnQrCodeType() ?: 'QR_PDF';
+        }
+
+        if (!isset($settings['returnBookCourier']) || $settings['returnBookCourier'] === '') {
+            $settings['returnBookCourier'] = $tpl?->getReturnBookCourier() ?? 0;
+        }
         if (empty($settings['shipmentId']) && !empty($shipmentId)) {
             $settings['shipmentId'] = $shipmentId;
         }

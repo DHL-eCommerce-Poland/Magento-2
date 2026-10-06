@@ -10,6 +10,7 @@ use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CreateShipmentReturnResult;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\ShipmentReturnDataMapper;
+use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Lock\LockManagerInterface;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -58,7 +59,7 @@ class ReturnShipmentCreationService
     public function createReturnShipment(
         DhlShipmentData $returnShipmentData,
         string $environment = 'sandbox',
-        int $expirationDays = 14,
+        int $expirationDays = ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS,
         ?string $primaryWaybillNumber = null,
         ?int $originalEntityId = null
     ): CreateShipmentReturnResult {

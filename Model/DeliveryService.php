@@ -7,6 +7,7 @@ namespace Ideo\Dhl\Model;
 use Ideo\Dhl\Api\Data\DeliveryServiceInterface;
 use Ideo\Dhl\Model\Config\Source\LabelType;
 use Ideo\Dhl\Model\ResourceModel\DeliveryService as DeliveryServiceResource;
+use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use InvalidArgumentException;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\LocalizedException;
@@ -157,6 +158,13 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
         $addServices = $this->getData(self::ADDITIONAL_SERVICES);
         if (is_array($addServices)) {
             $this->setData(self::ADDITIONAL_SERVICES, $this->serializer->serialize($addServices));
+        }
+
+        if ($this->getAutoCreateReturnShipment()) {
+            $days = $this->getData(self::RETURN_LABEL_EXP_DAYS);
+            if ($days === null || $days === '' || (int)$days <= 0) {
+                $this->setData(self::RETURN_LABEL_EXP_DAYS, ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS);
+            }
         }
 
         return $this;
@@ -500,6 +508,12 @@ class DeliveryService extends AbstractModel implements DeliveryServiceInterface
     public function getReturnLabelExpDays(): ?int
     {
         $val = $this->getData(self::RETURN_LABEL_EXP_DAYS);
+        if ($val !== null && $val !== '' && (int)$val > 0) {
+            return (int)$val;
+        }
+        if ($this->getAutoCreateReturnShipment()) {
+            return ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS;
+        }
         return ($val !== null && $val !== '') ? (int)$val : null;
     }
 

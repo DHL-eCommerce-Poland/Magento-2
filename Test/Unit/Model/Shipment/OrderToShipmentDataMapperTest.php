@@ -473,4 +473,44 @@ class OrderToShipmentDataMapperTest extends TestCase
         $this->assertFalse($shipmentData->getRecipient()->isPackstation());
         $this->assertNull($shipmentData->getRecipient()->getPostnummer());
     }
+
+    public function testMapAutoCreateReturnShipmentDefaultsReturnLabelExpDaysTo14(): void
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getFirstname')->willReturn('Jan');
+        $address->method('getLastname')->willReturn('Kowalski');
+        $address->method('getStreet')->willReturn(['Testowa 1']);
+        $address->method('getCity')->willReturn('Warszawa');
+        $address->method('getPostcode')->willReturn('00-001');
+        $address->method('getCountryId')->willReturn('PL');
+        $address->method('getTelephone')->willReturn('500600700');
+        $address->method('getEmail')->willReturn('jan@example.com');
+
+        $payment = $this->createStub(Payment::class);
+        $payment->method('getMethod')->willReturn('checkmo');
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getEntityId')->willReturn(113);
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getPayment')->willReturn($payment);
+        $order->method('getShippingMethod')->willReturn('dhlpoland_parcel_polska');
+
+        $shipmentDefaults = [
+            'auto_create_return_shipment' => 1,
+            'return_label_exp_days' => 0,
+            'return_label_type' => 'BLP',
+            'return_qr_code_type' => 'QR_PDF',
+            'return_book_courier' => 1,
+        ];
+
+        $shipmentData = $this->mapper->map($order, [], $shipmentDefaults);
+
+        $settings = $shipmentData->getShipmentSettings();
+        $this->assertTrue($settings->autoCreateReturnShipment());
+        $this->assertSame(14, $settings->getReturnLabelExpDays());
+        $this->assertSame('BLP', $settings->getReturnLabelType());
+        $this->assertSame('QR_PDF', $settings->getReturnQrCodeType());
+        $this->assertSame(1, $settings->getReturnBookCourier());
+    }
 }

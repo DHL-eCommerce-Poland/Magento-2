@@ -169,7 +169,7 @@ class ShipmentCreationService
                 ));
                 try {
                     $returnShipmentData = $this->returnBuilder->buildReturnShipmentData($shipmentData);
-                    $expDays = $shipmentData->getShipmentSettings()->getReturnLabelExpDays() ?: 14;
+                    $expDays = (int) $shipmentData->getShipmentSettings()->getReturnLabelExpDays();
                     $savedEntityId = $savedEntity ? (int) $savedEntity->getEntityId() : null;
 
                     $this->returnCreationService->createReturnShipment(
@@ -332,7 +332,7 @@ class ShipmentCreationService
                 ));
                 try {
                     $returnShipmentData = $this->returnBuilder->buildReturnShipmentData($shipmentData);
-                    $expDays = $shipmentData->getShipmentSettings()->getReturnLabelExpDays() ?: 14;
+                    $expDays = (int) $shipmentData->getShipmentSettings()->getReturnLabelExpDays();
 
                     $this->returnCreationService->createReturnShipment(
                         returnShipmentData: $returnShipmentData,

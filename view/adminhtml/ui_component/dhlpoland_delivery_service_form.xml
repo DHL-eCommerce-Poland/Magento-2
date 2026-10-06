@@ -254,10 +254,15 @@
             </formElements>
         </field>
         <field name="return_label_exp_days" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">14</item>
+                </item>
+            </argument>
             <settings>
                 <validation>
                     <rule name="validate-digits" xsi:type="boolean">true</rule>
-                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
                 </validation>
                 <dataType>text</dataType>
                 <label translate="true">Return Label Expiration (7-183 Days)</label>

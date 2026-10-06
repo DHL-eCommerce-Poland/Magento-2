@@ -66,7 +66,8 @@ class DataProviderTest extends TestCase
             $serializer,
             $timezoneStub,
             $dateSanitizer,
-            $this->createStub(\Psr\Log\LoggerInterface::class)
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            $this->createStub(\Ideo\Dhl\Api\DeliveryServiceRepositoryInterface::class)
         );
 
         $data = $dataProvider->getData();
@@ -123,12 +124,72 @@ class DataProviderTest extends TestCase
             $serializer,
             $timezoneStub,
             $dateSanitizer,
-            $this->createStub(\Psr\Log\LoggerInterface::class)
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            $this->createStub(\Ideo\Dhl\Api\DeliveryServiceRepositoryInterface::class)
         );
 
         $data = $dataProvider->getData();
 
         $this->assertEquals('JJD000030025688110000001106', $data[10]['packages'][0]['packageNumber']);
         $this->assertEquals('JJD000030025688110000001117', $data[10]['packages'][1]['packageNumber']);
+    }
+
+    public function testGetDataLoadsReturnLabelExpDaysFromTemplateWhenEmpty(): void
+    {
+        $collectionFactory = $this->createStub(CollectionFactory::class);
+        $collection = $this->createStub(Collection::class);
+        $serializer = $this->createStub(SerializerInterface::class);
+
+        $shipmentDataModel = $this->createStub(ShipmentData::class);
+        $shipmentDataModel->method('getId')->willReturn(3);
+        $shipmentDataModel->method('getData')->willReturn(['entity_id' => 3]);
+        $shipmentDataModel->method('getStatus')->willReturn('CREATED');
+        $shipmentDataModel->method('getReturnShipmentId')->willReturn('90040150425');
+        $shipmentDataModel->method('getDeliveryServiceTemplateId')->willReturn('1');
+        $shipmentDataModel->method('getShipmentData')->willReturn('{"test":true}');
+
+        $collection->method('getItems')->willReturn([$shipmentDataModel]);
+        $collectionFactory->method('create')->willReturn($collection);
+
+        $payloadArray = [
+            'shipmentSettings' => [
+                'returnLabelExpDays' => 0,
+                'autoCreateReturnShipment' => false,
+            ],
+        ];
+        $serializer->method('unserialize')->willReturn($payloadArray);
+
+        $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+        $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
+        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+
+        $deliveryServiceTemplate = $this->createStub(\Ideo\Dhl\Api\Data\DeliveryServiceInterface::class);
+        $deliveryServiceTemplate->method('getReturnLabelExpDays')->willReturn(21);
+        $deliveryServiceTemplate->method('getReturnLabelType')->willReturn('BLP');
+        $deliveryServiceTemplate->method('getReturnQrCodeType')->willReturn('QR_PDF');
+        $deliveryServiceTemplate->method('getReturnBookCourier')->willReturn(1);
+
+        $deliveryServiceRepo = $this->createStub(\Ideo\Dhl\Api\DeliveryServiceRepositoryInterface::class);
+        $deliveryServiceRepo->method('getById')->willReturn($deliveryServiceTemplate);
+
+        $dataProvider = new DataProvider(
+            'dhlpoland_shipment_form_data_source',
+            'entity_id',
+            'entity_id',
+            $collectionFactory,
+            $serializer,
+            $timezoneStub,
+            $dateSanitizer,
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            $deliveryServiceRepo
+        );
+
+        $data = $dataProvider->getData();
+
+        $this->assertEquals(21, $data[3]['shipmentSettings']['returnLabelExpDays']);
+        $this->assertEquals('0', $data[3]['shipmentSettings']['autoCreateReturnShipment']);
+        $this->assertEquals('BLP', $data[3]['shipmentSettings']['returnLabelType']);
+        $this->assertEquals('QR_PDF', $data[3]['shipmentSettings']['returnQrCodeType']);
+        $this->assertEquals(1, $data[3]['shipmentSettings']['returnBookCourier']);
     }
 }

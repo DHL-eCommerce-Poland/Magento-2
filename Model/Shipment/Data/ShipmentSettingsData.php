@@ -6,6 +6,8 @@ namespace Ideo\Dhl\Model\Shipment\Data;
 
 class ShipmentSettingsData
 {
+    public const DEFAULT_RETURN_LABEL_EXP_DAYS = 14;
+
     /** @var PackageData[] */
     private array $packages = [];
 
@@ -84,6 +86,10 @@ class ShipmentSettingsData
                 isNonStandard: $this->isNonStandard,
                 hasEuroReturn: $this->hasEuroReturn
             );
+        }
+
+        if ($this->autoCreateReturnShipment && ($this->returnLabelExpDays === null || $this->returnLabelExpDays <= 0)) {
+            $this->returnLabelExpDays = self::DEFAULT_RETURN_LABEL_EXP_DAYS;
         }
     }
 
@@ -385,7 +391,7 @@ class ShipmentSettingsData
             'autoCreateReturnShipment' => $this->autoCreateReturnShipment,
             'returnLabelType' => $this->returnLabelType,
             'returnQrCodeType' => $this->returnQrCodeType,
-            'returnLabelExpDays' => $this->returnLabelExpDays,
+            'returnLabelExpDays' => $this->getReturnLabelExpDays(),
             'returnBookCourier' => $this->returnBookCourier,
             'dropOffPointId' => $this->dropOffPointId,
             'addressType' => $this->addressType,

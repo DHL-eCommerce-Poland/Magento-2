@@ -375,11 +375,17 @@ define([
             autoCreateReturnShipment: ko.observable(isTruthy(st.autoCreateReturnShipment)),
             returnLabelType: ko.observable(st.returnLabelType || 'BLP'),
             returnQrCodeType: ko.observable(st.returnQrCodeType || 'QR_PDF'),
-            returnLabelExpDays: ko.observable(st.returnLabelExpDays !== undefined && st.returnLabelExpDays !== null ? st.returnLabelExpDays : 14),
+            returnLabelExpDays: ko.observable(st.returnLabelExpDays && parseInt(st.returnLabelExpDays, 10) > 0 ? parseInt(st.returnLabelExpDays, 10) : 14),
             returnBookCourier: ko.observable(st.returnBookCourier !== undefined && st.returnBookCourier !== null ? st.returnBookCourier : 0),
             addressType: ko.observable(st.addressType || 'N'),
             packages: packagesObsArr
         };
+
+        shipmentSettingsObj.autoCreateReturnShipment.subscribe(function (enabled) {
+            if (enabled && (!shipmentSettingsObj.returnLabelExpDays() || parseInt(shipmentSettingsObj.returnLabelExpDays(), 10) <= 0)) {
+                shipmentSettingsObj.returnLabelExpDays(14);
+            }
+        });
 
         shipmentSettingsObj.addPackageRow = function () {
             shipmentSettingsObj.packages.push(createPackageObservable({

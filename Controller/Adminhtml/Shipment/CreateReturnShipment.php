@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
 
 use Exception;
+use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService;
 use Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder;
 use Ideo\Dhl\Model\Shipment\ShipmentDataService;
@@ -74,7 +75,7 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
             $result = $this->returnCreationService->createReturnShipment(
                 returnShipmentData: $returnShipmentData,
                 environment: $environment,
-                expirationDays: 14,
+                expirationDays: ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS,
                 primaryWaybillNumber: $primaryWaybill,
                 originalEntityId: $entityId
             );

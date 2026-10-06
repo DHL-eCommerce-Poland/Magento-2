@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\Api;
 
 use Ideo\Dhl\Model\Config\Source\ReturnBookCourier;
+use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class ShipmentReturnDataMapper
 {
-    private const DEFAULT_EXPIRATION_DAYS = 14;
-
     /**
      * @param TimezoneInterface $timezone
      */
@@ -25,14 +24,14 @@ class ShipmentReturnDataMapper
      * Map inverted DhlShipmentData into DHL WebAPI2 createShipmentReturn SOAP request array.
      *
      * @param DhlShipmentData $shipmentData
-     * @param int $expirationDays Days until return label expires (default 14)
+     * @param int $expirationDays Days until return label expires
      * @param string|null $primaryWaybillNumber Primary shipment waybill if linking return
      *
      * @return array
      */
     public function map(
         DhlShipmentData $shipmentData,
-        int $expirationDays = self::DEFAULT_EXPIRATION_DAYS,
+        int $expirationDays = ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS,
         ?string $primaryWaybillNumber = null
     ): array {
         $customerSender = $shipmentData->getSender();

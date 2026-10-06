@@ -147,4 +147,34 @@ class DeliveryServiceTest extends TestCase
 
         $this->assertNull($this->model->getData('packages'));
     }
+
+    public function testGetReturnLabelExpDaysDefaultsTo14WhenAutoCreateReturnShipmentIsTrue(): void
+    {
+        $this->model->setAutoCreateReturnShipment(true);
+        $this->model->setReturnLabelExpDays(null);
+        $this->assertSame(14, $this->model->getReturnLabelExpDays());
+
+        $this->model->setData(\Ideo\Dhl\Api\Data\DeliveryServiceInterface::RETURN_LABEL_EXP_DAYS, 0);
+        $this->assertSame(14, $this->model->getReturnLabelExpDays());
+
+        $this->model->setReturnLabelExpDays(30);
+        $this->assertSame(30, $this->model->getReturnLabelExpDays());
+    }
+
+    public function testGetReturnLabelExpDaysReturnsNullWhenAutoCreateReturnShipmentIsFalseAndEmpty(): void
+    {
+        $this->model->setAutoCreateReturnShipment(false);
+        $this->model->setReturnLabelExpDays(null);
+        $this->assertNull($this->model->getReturnLabelExpDays());
+    }
+
+    public function testBeforeSaveDefaultsReturnLabelExpDaysWhenAutoCreateReturnShipmentIsTrue(): void
+    {
+        $this->model->setAutoCreateReturnShipment(true);
+        $this->model->setData(\Ideo\Dhl\Api\Data\DeliveryServiceInterface::RETURN_LABEL_EXP_DAYS, 0);
+        $this->model->beforeSave();
+
+        $field = \Ideo\Dhl\Api\Data\DeliveryServiceInterface::RETURN_LABEL_EXP_DAYS;
+        $this->assertSame(14, $this->model->getData($field));
+    }
 }

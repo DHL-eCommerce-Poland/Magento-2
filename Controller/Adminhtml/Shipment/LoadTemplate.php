@@ -9,6 +9,7 @@ use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
 use Ideo\Dhl\Model\CustomsTemplateRepository;
 use Ideo\Dhl\Model\MethodCatalog;
+use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Source\CustomsType;
 use Ideo\Dhl\Model\Template\TemplateManager;
 use Ideo\Dhl\Model\Template\TemplateVariableResolver;
@@ -181,7 +182,8 @@ class LoadTemplate extends Action
                         'autoCreateReturnShipment' => !empty($serviceData['auto_create_return_shipment']),
                         'returnLabelType' => $service->getReturnLabelType() ?: 'BLP',
                         'returnQrCodeType' => $service->getReturnQrCodeType() ?: 'QR_PDF',
-                        'returnLabelExpDays' => $service->getReturnLabelExpDays() ?? 14,
+                        'returnLabelExpDays' => $service->getReturnLabelExpDays()
+                            ?: ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS,
                         'returnBookCourier' => $service->getReturnBookCourier() ?? 0,
                         'packages' => $cleanPackages,
                         'addressType' => $serviceData['address_type'] ?? 'N',
