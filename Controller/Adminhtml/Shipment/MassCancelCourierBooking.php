@@ -10,6 +10,7 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Ui\Component\MassAction\Filter;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -73,6 +74,8 @@ class MassCancelCourierBooking extends Action implements HttpPostActionInterface
                     __('Failed to cancel courier booking: %1', $result->getErrorMessage())
                 );
             }
+        } catch (LocalizedException $e) {
+            $this->messageManager->addErrorMessage($e->getMessage());
         } catch (Throwable $e) {
             $this->logger->error(
                 '[MassCancelCourierBooking] Exception during mass courier cancellation: ' . $e->getMessage(),

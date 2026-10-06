@@ -22,6 +22,7 @@ class CourierBookingService
      * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
      * @param LoggerInterface $logger
+     * @param ShipmentDataPayloadReader $payloadReader
      */
     public function __construct(
         private readonly ClientInterface $client,
@@ -29,14 +30,15 @@ class CourierBookingService
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly ShipmentDataPayloadReader $payloadReader
     ) {
     }
 
     /**
-     * Book courier for selected Magento shipment entity IDs or DHL shipment IDs.
+     * Book courier for selected Magento shipment entities.
      *
-     * @param array $ids Array of entity IDs (int) or DHL shipment IDs (string)
+     * @param array $ids Shipment entity IDs
      * @param string $pickupDate YYYY-MM-DD format
      * @param string $pickupTimeFrom HH:MM format
      * @param string $pickupTimeTo HH:MM format
@@ -70,28 +72,59 @@ class CourierBookingService
         }
 
         $dhlShipmentIds = [];
+        $entityIdsByDhlShipmentId = [];
+        $shipmentIdsByServiceType = [];
+        $serviceTypeByDhlShipmentId = [];
 
         foreach ($ids as $id) {
             if (is_numeric($id) && (int) $id > 0) {
                 try {
                     $entity = $this->shipmentDataRepository->getById((int) $id);
-                    $dhlId = $entity->getShipmentId();
-                    if (!empty($dhlId)) {
-                        $dhlShipmentIds[] = (string) $dhlId;
-                    }
                 } catch (Throwable $e) {
                     $this->logger->warning(sprintf(
                         '[CourierBookingService] Could not load shipment entity #%s: %s',
                         $id,
                         $e->getMessage()
-                    ));
+                    ), ['exception' => $e]);
+                    throw new LocalizedException(
+                        __('Could not load selected shipment #%1 to determine its DHL service code.', (int) $id)
+                    );
                 }
+
+                $serviceType = $this->payloadReader->getServiceTypeFromEntity($entity);
+                if ($serviceType === null) {
+                    throw new LocalizedException(
+                        __('Cannot determine DHL service code for selected shipment #%1.', (int) $id)
+                    );
+                }
+
+                $dhlId = $entity->getShipmentId();
+                if (empty($dhlId)) {
+                    continue;
+                }
+
+                $dhlId = (string) $dhlId;
+                if (isset($serviceTypeByDhlShipmentId[$dhlId])
+                    && $serviceTypeByDhlShipmentId[$dhlId] !== $serviceType
+                ) {
+                    throw new LocalizedException(
+                        __('Selected DHL shipment %1 has conflicting service codes.', $dhlId)
+                    );
+                }
+
+                if (!isset($serviceTypeByDhlShipmentId[$dhlId])) {
+                    $serviceTypeByDhlShipmentId[$dhlId] = $serviceType;
+                    $shipmentIdsByServiceType[$serviceType][] = $dhlId;
+                    $dhlShipmentIds[] = $dhlId;
+                }
+
+                $entityIdsByDhlShipmentId[$dhlId][] = (int) $id;
             } elseif (is_string($id) && trim($id) !== '') {
-                $dhlShipmentIds[] = trim($id);
+                throw new LocalizedException(
+                    __('Courier booking requires shipment entities to determine DHL service codes.')
+                );
             }
         }
-
-        $dhlShipmentIds = array_values(array_unique($dhlShipmentIds));
 
         if (empty($dhlShipmentIds)) {
             throw new LocalizedException(
@@ -111,24 +144,45 @@ class CourierBookingService
         );
 
         if ($result->isSuccess()) {
-            $bookedStatus = $result->getOrderStatus() ?: (string) __('Kurier zamówiony');
-            $courierOrderId = $result->getCourierOrderId();
+            $courierOrderIds = $result->getCourierOrderIds();
+            if (count($courierOrderIds) !== count($shipmentIdsByServiceType)) {
+                return new CourierBookingResult(
+                    false,
+                    [],
+                    'INVALID_RESPONSE',
+                    (string) __('DHL returned an unexpected number of courier order IDs.')
+                );
+            }
 
-            foreach ($ids as $id) {
-                if (is_numeric($id) && (int) $id > 0) {
-                    try {
-                        $entity = $this->shipmentDataRepository->getById((int) $id);
-                        $entity->setStatus($bookedStatus);
-                        if (!empty($courierOrderId)) {
+            foreach ($courierOrderIds as $courierOrderId) {
+                if (!is_string($courierOrderId) || trim($courierOrderId) === '') {
+                    return new CourierBookingResult(
+                        false,
+                        [],
+                        'INVALID_RESPONSE',
+                        (string) __('DHL returned an invalid courier order ID.')
+                    );
+                }
+            }
+
+            $bookedStatus = $result->getOrderStatus() ?: (string) __('Kurier zamówiony');
+
+            foreach (array_values($shipmentIdsByServiceType) as $index => $serviceShipmentIds) {
+                $courierOrderId = trim($courierOrderIds[$index]);
+                foreach ($serviceShipmentIds as $dhlShipmentId) {
+                    foreach (array_unique($entityIdsByDhlShipmentId[$dhlShipmentId] ?? []) as $entityId) {
+                        try {
+                            $entity = $this->shipmentDataRepository->getById($entityId);
+                            $entity->setStatus($bookedStatus);
                             $entity->setDispatchNumber($courierOrderId);
+                            $this->shipmentDataRepository->save($entity);
+                        } catch (Throwable $e) {
+                            $this->logger->warning(sprintf(
+                                '[CourierBookingService] Failed to update courier booking for shipment entity #%s: %s',
+                                $entityId,
+                                $e->getMessage()
+                            ));
                         }
-                        $this->shipmentDataRepository->save($entity);
-                    } catch (Throwable $e) {
-                        $this->logger->warning(sprintf(
-                            '[CourierBookingService] Failed to update status for shipment entity #%s: %s',
-                            $id,
-                            $e->getMessage()
-                        ));
                     }
                 }
             }

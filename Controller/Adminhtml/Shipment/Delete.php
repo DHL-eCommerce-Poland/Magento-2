@@ -47,12 +47,18 @@ class Delete extends Action implements HttpGetActionInterface, HttpPostActionInt
         }
 
         try {
-            $this->shipmentDeletionService->deleteShipment($entityId);
-            $this->messageManager->addSuccessMessage(__('Shipment has been deleted successfully.'));
-            return $resultRedirect->setPath('*/*/index');
+            $deletionResult = $this->shipmentDeletionService->deleteShipment($entityId);
+            if ($deletionResult->isSuccess()) {
+                $this->messageManager->addSuccessMessage(__('Shipment has been deleted successfully.'));
+                return $resultRedirect->setPath('*/*/index');
+            }
+
+            $errorMessage = $deletionResult->getErrorMessage() ?: (string) __('Shipment could not be deleted.');
+            $this->messageManager->addErrorMessage(__('Failed to delete shipment: %1', $errorMessage));
+            return $resultRedirect->setPath('*/*/edit', ['entity_id' => $entityId]);
         } catch (LocalizedException $e) {
             $this->logger->error('Error deleting DHL shipment: ' . $e->getMessage(), ['exception' => $e]);
-            $this->messageManager->addErrorMessage($e->getMessage());
+            $this->messageManager->addErrorMessage(__('Failed to delete shipment: %1', $e->getMessage()));
             return $resultRedirect->setPath('*/*/edit', ['entity_id' => $entityId]);
         } catch (Exception $e) {
             $this->logger->error('Error deleting DHL shipment: ' . $e->getMessage(), ['exception' => $e]);

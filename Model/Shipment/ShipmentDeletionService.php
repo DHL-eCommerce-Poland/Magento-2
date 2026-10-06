@@ -41,10 +41,10 @@ class ShipmentDeletionService
      *
      * @param int $entityId
      *
-     * @return bool
+     * @return ShipmentDeletionResult
      * @throws LocalizedException
      */
-    public function deleteShipment(int $entityId): bool
+    public function deleteShipment(int $entityId): ShipmentDeletionResult
     {
         $shipment = $this->shipmentDataRepository->getById($entityId);
         $shipmentId = $shipment->getShipmentId();
@@ -59,14 +59,7 @@ class ShipmentDeletionService
 
             if (!$result->isSuccess()) {
                 $errorMsg = $result->getErrorMessage() ?? __('DHL API returned an error during deletion.')->render();
-                $this->logger->error(sprintf(
-                    '[DHL] Failed to delete shipment #%s (entity #%d) in DHL API: %s',
-                    $shipmentId,
-                    $entityId,
-                    $errorMsg
-                ));
-
-                throw new LocalizedException(__('Failed to delete shipment in DHL: %1', $errorMsg));
+                return new ShipmentDeletionResult(false, $errorMsg);
             }
         }
 
@@ -83,6 +76,11 @@ class ShipmentDeletionService
             }
         }
 
-        return $this->shipmentDataRepository->delete($shipment);
+        $isDeleted = $this->shipmentDataRepository->delete($shipment);
+
+        return new ShipmentDeletionResult(
+            $isDeleted,
+            $isDeleted ? null : (string) __('Shipment could not be deleted from Magento.')
+        );
     }
 }

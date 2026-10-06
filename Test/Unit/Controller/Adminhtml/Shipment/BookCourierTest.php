@@ -74,7 +74,7 @@ class BookCourierTest extends TestCase
 
         $bookingResult = $this->createMock(CourierBookingResult::class);
         $bookingResult->method('isSuccess')->willReturn(true);
-        $bookingResult->method('getCourierOrderId')->willReturn('ORDER999');
+        $bookingResult->method('getCourierOrderIds')->willReturn(['ORDER999']);
 
         $this->bookingService->expects($this->once())
             ->method('bookCourier')
@@ -88,7 +88,53 @@ class BookCourierTest extends TestCase
             ->method('setData')
             ->with($this->callback(function (array $data) {
                 return $data['success'] === true
-                    && $data['courier_order_id'] === 'ORDER999';
+                    && $data['courier_order_ids'] === ['ORDER999'];
+            }))
+            ->willReturnSelf();
+
+        $result = $this->controller->execute();
+        $this->assertSame($this->jsonResult, $result);
+    }
+
+    /**
+     * Test that the success message and JSON response include every courier order number.
+     *
+     * @return void
+     */
+    public function testExecuteSuccessReportsEveryCourierOrderNumber(): void
+    {
+        $this->request->method('getParam')->willReturnCallback(function ($key, $default = null) {
+            return match ($key) {
+                'shipment_ids' => [123, 456],
+                'pickup_date' => '2026-10-05',
+                'pickup_time_from' => '10:00',
+                'pickup_time_to' => '14:00',
+                'additional_info' => '',
+                default => $default,
+            };
+        });
+
+        $this->scopeConfig->method('getValue')->willReturn('sandbox');
+
+        $bookingResult = $this->createMock(CourierBookingResult::class);
+        $bookingResult->method('isSuccess')->willReturn(true);
+        $bookingResult->method('getCourierOrderIds')->willReturn(['ORDER_1', 'ORDER_2']);
+
+        $this->bookingService->expects($this->once())
+            ->method('bookCourier')
+            ->willReturn($bookingResult);
+
+        $this->messageManager->expects($this->once())
+            ->method('addSuccessMessage')
+            ->with($this->callback(static function ($message): bool {
+                return (string) $message === 'Courier booked successfully. Courier order numbers: ORDER_1, ORDER_2';
+            }));
+
+        $this->jsonResult->expects($this->once())
+            ->method('setData')
+            ->with($this->callback(static function (array $data): bool {
+                return $data['success'] === true
+                    && $data['courier_order_ids'] === ['ORDER_1', 'ORDER_2'];
             }))
             ->willReturnSelf();
 

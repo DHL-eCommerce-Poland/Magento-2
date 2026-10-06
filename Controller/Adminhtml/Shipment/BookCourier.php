@@ -77,19 +77,27 @@ class BookCourier extends Action implements HttpPostActionInterface
             );
 
             if ($bookingResult->isSuccess()) {
-                $orderMsg = $bookingResult->getCourierOrderId()
-                    ? __(
+                $courierOrderIds = $bookingResult->getCourierOrderIds();
+                if (count($courierOrderIds) === 1) {
+                    $orderMsg = __(
                         'Courier booked successfully. Courier order number: %1',
-                        $bookingResult->getCourierOrderId()
-                    )
-                    : __('Courier booked successfully.');
+                        $courierOrderIds[0]
+                    );
+                } elseif (count($courierOrderIds) > 1) {
+                    $orderMsg = __(
+                        'Courier booked successfully. Courier order numbers: %1',
+                        implode(', ', $courierOrderIds)
+                    );
+                } else {
+                    $orderMsg = __('Courier booked successfully.');
+                }
 
                 $this->messageManager->addSuccessMessage($orderMsg);
 
                 return $resultJson->setData([
                     'success' => true,
                     'message' => (string) $orderMsg,
-                    'courier_order_id' => $bookingResult->getCourierOrderId(),
+                    'courier_order_ids' => $courierOrderIds,
                 ]);
             }
 

@@ -30,8 +30,8 @@ define([
             var numbers = [];
             if (this.rows && Array.isArray(this.rows)) {
                 this.rows.forEach(function (row) {
-                    if (row.entity_id == recordId) {
-                        numbers.push(row.shipment_id || row.entity_id);
+                    if (row.entity_id == recordId && row.shipment_id) {
+                        numbers.push(row.shipment_id);
                     }
                 });
             }
@@ -53,7 +53,9 @@ define([
                 if (this.rows && Array.isArray(this.rows)) {
                     this.rows.forEach(function (row) {
                         if (selectedIds.indexOf(row.entity_id) !== -1 || selectedIds.indexOf(String(row.entity_id)) !== -1) {
-                            numbers.push(row.shipment_id || row.entity_id);
+                            if (row.shipment_id) {
+                                numbers.push(row.shipment_id);
+                            }
                         }
                     });
                 }

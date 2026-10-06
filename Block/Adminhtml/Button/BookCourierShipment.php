@@ -42,9 +42,10 @@ class BookCourierShipment extends Generic implements ButtonProviderInterface
             return [];
         }
 
-        $shipmentNumber = $entity->getShipmentId() ?: (string) $entityId;
-
-        $safeShipmentNumber = $this->escapeJs($shipmentNumber);
+        $shipmentNumber = trim((string) ($entity->getShipmentId() ?? ''));
+        $safeShipmentNumbers = $shipmentNumber !== ''
+            ? "['" . $this->escapeJs($shipmentNumber) . "']"
+            : '[]';
         $safeLoadingMsg = $this->escapeJs((string) __('Courier booking dialog is loading. Please try again.'));
 
         return [
@@ -54,17 +55,17 @@ class BookCourierShipment extends Generic implements ButtonProviderInterface
                 "require(['jquery'], function($) {
                     var modal = $('#ideo-dhl-book-courier-modal');
                     if (modal.length && typeof modal.data('openBookCourierModal') === 'function') {
-                        modal.data('openBookCourierModal')([%d], ['%s']);
+                        modal.data('openBookCourierModal')([%d], %s);
                     } else if (window.IdeoDhlBookCourier && typeof window.IdeoDhlBookCourier.openModal === 'function') {
-                        window.IdeoDhlBookCourier.openModal([%d], ['%s']);
+                        window.IdeoDhlBookCourier.openModal([%d], %s);
                     } else {
                         alert('%s');
                     }
                 });",
                 $entityId,
-                $safeShipmentNumber,
+                $safeShipmentNumbers,
                 $entityId,
-                $safeShipmentNumber,
+                $safeShipmentNumbers,
                 $safeLoadingMsg
             ),
             'sort_order' => 30,

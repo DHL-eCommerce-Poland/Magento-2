@@ -68,6 +68,31 @@ class ShipmentDataPayloadReader
     }
 
     /**
+     * Retrieve the DHL service type stored with a shipment entity.
+     *
+     * @param ShipmentDataInterface $shipment
+     *
+     * @return string|null
+     */
+    public function getServiceTypeFromEntity(ShipmentDataInterface $shipment): ?string
+    {
+        $data = $this->read($shipment->getShipmentData());
+        $shipmentSettings = $data['shipmentSettings'] ?? null;
+        if (!is_array($shipmentSettings)) {
+            return null;
+        }
+
+        $serviceType = $shipmentSettings['serviceType'] ?? null;
+        if (!is_string($serviceType)) {
+            return null;
+        }
+
+        $serviceType = trim($serviceType);
+
+        return $serviceType !== '' ? $serviceType : null;
+    }
+
+    /**
      * Retrieve unique return shipment identifiers from package data.
      *
      * @param array $data

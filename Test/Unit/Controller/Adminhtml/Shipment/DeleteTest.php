@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
 use Ideo\Dhl\Controller\Adminhtml\Shipment\Delete;
+use Ideo\Dhl\Model\Shipment\ShipmentDeletionResult;
 use Ideo\Dhl\Model\Shipment\ShipmentDeletionService;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
@@ -82,7 +82,7 @@ class DeleteTest extends TestCase
             ->willReturnCallback(static fn (string $param): ?string => $param === 'entity_id' ? '42' : null);
 
         $this->deletionServiceStub->method('deleteShipment')
-            ->willReturn(true);
+            ->willReturn(new ShipmentDeletionResult(true));
 
         $calledPath = null;
         $this->redirectStub->method('setPath')->willReturnCallback(function (string $path) use (&$calledPath) {
@@ -115,14 +115,14 @@ class DeleteTest extends TestCase
         $this->assertEquals('*/*/index', $calledPath);
     }
 
-    public function testExecuteLocalizedExceptionAddsDirectMessageWithoutDuplicatePrefix(): void
+    public function testExecuteFailureResultAddsContextToErrorReason(): void
     {
         $this->requestStub->method('getParam')
             ->willReturnCallback(static fn (string $param): ?string => $param === 'entity_id' ? '42' : null);
 
-        $errorMessage = 'Nie udało się usunąć przesyłki w DHL: Nie znaleziono przesyłki o zadanym identyfikatorze';
+        $errorMessage = '[90040166450] Nie znaleziono przesyłki o zadanym identyfikatorze';
         $this->deletionServiceStub->method('deleteShipment')
-            ->willThrowException(new LocalizedException(__($errorMessage)));
+            ->willReturn(new ShipmentDeletionResult(false, $errorMessage));
 
         $calledPath = null;
         $calledParams = null;
@@ -133,7 +133,7 @@ class DeleteTest extends TestCase
         });
         $this->messageManagerMock->expects($this->once())
             ->method('addErrorMessage')
-            ->with($errorMessage);
+            ->with('Failed to delete shipment: ' . $errorMessage);
 
         $result = $this->controller->execute();
         $this->assertSame($this->redirectStub, $result);

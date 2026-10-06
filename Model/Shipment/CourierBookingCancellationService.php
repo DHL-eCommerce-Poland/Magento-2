@@ -57,12 +57,6 @@ class CourierBookingCancellationService
                 try {
                     $entity = $this->shipmentDataRepository->getById((int) $id);
                     $dispatchNum = $entity->getDispatchNumber();
-                    if (empty($dispatchNum) && preg_match('/\(([A-Za-z0-9]+)\)/', $entity->getStatus(), $matches)) {
-                        $dispatchNum = $matches[1];
-                    }
-                    if (empty($dispatchNum) && !empty($entity->getShipmentId())) {
-                        $dispatchNum = $entity->getShipmentId();
-                    }
                     if (!empty($dispatchNum)) {
                         $dispatchNumbers[] = (string) $dispatchNum;
                         $affectedEntities[(int) $id] = $entity;
@@ -83,7 +77,7 @@ class CourierBookingCancellationService
 
         if (empty($dispatchNumbers)) {
             throw new LocalizedException(
-                __('None of the selected shipments have an active courier booking/dispatch number to cancel.')
+                __('None of the selected shipments have an active courier dispatch number to cancel.')
             );
         }
 

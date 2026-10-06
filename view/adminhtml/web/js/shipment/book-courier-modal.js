@@ -143,7 +143,7 @@ define([
         openModal: function (shipmentIds, shipmentNumbers) {
             var self = this;
             var ids = Array.isArray(shipmentIds) ? shipmentIds : [shipmentIds];
-            var numbers = (Array.isArray(shipmentNumbers) && shipmentNumbers.length) ? shipmentNumbers : ids;
+            var numbers = Array.isArray(shipmentNumbers) ? shipmentNumbers : [];
 
             self.selectedShipmentIds(ids);
             self.selectedShipmentNumbers(numbers);

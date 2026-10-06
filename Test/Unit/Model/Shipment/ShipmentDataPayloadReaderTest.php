@@ -42,6 +42,36 @@ class ShipmentDataPayloadReaderTest extends TestCase
         $this->assertSame([], $this->reader->read(null));
     }
 
+    public function testGetServiceTypeFromEntityReadsNestedServiceType(): void
+    {
+        $shipment = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment->method('getShipmentData')->willReturn(
+            (new Json())->serialize(['shipmentSettings' => ['serviceType' => ' AH ']])
+        );
+
+        $this->assertSame('AH', $this->reader->getServiceTypeFromEntity($shipment));
+    }
+
+    public function testGetServiceTypeFromEntityReturnsNullWhenMissing(): void
+    {
+        $shipment = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment->method('getShipmentData')->willReturn(
+            (new Json())->serialize(['shipmentSettings' => []])
+        );
+
+        $this->assertNull($this->reader->getServiceTypeFromEntity($shipment));
+    }
+
+    public function testGetServiceTypeFromEntityReturnsNullForInvalidServiceType(): void
+    {
+        $shipment = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment->method('getShipmentData')->willReturn(
+            (new Json())->serialize(['shipmentSettings' => ['serviceType' => ['invalid']]])
+        );
+
+        $this->assertNull($this->reader->getServiceTypeFromEntity($shipment));
+    }
+
     public function testGetPackagesPrefersRootPackages(): void
     {
         $rootPackages = [['pieceId' => 'BLP10001']];

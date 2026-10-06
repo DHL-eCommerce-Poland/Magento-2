@@ -87,19 +87,26 @@ class SoapClientAdapter implements ClientInterface
     public function getInternationalParams2(Credentials $credentials): array
     {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
-        $client = $this->createSoapClient($wsdlUrl);
+        $client = null;
 
-        $params = [
-            'authData' => [
-                'username' => $this->ensureUtf8($credentials->getUsername()),
-                'password' => $this->ensureUtf8($credentials->getPassword()),
-            ],
-        ];
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
 
-        $response = $client->getInternationalParams2($params);
-        $this->logSoapCommunication($client, 'getInternationalParams2', true);
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+            ];
 
-        return (array) ($response->getInternationalParams2Result ?? []);
+            $response = $client->getInternationalParams2($params);
+            $this->logSoapCommunication($client, 'getInternationalParams2');
+
+            return (array) ($response->getInternationalParams2Result ?? []);
+        } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getInternationalParams2');
+            throw $e;
+        }
     }
 
     /**
@@ -118,6 +125,7 @@ class SoapClientAdapter implements ClientInterface
     ): CreateShipmentResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
         $orderContext = $orderId !== null ? sprintf(' (Order #%d)', $orderId) : '';
+        $client = null;
 
         if (!isset($shipmentData['shipmentInfo']['dropOffType'])) {
             $shipmentData['shipmentInfo']['dropOffType'] = CreateShipmentResult::DROP_OFF_TYPE_REGULAR_PICKUP;
@@ -232,6 +240,7 @@ class SoapClientAdapter implements ClientInterface
         array $returnShipmentIds = []
     ): DeleteShipmentResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -353,6 +362,7 @@ class SoapClientAdapter implements ClientInterface
         ?string $additionalInfo = null
     ): CourierBookingResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -382,56 +392,72 @@ class SoapClientAdapter implements ClientInterface
             $this->logSoapCommunication($client, 'bookCourier');
 
             $result = $response->bookCourierResult ?? null;
+            $items = [];
+            $orderStatus = null;
 
             if (is_object($result)) {
                 if (!empty($result->error)) {
                     return new CourierBookingResult(
                         false,
-                        null,
+                        [],
                         'BOOK_COURIER_ERROR',
                         (string) $result->error
                     );
                 }
 
-                $orderId = null;
-                $orderStatus = null;
-
-                if (!empty($result->id)) {
-                    $orderId = (string) $result->id;
-                } elseif (!empty($result->item)) {
-                    $item = is_array($result->item) ? $result->item[0] : $result->item;
-                    if (is_object($item)) {
-                        $orderId = !empty($item->id) ? (string) $item->id : null;
-                        $orderStatus = !empty($item->orderStatus) ? (string) $item->orderStatus : null;
-                    } elseif (is_string($item)) {
-                        $orderId = $item;
-                    }
+                if (isset($result->item)) {
+                    $items = is_array($result->item) ? $result->item : [$result->item];
+                } elseif (!empty($result->id)) {
+                    $items = [$result];
                 }
 
                 if (empty($orderStatus) && !empty($result->orderStatus)) {
                     $orderStatus = (string) $result->orderStatus;
                 }
+            } elseif (is_array($result)) {
+                $items = $result;
+            } else {
+                return new CourierBookingResult(
+                    false,
+                    [],
+                    'INVALID_RESPONSE',
+                    (string) __('DHL returned an invalid courier order ID.')
+                );
+            }
 
-                if (empty($orderStatus)) {
-                    $orderStatus = (string) __('Kurier zamówiony');
+            $orderIds = [];
+            foreach ($items as $item) {
+                if (is_string($item) && trim($item) !== '') {
+                    $orderIds[] = trim($item);
+                } elseif (is_object($item) && !empty($item->id)) {
+                    $orderIds[] = (string) $item->id;
+                    if (empty($orderStatus) && !empty($item->orderStatus)) {
+                        $orderStatus = (string) $item->orderStatus;
+                    }
+                } else {
+                    return new CourierBookingResult(
+                        false,
+                        [],
+                        'INVALID_RESPONSE',
+                        (string) __('DHL returned an invalid courier order ID.')
+                    );
                 }
-
-                return new CourierBookingResult(true, $orderId, null, null, $orderStatus);
             }
 
-            if (is_array($result) && !empty($result)) {
-                $orderId = is_string($result[0]) ? $result[0] : (string) ($result[0]->id ?? '');
-                $orderStatus = (string) __('Kurier zamówiony');
-                return new CourierBookingResult(true, $orderId, null, null, $orderStatus);
+            if (empty($orderIds)) {
+                return new CourierBookingResult(
+                    false,
+                    [],
+                    'INVALID_RESPONSE',
+                    (string) __('DHL returned an invalid courier order ID.')
+                );
             }
 
-            return new CourierBookingResult(
-                false,
-                null,
-                'INVALID_RESPONSE',
-                'DHL WebAPI2 returned invalid response for bookCourier.'
-            );
+            $orderStatus = $orderStatus ?: (string) __('Kurier zamówiony');
+
+            return new CourierBookingResult(true, $orderIds, null, null, $orderStatus);
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'bookCourier');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during bookCourier: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -440,11 +466,12 @@ class SoapClientAdapter implements ClientInterface
 
             return new CourierBookingResult(
                 false,
-                null,
+                [],
                 $fault->faultcode ?? 'SOAP_FAULT',
                 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'bookCourier');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during bookCourier: %s',
                 $e->getMessage()
@@ -452,7 +479,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new CourierBookingResult(
                 false,
-                null,
+                [],
                 'CONNECTION_ERROR',
                 'An error occurred while connecting to DHL: ' . $e->getMessage()
             );
@@ -472,6 +499,7 @@ class SoapClientAdapter implements ClientInterface
         array $dispatchNumbers
     ): CancelCourierBookingResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -526,10 +554,12 @@ class SoapClientAdapter implements ClientInterface
                 'DHL WebAPI2 returned invalid response for cancelCourierBooking.'
             );
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'cancelCourierBooking');
+            $faultMessage = $this->redactCredentials($fault->getMessage(), $credentials);
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during cancelCourierBooking: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
-                $fault->getMessage()
+                $faultMessage
             ));
 
             return new CancelCourierBookingResult(
@@ -539,9 +569,11 @@ class SoapClientAdapter implements ClientInterface
                 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'cancelCourierBooking');
+            $exceptionMessage = $this->redactCredentials($e->getMessage(), $credentials);
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during cancelCourierBooking: %s',
-                $e->getMessage()
+                $exceptionMessage
             ));
 
             return new CancelCourierBookingResult(
@@ -566,6 +598,7 @@ class SoapClientAdapter implements ClientInterface
         string $shipmentId
     ): TrackingResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -627,6 +660,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL WebAPI2 returned invalid response for getTrackAndTraceInfo.'
             );
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'getTrackAndTraceInfo');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during getTrackAndTraceInfo: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -642,6 +676,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getTrackAndTraceInfo');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getTrackAndTraceInfo: %s',
                 $e->getMessage()
@@ -669,6 +704,8 @@ class SoapClientAdapter implements ClientInterface
     public function getLabels(Credentials $credentials, array $itemsToPrint): GetLabelsResult
     {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
+        $communicationAction = 'getLabels';
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -696,6 +733,9 @@ class SoapClientAdapter implements ClientInterface
             $parsedItems = [];
 
             foreach ($chunks as $chunkIndex => $chunk) {
+                $communicationAction = count($chunks) > 1
+                    ? sprintf('getLabels_batch_%d', $chunkIndex + 1)
+                    : 'getLabels';
                 $params = [
                     'authData' => [
                         'username' => $this->ensureUtf8($credentials->getUsername()),
@@ -705,10 +745,7 @@ class SoapClientAdapter implements ClientInterface
                 ];
 
                 $response = $client->getLabels($params);
-                $this->logSoapCommunication(
-                    $client,
-                    count($chunks) > 1 ? sprintf('getLabels_batch_%d', $chunkIndex + 1) : 'getLabels'
-                );
+                $this->logSoapCommunication($client, $communicationAction);
 
                 $result = $response->getLabelsResult ?? null;
 
@@ -755,6 +792,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new GetLabelsResult(true, $parsedItems);
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, $communicationAction);
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during getLabels: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -768,6 +806,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, $communicationAction);
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getLabels: %s',
                 $e->getMessage()
@@ -793,6 +832,7 @@ class SoapClientAdapter implements ClientInterface
     public function getShipmentScan(Credentials $credentials, string $shipmentId): GetScanResult
     {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -837,6 +877,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new GetScanResult(true, $fileData, $mimeType);
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'getShipmentScan');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during getShipmentScan: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -851,6 +892,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getShipmentScan');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getShipmentScan: %s',
                 $e->getMessage()
@@ -877,6 +919,7 @@ class SoapClientAdapter implements ClientInterface
     public function getEpod(Credentials $credentials, string $shipmentId): GetEpodResult
     {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -921,6 +964,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new GetEpodResult(true, $fileData, $mimeType);
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'getEpod');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during getEpod: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -935,6 +979,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getEpod');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getEpod: %s',
                 $e->getMessage()
@@ -965,6 +1010,7 @@ class SoapClientAdapter implements ClientInterface
         string $typePackage
     ): GetPnpResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -1015,6 +1061,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new GetPnpResult(true, $fileData, $fileName, $mimeType);
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'getPnp');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during getPnp: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -1030,6 +1077,7 @@ class SoapClientAdapter implements ClientInterface
                 $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getPnp');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getPnp: %s',
                 $e->getMessage()
@@ -1061,11 +1109,11 @@ class SoapClientAdapter implements ClientInterface
 
         $xml = $this->ensureUtf8($xml);
 
-        $xml = (string) preg_replace(
-            '/(<(?:[a-zA-Z0-9_]+:)?password>)[^<]+(<\/(?:[a-zA-Z0-9_]+:)?password>)/i',
-            '$1***MASKED***$2',
-            $xml
-        );
+        foreach (['username', 'password'] as $credentialTag) {
+            $pattern = '/(<(?:[a-zA-Z0-9_]+:)?' . $credentialTag . '>)[^<]*(<\/(?:[a-zA-Z0-9_]+:)?'
+                . $credentialTag . '>)/i';
+            $xml = (string) preg_replace($pattern, '$1***MASKED***$2', $xml);
+        }
 
         $binPattern = '/(<(?:[a-zA-Z0-9_]+:)?'
             . '(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile|invoice)>)'
@@ -1117,6 +1165,7 @@ class SoapClientAdapter implements ClientInterface
     ): CreateShipmentReturnResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
         $orderContext = $orderId !== null ? sprintf(' (Order #%d)', $orderId) : '';
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -1263,6 +1312,7 @@ class SoapClientAdapter implements ClientInterface
         int $radius = 15
     ): GetNearestServicepointsResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -1341,6 +1391,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL WebAPI2 returned invalid response for getNearestServicepoints.'
             );
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'getNearestServicepoints');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during getNearestServicepoints: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -1354,6 +1405,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getNearestServicepoints');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getNearestServicepoints: %s',
                 $e->getMessage()
@@ -1385,6 +1437,7 @@ class SoapClientAdapter implements ClientInterface
         }
 
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -1419,6 +1472,7 @@ class SoapClientAdapter implements ClientInterface
 
             return $this->extractPieceIds($resultItem);
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getPieceId');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getPieceId for shipment #%s: %s',
                 $shipmentId,
@@ -1488,14 +1542,12 @@ class SoapClientAdapter implements ClientInterface
      *
      * @param SoapClient|null $client
      * @param string $action
-     * @param bool $skipResponseBody Option to skip logging response body (e.g. for connection test endpoints)
      *
      * @return void
      */
     private function logSoapCommunication(
         ?SoapClient $client,
-        string $action,
-        bool $skipResponseBody = false
+        string $action
     ): void {
         if ($client === null) {
             return;
@@ -1530,12 +1582,8 @@ class SoapClientAdapter implements ClientInterface
 
             $lastResponse = (string) $client->__getLastResponse();
             if (!empty($lastResponse)) {
-                if ($skipResponseBody) {
-                    $this->logger->info(sprintf('[DHL SOAP Response - %s] [RESPONSE_BODY_OMITTED]', $action));
-                } else {
-                    $responseXml = $this->sanitizeXml($lastResponse);
-                    $this->logger->info(sprintf('[DHL SOAP Response - %s] %s', $action, $responseXml));
-                }
+                $responseXml = $this->sanitizeXml($lastResponse);
+                $this->logger->info(sprintf('[DHL SOAP Response - %s] %s', $action, $responseXml));
             }
         } catch (Throwable $e) {
             $this->logger->warning('Failed to log SOAP communication: ' . $e->getMessage());

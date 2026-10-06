@@ -13,7 +13,6 @@ use Ideo\Dhl\Model\Api\DeleteShipmentResult;
 use Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader;
 use Ideo\Dhl\Model\Shipment\ShipmentDeletionService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Json;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -58,7 +57,7 @@ class ShipmentDeletionServiceTest extends TestCase
         $this->clientMock = $this->createMock(ClientInterface::class);
         $this->credentialsProviderMock = $this->createMock(CredentialsProvider::class);
         $this->scopeConfigMock = $this->createMock(ScopeConfigInterface::class);
-        $this->loggerMock = $this->createStub(LoggerInterface::class);
+        $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->payloadReaderStub = new ShipmentDataPayloadReader(new Json());
         $syncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
 
@@ -111,7 +110,7 @@ class ShipmentDeletionServiceTest extends TestCase
             ->willReturn(true);
 
         $result = $this->deletionService->deleteShipment($entityId);
-        $this->assertTrue($result);
+        $this->assertTrue($result->isSuccess());
     }
 
     public function testDeleteShipmentWithReturnPackagesPassesReturnIdsToClient(): void
@@ -154,10 +153,10 @@ class ShipmentDeletionServiceTest extends TestCase
             ->willReturn(true);
 
         $result = $this->deletionService->deleteShipment($entityId);
-        $this->assertTrue($result);
+        $this->assertTrue($result->isSuccess());
     }
 
-    public function testDeleteShipmentApiFailureThrowsException(): void
+    public function testDeleteShipmentApiFailureReturnsReasonWithoutErrorLogging(): void
     {
         $entityId = 123;
         $shipmentId = '1234567890';
@@ -189,10 +188,13 @@ class ShipmentDeletionServiceTest extends TestCase
             ->with($credentials, $shipmentId, [])
             ->willReturn($deleteResult);
 
-        $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('Failed to delete shipment in DHL: Shipment cannot be deleted');
+        $this->repositoryMock->expects($this->never())->method('delete');
+        $this->loggerMock->expects($this->never())->method('error');
 
-        $this->deletionService->deleteShipment($entityId);
+        $result = $this->deletionService->deleteShipment($entityId);
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertSame('Shipment cannot be deleted', $result->getErrorMessage());
     }
 
     public function testDeleteShipmentCallsCancelDhlTrackingWhenMagentoShipmentIdExists(): void
@@ -234,7 +236,7 @@ class ShipmentDeletionServiceTest extends TestCase
         $repositoryStub->method('delete')->willReturn(true);
 
         $result = $service->deleteShipment($entityId);
-        $this->assertTrue($result);
+        $this->assertTrue($result->isSuccess());
     }
 
     public function testDeleteShipmentWhenShipmentIdIsNullDeletesFromDbWithoutApiCall(): void
@@ -260,6 +262,6 @@ class ShipmentDeletionServiceTest extends TestCase
             ->willReturn(true);
 
         $result = $this->deletionService->deleteShipment($entityId);
-        $this->assertTrue($result);
+        $this->assertTrue($result->isSuccess());
     }
 }
