@@ -864,6 +864,39 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('Piotr Nowak', $mapped['ship']['receiver']['address']['name']);
     }
 
+    /**
+     * Test mapping euroReturn flag for PALLET package with euro return enabled.
+     *
+     * @return void
+     */
+    public function testMapEuroReturnForPalletPackage(): void
+    {
+        $palletPackage = new PackageData(
+            packageType: 'PALLET',
+            quantity: 1,
+            weight: 150.0,
+            width: 80.0,
+            length: 120.0,
+            height: 100.0,
+            isNonStandard: false,
+            hasEuroReturn: true
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 301,
+            sender: new SenderData(),
+            recipient: new RecipientData(),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(packages: [$palletPackage])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertCount(1, $mapped['pieceList']['item']);
+        $this->assertEquals('PALLET', $mapped['pieceList']['item'][0]['type']);
+        $this->assertTrue($mapped['pieceList']['item'][0]['euroReturn']);
+    }
+
     public static function postalCodeDataProvider(): array
     {
         return [

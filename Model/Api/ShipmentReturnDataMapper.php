@@ -50,7 +50,7 @@ class ShipmentReturnDataMapper
                 'height' => $pkg->getHeight(),
                 'length' => $pkg->getLength(),
                 'nonStandard' => $pkg->isNonStandard() || $services->isNonStandard(),
-                'euroReturn' => $services->isEuroReturn(),
+                'euroReturn' => $pkg->hasEuroReturn(),
             ];
         }
 
