@@ -401,4 +401,219 @@ class ShipmentDataServiceTest extends TestCase
 
         $this->assertNull($decoded['shipmentSettings']['packages'][0]['returnShipmentId']);
     }
+
+    /**
+     * Test saveShipmentDataWithStatus maps multiple package numbers to a single package row with quantity > 1.
+     *
+     * @return void
+     */
+    public function testSaveShipmentDataMapsMultipleNumbersToSinglePackageRowWithQuantity(): void
+    {
+        $orderRepository = $this->createStub(OrderRepositoryInterface::class);
+        $mapper = $this->createStub(OrderToShipmentDataMapper::class);
+        $validator = $this->createStub(ShipmentDataValidator::class);
+        $dropOffPointRepository = $this->createStub(DropOffPointRepositoryInterface::class);
+        $deliveryServiceRepository = $this->createStub(DeliveryServiceRepositoryInterface::class);
+        $shipmentDataRepository = $this->createMock(ShipmentDataRepositoryInterface::class);
+        $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
+        $serializer = new Json();
+
+        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(
+            packages: [
+                ['packageType' => 'PACKAGE', 'quantity' => 2, 'weight' => 5.0],
+            ]
+        );
+
+        $shipmentData = new DhlShipmentData(orderId: 200, shipmentSettings: $shipmentSettings);
+        $entity = $this->createMock(ShipmentDataInterface::class);
+        $shipmentDataFactory->method('create')->willReturn($entity);
+
+        $capturedJson = null;
+        $entity->expects($this->once())
+            ->method('setShipmentData')
+            ->willReturnCallback(function (string $json) use (&$capturedJson, $entity) {
+                $capturedJson = $json;
+                return $entity;
+            });
+
+        $shipmentDataRepository->expects($this->once())
+            ->method('save')
+            ->willReturn($entity);
+
+        $service = new ShipmentDataService(
+            $orderRepository,
+            $mapper,
+            $validator,
+            $dropOffPointRepository,
+            $deliveryServiceRepository,
+            $shipmentDataRepository,
+            $shipmentDataFactory,
+            $serializer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
+        );
+
+        $packageNumbers = ['JJD000030025688110000001106', 'JJD000030025688110000001117'];
+
+        $service->saveShipmentDataWithStatus(
+            $shipmentData,
+            'Utworzono',
+            null,
+            null,
+            '90040027827',
+            null,
+            $packageNumbers
+        );
+
+        $this->assertNotNull($capturedJson);
+        $decoded = json_decode($capturedJson, true);
+
+        $expectedNumbers = 'JJD000030025688110000001106, JJD000030025688110000001117';
+        $this->assertEquals($expectedNumbers, $decoded['packages'][0]['packageNumber']);
+        $this->assertEquals($expectedNumbers, $decoded['shipmentSettings']['packages'][0]['packageNumber']);
+    }
+
+    /**
+     * Test saveShipmentDataWithStatus maps package numbers sequentially by quantity for multiple packages.
+     *
+     * @return void
+     */
+    public function testSaveShipmentDataMapsPackageNumbersSequentiallyByQuantity(): void
+    {
+        $orderRepository = $this->createStub(OrderRepositoryInterface::class);
+        $mapper = $this->createStub(OrderToShipmentDataMapper::class);
+        $validator = $this->createStub(ShipmentDataValidator::class);
+        $dropOffPointRepository = $this->createStub(DropOffPointRepositoryInterface::class);
+        $deliveryServiceRepository = $this->createStub(DeliveryServiceRepositoryInterface::class);
+        $shipmentDataRepository = $this->createMock(ShipmentDataRepositoryInterface::class);
+        $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
+        $serializer = new Json();
+
+        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(
+            packages: [
+                ['packageType' => 'PACKAGE', 'quantity' => 2, 'weight' => 5.0],
+                ['packageType' => 'PACKAGE', 'quantity' => 1, 'weight' => 2.0],
+            ]
+        );
+
+        $shipmentData = new DhlShipmentData(orderId: 200, shipmentSettings: $shipmentSettings);
+        $entity = $this->createMock(ShipmentDataInterface::class);
+        $shipmentDataFactory->method('create')->willReturn($entity);
+
+        $capturedJson = null;
+        $entity->expects($this->once())
+            ->method('setShipmentData')
+            ->willReturnCallback(function (string $json) use (&$capturedJson, $entity) {
+                $capturedJson = $json;
+                return $entity;
+            });
+
+        $shipmentDataRepository->expects($this->once())
+            ->method('save')
+            ->willReturn($entity);
+
+        $service = new ShipmentDataService(
+            $orderRepository,
+            $mapper,
+            $validator,
+            $dropOffPointRepository,
+            $deliveryServiceRepository,
+            $shipmentDataRepository,
+            $shipmentDataFactory,
+            $serializer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
+        );
+
+        $packageNumbers = ['JJD001', 'JJD002', 'JJD003'];
+
+        $service->saveShipmentDataWithStatus(
+            $shipmentData,
+            'Utworzono',
+            null,
+            null,
+            '90040027827',
+            null,
+            $packageNumbers
+        );
+
+        $this->assertNotNull($capturedJson);
+        $decoded = json_decode($capturedJson, true);
+
+        $this->assertEquals('JJD001, JJD002', $decoded['packages'][0]['packageNumber']);
+        $this->assertEquals('JJD003', $decoded['packages'][1]['packageNumber']);
+    }
+
+    /**
+     * Test updateReturnShipmentId maps return waybills by quantity for single and multiple packages.
+     *
+     * @return void
+     */
+    public function testUpdateReturnShipmentIdMapsReturnWaybillsByQuantity(): void
+    {
+        $orderRepository = $this->createStub(OrderRepositoryInterface::class);
+        $mapper = $this->createStub(OrderToShipmentDataMapper::class);
+        $validator = $this->createStub(ShipmentDataValidator::class);
+        $dropOffPointRepository = $this->createStub(DropOffPointRepositoryInterface::class);
+        $deliveryServiceRepository = $this->createStub(DeliveryServiceRepositoryInterface::class);
+        $shipmentDataRepository = $this->createMock(ShipmentDataRepositoryInterface::class);
+        $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
+        $serializer = new Json();
+
+        $entity = $this->createMock(ShipmentDataInterface::class);
+        $rawPayload = json_encode([
+            'packages' => [
+                ['packageType' => 'PACKAGE', 'quantity' => 2, 'weight' => 5.0],
+                ['packageType' => 'PACKAGE', 'quantity' => 1, 'weight' => 2.0],
+            ],
+            'shipmentSettings' => [
+                'packages' => [
+                    ['packageType' => 'PACKAGE', 'quantity' => 2, 'weight' => 5.0],
+                    ['packageType' => 'PACKAGE', 'quantity' => 1, 'weight' => 2.0],
+                ],
+            ],
+        ]);
+
+        $entity->method('getShipmentData')->willReturn($rawPayload);
+        $entity->expects($this->once())
+            ->method('setReturnShipmentId')
+            ->with('RET001, RET002, RET003');
+
+        $capturedJson = null;
+        $entity->expects($this->once())
+            ->method('setShipmentData')
+            ->willReturnCallback(function (string $json) use (&$capturedJson, $entity) {
+                $capturedJson = $json;
+                return $entity;
+            });
+
+        $shipmentDataRepository->method('getById')->with(10)->willReturn($entity);
+        $shipmentDataRepository->method('save')->willReturn($entity);
+
+        $service = new ShipmentDataService(
+            $orderRepository,
+            $mapper,
+            $validator,
+            $dropOffPointRepository,
+            $deliveryServiceRepository,
+            $shipmentDataRepository,
+            $shipmentDataFactory,
+            $serializer,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
+        );
+
+        $returnItems = [
+            ['waybill' => 'RET001'],
+            ['waybill' => 'RET002'],
+            ['waybill' => 'RET003'],
+        ];
+
+        $service->updateReturnShipmentId(10, 'RET001', $returnItems);
+
+        $this->assertNotNull($capturedJson);
+        $decoded = json_decode($capturedJson, true);
+
+        $this->assertEquals('RET001, RET002', $decoded['packages'][0]['returnShipmentId']);
+        $this->assertEquals('RET003', $decoded['packages'][1]['returnShipmentId']);
+        $this->assertEquals('RET001, RET002', $decoded['shipmentSettings']['packages'][0]['returnShipmentId']);
+        $this->assertEquals('RET003', $decoded['shipmentSettings']['packages'][1]['returnShipmentId']);
+    }
 }

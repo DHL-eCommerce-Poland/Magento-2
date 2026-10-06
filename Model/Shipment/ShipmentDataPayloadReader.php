@@ -89,7 +89,12 @@ class ShipmentDataPayloadReader
 
             $returnId = trim((string) $returnId);
             if ($returnId !== '') {
-                $returnIds[] = $returnId;
+                foreach (explode(',', $returnId) as $part) {
+                    $trimmedPart = trim($part);
+                    if ($trimmedPart !== '') {
+                        $returnIds[] = $trimmedPart;
+                    }
+                }
             }
         }
 

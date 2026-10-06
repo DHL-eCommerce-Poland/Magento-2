@@ -126,10 +126,17 @@ class DataProvider extends AbstractDataProvider
                             if ($hasPackages) {
                                 $pkgNumsRaw = $payload['packageNumbers']
                                     ?? ($payload['shipmentSettings']['packageNumbers'] ?? []);
-                                $rootPkgNums = (array) $pkgNumsRaw;
+                                $rootPkgNums = is_array($pkgNumsRaw)
+                                    ? $pkgNumsRaw
+                                    : (is_string($pkgNumsRaw) ? explode(',', $pkgNumsRaw) : []);
+                                $rootReturnIds = array_values(array_filter(
+                                    array_map('trim', explode(',', $returnShipmentId)),
+                                    static fn($val) => $val !== ''
+                                ));
                                 $data['packages'] = $this->normalizePackages(
                                     $payload['shipmentSettings']['packages'],
-                                    $rootPkgNums
+                                    $rootPkgNums,
+                                    $rootReturnIds
                                 );
                                 $data['packages_fieldset'] = ['packages' => $data['packages']];
                             }
@@ -160,8 +167,18 @@ class DataProvider extends AbstractDataProvider
                         try {
                             $pkgNumsRaw = $payload['packageNumbers']
                                 ?? ($payload['shipmentSettings']['packageNumbers'] ?? []);
-                            $rootPkgNums = (array) $pkgNumsRaw;
-                            $data['packages'] = $this->normalizePackages($payload['packages'], $rootPkgNums);
+                            $rootPkgNums = is_array($pkgNumsRaw)
+                                ? $pkgNumsRaw
+                                : (is_string($pkgNumsRaw) ? explode(',', $pkgNumsRaw) : []);
+                            $rootReturnIds = array_values(array_filter(
+                                array_map('trim', explode(',', (string)($item->getReturnShipmentId() ?? ''))),
+                                static fn($val) => $val !== ''
+                            ));
+                            $data['packages'] = $this->normalizePackages(
+                                $payload['packages'],
+                                $rootPkgNums,
+                                $rootReturnIds
+                            );
                             $data['packages_fieldset'] = ['packages' => $data['packages']];
                         } catch (Throwable $e) {
                             $this->logger->error(sprintf(
@@ -312,29 +329,73 @@ class DataProvider extends AbstractDataProvider
     }
 
     /**
-     * Normalize packages array flags to string '1'/'0', record_id, and returnShipmentId.
+     * Normalize packages array flags to string '1'/'0', record_id, packageNumber, and returnShipmentId.
      *
      * @param array $packages
      * @param array $rootPackageNumbers
+     * @param array $rootReturnShipmentIds
      *
      * @return array
      */
-    private function normalizePackages(array $packages, array $rootPackageNumbers = []): array
-    {
+    private function normalizePackages(
+        array $packages,
+        array $rootPackageNumbers = [],
+        array $rootReturnShipmentIds = []
+    ): array {
         $result = [];
-        $rootPackageNumbers = array_values($rootPackageNumbers);
+        $cleanRootPkgNums = array_values(array_filter(
+            array_map('trim', $rootPackageNumbers),
+            static fn($val) => $val !== ''
+        ));
+        $cleanRootReturnIds = array_values(array_filter(
+            array_map('trim', $rootReturnShipmentIds),
+            static fn($val) => $val !== ''
+        ));
+
+        $pkgNumOffset = 0;
+        $retIdOffset = 0;
+
         foreach ($packages as $index => $pkg) {
-            if (is_array($pkg)) {
-                $pkg['record_id'] = (string)$index;
-                $pkg['isNonStandard'] = !empty($pkg['isNonStandard']) ? '1' : '0';
-                $pkg['hasEuroReturn'] = !empty($pkg['hasEuroReturn']) ? '1' : '0';
-                $pkgNumber = $pkg['packageNumber'] ?? $pkg['pieceId'] ?? null;
-                if (empty($pkgNumber) && isset($rootPackageNumbers[$index])) {
-                    $pkgNumber = $rootPackageNumbers[$index];
-                }
-                $pkg['packageNumber'] = (string)($pkgNumber ?? '');
-                $result[$index] = $pkg;
+            if (!is_array($pkg)) {
+                continue;
             }
+            $pkg['record_id'] = (string)$index;
+            $pkg['isNonStandard'] = !empty($pkg['isNonStandard']) ? '1' : '0';
+            $pkg['hasEuroReturn'] = !empty($pkg['hasEuroReturn']) ? '1' : '0';
+
+            $qty = max(1, (int)($pkg['quantity'] ?? 1));
+
+            // Package numbers
+            $pkgNumber = $pkg['packageNumber'] ?? $pkg['pieceId'] ?? null;
+            if (is_array($pkgNumber)) {
+                $pkgNumber = implode(', ', array_filter(array_map('trim', $pkgNumber), static fn($v) => $v !== ''));
+            } elseif ($pkgNumber !== null) {
+                $pkgNumber = trim((string)$pkgNumber);
+            }
+
+            if (empty($pkgNumber) && !empty($cleanRootPkgNums)) {
+                $slice = array_slice($cleanRootPkgNums, $pkgNumOffset, $qty);
+                $pkgNumber = implode(', ', $slice);
+            }
+            $pkgNumOffset += $qty;
+            $pkg['packageNumber'] = (string)($pkgNumber ?? '');
+
+            // Return package numbers
+            $retNumber = $pkg['returnShipmentId'] ?? null;
+            if (is_array($retNumber)) {
+                $retNumber = implode(', ', array_filter(array_map('trim', $retNumber), static fn($v) => $v !== ''));
+            } elseif ($retNumber !== null) {
+                $retNumber = trim((string)$retNumber);
+            }
+
+            if (empty($retNumber) && !empty($cleanRootReturnIds)) {
+                $retSlice = array_slice($cleanRootReturnIds, $retIdOffset, $qty);
+                $retNumber = implode(', ', $retSlice);
+            }
+            $retIdOffset += $qty;
+            $pkg['returnShipmentId'] = (string)($retNumber ?? '');
+
+            $result[$index] = $pkg;
         }
         return $result;
     }

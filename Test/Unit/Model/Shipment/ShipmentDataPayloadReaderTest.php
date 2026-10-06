@@ -119,5 +119,18 @@ class ShipmentDataPayloadReaderTest extends TestCase
 
         $this->assertSame([], $result);
     }
+
+    public function testGetReturnShipmentIdsSplitsCommaSeparatedValuesOnPackageRows(): void
+    {
+        $returnIds = $this->reader->getReturnShipmentIds([
+            'packages' => [
+                ['returnShipmentId' => 'RET001, RET002'],
+                ['returnShipmentId' => 'RET003'],
+            ],
+        ]);
+
+        $this->assertSame(['RET001', 'RET002', 'RET003'], $returnIds);
+    }
 }
+
 

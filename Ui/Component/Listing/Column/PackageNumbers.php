@@ -82,7 +82,12 @@ class PackageNumbers extends Column
             foreach (['packageNumber', 'pieceId'] as $key) {
                 $number = $package[$key] ?? null;
                 if ($this->isDisplayValue($number) && trim((string) $number) !== '') {
-                    $packageNumbers[] = trim((string) $number);
+                    foreach (explode(',', trim((string) $number)) as $part) {
+                        $trimmedPart = trim($part);
+                        if ($trimmedPart !== '') {
+                            $packageNumbers[] = $trimmedPart;
+                        }
+                    }
                     break;
                 }
             }

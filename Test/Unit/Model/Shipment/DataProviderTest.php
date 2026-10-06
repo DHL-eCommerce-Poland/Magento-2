@@ -192,4 +192,57 @@ class DataProviderTest extends TestCase
         $this->assertEquals('QR_PDF', $data[3]['shipmentSettings']['returnQrCodeType']);
         $this->assertEquals(1, $data[3]['shipmentSettings']['returnBookCourier']);
     }
+
+    public function testGetDataNormalizesPackagesWithQuantityGreaterThanOne(): void
+    {
+        $collectionFactory = $this->createStub(CollectionFactory::class);
+        $collection = $this->createStub(Collection::class);
+        $serializer = $this->createStub(SerializerInterface::class);
+
+        $shipmentDataModel = $this->createStub(ShipmentData::class);
+        $shipmentDataModel->method('getId')->willReturn(20);
+        $shipmentDataModel->method('getData')->willReturn(['entity_id' => 20]);
+        $shipmentDataModel->method('getStatus')->willReturn('CREATED');
+        $shipmentDataModel->method('getReturnShipmentId')->willReturn('RET001, RET002, RET003');
+        $shipmentDataModel->method('getShipmentData')->willReturn('{"test":true}');
+
+        $collection->method('getItems')->willReturn([$shipmentDataModel]);
+        $collectionFactory->method('create')->willReturn($collection);
+
+        $payloadArray = [
+            'packageNumbers' => ['JJD001', 'JJD002', 'JJD003'],
+            'shipmentSettings' => [
+                'packages' => [
+                    ['quantity' => 2, 'weight' => 5.0],
+                    ['quantity' => 1, 'weight' => 2.0],
+                ],
+            ],
+        ];
+
+        $serializer->method('unserialize')->willReturn($payloadArray);
+
+        $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+        $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
+        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+
+        $dataProvider = new DataProvider(
+            'dhlpoland_shipment_form_data_source',
+            'entity_id',
+            'entity_id',
+            $collectionFactory,
+            $serializer,
+            $timezoneStub,
+            $dateSanitizer,
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            $this->createStub(\Ideo\Dhl\Api\DeliveryServiceRepositoryInterface::class)
+        );
+
+        $data = $dataProvider->getData();
+
+        $this->assertEquals('JJD001, JJD002', $data[20]['packages'][0]['packageNumber']);
+        $this->assertEquals('JJD003', $data[20]['packages'][1]['packageNumber']);
+        $this->assertEquals('RET001, RET002', $data[20]['packages'][0]['returnShipmentId']);
+        $this->assertEquals('RET003', $data[20]['packages'][1]['returnShipmentId']);
+    }
 }
+
