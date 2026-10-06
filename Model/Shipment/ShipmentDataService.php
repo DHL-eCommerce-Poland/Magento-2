@@ -171,7 +171,11 @@ class ShipmentDataService
             }
         }
 
-        return $this->mapper->map($order, $senderDefaults, $shipmentDefaults);
+        return $this->mapper->map(
+            $order,
+            $senderDefaults,
+            $this->normalizeShipmentDefaults($shipmentDefaults)
+        );
     }
 
     /**
@@ -530,6 +534,35 @@ class ShipmentDataService
             }
         }
         return null;
+    }
+
+    /**
+     * Convert persisted delivery service field names to the mapper's camelCase input format.
+     *
+     * @param array $defaults
+     *
+     * @return array
+     */
+    private function normalizeShipmentDefaults(array $defaults): array
+    {
+        $keyMap = [
+            'label_type' => 'labelType',
+            'address_type' => 'addressType',
+            'auto_create_return_shipment' => 'autoCreateReturnShipment',
+            'return_label_type' => 'returnLabelType',
+            'return_qr_code_type' => 'returnQrCodeType',
+            'return_label_exp_days' => 'returnLabelExpDays',
+            'return_book_courier' => 'returnBookCourier',
+        ];
+
+        foreach ($keyMap as $storedKey => $mapperKey) {
+            if (array_key_exists($storedKey, $defaults)) {
+                $defaults[$mapperKey] = $defaults[$mapperKey] ?? $defaults[$storedKey];
+                unset($defaults[$storedKey]);
+            }
+        }
+
+        return $defaults;
     }
 
     /**

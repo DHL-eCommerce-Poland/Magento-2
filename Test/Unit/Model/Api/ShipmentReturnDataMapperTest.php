@@ -65,7 +65,8 @@ class ShipmentReturnDataMapperTest extends TestCase
             mpk: 'MPK99',
             comment: 'Komentarz',
             reference: 'REF123',
-            labelType: 'BLP',
+            labelType: 'LBLP',
+            returnLabelType: 'ZBLP300',
             packages: [$pkg]
         );
         $services = new SpecialServicesData(insurance: true, insuranceValue: 150.0);
@@ -84,7 +85,7 @@ class ShipmentReturnDataMapperTest extends TestCase
         $this->assertEquals('RECEIVER', $mapped['shipmentInfo']['billing']['shippingPaymentType']);
         $this->assertEquals(123456, $mapped['shipmentInfo']['billing']['billingAccountNumber']);
         $this->assertEquals('BANK_TRANSFER', $mapped['shipmentInfo']['billing']['paymentType']);
-        $this->assertEquals('BLP', $mapped['shipmentInfo']['labelType']);
+        $this->assertSame('ZBLP300', $mapped['shipmentInfo']['labelType']);
 
         // Check Shipper (customer)
         $this->assertEquals('Firma Klienta', $mapped['ship']['shipper']['address']['name']);

@@ -497,20 +497,22 @@ class OrderToShipmentDataMapperTest extends TestCase
         $order->method('getShippingMethod')->willReturn('dhlpoland_parcel_polska');
 
         $shipmentDefaults = [
-            'auto_create_return_shipment' => 1,
-            'return_label_exp_days' => 0,
-            'return_label_type' => 'BLP',
-            'return_qr_code_type' => 'QR_PDF',
-            'return_book_courier' => 1,
+            'autoCreateReturnShipment' => 1,
+            'returnLabelExpDays' => 0,
+            'labelType' => 'LBLP',
+            'returnLabelType' => 'ZBLP300',
+            'returnQrCodeType' => 'QR4_IMG',
+            'returnBookCourier' => 1,
         ];
 
         $shipmentData = $this->mapper->map($order, [], $shipmentDefaults);
 
         $settings = $shipmentData->getShipmentSettings();
         $this->assertTrue($settings->autoCreateReturnShipment());
+        $this->assertSame('LBLP', $settings->getLabelType());
         $this->assertSame(14, $settings->getReturnLabelExpDays());
-        $this->assertSame('BLP', $settings->getReturnLabelType());
-        $this->assertSame('QR_PDF', $settings->getReturnQrCodeType());
+        $this->assertSame('ZBLP300', $settings->getReturnLabelType());
+        $this->assertSame('QR4_IMG', $settings->getReturnQrCodeType());
         $this->assertSame(1, $settings->getReturnBookCourier());
     }
 }

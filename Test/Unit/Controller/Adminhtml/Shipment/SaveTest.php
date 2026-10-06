@@ -156,7 +156,12 @@ class SaveTest extends TestCase
             'sender' => ['name' => 'Jan Kowalski'],
             'recipient' => ['name' => 'Firma ABC'],
             'specialServices' => [],
-            'shipmentSettings' => ['serviceType' => 'AH']
+            'shipmentSettings' => [
+                'serviceType' => 'AH',
+                'labelType' => 'LBLP',
+                'returnLabelType' => 'ZBLP300',
+                'returnQrCodeType' => 'QR6_IMG',
+            ]
         ];
 
         $this->requestStub
@@ -182,7 +187,10 @@ class SaveTest extends TestCase
         $apiResult = new CreateShipmentResult(true, false, '90039521201');
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('createShipment')
-            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'sandbox', '1', '2', null)
+            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData
+                && $arg->getShipmentSettings()->getLabelType() === 'LBLP'
+                && $arg->getShipmentSettings()->getReturnLabelType() === 'ZBLP300'
+                && $arg->getShipmentSettings()->getReturnQrCodeType() === 'QR6_IMG'), 'sandbox', '1', '2', null)
             ->willReturn($apiResult);
 
         $this->jsonResultMock->expects(self::once())
@@ -366,6 +374,9 @@ class SaveTest extends TestCase
             'specialServices' => [],
             'shipmentSettings' => [
                 'serviceType' => 'AH',
+                'labelType' => 'ZBLP300',
+                'returnLabelType' => 'LBLP',
+                'returnQrCodeType' => 'QR4_IMG',
                 'packages' => [
                     ['weight' => 10.0, 'quantity' => 1],
                 ],
@@ -402,6 +413,9 @@ class SaveTest extends TestCase
                 42,
                 Assert::callback(function ($arg) {
                     return $arg instanceof DhlShipmentData
+                        && $arg->getShipmentSettings()->getLabelType() === 'ZBLP300'
+                        && $arg->getShipmentSettings()->getReturnLabelType() === 'LBLP'
+                        && $arg->getShipmentSettings()->getReturnQrCodeType() === 'QR4_IMG'
                         && count($arg->getShipmentSettings()->getPackages()) === 2
                         && $arg->getShipmentSettings()->getPackageQuantity() === 2;
                 }),

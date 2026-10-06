@@ -99,6 +99,7 @@ class ShipmentFullDataMapperTest extends TestCase
             shipmentDate: '2026-08-25',
             pickupHourFrom: '10:00',
             pickupHourTo: '14:00',
+            labelType: 'LBLP',
             packages: $packages
         );
 
@@ -143,6 +144,7 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('1234567', $mapped['shipmentInfo']['billing']['billingAccountNumber']);
         $this->assertEquals('MPK123', $mapped['shipmentInfo']['billing']['costsCenter']);
         $this->assertEquals('AH', $mapped['shipmentInfo']['serviceType']);
+        $this->assertSame('LBLP', $mapped['shipmentInfo']['labelType']);
         $this->assertNotEmpty($mapped['shipmentInfo']['specialServices']['item']);
         $items = $mapped['shipmentInfo']['specialServices']['item'];
         $servicesByType = [];

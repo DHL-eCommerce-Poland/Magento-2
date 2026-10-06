@@ -8,6 +8,7 @@ use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
+use Ideo\Dhl\Model\DeliveryService;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use Ideo\Dhl\Model\Shipment\ShipmentDataService;
@@ -60,6 +61,79 @@ class ShipmentDataServiceTest extends TestCase
 
         $result = $service->prepareShipmentData(101);
         $this->assertSame($expectedData, $result);
+    }
+
+    /**
+     * Test persisted delivery service fields are normalized before shipment mapping.
+     *
+     * @return void
+     */
+    public function testPrepareShipmentDataNormalizesDeliveryServiceDefaults(): void
+    {
+        $orderRepository = $this->createStub(OrderRepositoryInterface::class);
+        $mapper = $this->createMock(OrderToShipmentDataMapper::class);
+        $validator = $this->createStub(ShipmentDataValidator::class);
+        $dropOffPointRepository = $this->createStub(DropOffPointRepositoryInterface::class);
+        $deliveryServiceRepository = $this->createStub(DeliveryServiceRepositoryInterface::class);
+        $shipmentDataRepository = $this->createStub(ShipmentDataRepositoryInterface::class);
+        $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
+
+        $order = $this->createStub(OrderInterface::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $orderRepository->method('get')->willReturn($order);
+        $dropOffPointRepository->method('getDefault')->willReturn(null);
+
+        $deliveryService = $this->createStub(DeliveryService::class);
+        $deliveryService->method('getData')->willReturn([
+            'label_type' => 'LBLP',
+            'address_type' => 'B',
+            'auto_create_return_shipment' => 1,
+            'return_label_type' => 'ZBLP300',
+            'return_qr_code_type' => 'QR4_IMG',
+            'return_label_exp_days' => 14,
+            'return_book_courier' => 1,
+        ]);
+        $deliveryService->method('getPackages')->willReturn([]);
+        $deliveryServiceRepository->method('getById')->willReturn($deliveryService);
+
+        $expectedData = new DhlShipmentData(orderId: 101);
+        $mapper->expects(self::once())
+            ->method('map')
+            ->with(
+                $order,
+                [],
+                self::callback(static function (array $defaults): bool {
+                    return ($defaults['labelType'] ?? null) === 'LBLP'
+                        && ($defaults['addressType'] ?? null) === 'B'
+                        && ($defaults['autoCreateReturnShipment'] ?? null) === 1
+                        && ($defaults['returnLabelType'] ?? null) === 'ZBLP300'
+                        && ($defaults['returnQrCodeType'] ?? null) === 'QR4_IMG'
+                        && ($defaults['returnLabelExpDays'] ?? null) === 14
+                        && ($defaults['returnBookCourier'] ?? null) === 1
+                        && !array_key_exists('label_type', $defaults)
+                        && !array_key_exists('address_type', $defaults)
+                        && !array_key_exists('auto_create_return_shipment', $defaults)
+                        && !array_key_exists('return_label_type', $defaults)
+                        && !array_key_exists('return_qr_code_type', $defaults)
+                        && !array_key_exists('return_label_exp_days', $defaults)
+                        && !array_key_exists('return_book_courier', $defaults);
+                })
+            )
+            ->willReturn($expectedData);
+
+        $service = new ShipmentDataService(
+            $orderRepository,
+            $mapper,
+            $validator,
+            $dropOffPointRepository,
+            $deliveryServiceRepository,
+            $shipmentDataRepository,
+            $shipmentDataFactory,
+            new Json(),
+            $this->createStub(\Psr\Log\LoggerInterface::class)
+        );
+
+        self::assertSame($expectedData, $service->prepareShipmentData(101, null, 5));
     }
 
     /**

@@ -56,7 +56,12 @@ class DhlShipmentDataTest extends TestCase
             'sender' => (new SenderData(name: 'Sender Inc'))->toArray(),
             'recipient' => (new RecipientData(name: 'Recipient Ltd'))->toArray(),
             'specialServices' => (new SpecialServicesData(insurance: true, insuranceValue: 500.0))->toArray(),
-            'shipmentSettings' => (new ShipmentSettingsData(serviceType: '09'))->toArray(),
+            'shipmentSettings' => (new ShipmentSettingsData(
+                serviceType: '09',
+                labelType: 'ZBLP300',
+                returnLabelType: 'LBLP',
+                returnQrCodeType: 'QR6_IMG'
+            ))->toArray(),
             'customs' => null,
         ];
 
@@ -65,6 +70,9 @@ class DhlShipmentDataTest extends TestCase
         $this->assertEquals(250.50, $shipmentData->getOrderGrandTotal());
         $this->assertEquals('Sender Inc', $shipmentData->getSender()->getName());
         $this->assertEquals('09', $shipmentData->getShipmentSettings()->getServiceType());
+        $this->assertSame('ZBLP300', $shipmentData->getShipmentSettings()->getLabelType());
+        $this->assertSame('LBLP', $shipmentData->getShipmentSettings()->getReturnLabelType());
+        $this->assertSame('QR6_IMG', $shipmentData->getShipmentSettings()->getReturnQrCodeType());
         $this->assertNull($shipmentData->getCustoms());
 
         $exported = $shipmentData->toArray();

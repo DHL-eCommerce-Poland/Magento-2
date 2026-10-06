@@ -348,21 +348,12 @@ class OrderToShipmentDataMapper
             }
         }
 
-        $autoCreateReturn = !empty($defaultShipmentDefaults['autoCreateReturnShipment'])
-            || !empty($defaultShipmentDefaults['auto_create_return_shipment']);
-        $rawExpDays = $defaultShipmentDefaults['returnLabelExpDays']
-            ?? $defaultShipmentDefaults['return_label_exp_days']
-            ?? null;
+        $autoCreateReturn = !empty($defaultShipmentDefaults['autoCreateReturnShipment']);
+        $rawExpDays = $defaultShipmentDefaults['returnLabelExpDays'] ?? null;
         $returnExpDays = ($rawExpDays !== null && $rawExpDays !== '') ? (int)$rawExpDays : null;
-        $returnLabelType = $defaultShipmentDefaults['returnLabelType']
-            ?? $defaultShipmentDefaults['return_label_type']
-            ?? null;
-        $returnQrCodeType = $defaultShipmentDefaults['returnQrCodeType']
-            ?? $defaultShipmentDefaults['return_qr_code_type']
-            ?? null;
-        $returnBookCourier = $defaultShipmentDefaults['returnBookCourier']
-            ?? $defaultShipmentDefaults['return_book_courier']
-            ?? null;
+        $returnLabelType = $defaultShipmentDefaults['returnLabelType'] ?? null;
+        $returnQrCodeType = $defaultShipmentDefaults['returnQrCodeType'] ?? null;
+        $returnBookCourier = $defaultShipmentDefaults['returnBookCourier'] ?? null;
 
         $shipmentSettings = new ShipmentSettingsData(
             serviceType: $serviceType,
