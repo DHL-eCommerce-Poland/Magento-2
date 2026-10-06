@@ -435,7 +435,6 @@ define([
         var rodDocumentTextObs = ko.observable(rodDocumentTextVal);
         var podObs = ko.observable(isTruthy(ss.proofOfDelivery));
         var ageverObs = ko.observable(isTruthy(ss.ageVer));
-        var odbObs = ko.observable(isTruthy(ss.selfCollect));
 
         insuranceObs.subscribe(function (checked) {
             if (checked) {
@@ -486,8 +485,7 @@ define([
                 returnOnDelivery: rodObs,
                 returnOnDeliveryReference: rodDocumentTextObs,
                 proofOfDelivery: podObs,
-                ageVer: ageverObs,
-                selfCollect: odbObs
+                ageVer: ageverObs
             },
             shipmentSettings: shipmentSettingsObj,
             customs: createCustomsData(data.customs || {})
@@ -1066,7 +1064,6 @@ define([
                     ssReset.returnOnDeliveryReference('');
                     ssReset.proofOfDelivery(false);
                     ssReset.ageVer(false);
-                    ssReset.selfCollect(false);
                 }
                 return;
             }
@@ -1169,10 +1166,6 @@ define([
 
                         if (specialServices.ageVer !== undefined && typeof currentSS.ageVer === 'function') {
                             currentSS.ageVer(isTruthy(specialServices.ageVer));
-                        }
-
-                        if (specialServices.selfCollect !== undefined && typeof currentSS.selfCollect === 'function') {
-                            currentSS.selfCollect(isTruthy(specialServices.selfCollect));
                         }
 
                         if (specialServices.collectOnDelivery !== undefined && typeof currentSS.collectOnDelivery === 'function') {

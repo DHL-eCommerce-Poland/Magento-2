@@ -90,7 +90,6 @@ class SpecialServicesDataTest extends TestCase
             'euroReturn' => false,
             'nonStandard' => false,
             'ageVer' => false,
-            'selfCollect' => false,
         ];
 
         $services = SpecialServicesData::fromArray($data);
@@ -102,6 +101,7 @@ class SpecialServicesDataTest extends TestCase
         $exported = $services->toArray();
         $this->assertEquals(1000.0, $exported['insuranceValue']);
         $this->assertTrue($exported['collectOnDelivery']);
+        $this->assertArrayNotHasKey('selfCollect', $exported);
     }
 
     /**
@@ -120,7 +120,6 @@ class SpecialServicesDataTest extends TestCase
             'returnOnDeliveryReference' => 'REF-999',
             'proofOfDelivery' => true,
             'ageVer' => true,
-            'selfCollect' => true,
         ];
 
         $services = SpecialServicesData::fromArray($data);
@@ -132,12 +131,11 @@ class SpecialServicesDataTest extends TestCase
         $this->assertEquals('REF-999', $services->getReturnOnDeliveryReference());
         $this->assertTrue($services->isProofOfDelivery());
         $this->assertTrue($services->isAgeVer());
-        $this->assertTrue($services->isSelfCollect());
 
         $exported = $services->toArray();
         $this->assertTrue($exported['deliveryEvening']);
         $this->assertTrue($exported['ageVer']);
-        $this->assertTrue($exported['selfCollect']);
         $this->assertTrue($exported['deliveryOnSaturday']);
+        $this->assertArrayNotHasKey('selfCollect', $exported);
     }
 }

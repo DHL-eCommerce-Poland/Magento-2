@@ -601,7 +601,6 @@ class TemplateManager
             $isRodVal = $this->isTrueValue($addServices['returnOnDelivery'] ?? false);
             $isPodVal = $this->isTrueValue($addServices['proofOfDelivery'] ?? false);
             $isAgeverVal = $this->isTrueValue($addServices['ageVer'] ?? false);
-            $isOdbVal = $this->isTrueValue($addServices['selfCollect'] ?? false);
             $isCodVal = $this->isTrueValue($addServices['collectOnDelivery'] ?? false);
             $rodDocText = (string)($addServices['returnOnDeliveryReference'] ?? '');
 
@@ -619,7 +618,6 @@ class TemplateManager
                 'returnOnDeliveryReference' => $rodDocText,
                 'proofOfDelivery' => $isPodVal,
                 'ageVer' => $isAgeverVal,
-                'selfCollect' => $isOdbVal,
             ];
         } catch (Exception $e) {
             $this->logger->error('Error loading special services template: ' . $e->getMessage(), ['exception' => $e]);

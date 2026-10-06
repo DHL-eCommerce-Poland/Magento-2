@@ -223,7 +223,6 @@ class DataProvider extends AbstractDataProvider
             'returnOnDeliveryReference' => $dto->isReturnOnDelivery() ? $dto->getReturnOnDeliveryReference() : '',
             'proofOfDelivery' => $dto->isProofOfDelivery() ? '1' : '0',
             'ageVer' => $dto->isAgeVer() ? '1' : '0',
-            'selfCollect' => $dto->isSelfCollect() ? '1' : '0',
         ];
     }
 
@@ -237,7 +236,7 @@ class DataProvider extends AbstractDataProvider
      * @param array $sender
      * @param string $dispatchNumber
      * @param string $returnShipmentId
-     *
+     * @param string $deliveryServiceTemplateId
      * @return array
      */
     private function normalizeShipmentSettings(

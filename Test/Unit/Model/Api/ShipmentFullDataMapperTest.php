@@ -223,11 +223,11 @@ class ShipmentFullDataMapperTest extends TestCase
     }
 
     /**
-     * Test mapping of ageVer, selfCollect, and special services in service definition.
+     * Test mapping of ageVer and other special services in the service definition.
      *
      * @return void
      */
-    public function testMapIncludesAgeVerAndSelfCollectAndSpecialServicesInServiceDef(): void
+    public function testMapIncludesAgeVerAndSpecialServicesWithoutSelfCollect(): void
     {
         $sender = new SenderData();
         $recipient = new RecipientData(name: 'Test Recipient');
@@ -239,8 +239,7 @@ class ShipmentFullDataMapperTest extends TestCase
             returnOnDelivery: true,
             returnOnDeliveryReference: 'REF123',
             proofOfDelivery: true,
-            ageVer: true,
-            selfCollect: true
+            ageVer: true
         );
         $settings = new ShipmentSettingsData(serviceType: 'AH', packages: [new PackageData()]);
 
@@ -268,7 +267,7 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('REF123', $servicesByType['ROD']['textInstruction']);
         $this->assertArrayHasKey('POD', $servicesByType);
         $this->assertArrayHasKey('AGEVER', $servicesByType);
-        $this->assertArrayHasKey('ODB', $servicesByType);
+        $this->assertArrayNotHasKey('ODB', $servicesByType);
     }
 
     /**

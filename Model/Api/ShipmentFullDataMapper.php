@@ -448,7 +448,6 @@ class ShipmentFullDataMapper
             'PDI' => $services->isPredeliveryInformation(),
             'POD' => $services->isProofOfDelivery(),
             'AGEVER' => $services->isAgeVer(),
-            'ODB' => $services->isSelfCollect(),
         ];
 
         foreach ($flagServices as $code => $isEnabled) {

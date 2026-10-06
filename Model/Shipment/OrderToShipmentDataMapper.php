@@ -268,7 +268,6 @@ class OrderToShipmentDataMapper
         $rodDocumentText = (string)($presetSS['returnOnDeliveryReference'] ?? '');
         $isPod = !empty($presetSS['proofOfDelivery']);
         $isAgever = !empty($presetSS['ageVer']);
-        $isOdb = !empty($presetSS['selfCollect']);
 
         $presetCodAmount = isset($presetSS['collectOnDeliveryValue']) && $presetSS['collectOnDeliveryValue'] !== null && $presetSS['collectOnDeliveryValue'] !== ''
             ? (float)$presetSS['collectOnDeliveryValue']
@@ -289,8 +288,7 @@ class OrderToShipmentDataMapper
             returnOnDelivery: $isRod,
             returnOnDeliveryReference: $rodDocumentText,
             proofOfDelivery: $isPod,
-            ageVer: $isAgever,
-            selfCollect: $isOdb
+            ageVer: $isAgever
         );
 
         // 6. Packages

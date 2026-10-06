@@ -28,7 +28,6 @@ class SpecialServicesData
      * @param bool $euroReturn
      * @param bool $nonStandard
      * @param bool $ageVer
-     * @param bool $selfCollect
      */
     public function __construct(
         private ?string $deliveryHours = null,
@@ -46,8 +45,7 @@ class SpecialServicesData
         private bool $proofOfDelivery = false,
         private bool $euroReturn = false,
         private bool $nonStandard = false,
-        private bool $ageVer = false,
-        private bool $selfCollect = false
+        private bool $ageVer = false
     ) {
         if ($this->deliveryEvening && $this->deliveryHours === null) {
             $this->deliveryHours = self::DELIVERY_HOURS_EVENING;
@@ -217,16 +215,6 @@ class SpecialServicesData
     }
 
     /**
-     * Check if Self Pickup (ODB / selfCollect) service is enabled.
-     *
-     * @return bool
-     */
-    public function isSelfCollect(): bool
-    {
-        return $this->selfCollect;
-    }
-
-    /**
      * Convert special services object to array representation using official DHL WebAPI2 names.
      *
      * @return array
@@ -250,7 +238,6 @@ class SpecialServicesData
             'euroReturn' => $this->euroReturn,
             'nonStandard' => $this->nonStandard,
             'ageVer' => $this->ageVer,
-            'selfCollect' => $this->selfCollect,
         ];
     }
 
@@ -300,8 +287,7 @@ class SpecialServicesData
             proofOfDelivery: filter_var($data['proofOfDelivery'] ?? false, FILTER_VALIDATE_BOOLEAN),
             euroReturn: filter_var($data['euroReturn'] ?? false, FILTER_VALIDATE_BOOLEAN),
             nonStandard: filter_var($data['nonStandard'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            ageVer: filter_var($data['ageVer'] ?? false, FILTER_VALIDATE_BOOLEAN),
-            selfCollect: filter_var($data['selfCollect'] ?? false, FILTER_VALIDATE_BOOLEAN)
+            ageVer: filter_var($data['ageVer'] ?? false, FILTER_VALIDATE_BOOLEAN)
         );
     }
 }
