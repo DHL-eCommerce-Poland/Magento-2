@@ -32,6 +32,10 @@ class RecreateShipmentTest extends TestCase
         $this->contextStub = $this->createStub(Context::class);
         $this->shipmentDataStub = $this->createStub(AdminhtmlShipmentData::class);
 
+        $urlBuilderStub = $this->createStub(\Magento\Framework\UrlInterface::class);
+        $urlBuilderStub->method('getUrl')->willReturn('http://example.com/dhlpoland/shipment/save');
+        $this->contextStub->method('getUrlBuilder')->willReturn($urlBuilderStub);
+
         $escaperStub = $this->createStub(Escaper::class);
         $escaperStub->method('escapeJs')->willReturnCallback(fn (string $str) => addslashes($str));
         $this->contextStub->method('getEscaper')->willReturn($escaperStub);
@@ -77,6 +81,6 @@ class RecreateShipmentTest extends TestCase
         $this->assertEquals(__('Save & Resend to DHL'), $buttonData['label']);
         $this->assertEquals('save primary', $buttonData['class']);
         $this->assertEquals(70, $buttonData['sort_order']);
-        $this->assertStringContainsString('dhlpoland_shipment_form', $buttonData['on_click']);
+        $this->assertStringContainsString('Ideo_Dhl/js/shipment/recreate-shipment', $buttonData['on_click']);
     }
 }

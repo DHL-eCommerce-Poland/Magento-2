@@ -89,13 +89,20 @@ class Save extends Action implements HttpPostActionInterface
             $payload = $payload['data'];
         }
 
+        $paramId = $this->getRequest()->getParam('entity_id')
+            ?? $this->getRequest()->getParam('id')
+            ?? (is_array($payload) ? ($payload['entity_id'] ?? 0) : 0);
+        $entityId = (int) $paramId;
+
         if (empty($payload) || !is_array($payload)) {
             $msg = __('Invalid shipment data provided.')->render();
             if ($isAjax) {
                 return $resultJson->setData(['success' => false, 'message' => $msg]);
             }
             $this->messageManager->addErrorMessage($msg);
-            return $this->resultRedirectFactory->create()->setPath('*/*/index');
+            $redirectPath = $entityId > 0 ? '*/*/edit' : '*/*/index';
+            return $this->resultRedirectFactory->create()
+                ->setPath($redirectPath, ['entity_id' => $entityId]);
         }
 
         // Validate raw payload against commas in numeric fields
@@ -107,7 +114,9 @@ class Save extends Action implements HttpPostActionInterface
                 return $resultJson->setData(['success' => false, 'message' => $errorMsg]);
             }
             $this->messageManager->addErrorMessage($errorMsg);
-            return $this->resultRedirectFactory->create()->setPath('*/*/index');
+            $redirectPath = $entityId > 0 ? '*/*/edit' : '*/*/index';
+            return $this->resultRedirectFactory->create()
+                ->setPath($redirectPath, ['entity_id' => $entityId]);
         }
 
         // Validate and sanitize shipmentDate (must be valid and not in the past)
@@ -122,7 +131,9 @@ class Save extends Action implements HttpPostActionInterface
                     return $resultJson->setData(['success' => false, 'message' => (string) $msg]);
                 }
                 $this->messageManager->addErrorMessage($msg);
-                return $this->resultRedirectFactory->create()->setPath('*/*/index');
+                $redirectPath = $entityId > 0 ? '*/*/edit' : '*/*/index';
+                return $this->resultRedirectFactory->create()
+                    ->setPath($redirectPath, ['entity_id' => $entityId]);
             }
 
             $payload['shipmentSettings']['shipmentDate'] = $finalDate;
@@ -141,11 +152,6 @@ class Save extends Action implements HttpPostActionInterface
                 $payload['sender']['pickupHourTo'] = $payload['shipmentSettings']['pickupHourTo'] ?? null;
             }
         }
-
-        $paramId = $this->getRequest()->getParam('entity_id')
-            ?? $this->getRequest()->getParam('id')
-            ?? ($payload['entity_id'] ?? 0);
-        $entityId = (int) $paramId;
 
         try {
             $shipmentData = DhlShipmentData::fromArray($payload);
