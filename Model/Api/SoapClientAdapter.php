@@ -131,7 +131,7 @@ class SoapClientAdapter implements ClientInterface
                     'username' => $this->ensureUtf8($credentials->getUsername()),
                     'password' => $this->ensureUtf8($credentials->getPassword()),
                 ],
-                'shipment' => $shipmentData,
+                'shipment' => $this->preserveFractionalPackageMeasurements($shipmentData),
             ];
 
             $response = $client->createShipment($params);
@@ -1624,5 +1624,41 @@ class SoapClientAdapter implements ClientInterface
         }
 
         return $message;
+    }
+
+    /**
+     * Force fractional package measurements to be serialized as XML floats for createShipment.
+     *
+     * DHL's WSDL declares these fields as integers, which makes SoapClient truncate fractional values.
+     *
+     * @param array $shipmentData
+     *
+     * @return array
+     */
+    private function preserveFractionalPackageMeasurements(array $shipmentData): array
+    {
+        $packageItems = $shipmentData['pieceList']['item'] ?? null;
+        if (!is_array($packageItems)) {
+            return $shipmentData;
+        }
+
+        foreach ($packageItems as $packageIndex => $package) {
+            if (!is_array($package)) {
+                continue;
+            }
+
+            foreach (['weight', 'width', 'height', 'length'] as $measurement) {
+                $value = $package[$measurement] ?? null;
+                if ($value !== null && $value !== '' && is_numeric($value)) {
+                    $package[$measurement] = new \SoapVar((float) $value, XSD_FLOAT);
+                }
+            }
+
+            $packageItems[$packageIndex] = $package;
+        }
+
+        $shipmentData['pieceList']['item'] = $packageItems;
+
+        return $shipmentData;
     }
 }

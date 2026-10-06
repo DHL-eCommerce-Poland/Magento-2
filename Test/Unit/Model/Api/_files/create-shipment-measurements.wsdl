@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:tns="urn:ideo:dhl:test"
+             targetNamespace="urn:ideo:dhl:test">
+    <types>
+        <xsd:schema targetNamespace="urn:ideo:dhl:test">
+            <xsd:complexType name="AuthData">
+                <xsd:sequence>
+                    <xsd:element name="username" type="xsd:string"/>
+                    <xsd:element name="password" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="Package">
+                <xsd:all>
+                    <xsd:element name="type" type="xsd:string" nillable="true"/>
+                    <xsd:element name="weight" type="xsd:int" nillable="true"/>
+                    <xsd:element name="width" type="xsd:int" nillable="true"/>
+                    <xsd:element name="height" type="xsd:int" nillable="true"/>
+                    <xsd:element name="length" type="xsd:int" nillable="true"/>
+                    <xsd:element name="quantity" type="xsd:int" nillable="true"/>
+                </xsd:all>
+            </xsd:complexType>
+            <xsd:complexType name="ArrayOfPackage">
+                <xsd:sequence>
+                    <xsd:element name="item" type="tns:Package" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="Shipment">
+                <xsd:sequence>
+                    <xsd:element name="pieceList" type="tns:ArrayOfPackage" minOccurs="0" nillable="true"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="createShipment">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="authData" type="tns:AuthData"/>
+                        <xsd:element name="shipment" type="tns:Shipment"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="createShipmentResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="createShipmentResult" type="xsd:string" minOccurs="0"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </types>
+    <message name="createShipmentIn">
+        <part name="parameters" element="tns:createShipment"/>
+    </message>
+    <message name="createShipmentOut">
+        <part name="parameters" element="tns:createShipmentResponse"/>
+    </message>
+    <portType name="DhlTestPortType">
+        <operation name="createShipment">
+            <input message="tns:createShipmentIn"/>
+            <output message="tns:createShipmentOut"/>
+        </operation>
+    </portType>
+    <binding name="DhlTestBinding" type="tns:DhlTestPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="createShipment">
+            <soap:operation soapAction="urn:ideo:dhl:test#createShipment"/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+    </binding>
+    <service name="DhlTestService">
+        <port name="DhlTestPort" binding="tns:DhlTestBinding">
+            <soap:address location="http://localhost"/>
+        </port>
+    </service>
+</definitions>

@@ -310,6 +310,89 @@ class SoapClientAdapterTest extends TestCase
     }
 
     /**
+     * Test that createShipment SOAP XML retains decimal package measurements and nullable fields.
+     *
+     * @return void
+     */
+    public function testCreateShipmentSoapRequestKeepsFractionalMeasurementsAndNilValues(): void
+    {
+        $wsdl = __DIR__ . '/_files/create-shipment-measurements.wsdl';
+        $soapClient = new class($wsdl) extends \SoapClient {
+            /** @var string */
+            public string $capturedRequest = '';
+
+            public function __construct(string $wsdlPath)
+            {
+                parent::__construct($wsdlPath, [
+                    'cache_wsdl' => WSDL_CACHE_NONE,
+                    'exceptions' => true,
+                    'trace' => true,
+                ]);
+            }
+
+            public function __doRequest(
+                string $request,
+                string $location,
+                string $action,
+                int $version,
+                bool $oneWay = false,
+                ?string $uriParserClass = null
+            ): ?string {
+                $this->capturedRequest = $request;
+
+                return '<?xml version="1.0"?>'
+                    . '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">'
+                    . '<SOAP-ENV:Body><createShipmentResponse xmlns="urn:ideo:dhl:test">'
+                    . '<createShipmentResult>OK</createShipmentResult>'
+                    . '</createShipmentResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+            }
+        };
+
+        $adapter = $this->getMockBuilder(SoapClientAdapter::class)
+            ->setConstructorArgs([
+                $this->loggerStub,
+                $this->scopeConfigStub,
+                $this->dateSanitizer,
+                $this->fileDriverStub,
+            ])
+            ->onlyMethods(['createSoapClient'])
+            ->getMock();
+        $adapter->expects($this->once())
+            ->method('createSoapClient')
+            ->willReturn($soapClient);
+
+        $adapter->createShipment(new Credentials('user', 'pass', true), [
+            'shipmentInfo' => [],
+            'pieceList' => [
+                'item' => [
+                    [
+                        'type' => 'PACKAGE',
+                        'weight' => '0.12',
+                        'width' => '0.5',
+                        'height' => '0.5',
+                        'length' => '0.5',
+                        'quantity' => 1,
+                    ],
+                    [
+                        'type' => 'PACKAGE',
+                        'weight' => null,
+                        'width' => null,
+                        'height' => null,
+                        'length' => null,
+                        'quantity' => 1,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertStringContainsString('<weight>0.12</weight>', $soapClient->capturedRequest);
+        $this->assertStringContainsString('<width>0.5</width>', $soapClient->capturedRequest);
+        $this->assertStringContainsString('<height>0.5</height>', $soapClient->capturedRequest);
+        $this->assertStringContainsString('<length>0.5</length>', $soapClient->capturedRequest);
+        $this->assertSame(4, substr_count($soapClient->capturedRequest, 'xsi:nil="true"'));
+    }
+
+    /**
      * Test createShipment handling timeout exception.
      *
      * @return void
