@@ -5,6 +5,7 @@
         <carriers>
             <dhlpoland>
                 <model>Ideo\Dhl\Model\Carrier</model>
+                <title>DHL eCommerce Poland</title>
                 <active>1</active>
                 <sandbox>0</sandbox>
                 <api_login backend_model="Magento\Config\Model\Config\Backend\Encrypted" />

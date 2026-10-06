@@ -1,0 +1,227 @@
+<?php
+
+declare(strict_types=1);
+
+use Ideo\Dhl\ViewModel\Adminhtml\Order\Create\ShippingMethodFormViewModel;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Magento\Sales\Block\Adminhtml\Order\Create\Shipping\Method\Form;
+
+/** @var Form $block */
+/** @var SecureHtmlRenderer $secureRenderer */
+/** @var Escaper $escaper */
+/** @var ShippingMethodFormViewModel $viewModel */
+
+$viewModel = $block->getData('viewModel');
+$taxHelper = $block->getData('taxHelper');
+$quoteAddress = $block->getAddress();
+
+$spId = $viewModel->getServicePointId($quoteAddress);
+$spName = $viewModel->getServicePointName($quoteAddress);
+$spStreet = $viewModel->getServicePointStreet($quoteAddress);
+$spPostcode = $viewModel->getServicePointPostcode($quoteAddress);
+$spCity = $viewModel->getServicePointCity($quoteAddress);
+$spIsPackstation = $viewModel->getIsPackstation($quoteAddress);
+$spIsPostfiliale = $viewModel->getIsPostfiliale($quoteAddress);
+$spPostnummer = $viewModel->getPostnummer($quoteAddress);
+$spDisplayText = $viewModel->getFormattedDisplayText($quoteAddress);
+$countryId = $viewModel->getCountryId($quoteAddress);
+
+$shippingRateGroups = $block->getShippingRates();
+?>
+<?php if ($shippingRateGroups): ?>
+    <div id="order-shipping-method-choose" class="control">
+        <dl class="admin__order-shipment-methods">
+            <?php foreach ($shippingRateGroups as $code => $rates): ?>
+                <dt class="admin__order-shipment-methods-title"><?= $escaper->escapeHtml($block->getCarrierName($code)) ?></dt>
+                <dd class="admin__order-shipment-methods-options">
+                    <ul class="admin__order-shipment-methods-options-list">
+                        <?php foreach ($rates as $rate): ?>
+                            <?php $radioProperty = 'name="order[shipping_method]" type="radio"' ?>
+                            <?php $rateCarrier = (string) $rate->getCarrier(); ?>
+                            <?php $rateMethod = (string) $rate->getMethod(); ?>
+                            <?php $rateCode = (string) ($rate->getCode() ?: ($rateCarrier . '_' . $rateMethod)); ?>
+                            <?php $isSp = $viewModel->isDhlServicePointMethod($rateCarrier, $rateMethod, $rateCode); ?>
+                            <li class="admin__field-option">
+                                <?php if ($rate->getErrorMessage()): ?>
+                                    <div class="messages">
+                                        <div class="message message-error error">
+                                            <div><?= $escaper->escapeHtml($rate->getErrorMessage()) ?></div>
+                                        </div>
+                                    </div>
+                                <?php else: ?>
+                                    <?php $checked = $block->isMethodActive($rateCode) || $block->isMethodActive($rateMethod) ? 'checked="checked"' : '' ?>
+                                    <input <?= /* @noEscape */ $radioProperty ?>
+                                        value="<?= $escaper->escapeHtmlAttr($rateCode) ?>"
+                                        id="s_method_<?= $escaper->escapeHtmlAttr($rateCode) ?>" <?= /* @noEscape */ $checked ?>
+                                        class="admin__control-radio required-entry"/>
+                                    <label class="admin__field-label" for="s_method_<?= $escaper->escapeHtmlAttr($rateCode) ?>">
+                                        <?= $escaper->escapeHtml($rate->getMethodTitle() ? $rate->getMethodTitle() : $rate->getMethodDescription()) ?> -
+                                        <strong>
+                                            <?php $excl = $block->getShippingPrice($rate->getPrice(), $taxHelper->displayShippingPriceIncludingTax()); ?>
+                                            <?php $incl = $block->getShippingPrice($rate->getPrice(), true); ?>
+                                            <?= /* @noEscape */ $excl ?>
+                                            <?php if ($taxHelper->displayShippingBothPrices() && $incl != $excl): ?>
+                                                (<?= $escaper->escapeHtml(__('Incl. Tax')) ?> <?= /* @noEscape */ $incl ?>)
+                                            <?php endif; ?>
+                                        </strong>
+                                    </label>
+
+                                    <?php if ($isSp): ?>
+                                        <div class="dhl-service-point-selector-wrapper" <?= $checked ? '' : 'style="display: none;"' ?>>
+                                            <span class="dhl-sp-label"><?= $escaper->escapeHtml(__('Selected DHL pickup point:')) ?></span>
+                                            <strong class="dhl-sp-display-text"><?= $escaper->escapeHtml($spDisplayText !== '' ? $spDisplayText : __('None')) ?></strong>
+                                            &nbsp;
+                                            <a href="#" class="action-secondary dhl-show-map-btn">
+                                                <span><?= $escaper->escapeHtml(__('Select DHL pickup point')) ?></span>
+                                            </a>
+                                            <div class="dhl-postnummer-wrapper" style="display: none;">
+                                                <label for="dhl_postnummer_input" class="admin__field-label dhl-postnummer-label">
+                                                    <?= $escaper->escapeHtml(__('German Customer Number (Postnummer):')) ?>
+                                                </label>
+                                                <input type="text"
+                                                       id="dhl_postnummer_input"
+                                                       class="admin__control-text dhl-postnummer-input"
+                                                       value="<?= $escaper->escapeHtmlAttr($spPostnummer) ?>"
+                                                       placeholder="<?= $escaper->escapeHtmlAttr(__('6-10 digits')) ?>" />
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
+                                        'onclick',
+                                        "order.setShippingMethod(this.value)",
+                                        'input#s_method_' . $escaper->escapeHtmlAttr($rateCode)
+                                    ) ?>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </dd>
+            <?php endforeach; ?>
+        </dl>
+    </div>
+    <?= /* @noEscape */ $secureRenderer->renderStyleAsTag("display:none", 'div#order-shipping-method-choose') ?>
+    <?php if ($rate = $block->getActiveMethodRate()): ?>
+        <?php
+            $activeCarrier = (string) $rate->getCarrier();
+            $activeMethod = (string) $rate->getMethod();
+            $activeCode = (string) ($rate->getCode() ?: ($activeCarrier . '_' . $activeMethod));
+            $isActiveDhlSpMethod = $viewModel->isDhlServicePointMethod($activeCarrier, $activeMethod, $activeCode);
+        ?>
+        <div id="order-shipping-method-info" class="order-shipping-method-info">
+            <dl class="admin__order-shipment-methods">
+                <dt class="admin__order-shipment-methods-title">
+                    <?= $escaper->escapeHtml($block->getCarrierName($rate->getCarrier())) ?>
+                </dt>
+                <dd class="admin__order-shipment-methods-options">
+                    <?= $escaper->escapeHtml($rate->getMethodTitle() ? $rate->getMethodTitle() : $rate->getMethodDescription()) ?> -
+                    <strong>
+                        <?php $excl = $block->getShippingPrice($rate->getPrice(), $taxHelper->displayShippingPriceIncludingTax()); ?>
+                        <?php $incl = $block->getShippingPrice($rate->getPrice(), true); ?>
+                        <?= /* @noEscape */ $excl ?>
+                        <?php if ($taxHelper->displayShippingBothPrices() && $incl != $excl): ?>
+                            (<?= $escaper->escapeHtml(__('Incl. Tax')) ?> <?= /* @noEscape */ $incl ?>)
+                        <?php endif; ?>
+                    </strong>
+
+                    <?php if ($isActiveDhlSpMethod): ?>
+                        <div class="dhl-service-point-selector-wrapper dhl-sp-active-info">
+                            <span class="dhl-sp-label"><?= $escaper->escapeHtml(__('Selected DHL pickup point:')) ?></span>
+                            <strong class="dhl-sp-display-text"><?= $escaper->escapeHtml($spDisplayText !== '' ? $spDisplayText : __('None')) ?></strong>
+                            &nbsp;
+                            <a href="#" class="action-secondary dhl-show-map-btn">
+                                <span><?= $escaper->escapeHtml(__('Select DHL pickup point')) ?></span>
+                            </a>
+                            <div class="dhl-postnummer-wrapper" style="display: none;">
+                                <label for="dhl_postnummer_input" class="admin__field-label dhl-postnummer-label">
+                                    <?= $escaper->escapeHtml(__('German Customer Number (Postnummer):')) ?>
+                                </label>
+                                <input type="text"
+                                       id="dhl_postnummer_input"
+                                       class="admin__control-text dhl-postnummer-input"
+                                       value="<?= $escaper->escapeHtmlAttr($spPostnummer) ?>"
+                                       placeholder="<?= $escaper->escapeHtmlAttr(__('6-10 digits')) ?>" />
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </dd>
+            </dl>
+            <a href="#" class="action-default">
+                <span><?= $escaper->escapeHtml(__('Click to change shipping method')) ?></span>
+            </a>
+        </div>
+        <?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
+            'onclick',
+            "$('order-shipping-method-info').hide();$('order-shipping-method-choose').show();event.preventDefault()",
+            'div#order-shipping-method-info a.action-default'
+        ) ?>
+    <?php else: ?>
+        <?php $scriptString = <<<script
+require(['prototype'], function(){
+    $('order-shipping-method-choose').show();
+});
+script;
+        ?>
+        <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+    <?php endif; ?>
+<?php elseif ($block->getIsRateRequest()): ?>
+    <div class="order-shipping-method-summary">
+        <strong class="order-shipping-method-not-available">
+            <?= $escaper->escapeHtml(__('Sorry, no quotes are available for this order.')) ?>
+        </strong>
+    </div>
+<?php else: ?>
+    <div id="order-shipping-method-summary" class="order-shipping-method-summary">
+        <a href="#" class="action-default">
+            <span><?= $escaper->escapeHtml(__('Get shipping methods and rates')) ?></span>
+        </a>
+        <input type="hidden" name="order[has_shipping]" value="" class="required-entry" />
+    </div>
+    <?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
+        'onclick',
+        "order.loadShippingRates();event.preventDefault();",
+        'div#order-shipping-method-summary a.action-default'
+    ) ?>
+<?php endif; ?>
+
+<input type="hidden" name="order[dhl_service_point_id]" id="dhl_service_point_id" value="<?= $escaper->escapeHtmlAttr($spId) ?>" />
+<input type="hidden" name="order[dhl_service_point_name]" id="dhl_service_point_name" value="<?= $escaper->escapeHtmlAttr($spName) ?>" />
+<input type="hidden" name="order[dhl_service_point_street]" id="dhl_service_point_street" value="<?= $escaper->escapeHtmlAttr($spStreet) ?>" />
+<input type="hidden" name="order[dhl_service_point_postcode]" id="dhl_service_point_postcode" value="<?= $escaper->escapeHtmlAttr($spPostcode) ?>" />
+<input type="hidden" name="order[dhl_service_point_city]" id="dhl_service_point_city" value="<?= $escaper->escapeHtmlAttr($spCity) ?>" />
+<input type="hidden" name="order[dhl_is_packstation]" id="dhl_is_packstation" value="<?= $escaper->escapeHtmlAttr($spIsPackstation) ?>" />
+<input type="hidden" name="order[dhl_is_postfiliale]" id="dhl_is_postfiliale" value="<?= $escaper->escapeHtmlAttr($spIsPostfiliale) ?>" />
+<input type="hidden" name="order[dhl_postnummer]" id="dhl_postnummer" value="<?= $escaper->escapeHtmlAttr($spPostnummer) ?>" />
+
+<div id="shipping-method-overlay" class="order-methods-overlay">
+    <span><?= $escaper->escapeHtml(__('You don\'t need to select a shipping method.')) ?></span>
+</div>
+<?= /* @noEscape */ $secureRenderer->renderStyleAsTag("display: none;", 'div#shipping-method-overlay') ?>
+
+<?php
+$escapedCountryId = $escaper->escapeJs($countryId);
+$mapInitScript = <<<script
+    require(["jquery", "Ideo_Dhl/js/order/create/dhl-map-point"], function($, dhlMapPoint){
+        dhlMapPoint(
+            { country: "{$escapedCountryId}" },
+            $("#order-shipping-method-choose, #order-shipping-method-info")
+        );
+    });
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $mapInitScript, false) ?>
+
+<?php
+$isVirtual = $block->getQuote() ? $block->getQuote()->isVirtual() : false;
+$isVirtualStr = $isVirtual ? 'true' : 'false';
+$isNotVirtualStr = $isVirtual ? 'false' : 'true';
+$scriptString = <<<script
+    require(["Magento_Sales/order/create/form"], function(){
+        order.overlay('shipping-method-overlay', {$isNotVirtualStr});
+        order.overlay('address-shipping-overlay', {$isNotVirtualStr});
+        order.isOnlyVirtualProduct = {$isVirtualStr};
+    });
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>

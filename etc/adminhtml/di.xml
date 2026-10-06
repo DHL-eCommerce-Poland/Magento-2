@@ -18,4 +18,16 @@
                 type="Ideo\Dhl\Plugin\Adminhtml\Order\View\Tab\RedirectShipmentUiViewActionPlugin"
                 sortOrder="10" />
     </type>
+
+    <type name="Magento\Sales\Model\AdminOrder\Create">
+        <plugin name="dhlpoland_preserve_service_point_on_admin_order_create"
+                type="Ideo\Dhl\Plugin\Adminhtml\Order\Create\PreserveServicePointOnAdminOrderCreate"
+                sortOrder="10" />
+    </type>
+
+    <type name="Magento\Sales\Block\Adminhtml\Order\Create\Shipping\Method\Form">
+        <plugin name="ideo_dhl_add_service_point_to_shipping_method_form"
+                type="Ideo\Dhl\Plugin\Adminhtml\Order\Create\AddDhlServicePointToShippingMethodFormPlugin"
+                sortOrder="10" />
+    </type>
 </config>
