@@ -42,21 +42,17 @@ class CreateReturnShipment extends Generic implements ButtonProviderInterface
             return [];
         }
 
-        $confirmMessage = $this->escapeJs(
-            (string) __('Are you sure you want to create a return shipment for this parcel?')
-        );
-        $url = $this->escapeJs($this->getUrl(
+        $url = $this->getUrl(
             'dhlpoland/shipment/createReturnShipment',
             ['entity_id' => $entityId]
-        ));
+        );
 
         return [
             'label' => __('Create Return Shipment'),
             'class' => '',
             'on_click' => sprintf(
-                "confirmSetLocation('%s', '%s')",
-                $confirmMessage,
-                $url
+                "require(['Ideo_Dhl/js/shipment/create-return'], function (createReturn) { createReturn('%s'); });",
+                $this->escapeJs($url)
             ),
             'sort_order' => 65,
         ];

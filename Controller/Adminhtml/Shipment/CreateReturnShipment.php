@@ -14,7 +14,8 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Controller\ResultInterface;
 use Psr\Log\LoggerInterface;
 
 class CreateReturnShipment extends Action implements HttpGetActionInterface, HttpPostActionInterface
@@ -28,6 +29,7 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
      * @param ReturnShipmentCreationService $returnCreationService
      * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
+     * @param JsonFactory $resultJsonFactory
      */
     public function __construct(
         Context $context,
@@ -35,7 +37,8 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
         private readonly ReturnShipmentDataBuilder $returnBuilder,
         private readonly ReturnShipmentCreationService $returnCreationService,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly JsonFactory $resultJsonFactory
     ) {
         parent::__construct($context);
     }
@@ -43,15 +46,24 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
     /**
      * Execute return shipment creation action.
      *
-     * @return Redirect
+     * @return ResultInterface
      */
-    public function execute(): Redirect
+    public function execute(): ResultInterface
     {
+        $request = $this->getRequest();
+        $isAjax = $request->isXmlHttpRequest() || (bool) $request->getParam('isAjax');
         $resultRedirect = $this->resultRedirectFactory->create();
-        $entityId = (int) $this->getRequest()->getParam('entity_id');
+        $entityId = (int) $request->getParam('entity_id');
 
         if ($entityId <= 0) {
-            $this->messageManager->addErrorMessage(__('Invalid shipment entity ID.'));
+            $msg = __('Invalid shipment entity ID.');
+            if ($isAjax) {
+                return $this->resultJsonFactory->create()->setData([
+                    'success' => false,
+                    'message' => (string) $msg,
+                ]);
+            }
+            $this->messageManager->addErrorMessage($msg);
             return $resultRedirect->setPath('*/*/index');
         }
 
@@ -60,10 +72,15 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
             $shipmentData = $this->shipmentDataService->loadShipmentDataFromEntity($existingEntity);
 
             if ($shipmentData === null) {
-                $this->messageManager->addErrorMessage(
-                    __('Could not load shipment data for return shipment creation.')
-                );
-                return $resultRedirect->setPath('*/*/index');
+                $msg = __('Could not load shipment data for return shipment creation.');
+                if ($isAjax) {
+                    return $this->resultJsonFactory->create()->setData([
+                        'success' => false,
+                        'message' => (string) $msg,
+                    ]);
+                }
+                $this->messageManager->addErrorMessage($msg);
+                return $resultRedirect->setPath('*/*/edit', ['entity_id' => $entityId]);
             }
 
             $returnShipmentData = $this->returnBuilder->buildReturnShipmentData($shipmentData);
@@ -81,19 +98,43 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
             );
 
             if ($result->isSuccess()) {
-                $this->messageManager->addSuccessMessage(
-                    __('Return shipment created successfully. Return Package Number: %1', $result->getShipmentId())
+                $successMsg = __(
+                    'Return shipment created successfully. Return Package Number: %1',
+                    $result->getShipmentId()
                 );
+                $this->messageManager->addSuccessMessage($successMsg);
+                if ($isAjax) {
+                    return $this->resultJsonFactory->create()->setData([
+                        'success' => true,
+                        'message' => (string) $successMsg,
+                        'shipmentId' => $result->getShipmentId(),
+                    ]);
+                }
             } else {
-                $this->messageManager->addErrorMessage(
-                    __('Failed to create return shipment: %1', $result->getErrorMessage() ?: __('Unknown error'))
+                $errorMsg = __(
+                    'Failed to create return shipment: %1',
+                    $result->getErrorMessage() ?: __('Unknown error')
                 );
+                if ($isAjax) {
+                    return $this->resultJsonFactory->create()->setData([
+                        'success' => false,
+                        'message' => (string) $errorMsg,
+                    ]);
+                }
+                $this->messageManager->addErrorMessage($errorMsg);
             }
         } catch (Exception $e) {
             $this->logger->error('Error creating DHL return shipment: ' . $e->getMessage(), ['exception' => $e]);
-            $this->messageManager->addErrorMessage(__('Failed to create return shipment: %1', $e->getMessage()));
+            $errorMsg = __('Failed to create return shipment: %1', $e->getMessage());
+            if ($isAjax) {
+                return $this->resultJsonFactory->create()->setData([
+                    'success' => false,
+                    'message' => (string) $errorMsg,
+                ]);
+            }
+            $this->messageManager->addErrorMessage($errorMsg);
         }
 
-        return $resultRedirect->setPath('*/*/index');
+        return $resultRedirect->setPath('*/*/edit', ['entity_id' => $entityId]);
     }
 }

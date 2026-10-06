@@ -42,7 +42,10 @@ class PrintReturnQrCode extends Generic implements ButtonProviderInterface
         return [
             'label' => __('Print Return QR Code'),
             'class' => '',
-            'on_click' => sprintf("window.open('%s', '_blank');", $this->escapeJs($printUrl)),
+            'on_click' => sprintf(
+                "require(['Ideo_Dhl/js/shipment/download-document'], function (downloadDocument) { downloadDocument('%s'); });",
+                $this->escapeJs($printUrl)
+            ),
             'sort_order' => 53,
         ];
     }

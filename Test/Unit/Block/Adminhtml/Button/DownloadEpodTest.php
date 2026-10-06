@@ -74,6 +74,7 @@ class DownloadEpodTest extends TestCase
 
         $this->assertNotEmpty($data);
         $this->assertEquals('Download ePOD', (string) $data['label']);
-        $this->assertStringContainsString('window.open(\'http://example.com/downloadEpod\'', $data['on_click']);
+        $this->assertStringContainsString('download-document', $data['on_click']);
+        $this->assertStringContainsString('http://example.com/downloadEpod', $data['on_click']);
     }
 }

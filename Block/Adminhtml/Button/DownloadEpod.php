@@ -42,7 +42,10 @@ class DownloadEpod extends Generic implements ButtonProviderInterface
         return [
             'label' => __('Download ePOD'),
             'class' => '',
-            'on_click' => sprintf("window.open('%s', '_blank');", $this->escapeJs($downloadUrl)),
+            'on_click' => sprintf(
+                "require(['Ideo_Dhl/js/shipment/download-document'], function (downloadDocument) { downloadDocument('%s'); });",
+                $this->escapeJs($downloadUrl)
+            ),
             'sort_order' => 54,
         ];
     }
