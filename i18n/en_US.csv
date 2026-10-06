@@ -220,6 +220,7 @@
 "Cannot create or find Magento shipment for order #%1.","Cannot create or find Magento shipment for order #%1."
 "DHL shipment #%1 created with tracking number(s): %2.","DHL shipment #%1 created with tracking number(s): %2."
 "DHL tracking for shipment #%1 has been canceled.","DHL tracking for shipment #%1 has been canceled."
+"DHL shipment has been deleted. Redirected to the default Magento shipment view.","DHL shipment has been deleted. Redirected to the default Magento shipment view."
 "DHL shipping cannot be created for virtual orders.","DHL shipping cannot be created for virtual orders."
 "Invalid date format. Please specify date in YYYY-MM-DD format.","Invalid date format. Please specify date in YYYY-MM-DD format."
 "Invalid package type specified for courier report.","Invalid package type specified for courier report."

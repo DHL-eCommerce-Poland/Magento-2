@@ -220,6 +220,7 @@
 "Cannot create or find Magento shipment for order #%1.","Nie można utworzyć ani znaleźć przesyłki Magento dla zamówienia #%1."
 "DHL shipment #%1 created with tracking number(s): %2.","Przesyłka DHL #%1 została utworzona z numerem(ami) śledzenia: %2."
 "DHL tracking for shipment #%1 has been canceled.","Śledzenie DHL dla przesyłki #%1 zostało anulowane."
+"DHL shipment has been deleted. Redirected to the default Magento shipment view.","Przesyłka DHL została usunięta. Przeniesiono na domyślny widok przesyłki Magento."
 "DHL shipping cannot be created for virtual orders.","Wysyłka DHL nie może zostać utworzona dla zamówień wirtualnych."
 "Invalid date format. Please specify date in YYYY-MM-DD format.","Nieprawidłowy format daty. Prosimy podać datę w formacie RRRR-MM-DD."
 "Invalid package type specified for courier report.","Określono nieprawidłowy typ paczki dla raportu kurierskiego."
