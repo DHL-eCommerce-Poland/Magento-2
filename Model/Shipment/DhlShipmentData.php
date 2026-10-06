@@ -174,12 +174,13 @@ class DhlShipmentData
     public static function fromArray(array $data): self
     {
         $shipmentSettings = $data['shipmentSettings'] ?? [];
-        if (isset($data['packages']) && is_array($data['packages'])) {
-            $shipmentSettings['packages'] = $data['packages'];
-        } elseif (isset($data['packages_fieldset']['packages'])
-            && is_array($data['packages_fieldset']['packages'])
-        ) {
-            $shipmentSettings['packages'] = $data['packages_fieldset']['packages'];
+        $packages = array_filter([
+            $data['packages'] ?? null,
+            $data['packages_fieldset']['packages'] ?? null,
+            $data['shipmentSettings']['packages'] ?? null,
+        ]);
+        if ($packages) {
+            $shipmentSettings['packages'] = reset($packages);
         }
 
         $customs = null;

@@ -329,12 +329,17 @@ class RecipientData
             }
         }
 
+        $firstName = (string)($data['firstName'] ?? '');
+        $lastName = (string)($data['lastName'] ?? '');
+        $computedContact = trim($firstName . ' ' . $lastName);
+        $contactPerson = $computedContact !== '' ? $computedContact : (string)($data['contactPerson'] ?? '');
+
         return new self(
             $name,
             $type,
-            (string)($data['firstName'] ?? ''),
-            (string)($data['lastName'] ?? ''),
-            (string)($data['contactPerson'] ?? ''),
+            $firstName,
+            $lastName,
+            $contactPerson,
             (string)($data['street'] ?? ''),
             (string)($data['houseNumber'] ?? ''),
             (string)($data['flatNumber'] ?? ''),

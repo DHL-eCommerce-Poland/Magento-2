@@ -54,9 +54,10 @@ class ShipmentFullDataMapper
         $senderName = $senderCompanyName !== '' ? $senderCompanyName : $senderFullName;
         $senderContact = $senderFullName;
 
-        $recipientContact = $recipient->getContactPerson() !== ''
-            ? $recipient->getContactPerson()
-            : ($recipient->getFirstName() . ' ' . $recipient->getLastName());
+        $recipientFullName = trim($recipient->getFirstName() . ' ' . $recipient->getLastName());
+        $recipientContact = $recipientFullName !== ''
+            ? $recipientFullName
+            : $recipient->getContactPerson();
 
         $payerType = match ($sender->getPayer()) {
             'RECIPIENT' => 'RECEIVER',

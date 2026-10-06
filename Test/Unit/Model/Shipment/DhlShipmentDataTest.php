@@ -166,6 +166,24 @@ class DhlShipmentDataTest extends TestCase
         $this->assertEquals(2, $shipmentData2->getShipmentSettings()->getPackageQuantity());
         $this->assertEquals(10.0, $shipmentData2->getShipmentSettings()->getPackages()[0]->getWeight());
         $this->assertEquals(5.0, $shipmentData2->getShipmentSettings()->getPackages()[1]->getWeight());
+
+        // Case 3: root packages (updated by dynamicRows component) overrides stale packages_fieldset
+        $dataDynamicRows = [
+            'orderId' => 403,
+            'shipmentSettings' => [
+                'serviceType' => 'AH',
+            ],
+            'packages_fieldset' => [
+                'packages' => [$pkgOld],
+            ],
+            'packages' => [$pkgNew1, $pkgNew2],
+        ];
+
+        $shipmentData3 = DhlShipmentData::fromArray($dataDynamicRows);
+        $this->assertCount(2, $shipmentData3->getShipmentSettings()->getPackages());
+        $this->assertEquals(2, $shipmentData3->getShipmentSettings()->getPackageQuantity());
+        $this->assertEquals(10.0, $shipmentData3->getShipmentSettings()->getPackages()[0]->getWeight());
+        $this->assertEquals(5.0, $shipmentData3->getShipmentSettings()->getPackages()[1]->getWeight());
     }
 
     /**

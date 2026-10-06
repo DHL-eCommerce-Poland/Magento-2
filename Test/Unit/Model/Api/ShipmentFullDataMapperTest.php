@@ -830,6 +830,40 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertArrayNotHasKey('postnummer', $mapped['ship']['receiver']['address']);
     }
 
+    /**
+     * Test mapping uses recipient first and last name when provided over stale contactPerson.
+     *
+     * @return void
+     */
+    public function testMapUsesRecipientFirstAndLastNameWhenProvided(): void
+    {
+        $recipient = new RecipientData(
+            name: '',
+            type: 'C',
+            firstName: 'Piotr',
+            lastName: 'Nowak',
+            contactPerson: 'Jan Kowalski',
+            street: 'Warszawska',
+            houseNumber: '1',
+            city: 'Warszawa',
+            postalCode: '00-001',
+            country: 'PL'
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 201,
+            sender: new SenderData(),
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(packages: [new PackageData()])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertEquals('Piotr Nowak', $mapped['ship']['receiver']['contact']['personName']);
+        $this->assertEquals('Piotr Nowak', $mapped['ship']['receiver']['address']['name']);
+    }
+
     public static function postalCodeDataProvider(): array
     {
         return [

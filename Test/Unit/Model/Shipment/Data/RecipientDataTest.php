@@ -150,4 +150,23 @@ class RecipientDataTest extends TestCase
         $this->assertFalse($recipientCourier->isPackstation());
         $this->assertFalse($recipientCourier->isPostfiliale());
     }
+
+    /**
+     * Test fromArray synchronizes contactPerson when firstName or lastName are provided.
+     *
+     * @return void
+     */
+    public function testFromArrayUpdatesContactPersonWhenNamesProvided(): void
+    {
+        $data = [
+            'firstName' => 'Piotr',
+            'lastName' => 'Nowak',
+            'contactPerson' => 'Jan Kowalski',
+        ];
+
+        $recipient = RecipientData::fromArray($data);
+        $this->assertEquals('Piotr', $recipient->getFirstName());
+        $this->assertEquals('Nowak', $recipient->getLastName());
+        $this->assertEquals('Piotr Nowak', $recipient->getContactPerson());
+    }
 }
