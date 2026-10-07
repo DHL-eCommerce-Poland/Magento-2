@@ -77,9 +77,6 @@ class ShipmentDataValidator
         $serviceType = $settings->getServiceType();
         $popId = $recipient->getPopId();
 
-        if (empty(trim($settings->getContent()))) {
-            $errors[] = __('Package Contents Description is required.')->render();
-        }
 
         // ServicePoint / POP point requirement
         if (in_array(strtoupper(trim((string)$serviceType)), [MethodCatalog::SERVICE_SP], true) && empty($popId)) {

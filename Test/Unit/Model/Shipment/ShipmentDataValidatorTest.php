@@ -175,6 +175,42 @@ class ShipmentDataValidatorTest extends TestCase
     }
 
     /**
+     * Test validation passes without exception when package contents description is empty.
+     *
+     * @return void
+     */
+    public function testValidateAllowsEmptyPackageContentDescription(): void
+    {
+        $sender = new SenderData(
+            name: 'Sender',
+            street: 'Street',
+            houseNumber: '1',
+            postalCode: '00-000',
+            city: 'City'
+        );
+        $recipient = new RecipientData(
+            firstName: 'Jan',
+            lastName: 'Kowalski',
+            street: 'Street',
+            houseNumber: '2',
+            postalCode: '00-000',
+            city: 'City'
+        );
+        $package = new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 1.0);
+        $settings = new ShipmentSettingsData(content: '', packages: [$package]);
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 1,
+            sender: $sender,
+            recipient: $recipient,
+            shipmentSettings: $settings
+        );
+
+        $this->validator->validate($shipmentData);
+        $this->addToAssertionCount(1);
+    }
+
+    /**
      * Test validate passes without exception when special services (insurance, ROD, COD) are selected without values.
      *
      * @return void
