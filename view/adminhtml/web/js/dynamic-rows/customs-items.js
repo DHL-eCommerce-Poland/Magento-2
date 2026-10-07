@@ -21,7 +21,9 @@ define([
             },
             columnRules: columnRules,
             imports: {
-                onCustomsTypeChange: '${ $.ns }.${ $.ns }.general.customs_type:value'
+                onCustomsTypeChange: '${ $.provider }:data.customs.customsType',
+                onCustomsTypeChangeTemplate: '${ $.provider }:data.customs_type',
+                onCustomsTypeChangeNs: '${ $.ns }.${ $.ns }.general.customs_type:value'
             }
         },
 
@@ -79,8 +81,18 @@ define([
          * @param {String} value
          */
         onCustomsTypeChange: function (value) {
-            this.customsType = value;
-            this.updateColumnsVisibility();
+            if (value !== undefined && value !== null) {
+                this.customsType = value;
+                this.updateColumnsVisibility();
+            }
+        },
+
+        onCustomsTypeChangeTemplate: function (value) {
+            this.onCustomsTypeChange(value);
+        },
+
+        onCustomsTypeChangeNs: function (value) {
+            this.onCustomsTypeChange(value);
         },
 
         /**
@@ -101,14 +113,7 @@ define([
          * @returns {Boolean}
          */
         isColumnAllowed: function (columnName) {
-            if (!this.isColumnConfigured(columnName)) {
-                return true;
-            }
-
-            var allowedTypes = this.columnRules[columnName],
-                currentType = _.isFunction(this.customsType) ? this.customsType() : this.customsType;
-
-            return _.contains(allowedTypes, currentType);
+            return true;
         },
 
         /**

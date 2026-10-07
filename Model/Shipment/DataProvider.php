@@ -6,6 +6,7 @@ namespace Ideo\Dhl\Model\Shipment;
 
 use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
+use Ideo\Dhl\Model\Shipment\Data\CustomsData;
 use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -155,6 +156,21 @@ class DataProvider extends AbstractDataProvider
                         } catch (Throwable $e) {
                             $this->logger->error(sprintf(
                                 '[DataProvider] Failed to normalize specialServices for shipment entity #%s: %s',
+                                $item->getId(),
+                                $e->getMessage()
+                            ));
+                        }
+                    }
+                    if (isset($payload['customs']) && is_array($payload['customs'])) {
+                        try {
+                            $customsTemplateId = (string) ($item->getCustomsTemplateId()
+                                ?? ($payload['customs_template_id']
+                                ?? ($payload['customs']['selectedCustomsTemplateId'] ?? '')));
+                            $data['customs'] = $this->normalizeCustoms($payload['customs'], $customsTemplateId);
+                            $data['customs_fieldset'] = $data['customs'];
+                        } catch (Throwable $e) {
+                            $this->logger->error(sprintf(
+                                '[DataProvider] Failed to normalize customs for shipment entity #%s: %s',
                                 $item->getId(),
                                 $e->getMessage()
                             ));
@@ -396,6 +412,44 @@ class DataProvider extends AbstractDataProvider
 
             $result[$index] = $pkg;
         }
+        return $result;
+    }
+
+    /**
+     * Normalize customs clearance array flags to string '1'/'0' and assign record_id to dynamic row items.
+     *
+     * @param array $customs
+     * @param string $customsTemplateId
+     *
+     * @return array
+     */
+    private function normalizeCustoms(array $customs, string $customsTemplateId = ''): array
+    {
+        $dto = CustomsData::fromArray($customs);
+        $result = $dto->toArray();
+
+        if (empty($result['selectedCustomsTemplateId']) && !empty($customsTemplateId)) {
+            $result['selectedCustomsTemplateId'] = (int)$customsTemplateId;
+        }
+
+        $result['notExceedValue'] = $dto->isNotExceedValue() ? '1' : '0';
+        $result['notProhibitedGoods'] = $dto->isNotProhibitedGoods() ? '1' : '0';
+        $result['notRestrictedGoods'] = $dto->isNotRestrictedGoods() ? '1' : '0';
+        $result['invoiceContent'] = $dto->isInvoiceContent() ? '1' : '0';
+
+        $rawItems = $result['customsItems'] ?? [];
+        $normalizedItems = [];
+        if (is_array($rawItems)) {
+            foreach ($rawItems as $index => $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+                $item['record_id'] = (string)$index;
+                $normalizedItems[$index] = $item;
+            }
+        }
+        $result['customsItems'] = $normalizedItems;
+
         return $result;
     }
 }

@@ -1,10 +1,10 @@
 define([
-    'Magento_Ui/js/form/components/fieldset',
+    'Magento_Ui/js/form/components/group',
     'underscore'
-], function (Fieldset, _) {
+], function (Group, _) {
     'use strict';
 
-    return Fieldset.extend({
+    return Group.extend({
         defaults: {
             listens: {
                 'visible': 'onVisibleChange'
@@ -12,7 +12,7 @@ define([
         },
 
         /**
-         * Initialize element and apply current fieldset visibility.
+         * Initialize element and apply the current group visibility.
          *
          * @param {Object} elem
          *
@@ -56,7 +56,7 @@ define([
                 });
             }
 
-            if (!visible) {
+            if (!visible && _.isFunction(this.error)) {
                 this.error(false);
             }
         }

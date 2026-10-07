@@ -1,0 +1,22 @@
+<input type="file"
+       class="admin__control-file"
+       style="display: none;"
+       data-bind="attr: {id: uid + '-pdf-input', accept: 'application/pdf,.pdf'}, event: {change: onFileSelected.bind($data)}" />
+
+<div class="admin__control-uploaded-file" style="display: flex; align-items: center; gap: 10px;">
+    <button type="button" class="action-secondary" click="openFileDialog">
+        <span data-bind="i18n: 'Upload VAT Invoice'"></span>
+    </button>
+
+    <span if="value" class="admin__field-note" text="fileName"></span>
+
+    <button if="value"
+            type="button"
+            class="action-delete"
+            click="removeFile"
+            attr="title: $t('Remove File')">
+        <span translate="'Remove'"></span>
+    </button>
+</div>
+
+<div class="admin__field-note" data-bind="i18n: 'Only .pdf files allowed (max 10MB)'"></div>

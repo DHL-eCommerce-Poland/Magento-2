@@ -1275,6 +1275,507 @@
         </dynamicRows>
     </fieldset>
 
+    <fieldset name="customs_fieldset">
+        <settings>
+            <label translate="true">DHL Customs Clearance</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="customs[customsType]" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">U</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Customs Clearance Type</label>
+                <dataScope>customs.customsType</dataScope>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>I</value>
+                            <actions>
+                                <action name="0">
+                                    <target>dhlpoland_shipment_form.dhlpoland_shipment_form.customs_fieldset.individual_customs</target>
+                                    <callback>visible</callback>
+                                    <params>
+                                        <param name="0" xsi:type="boolean">true</param>
+                                    </params>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>U</value>
+                            <actions>
+                                <action name="0">
+                                    <target>dhlpoland_shipment_form.dhlpoland_shipment_form.customs_fieldset.individual_customs</target>
+                                    <callback>visible</callback>
+                                    <params>
+                                        <param name="0" xsi:type="boolean">false</param>
+                                    </params>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="2">
+                            <value>S</value>
+                            <actions>
+                                <action name="0">
+                                    <target>dhlpoland_shipment_form.dhlpoland_shipment_form.customs_fieldset.individual_customs</target>
+                                    <callback>visible</callback>
+                                    <params>
+                                        <param name="0" xsi:type="boolean">false</param>
+                                    </params>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Source\CustomsType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="customs[categoryOfItem]" formElement="select" component="Ideo_Dhl/js/form/element/customs-category">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Category Of Item</label>
+                <dataScope>customs.categoryOfItem</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Source\CategoryOfItem"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="customs[currency]" formElement="select" component="Ideo_Dhl/js/form/element/customs-currency">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">EUR</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Currency</label>
+                <dataScope>customs.currency</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Ideo\Dhl\Model\Source\CustomsCurrency"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="customs[countryOfOrigin]" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">PL</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Country of Origin (ISO 3166-1 alpha-2)</label>
+                <dataScope>customs.countryOfOrigin</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Directory\Model\Config\Source\Country"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="customs[costsOfShipment]" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-no-comma" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Gross Costs of Shipment</label>
+                <dataScope>customs.costsOfShipment</dataScope>
+            </settings>
+        </field>
+        <field name="customs[grossWeight]" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                    <rule name="validate-no-comma" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Gross Weight (kg)</label>
+                <dataScope>customs.grossWeight</dataScope>
+            </settings>
+        </field>
+        <field name="customs[firstName]" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">First Name</label>
+                <dataScope>customs.firstName</dataScope>
+            </settings>
+        </field>
+        <field name="customs[secondaryName]" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Last Name</label>
+                <dataScope>customs.secondaryName</dataScope>
+            </settings>
+        </field>
+        <field name="customs[additionalInfo]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Additional Information</label>
+                <dataScope>customs.additionalInfo</dataScope>
+            </settings>
+        </field>
+        <field name="customs[vatRegistrationNumber]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Shipper VAT Registration Number</label>
+                <dataScope>customs.vatRegistrationNumber</dataScope>
+            </settings>
+        </field>
+        <field name="customs[vatRegistrationNumberReceiver]" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Receiver VAT Registration Number</label>
+                <dataScope>customs.vatRegistrationNumberReceiver</dataScope>
+            </settings>
+        </field>
+
+        <container name="individual_customs" component="Ideo_Dhl/js/form/components/individual-customs">
+            <argument name="data" xsi:type="array">
+                <item name="type" xsi:type="string">group</item>
+                <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="template" xsi:type="string">ui/collection</item>
+                </item>
+            </argument>
+            <field name="customs[nipNr]" formElement="input">
+                <settings>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                    </validation>
+                    <dataType>text</dataType>
+                    <label translate="true">Shipper NIP Number</label>
+                    <dataScope>customs.nipNr</dataScope>
+                </settings>
+            </field>
+            <field name="customs[eoriNr]" formElement="input">
+                <settings>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                    </validation>
+                    <dataType>text</dataType>
+                    <label translate="true">Shipper EORI Number</label>
+                    <dataScope>customs.eoriNr</dataScope>
+                </settings>
+            </field>
+            <field name="customs[eoriNrReceiver]" formElement="input">
+                <settings>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                    </validation>
+                    <dataType>text</dataType>
+                    <label translate="true">Receiver EORI Number</label>
+                    <dataScope>customs.eoriNrReceiver</dataScope>
+                </settings>
+            </field>
+            <field name="customs[invoiceNr]" formElement="input">
+                <settings>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                    </validation>
+                    <dataType>text</dataType>
+                    <label translate="true">Invoice Number</label>
+                    <dataScope>customs.invoiceNr</dataScope>
+                </settings>
+            </field>
+            <field name="customs[invoiceDate]" formElement="date">
+                <settings>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                    </validation>
+                    <dataType>text</dataType>
+                    <label translate="true">Date of invoice</label>
+                    <dataScope>customs.invoiceDate</dataScope>
+                </settings>
+                <formElements>
+                    <date>
+                        <settings>
+                            <options>
+                                <option name="dateFormat" xsi:type="string">y-MM-dd</option>
+                                <option name="outputFormat" xsi:type="string">y-MM-dd</option>
+                            </options>
+                        </settings>
+                    </date>
+                </formElements>
+            </field>
+            <field name="customs[invoiceFile]" formElement="input" component="Ideo_Dhl/js/form/element/pdf-invoice">
+                <settings>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                    </validation>
+                    <dataType>text</dataType>
+                    <label translate="true">VAT Invoice</label>
+                    <dataScope>customs.invoiceFile</dataScope>
+                </settings>
+            </field>
+        </container>
+
+        <field name="customs[notExceedValue]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">1</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="checked" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>boolean</dataType>
+                <label translate="true">Value Does Not Exceed Limit</label>
+                <dataScope>customs.notExceedValue</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="customs[notProhibitedGoods]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">1</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="checked" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>boolean</dataType>
+                <label translate="true">Shipment Does Not Contain Prohibited Goods</label>
+                <dataScope>customs.notProhibitedGoods</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="customs[notRestrictedGoods]" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">1</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="checked" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>boolean</dataType>
+                <label translate="true">Shipment Does Not Contain Restricted Goods</label>
+                <dataScope>customs.notRestrictedGoods</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+
+        <dynamicRows name="customsItems" component="Ideo_Dhl/js/dynamic-rows/customs-items">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="deleteButtonLabel" xsi:type="string" translate="true">Delete</item>
+                    <item name="dndConfig" xsi:type="array">
+                        <item name="enabled" xsi:type="boolean">false</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <addButtonLabel translate="true">Add Goods Item</addButtonLabel>
+                <label translate="true">Customs Items (Goods)</label>
+                <componentType>dynamicRows</componentType>
+                <dataScope>customs.customsItems</dataScope>
+                <dndConfig>
+                    <param name="enabled" xsi:type="boolean">false</param>
+                </dndConfig>
+            </settings>
+            <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="isTemplate" xsi:type="boolean">true</item>
+                        <item name="is_collection" xsi:type="boolean">true</item>
+                        <item name="componentType" xsi:type="string">container</item>
+                    </item>
+                </argument>
+                <field name="nameEn" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">English Name</label>
+                        <dataScope>nameEn</dataScope>
+                    </settings>
+                </field>
+                <field name="namePl" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Polish Name</label>
+                        <dataScope>namePl</dataScope>
+                    </settings>
+                </field>
+                <field name="quantity" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Quantity</label>
+                        <dataScope>quantity</dataScope>
+                    </settings>
+                </field>
+                <field name="weight" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-xsmall</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Weight (kg)</label>
+                        <dataScope>weight</dataScope>
+                    </settings>
+                </field>
+                <field name="value" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Value</label>
+                        <dataScope>value</dataScope>
+                    </settings>
+                </field>
+                <field name="tariffCode" formElement="input">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Customs Tariff Code</label>
+                        <dataScope>tariffCode</dataScope>
+                    </settings>
+                </field>
+                <field name="countryOfOrigin" formElement="select">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                            <item name="additionalClasses" xsi:type="string">admin__field-small</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Country Of Origin</label>
+                        <dataScope>countryOfOrigin</dataScope>
+                    </settings>
+                    <formElements>
+                        <select>
+                            <settings>
+                                <options class="Magento\Directory\Model\Config\Source\Country"/>
+                            </settings>
+                        </select>
+                    </formElements>
+                </field>
+                <actionDelete name="actionDelete">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <additionalClasses>
+                            <class name="data-grid-actions-cell">true</class>
+                        </additionalClasses>
+                        <dataType>text</dataType>
+                        <label translate="true">Akcje</label>
+                        <componentType>actionDelete</componentType>
+                    </settings>
+                </actionDelete>
+            </container>
+        </dynamicRows>
+    </fieldset>
+
     <fieldset name="tracking_history_fieldset">
         <settings>
             <label translate="true">Shipment Tracking History</label>

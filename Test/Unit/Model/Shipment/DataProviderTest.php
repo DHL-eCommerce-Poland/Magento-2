@@ -244,5 +244,103 @@ class DataProviderTest extends TestCase
         $this->assertEquals('RET001, RET002', $data[20]['packages'][0]['returnShipmentId']);
         $this->assertEquals('RET003', $data[20]['packages'][1]['returnShipmentId']);
     }
+
+    public function testGetDataNormalizesCustomsData(): void
+    {
+        $collectionFactory = $this->createStub(CollectionFactory::class);
+        $collection = $this->createStub(Collection::class);
+        $serializer = $this->createStub(SerializerInterface::class);
+
+        $shipmentDataModel = $this->createStub(ShipmentData::class);
+        $shipmentDataModel->method('getId')->willReturn(15);
+        $shipmentDataModel->method('getData')->willReturn(['entity_id' => 15]);
+        $shipmentDataModel->method('getStatus')->willReturn('CREATED');
+        $shipmentDataModel->method('getCustomsTemplateId')->willReturn('5');
+        $shipmentDataModel->method('getShipmentData')->willReturn('{"customs":{}}');
+
+        $collection->method('getItems')->willReturn([$shipmentDataModel]);
+        $collectionFactory->method('create')->willReturn($collection);
+
+        $payloadArray = [
+            'customs' => [
+                'customsType' => 'I',
+                'categoryOfItem' => '11',
+                'currency' => 'EUR',
+                'countryOfOrigin' => 'DE',
+                'costsOfShipment' => 15.5,
+                'grossWeight' => 3.2,
+                'firstName' => 'Anna',
+                'secondaryName' => 'Kowalska',
+                'nipNr' => '1234567890',
+                'eoriNr' => 'DE12345678',
+                'eoriNrReceiver' => 'PL987654321',
+                'invoiceNr' => 'FV/2026/001',
+                'invoiceDate' => '2026-10-07',
+                'invoiceFile' => '/media/dhl/invoices/inv_001.pdf',
+                'notExceedValue' => true,
+                'notProhibitedGoods' => true,
+                'notRestrictedGoods' => false,
+                'invoiceContent' => false,
+                'customsItems' => [
+                    [
+                        'nameEn' => 'T-Shirt Cotton',
+                        'namePl' => 'Koszulka bawełniana',
+                        'quantity' => 2,
+                        'weight' => 0.5,
+                        'value' => 25.0,
+                        'tariffCode' => '61091000',
+                        'countryOfOrigin' => 'DE',
+                    ],
+                ],
+            ],
+        ];
+
+        $serializer->method('unserialize')->willReturn($payloadArray);
+
+        $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+        $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-10-07'));
+        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+
+        $dataProvider = new DataProvider(
+            'dhlpoland_shipment_form_data_source',
+            'entity_id',
+            'entity_id',
+            $collectionFactory,
+            $serializer,
+            $timezoneStub,
+            $dateSanitizer,
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            $this->createStub(\Ideo\Dhl\Api\DeliveryServiceRepositoryInterface::class)
+        );
+
+        $data = $dataProvider->getData();
+
+        $this->assertArrayHasKey(15, $data);
+        $this->assertArrayHasKey('customs', $data[15]);
+        $this->assertArrayHasKey('customs_fieldset', $data[15]);
+
+        $customs = $data[15]['customs'];
+        $this->assertEquals(5, $customs['selectedCustomsTemplateId']);
+        $this->assertEquals('I', $customs['customsType']);
+        $this->assertEquals('11', $customs['categoryOfItem']);
+        $this->assertEquals('EUR', $customs['currency']);
+        $this->assertEquals('DE', $customs['countryOfOrigin']);
+        $this->assertEquals(15.5, $customs['costsOfShipment']);
+        $this->assertEquals(3.2, $customs['grossWeight']);
+        $this->assertEquals('Anna', $customs['firstName']);
+        $this->assertEquals('Kowalska', $customs['secondaryName']);
+        $this->assertEquals('1234567890', $customs['nipNr']);
+        $this->assertEquals('DE12345678', $customs['eoriNr']);
+        $this->assertEquals('/media/dhl/invoices/inv_001.pdf', $customs['invoiceFile']);
+
+        $this->assertEquals('1', $customs['notExceedValue']);
+        $this->assertEquals('1', $customs['notProhibitedGoods']);
+        $this->assertEquals('0', $customs['notRestrictedGoods']);
+
+        $this->assertCount(1, $customs['customsItems']);
+        $this->assertEquals('0', $customs['customsItems'][0]['record_id']);
+        $this->assertEquals('T-Shirt Cotton', $customs['customsItems'][0]['nameEn']);
+        $this->assertEquals('61091000', $customs['customsItems'][0]['tariffCode']);
+    }
 }
 
