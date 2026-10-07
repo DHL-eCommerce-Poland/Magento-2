@@ -32,6 +32,25 @@ define([
                 });
             }
 
+            var providerName = this.provider;
+            if (providerName) {
+                registry.get(providerName, function (source) {
+                    self.source = source;
+
+                    self.updateCountry(source.get('data.recipient.country'));
+                    self.updateServiceType(source.get('data.shipmentSettings.serviceType'));
+
+                    if (typeof source.on === 'function') {
+                        source.on('data.recipient.country', function (country) {
+                            self.updateCountry(country);
+                        });
+                        source.on('data.shipmentSettings.serviceType', function (serviceType) {
+                            self.updateServiceType(serviceType);
+                        });
+                    }
+                });
+            }
+
             return this;
         },
 
@@ -60,7 +79,8 @@ define([
          */
         refreshVisibility: function () {
             var isNonPl = this.country && String(this.country).toUpperCase() !== 'PL';
-            var isPointService = this.serviceType === 'SP' || this.serviceType === 'EK';
+            var serviceType = this.serviceType ? String(this.serviceType).trim().toUpperCase() : '';
+            var isPointService = serviceType === 'SP' || serviceType === 'EK';
             this.visible(isNonPl && isPointService);
         },
 
