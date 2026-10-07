@@ -39,48 +39,52 @@ class ShipmentDateSanitizer
         $minYear = 2024;
         $maxYear = $currentYear + 5;
 
-        // ISO format YYYY-MM-DD
-        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $rawDate, $m)) {
-            $y = (int)$m[1];
-            $mNum = (int)$m[2];
-            $d = (int)$m[3];
-            if (checkdate($mNum, $d, $y)) {
-                $formatted = sprintf('%04d-%02d-%02d', $y, $mNum, $d);
-                if ($y < $minYear || $y > $maxYear || (!$allowPastDate && $formatted < $today)) {
-                    return $fallback;
-                }
-                return $formatted;
-            }
+        $parts = $this->parseDateParts($rawDate);
+        if ($parts === null) {
+            return $fallback;
         }
 
-        // Polish / European format DD.MM.YYYY
-        if (preg_match('/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/', $rawDate, $m)) {
-            $d = (int)$m[1];
-            $mNum = (int)$m[2];
-            $y = (int)$m[3];
-            if (checkdate($mNum, $d, $y)) {
-                $formatted = sprintf('%04d-%02d-%02d', $y, $mNum, $d);
-                if ($y < $minYear || $y > $maxYear || (!$allowPastDate && $formatted < $today)) {
-                    return $fallback;
-                }
-                return $formatted;
-            }
+        [$y, $mNum, $d] = $parts;
+        if ($y < 100) {
+            $y += 2000;
         }
 
-        // US format MM/DD/YYYY
-        if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $rawDate, $m)) {
-            $mNum = (int)$m[1];
-            $d = (int)$m[2];
-            $y = (int)$m[3];
-            if (checkdate($mNum, $d, $y)) {
-                $formatted = sprintf('%04d-%02d-%02d', $y, $mNum, $d);
-                if ($y < $minYear || $y > $maxYear || (!$allowPastDate && $formatted < $today)) {
-                    return $fallback;
-                }
-                return $formatted;
-            }
+        if (!checkdate($mNum, $d, $y)) {
+            return $fallback;
         }
 
-        return $fallback;
+        $formatted = sprintf('%04d-%02d-%02d', $y, $mNum, $d);
+        if ($y < $minYear || $y > $maxYear || (!$allowPastDate && $formatted < $today)) {
+            return $fallback;
+        }
+
+        return $formatted;
+    }
+
+    /**
+     * Parse raw date string into [year, month, day] tuple.
+     *
+     * @param string $date
+     *
+     * @return int[]|null
+     */
+    private function parseDateParts(string $date): ?array
+    {
+        // 1. Year first format: YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD
+        if (preg_match('/^(\d{4})[-\/\.](\d{1,2})[-\/\.](\d{1,2})$/', $date, $m)) {
+            return [(int)$m[1], (int)$m[2], (int)$m[3]];
+        }
+
+        // 2. US format (slash separated): MM/DD/YYYY or MM/DD/YY
+        if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/', $date, $m)) {
+            return [(int)$m[3], (int)$m[1], (int)$m[2]];
+        }
+
+        // 3. European format (dot or hyphen separated): DD.MM.YYYY, DD-MM-YYYY, DD.MM.YY, DD-MM-YY
+        if (preg_match('/^(\d{1,2})[\.-](\d{1,2})[\.-](\d{2,4})$/', $date, $m)) {
+            return [(int)$m[3], (int)$m[2], (int)$m[1]];
+        }
+
+        return null;
     }
 }

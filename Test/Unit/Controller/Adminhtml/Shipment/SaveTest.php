@@ -434,4 +434,60 @@ class SaveTest extends TestCase
         $result = $this->controller->execute();
         $this->assertSame($this->jsonResultMock, $result);
     }
+
+    public function testExecuteSanitizesCustomsInvoiceDate(): void
+    {
+        $payloadData = [
+            'entity_id' => 42,
+            'shipmentSettings' => [
+                'shipmentDate' => '2026-09-10',
+                'serviceType' => 'AH',
+            ],
+            'customs' => [
+                'invoiceDate' => '10.08.2025',
+                'customsType' => 'C',
+            ],
+        ];
+
+        $this->requestStub
+            ->method('getParam')
+            ->willReturnCallback(function (string $param) use ($payloadData) {
+                if ($param === 'shipment_data') {
+                    return json_encode($payloadData);
+                }
+                if ($param === 'entity_id') {
+                    return 42;
+                }
+                return null;
+            });
+
+        $this->scopeConfigMock
+            ->method('getValue')
+            ->with('carriers/dhlpoland/sandbox')
+            ->willReturn('1');
+
+        $apiResult = new CreateShipmentResult(true, false, '90039521202');
+        $this->shipmentCreationServiceMock->expects(self::once())
+            ->method('recreateShipment')
+            ->with(
+                42,
+                Assert::callback(function ($arg) {
+                    return $arg instanceof DhlShipmentData
+                        && $arg->getCustoms() !== null
+                        && $arg->getCustoms()->getInvoiceDate() === '2025-08-10';
+                }),
+                'sandbox'
+            )
+            ->willReturn($apiResult);
+
+        $this->jsonResultMock->expects(self::once())
+            ->method('setData')
+            ->with(Assert::callback(function (array $data) {
+                return $data['success'] === true;
+            }))
+            ->willReturn($this->jsonResultMock);
+
+        $result = $this->controller->execute();
+        $this->assertSame($this->jsonResultMock, $result);
+    }
 }

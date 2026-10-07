@@ -153,6 +153,18 @@ class Save extends Action implements HttpPostActionInterface
             }
         }
 
+        // Sanitize customs invoiceDate if present (allowing past dates)
+        if (isset($payload['customs']) && is_array($payload['customs'])) {
+            if (!empty($payload['customs']['invoiceDate'])) {
+                $rawInvoiceDate = trim((string)$payload['customs']['invoiceDate']);
+                $payload['customs']['invoiceDate'] = $this->dateSanitizer->sanitize(
+                    $rawInvoiceDate,
+                    $rawInvoiceDate,
+                    true
+                );
+            }
+        }
+
         try {
             $shipmentData = DhlShipmentData::fromArray($payload);
 

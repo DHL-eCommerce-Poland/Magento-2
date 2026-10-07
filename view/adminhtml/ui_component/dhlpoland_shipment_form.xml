@@ -172,7 +172,6 @@
                 <date>
                     <settings>
                         <options>
-                            <option name="dateFormat" xsi:type="string">y-MM-dd</option>
                             <option name="outputFormat" xsi:type="string">y-MM-dd</option>
                             <option name="minDate" xsi:type="string">today</option>
                         </options>
@@ -1555,7 +1554,6 @@
                     <date>
                         <settings>
                             <options>
-                                <option name="dateFormat" xsi:type="string">y-MM-dd</option>
                                 <option name="outputFormat" xsi:type="string">y-MM-dd</option>
                             </options>
                         </settings>
