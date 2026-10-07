@@ -71,11 +71,6 @@ class ShipmentCreationServiceTest extends TestCase
     private $loggerStub;
 
     /**
-     * @var \Ideo\Dhl\Model\ServicePoint\NearestPointResolver|MockObject
-     */
-    private $nearestPointResolverMock;
-
-    /**
      * @var ShipmentDataPayloadReader
      */
     private ShipmentDataPayloadReader $payloadReaderStub;
@@ -96,7 +91,6 @@ class ShipmentCreationServiceTest extends TestCase
         $this->resourceConnectionStub = $this->createStub(ResourceConnection::class);
         $this->dbAdapterStub = $this->createStub(AdapterInterface::class);
         $this->loggerStub = $this->createStub(LoggerInterface::class);
-        $this->nearestPointResolverMock = $this->createMock(\Ideo\Dhl\Model\ServicePoint\NearestPointResolver::class);
 
         $this->resourceConnectionStub->method('getConnection')->willReturn($this->dbAdapterStub);
 
@@ -119,7 +113,6 @@ class ShipmentCreationServiceTest extends TestCase
             $returnBuilderMock,
             $returnCreationServiceMock,
             $magentoSyncServiceMock,
-            $this->nearestPointResolverMock,
             $this->payloadReaderStub
         );
     }
@@ -381,7 +374,6 @@ class ShipmentCreationServiceTest extends TestCase
             $returnBuilderMock,
             $returnCreationServiceMock,
             $magentoSyncServiceMock,
-            $this->nearestPointResolverMock,
             $this->payloadReaderStub
         );
 
@@ -452,167 +444,10 @@ class ShipmentCreationServiceTest extends TestCase
             $returnBuilderMock,
             $returnCreationServiceMock,
             $magentoSyncServiceMock,
-            $this->nearestPointResolverMock,
             $this->payloadReaderStub
         );
 
         $result = $serviceWithReturn->recreateShipment(10, $shipmentData, 'sandbox');
-        $this->assertTrue($result->isSuccess());
-    }
-
-    /**
-     * Test auto-resolving nearest service point when serviceType is SP and popId is empty.
-     *
-     * @return void
-     */
-    public function testCreateShipmentAutoResolvesNearestPointWhenPopIdIsEmpty(): void
-    {
-        $recipientData = new \Ideo\Dhl\Model\Shipment\Data\RecipientData(
-            postalCode: '00001',
-            city: 'Warszawa',
-            country: 'PL',
-            popId: null
-        );
-
-        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(
-            serviceType: 'SP'
-        );
-
-        $shipmentData = new DhlShipmentData(
-            orderId: 200,
-            recipient: $recipientData,
-            shipmentSettings: $shipmentSettings
-        );
-
-        $this->lockManagerMock->method('lock')->willReturn(true);
-
-        $resolvedRecipient = new \Ideo\Dhl\Model\Shipment\Data\RecipientData(
-            postalCode: '00001',
-            city: 'Warszawa',
-            country: 'PL',
-            popId: 'POP-WAW-777',
-            popName: 'Test Nearest Point'
-        );
-
-        $resolverMock = $this->createMock(\Ideo\Dhl\Model\ServicePoint\NearestPointResolver::class);
-        $resolverMock->expects($this->once())
-            ->method('resolveForRecipient')
-            ->willReturn($resolvedRecipient);
-
-        $credentials = new Credentials('user', 'pass', true);
-        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
-
-        $mapperMock = $this->createMock(ShipmentFullDataMapper::class);
-        $mapperMock->expects($this->once())
-            ->method('map')
-            ->with($this->callback(function (DhlShipmentData $data) {
-                return $data->getRecipient()->getPopId() === 'POP-WAW-777';
-            }))
-            ->willReturn(['servicePointAccountNumber' => 'POP-WAW-777']);
-
-        $apiResult = new CreateShipmentResult(true, false, '900999000');
-        $this->clientStub->method('createShipment')->willReturn($apiResult);
-
-        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
-        $returnBuilderMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
-        $returnCreationServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
-        $magentoSyncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
-
-        $serviceWithResolver = new ShipmentCreationService(
-            $this->shipmentDataServiceMock,
-            $this->validatorStub,
-            $mapperMock,
-            $this->credentialsProviderStub,
-            $this->clientStub,
-            $this->lockManagerMock,
-            $this->loggerStub,
-            $serializer,
-            $returnBuilderMock,
-            $returnCreationServiceMock,
-            $magentoSyncServiceMock,
-            $resolverMock,
-            $this->payloadReaderStub
-        );
-
-        $result = $serviceWithResolver->createShipment($shipmentData, 'sandbox');
-        $this->assertTrue($result->isSuccess());
-    }
-
-    /**
-     * Test auto-resolving nearest service point when serviceType is EK and popId is empty.
-     *
-     * @return void
-     */
-    public function testCreateShipmentAutoResolvesNearestPointWhenPopIdIsEmptyForEkService(): void
-    {
-        $recipientData = new \Ideo\Dhl\Model\Shipment\Data\RecipientData(
-            postalCode: '10115',
-            city: 'Berlin',
-            country: 'DE',
-            popId: null
-        );
-
-        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(
-            serviceType: 'EK'
-        );
-
-        $shipmentData = new DhlShipmentData(
-            orderId: 201,
-            recipient: $recipientData,
-            shipmentSettings: $shipmentSettings
-        );
-
-        $this->lockManagerMock->method('lock')->willReturn(true);
-
-        $resolvedRecipient = new \Ideo\Dhl\Model\Shipment\Data\RecipientData(
-            postalCode: '10115',
-            city: 'Berlin',
-            country: 'DE',
-            popId: 'POP-BER-888',
-            popName: 'Berlin Service Point'
-        );
-
-        $resolverMock = $this->createMock(\Ideo\Dhl\Model\ServicePoint\NearestPointResolver::class);
-        $resolverMock->expects($this->once())
-            ->method('resolveForRecipient')
-            ->willReturn($resolvedRecipient);
-
-        $credentials = new Credentials('user', 'pass', true);
-        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
-
-        $mapperMock = $this->createMock(ShipmentFullDataMapper::class);
-        $mapperMock->expects($this->once())
-            ->method('map')
-            ->with($this->callback(function (DhlShipmentData $data) {
-                return $data->getRecipient()->getPopId() === 'POP-BER-888';
-            }))
-            ->willReturn(['servicePointAccountNumber' => 'POP-BER-888']);
-
-        $apiResult = new CreateShipmentResult(true, false, '900999001');
-        $this->clientStub->method('createShipment')->willReturn($apiResult);
-
-        $serializer = new \Magento\Framework\Serialize\Serializer\Json();
-        $returnBuilderMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
-        $returnCreationServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
-        $magentoSyncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
-
-        $serviceWithResolver = new ShipmentCreationService(
-            $this->shipmentDataServiceMock,
-            $this->validatorStub,
-            $mapperMock,
-            $this->credentialsProviderStub,
-            $this->clientStub,
-            $this->lockManagerMock,
-            $this->loggerStub,
-            $serializer,
-            $returnBuilderMock,
-            $returnCreationServiceMock,
-            $magentoSyncServiceMock,
-            $resolverMock,
-            $this->payloadReaderStub
-        );
-
-        $result = $serviceWithResolver->createShipment($shipmentData, 'sandbox');
         $this->assertTrue($result->isSuccess());
     }
 
@@ -695,7 +530,6 @@ class ShipmentCreationServiceTest extends TestCase
             $returnBuilderMock,
             $returnCreationServiceMock,
             $magentoSyncServiceMock,
-            $this->nearestPointResolverMock,
             $this->payloadReaderStub
         );
 
@@ -747,7 +581,6 @@ class ShipmentCreationServiceTest extends TestCase
             $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class),
             $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class),
             $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class),
-            $this->nearestPointResolverMock,
             new \Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader($serializer)
         );
 

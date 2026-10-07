@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
 use DateTime;
-use Ideo\Dhl\Model\ServicePoint\NearestPointResolver;
 use Ideo\Dhl\Model\Shipment\Data\RecipientData;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use Ideo\Dhl\Model\Shipment\OrderWeightAggregator;
@@ -27,11 +26,6 @@ class OrderToShipmentDataMapperTest extends TestCase
      */
     private $mapper;
 
-    /**
-     * @var NearestPointResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $nearestPointResolverMock;
-
     protected function setUp(): void
     {
         $addressParser = new StreetAddressParser();
@@ -43,17 +37,13 @@ class OrderToShipmentDataMapperTest extends TestCase
         $timezoneMock->method('scopeDate')
             ->willReturn(new DateTime('2026-09-02'));
 
-        $this->nearestPointResolverMock = $this->createMock(NearestPointResolver::class);
-
         $this->mapper = new OrderToShipmentDataMapper(
             $addressParser,
             $weightAggregator,
             $variableResolver,
             $serializer,
             $timezoneMock,
-            $this->nearestPointResolverMock,
-            new \Ideo\Dhl\Model\MethodCatalog(),
-            $this->createStub(\Psr\Log\LoggerInterface::class)
+            new \Ideo\Dhl\Model\MethodCatalog()
         );
     }
 

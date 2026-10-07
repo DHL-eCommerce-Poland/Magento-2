@@ -9,7 +9,6 @@ namespace Ideo\Dhl\Model\Shipment;
 use Ideo\Dhl\Model\Carrier;
 use Ideo\Dhl\Model\Config\Source\InternationalMapPointType;
 use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\ServicePoint\NearestPointResolver;
 use Ideo\Dhl\Model\Shipment\Data\PackageData;
 use Ideo\Dhl\Model\Shipment\Data\RecipientData;
 use Ideo\Dhl\Model\Shipment\Data\SenderData;
@@ -21,8 +20,6 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Psr\Log\LoggerInterface;
-use Throwable;
 
 class OrderToShipmentDataMapper
 {
@@ -32,9 +29,7 @@ class OrderToShipmentDataMapper
      * @param TemplateVariableResolver $variableResolver
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
-     * @param NearestPointResolver $nearestPointResolver
      * @param MethodCatalog $methodCatalog
-     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly StreetAddressParser $streetAddressParser,
@@ -42,9 +37,7 @@ class OrderToShipmentDataMapper
         private readonly TemplateVariableResolver $variableResolver,
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
-        private readonly NearestPointResolver $nearestPointResolver,
-        private readonly MethodCatalog $methodCatalog,
-        private readonly LoggerInterface $logger
+        private readonly MethodCatalog $methodCatalog
     ) {
     }
 
@@ -333,21 +326,6 @@ class OrderToShipmentDataMapper
         $shippingMethod = (string)($order->getShippingMethod() ?? '');
         $serviceType = $this->methodCatalog->getServiceCodeForMethod($shippingMethod);
 
-        $isSpOrPsOrEk = in_array(
-            strtoupper(trim((string)$serviceType)),
-            [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_EK],
-            true
-        );
-        if ($isSpOrPsOrEk
-            && (empty($popId) || trim((string)$popId) === '')
-            && $this->nearestPointResolver !== null
-        ) {
-            try {
-                $recipientData = $this->nearestPointResolver->resolveForRecipient($recipientData);
-            } catch (Throwable $e) {
-                $this->logger->warning('Could not resolve nearest point during OrderToShipmentDataMapper::map: ' . $e->getMessage());
-            }
-        }
 
         $autoCreateReturn = !empty($defaultShipmentDefaults['autoCreateReturnShipment']);
         $rawExpDays = $defaultShipmentDefaults['returnLabelExpDays'] ?? null;

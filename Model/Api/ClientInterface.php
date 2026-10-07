@@ -171,24 +171,6 @@ interface ClientInterface
         ?int $orderId = null
     ): CreateShipmentReturnResult;
 
-    /**
-     * Get nearest DHL service points for recipient address via DHL WebAPI2 API.
-     *
-     * @param Credentials $credentials
-     * @param string $country
-     * @param string $postCode
-     * @param string $city
-     * @param int $radius
-     *
-     * @return GetNearestServicepointsResult
-     */
-    public function getNearestServicepoints(
-        Credentials $credentials,
-        string $country,
-        string $postCode,
-        string $city = '',
-        int $radius = 15
-    ): GetNearestServicepointsResult;
 
     /**
      * Get piece IDs / package tracking numbers for a shipment via DHL WebAPI2 getPieceId endpoint.
