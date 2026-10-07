@@ -79,7 +79,9 @@ class ShipmentReturnDataMapper
             ->format('Y-m-d');
 
         $countryCode = strtoupper($merchantRecipient->getCountry() ?: 'PL');
-        $serviceType = ($countryCode === 'PL') ? 'ZK' : 'ZC';
+        $customerCountry = strtoupper($customerSender->getCountry() ?: 'PL');
+        $configuredServiceType = strtoupper(trim((string) $settings->getServiceType()));
+        $serviceType = ($customerCountry !== 'PL' || $configuredServiceType === 'ZC') ? 'ZC' : 'ZK';
 
         $billingAccount = $customerSender->getSapNumber() !== ''
             ? $customerSender->getSapNumber()
@@ -95,9 +97,13 @@ class ShipmentReturnDataMapper
             $billing['costsCenter'] = $this->sanitizeString($settings->getMpk());
         }
 
-        $returnBookCourierVal = (string) ($settings->getReturnBookCourier() ?? ReturnBookCourier::DROP_OFF_OR_COURIER);
-        $bookCourier = $returnBookCourierVal === ReturnBookCourier::DROP_OFF_OR_COURIER;
-        $labelType = $settings->getReturnLabelType() ?: ($settings->getLabelType() ?: 'BLP');
+        if ($serviceType === 'ZC') {
+            $bookCourier = false;
+        } else {
+            $returnBookCourierVal = (string) ($settings->getReturnBookCourier() ?? ReturnBookCourier::DROP_OFF_OR_COURIER);
+            $bookCourier = $returnBookCourierVal === ReturnBookCourier::DROP_OFF_OR_COURIER;
+        }
+        $labelType = $settings->getReturnLabelType() ?: 'BLP';
 
         $shipmentInfo = [
             'serviceType' => $serviceType,
@@ -139,7 +145,7 @@ class ShipmentReturnDataMapper
 
         $result = [
             'shipmentInfo' => $shipmentInfo,
-            'content' => $this->sanitizeString($settings->getContent() ?: (string) __('Order Return')),
+            'content' => $this->sanitizeString($settings->getContent()),
             'ship' => [
                 'shipper' => [
                     'preaviso' => $customerContactInfo,

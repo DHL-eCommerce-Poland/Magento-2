@@ -211,6 +211,54 @@ class ShipmentReturnDataMapperTest extends TestCase
         $this->assertTrue($mapped['pieceList']['item'][0]['euroReturn']);
     }
 
+    public function testMapInternationalReturnShipmentForcesZcAndBookCourierFalse(): void
+    {
+        $sender = new SenderData(
+            name: 'Foreign Customer',
+            firstName: 'Hans',
+            lastName: 'Müller',
+            postalCode: '10115',
+            city: 'Berlin',
+            street: 'Friedrichstraße',
+            houseNumber: '12',
+            country: 'DE',
+            email: 'hans@example.de',
+            phone: '+4930123456'
+        );
+
+        $recipient = new RecipientData(
+            name: 'Polish Merchant Sp. z o.o.',
+            postalCode: '00-001',
+            city: 'Warszawa',
+            street: 'Prosta',
+            houseNumber: '1',
+            country: 'PL',
+            email: 'returns@merchant.pl',
+            phone: '+48221002030'
+        );
+
+        $pkg = new PackageData('PACKAGE', 1, 2.0, 30.0, 20.0, 10.0, false);
+        $settings = new ShipmentSettingsData(
+            serviceType: 'ZK',
+            returnBookCourier: 1, // 1 = DROP_OFF_OR_COURIER (which would normally produce bookCourier = true for domestic)
+            packages: [$pkg]
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 4004,
+            sender: $sender,
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: $settings
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertSame('ZC', $mapped['shipmentInfo']['serviceType']);
+        $this->assertFalse($mapped['shipmentInfo']['bookCourier']);
+    }
+
+
     #[DataProvider('postalCodeDataProvider')]
     public function testSanitizePostalCode(string $inputCode, string $countryCode, string $expected): void
     {
