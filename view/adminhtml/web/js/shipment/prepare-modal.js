@@ -813,6 +813,7 @@ define([
             var customs = this.shipmentData() ? this.shipmentData().customs : null;
             if (!customs) return;
 
+            this._customsTemplateMatchRequestId = (this._customsTemplateMatchRequestId || 0) + 1;
             customs.selectedCustomsTemplateId(null);
             customs.customsType('U');
             customs.categoryOfItem('11');
@@ -882,6 +883,7 @@ define([
             if (!customs) return;
 
             if (event && event.target) {
+                this._customsTemplateMatchRequestId = (this._customsTemplateMatchRequestId || 0) + 1;
                 templateId = event.target.value;
             } else if (templateId === undefined || templateId === null || typeof templateId === 'object') {
                 templateId = (typeof customs.selectedCustomsTemplateId === 'function')
@@ -918,9 +920,46 @@ define([
                 template_type: 'customs',
                 order_id: self.shipmentData().orderId
             }).done(function (res) {
-                if (res.success && res.data) {
+                if (self._activeCustomsTemplateId === templateId && res.success && res.data) {
                     self.populateCustomsData(res.data);
                 }
+            });
+        },
+
+        onRecipientCountryChange: function (countryId) {
+            var customs = this.shipmentData() ? this.shipmentData().customs : null,
+                country = countryId ? String(countryId).trim().toUpperCase() : '',
+                url = this.loadTemplateUrl,
+                self = this,
+                requestId;
+
+            if (!customs) return;
+
+            this.resetCustomsData();
+            if (country === '' || country === 'PL' || !url) {
+                return;
+            }
+
+            requestId = this._customsTemplateMatchRequestId;
+            $.getJSON(url, {
+                template_type: 'customs',
+                country_id: country,
+                order_id: this.shipmentData().orderId
+            }).done(function (response) {
+                var templateId;
+
+                if (requestId !== self._customsTemplateMatchRequestId || !response.success || !response.data) {
+                    return;
+                }
+
+                templateId = response.data.selectedCustomsTemplateId;
+                if (!templateId) {
+                    return;
+                }
+
+                self._activeCustomsTemplateId = String(templateId);
+                customs.selectedCustomsTemplateId(templateId);
+                self.populateCustomsData(response.data);
             });
         },
 
@@ -1249,7 +1288,7 @@ define([
                             response.data.shipmentSettings.selectedDeliveryServiceId = defaultDeliveryServiceId;
                         }
 
-                        var defaultCustomsTemplateId = response.defaultCustomsTemplateId || (response.data.customs ? response.data.customs.selectedCustomsTemplateId : null);
+                        var defaultCustomsTemplateId = response.defaultCustomsTemplateId;
                         if (response.data.customs) {
                             response.data.customs.selectedCustomsTemplateId = defaultCustomsTemplateId;
                         }
@@ -1257,6 +1296,7 @@ define([
                         self._activeSenderTemplateId = null;
                         self._activeShipmentTemplateId = null;
                         self._activeCustomsTemplateId = null;
+                        self._customsTemplateMatchRequestId = (self._customsTemplateMatchRequestId || 0) + 1;
 
                         // 3. Create reactive shipmentData instance AFTER options are set
                         var newShipmentData = createShipmentData(response.data, self.todayDate);
@@ -1281,9 +1321,7 @@ define([
                             self.onShipmentTemplateChange(newVal);
                         });
                         newShipmentData.recipient.country.subscribe(function (newCountry) {
-                            if (newCountry && newCountry.toUpperCase() === 'PL') {
-                                self.resetCustomsData();
-                            }
+                            self.onRecipientCountryChange(newCountry);
                         });
                         newShipmentData.customs.selectedCustomsTemplateId.subscribe(function (newVal) {
                             self.onCustomsTemplateChange(newVal);

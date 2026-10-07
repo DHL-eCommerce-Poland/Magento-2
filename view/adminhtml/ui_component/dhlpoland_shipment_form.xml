@@ -1138,7 +1138,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Weight (kg)</label>
+                        <label translate="true">Weight [kg]</label>
                         <dataScope>weight</dataScope>
                     </settings>
                 </field>
@@ -1151,7 +1151,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Width (cm)</label>
+                        <label translate="true">Width [cm]</label>
                         <dataScope>width</dataScope>
                     </settings>
                 </field>
@@ -1164,7 +1164,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Length (cm)</label>
+                        <label translate="true">Length [cm]</label>
                         <dataScope>length</dataScope>
                     </settings>
                 </field>
@@ -1177,7 +1177,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Height (cm)</label>
+                        <label translate="true">Height [cm]</label>
                         <dataScope>height</dataScope>
                     </settings>
                 </field>
@@ -1277,7 +1277,7 @@
 
     <fieldset name="customs_fieldset">
         <settings>
-            <label translate="true">DHL Customs Clearance</label>
+            <label translate="true">Customs Clearance</label>
             <collapsible>true</collapsible>
             <opened>true</opened>
         </settings>
@@ -1461,14 +1461,14 @@
         <field name="customs[vatRegistrationNumber]" formElement="input">
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Shipper VAT Registration Number</label>
+                <label translate="true">Shipper VAT</label>
                 <dataScope>customs.vatRegistrationNumber</dataScope>
             </settings>
         </field>
         <field name="customs[vatRegistrationNumberReceiver]" formElement="input">
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Receiver VAT Registration Number</label>
+                <label translate="true">Receiver VAT</label>
                 <dataScope>customs.vatRegistrationNumberReceiver</dataScope>
             </settings>
         </field>
@@ -1487,7 +1487,7 @@
                         <rule name="required-entry" xsi:type="boolean">true</rule>
                     </validation>
                     <dataType>text</dataType>
-                    <label translate="true">Shipper NIP Number</label>
+                    <label translate="true">Shipper NIP</label>
                     <dataScope>customs.nipNr</dataScope>
                 </settings>
             </field>
@@ -1497,7 +1497,7 @@
                         <rule name="required-entry" xsi:type="boolean">true</rule>
                     </validation>
                     <dataType>text</dataType>
-                    <label translate="true">Shipper EORI Number</label>
+                    <label translate="true">Shipper EORI</label>
                     <dataScope>customs.eoriNr</dataScope>
                 </settings>
             </field>
@@ -1507,7 +1507,7 @@
                         <rule name="required-entry" xsi:type="boolean">true</rule>
                     </validation>
                     <dataType>text</dataType>
-                    <label translate="true">Receiver EORI Number</label>
+                    <label translate="true">Receiver EORI</label>
                     <dataScope>customs.eoriNrReceiver</dataScope>
                 </settings>
             </field>
@@ -1707,7 +1707,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Weight (kg)</label>
+                        <label translate="true">Weight [kg]</label>
                         <dataScope>weight</dataScope>
                     </settings>
                 </field>

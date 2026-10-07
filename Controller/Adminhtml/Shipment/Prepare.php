@@ -93,7 +93,7 @@ class Prepare extends Action
                 'shipmentTemplates' => $shipmentTemplates,
                 'defaultDropOffPointId' => $defaultDropOffPointId ? (string)$defaultDropOffPointId : null,
                 'defaultDeliveryServiceId' => $defaultDeliveryServiceId ? (string)$defaultDeliveryServiceId : null,
-                'defaultCustomsTemplateId' => $defaultCustomsTemplateId ? (string)$defaultCustomsTemplateId : null,
+                'defaultCustomsTemplateId' => $defaultCustomsTemplateId,
                 'countryOptions' => $this->templateManager->getCountryOptions(),
                 'serviceCodeOptions' => $this->templateManager->getServiceCodeOptions(),
                 'labelTypeOptions' => $this->templateManager->getLabelTypeOptions(),

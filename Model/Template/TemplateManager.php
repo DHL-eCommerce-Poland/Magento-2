@@ -345,6 +345,7 @@ class TemplateManager
     public function getCustomsTemplatesOptions(): array
     {
         $collection = $this->customsTemplateCollectionFactory->create();
+        $collection->setOrder('entity_id', 'ASC');
         $options = [];
 
         foreach ($collection as $item) {
@@ -395,6 +396,7 @@ class TemplateManager
         }
 
         $collection = $this->customsTemplateCollectionFactory->create();
+        $collection->setOrder('entity_id', 'ASC');
         foreach ($collection as $item) {
             $rawCountryId = (string)($item->getCountryId() ?? '');
             if (empty($rawCountryId)) {

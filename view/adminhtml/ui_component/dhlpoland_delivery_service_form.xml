@@ -706,7 +706,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Weight (kg)</label>
+                        <label translate="true">Weight [kg]</label>
                         <dataScope>weight</dataScope>
                     </settings>
                 </field>
@@ -719,7 +719,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Width (cm)</label>
+                        <label translate="true">Width [cm]</label>
                         <dataScope>width</dataScope>
                     </settings>
                 </field>
@@ -732,7 +732,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Length (cm)</label>
+                        <label translate="true">Length [cm]</label>
                         <dataScope>length</dataScope>
                     </settings>
                 </field>
@@ -745,7 +745,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Height (cm)</label>
+                        <label translate="true">Height [cm]</label>
                         <dataScope>height</dataScope>
                     </settings>
                 </field>

@@ -445,10 +445,10 @@ $todayIsoDate = $viewModel->getIsoDate();
                 <!-- ko if: isCustomsClearanceVisible -->
                 <div style="flex: 1; max-width: calc(50% - 10px); min-width: 0;">
                     <fieldset class="admin__fieldset" data-bind="with: shipmentData().customs">
-                        <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Customs Clearance')) ?></span></legend>
+                        <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Customs Clearance Templates')) ?></span></legend>
 
                         <div class="admin__field">
-                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Customs Clearance Template')) ?></span></label>
+                            <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Customs Clearance')) ?></span></label>
                             <div class="admin__field-control">
                                 <select class="admin__control-select" data-bind="options: $parent.customsTemplates, optionsText: 'label', optionsValue: 'value', value: selectedCustomsTemplateId, optionsCaption: '<?= $escaper->escapeHtmlAttr(__('Select Template...')) ?>', event: { change: function(d, e) { $parent.onCustomsTemplateChange(null, e); } }"></select>
                             </div>
@@ -490,8 +490,8 @@ $todayIsoDate = $viewModel->getIsoDate();
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipper VAT & Receiver VAT')) ?></span></label>
                             <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" maxlength="15" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper VAT No')) ?>" data-bind="value: vatRegistrationNumber" style="flex: 1;" />
-                                <input type="text" maxlength="15" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver VAT No')) ?>" data-bind="value: vatRegistrationNumberReceiver" style="flex: 1;" />
+                                <input type="text" maxlength="15" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper VAT')) ?>" data-bind="value: vatRegistrationNumber" style="flex: 1;" />
+                                <input type="text" maxlength="15" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver VAT')) ?>" data-bind="value: vatRegistrationNumberReceiver" style="flex: 1;" />
                             </div>
                         </div>
 
@@ -499,9 +499,9 @@ $todayIsoDate = $viewModel->getIsoDate();
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipper NIP, Shipper EORI & Receiver EORI')) ?></span></label>
                             <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" maxlength="17" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper NIP Number')) ?>" data-bind="value: nipNr" style="flex: 1;" required />
-                                <input type="text" maxlength="17" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper EORI Number')) ?>" data-bind="value: eoriNr" style="flex: 1;" required />
-                                <input type="text" maxlength="17" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver EORI Number')) ?>" data-bind="value: eoriNrReceiver" style="flex: 1;" required />
+                                <input type="text" maxlength="17" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper NIP')) ?>" data-bind="value: nipNr" style="flex: 1;" required />
+                                <input type="text" maxlength="17" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper EORI')) ?>" data-bind="value: eoriNr" style="flex: 1;" required />
+                                <input type="text" maxlength="17" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver EORI')) ?>" data-bind="value: eoriNrReceiver" style="flex: 1;" required />
                             </div>
                         </div>
 

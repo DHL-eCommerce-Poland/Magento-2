@@ -69,8 +69,11 @@ class LoadTemplate extends Action
         $templateId = (int)$this->getRequest()->getParam('template_id');
         $templateType = (string)$this->getRequest()->getParam('template_type');
         $orderId = (int)$this->getRequest()->getParam('order_id');
+        $countryId = strtoupper(trim((string)$this->getRequest()->getParam('country_id')));
 
-        if (!$templateId || empty($templateType)) {
+        if (empty($templateType)
+            || (!$templateId && ($templateType !== 'customs' || $countryId === ''))
+        ) {
             return $resultJson->setData([
                 'success' => false,
                 'message' => __('Missing template_id or template_type parameter.'),
@@ -194,6 +197,16 @@ class LoadTemplate extends Action
             }
 
             if ($templateType === 'customs') {
+                if (!$templateId) {
+                    $templateId = $this->templateManager->getMatchingCustomsTemplateIdForCountry($countryId) ?? 0;
+                    if (!$templateId) {
+                        return $resultJson->setData([
+                            'success' => true,
+                            'data' => null,
+                        ]);
+                    }
+                }
+
                 $template = $this->customsTemplateRepository->getById($templateId);
                 $customsItems = [];
                 $rawItems = $template->getCustomsItems();
