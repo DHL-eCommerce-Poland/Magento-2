@@ -4,13 +4,14 @@ define([
 ], function (Abstract, $t) {
     'use strict';
 
-    var MAX_FILE_SIZE = 10 * 1024 * 1024,
+    var MAX_FILE_SIZE = 3 * 1024 * 1024,
         PDF_SIGNATURE = [37, 80, 68, 70, 45];
 
     return Abstract.extend({
         defaults: {
             elementTmpl: 'Ideo_Dhl/form/element/pdf-invoice',
-            fileName: ''
+            fileName: '',
+            fileNote: $t('Only .pdf files allowed (max 3MB)')
         },
 
         /**
@@ -74,7 +75,7 @@ define([
             }
 
             if (file.size > MAX_FILE_SIZE) {
-                this.rejectFile(fileControl, $t('File size exceeds the 10MB limit.'));
+                this.rejectFile(fileControl, $t('File size exceeds the 3MB limit.'));
                 return;
             }
 

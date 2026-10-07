@@ -10,6 +10,8 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class ShipmentDataValidator
 {
+    private const MAX_INVOICE_FILE_SIZE = 3 * 1024 * 1024;
+
     /**
      * @param TimezoneInterface $timezone
      */
@@ -130,6 +132,11 @@ class ShipmentDataValidator
         if (!empty($errors)) {
             throw new LocalizedException(__(implode("\n", array_unique($errors))));
         }
+
+        $invoiceFile = $shipmentData->getCustoms()?->getInvoiceFile();
+        if ($invoiceFile !== null && $invoiceFile !== '' && $this->invoiceFileExceedsSizeLimit($invoiceFile)) {
+            throw new LocalizedException(__('File size exceeds the 3MB limit.'));
+        }
     }
 
     /**
@@ -247,5 +254,25 @@ class ShipmentDataValidator
         if (!empty($errors)) {
             throw new LocalizedException(__(implode("\n", array_unique($errors))));
         }
+    }
+
+    /**
+     * Check the decoded size of a Base64 VAT invoice without decoding oversized input.
+     *
+     * @param string $invoiceFile
+     *
+     * @return bool
+     */
+    private function invoiceFileExceedsSizeLimit(string $invoiceFile): bool
+    {
+        $base64 = (string) preg_replace('/^data:[^;]+;base64,/', '', $invoiceFile);
+        $maximumEncodedSize = 4 * (int) ceil(self::MAX_INVOICE_FILE_SIZE / 3);
+        if (strlen($base64) > $maximumEncodedSize) {
+            return true;
+        }
+
+        $decoded = base64_decode($base64, true);
+
+        return $decoded !== false && strlen($decoded) > self::MAX_INVOICE_FILE_SIZE;
     }
 }

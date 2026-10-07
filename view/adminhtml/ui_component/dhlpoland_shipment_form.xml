@@ -1648,7 +1648,7 @@
                 <addButtonLabel translate="true">Add Goods Item</addButtonLabel>
                 <label translate="true">Customs Items (Goods)</label>
                 <componentType>dynamicRows</componentType>
-                <dataScope>customs.customsItems</dataScope>
+                <dataScope>customs</dataScope>
                 <dndConfig>
                     <param name="enabled" xsi:type="boolean">false</param>
                 </dndConfig>

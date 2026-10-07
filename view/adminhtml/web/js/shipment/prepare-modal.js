@@ -775,11 +775,11 @@ define([
                 return;
             }
 
-            var maxSizeBytes = 10 * 1024 * 1024; // 10MB limit
+            var maxSizeBytes = 3 * 1024 * 1024; // 3MB limit
             if (file.size > maxSizeBytes) {
                 alert({
                     title: $.mage.__('Error'),
-                    content: $.mage.__('File size exceeds the 10MB limit.')
+                    content: $.mage.__('File size exceeds the 3MB limit.')
                 });
                 event.target.value = '';
                 return;

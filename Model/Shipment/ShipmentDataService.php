@@ -226,6 +226,8 @@ class ShipmentDataService
             $payloadArr['magentoShipmentId'] = $magentoShipmentId;
         }
 
+        $this->removeInvoiceFileFromPayload($payloadArr);
+
         $entity->setOrderId($orderId);
         $entity->setMagentoShipmentId($magentoShipmentId);
         $entity->setStatus($status);
@@ -405,6 +407,8 @@ class ShipmentDataService
             $payloadArr['magentoShipmentId'] = $magentoShipmentId;
             $entity->setMagentoShipmentId($magentoShipmentId);
         }
+
+        $this->removeInvoiceFileFromPayload($payloadArr);
 
         $entity->setStatus($status);
         $entity->setShipmentData($this->serializer->serialize($payloadArr));
@@ -628,5 +632,19 @@ class ShipmentDataService
         unset($pkg);
 
         return $packages;
+    }
+
+    /**
+     * Keep the uploaded VAT invoice in the DHL request only, not in the persisted shipment payload.
+     *
+     * @param array $payloadArr
+     *
+     * @return void
+     */
+    private function removeInvoiceFileFromPayload(array &$payloadArr): void
+    {
+        if (isset($payloadArr['customs']) && is_array($payloadArr['customs'])) {
+            unset($payloadArr['customs']['invoiceFile']);
+        }
     }
 }

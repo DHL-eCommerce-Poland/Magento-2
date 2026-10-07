@@ -38,7 +38,7 @@ define([
         initElement: function (elem) {
             var self = this;
 
-            this._super();
+            this._super(elem);
 
             if (elem && _.isFunction(elem.setVisibilityColumn)) {
                 var originalSetVisibility = elem.setVisibilityColumn.bind(elem);
