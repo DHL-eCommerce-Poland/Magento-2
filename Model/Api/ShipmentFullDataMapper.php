@@ -84,7 +84,7 @@ class ShipmentFullDataMapper
             }
         }
 
-        $servicePointAccountNumber = ($isPointDelivery && !empty($recipient->getPopId()))
+        $servicePointAccountNumber = ($countryCode === 'PL' && $isPointDelivery && !empty($recipient->getPopId()))
             ? $this->sanitizeString($recipient->getPopId())
             : null;
 

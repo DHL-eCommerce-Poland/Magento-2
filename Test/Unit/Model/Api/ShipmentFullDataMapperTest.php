@@ -344,7 +344,7 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('Montabaur', $mapped['ship']['receiver']['address']['city']);
         $this->assertEquals('Hospitalstr', $mapped['ship']['receiver']['address']['street']);
         $this->assertEquals('132', $mapped['ship']['receiver']['address']['houseNumber']);
-        $this->assertEquals('132', $mapped['ship']['servicePointAccountNumber']);
+        $this->assertNull($mapped['ship']['servicePointAccountNumber']);
     }
 
     /**
@@ -385,6 +385,43 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('Montabaur', $mapped['ship']['receiver']['address']['city']);
         $this->assertEquals('Hospitalstr 132', $mapped['ship']['receiver']['address']['street']);
         $this->assertEquals('132', $mapped['ship']['receiver']['address']['houseNumber']);
+        $this->assertNull($mapped['ship']['servicePointAccountNumber']);
+    }
+
+    /**
+     * Preserve an international Packstation street number supplied by the point address.
+     *
+     * @return void
+     */
+    public function testMapInternationalPackstationPreservesStreetNumberFromPointAddress(): void
+    {
+        $recipient = new RecipientData(
+            name: 'Norbert',
+            street: 'Home Street',
+            houseNumber: '1',
+            city: 'Berlin',
+            postalCode: '10115',
+            country: 'DE',
+            popId: '132',
+            isPackstation: true,
+            popStreet: 'Hospitalstr 12',
+            popCity: 'Montabaur',
+            popPostcode: '56410'
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 104,
+            sender: new SenderData(),
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertSame('Hospitalstr 12', $mapped['ship']['receiver']['address']['street']);
+        $this->assertSame('132', $mapped['ship']['receiver']['address']['houseNumber']);
+        $this->assertNull($mapped['ship']['servicePointAccountNumber']);
     }
 
     /**
@@ -427,6 +464,7 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('Montabaur', $mapped['ship']['receiver']['address']['city']);
         $this->assertEquals('Hospitalstr', $mapped['ship']['receiver']['address']['street']);
         $this->assertEquals('623', $mapped['ship']['receiver']['address']['houseNumber']);
+        $this->assertNull($mapped['ship']['servicePointAccountNumber']);
     }
 
     /**
