@@ -444,6 +444,12 @@ class DataProvider extends AbstractDataProvider
                 if (!is_array($item)) {
                     continue;
                 }
+                $itemFields = ['nameEn', 'namePl', 'quantity', 'weight', 'value', 'tariffCode', 'countryOfOrigin'];
+                foreach ($itemFields as $field) {
+                    if (!isset($item[$field])) {
+                        $item[$field] = '';
+                    }
+                }
                 $item['record_id'] = (string)$index;
                 $normalizedItems[$index] = $item;
             }

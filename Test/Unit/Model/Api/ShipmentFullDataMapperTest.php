@@ -714,6 +714,81 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertSame(2, $c['customsItem'][0]['quantity']);
     }
 
+    /**
+     * Ensure empty customs item values stay empty in the DHL request data.
+     *
+     * @return void
+     */
+    public function testMapPreservesEmptyCustomsItemFields(): void
+    {
+        $shipmentData = new DhlShipmentData(
+            orderId: 109,
+            sender: new SenderData(name: 'Sender Corp'),
+            recipient: new RecipientData(name: 'DE Customer', country: 'DE'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
+            customs: new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
+                customsItems: [
+                    [
+                        'namePl' => '',
+                        'nameEn' => '',
+                        'quantity' => '',
+                        'weight' => '',
+                        'value' => '',
+                        'tariffCode' => '',
+                        'countryOfOrigin' => '',
+                    ],
+                ]
+            )
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertSame(
+            [
+                'namePl' => '',
+                'nameEn' => '',
+                'quantity' => '',
+                'weight' => '',
+                'value' => '',
+                'tariffCode' => '',
+                'countryOfOrigin' => '',
+            ],
+            $mapped['customs']['customsItem'][0]
+        );
+    }
+
+    /**
+     * Ensure comma decimal values are normalized before building the DHL request data.
+     *
+     * @return void
+     */
+    public function testMapConvertsCommaDecimalCustomsItemValues(): void
+    {
+        $shipmentData = new DhlShipmentData(
+            orderId: 110,
+            sender: new SenderData(name: 'Sender Corp'),
+            recipient: new RecipientData(name: 'DE Customer', country: 'DE'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
+            customs: new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
+                customsItems: [
+                    [
+                        'quantity' => '2',
+                        'weight' => '0,75',
+                        'value' => '10,50',
+                    ],
+                ]
+            )
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertSame(2, $mapped['customs']['customsItem'][0]['quantity']);
+        $this->assertSame(0.75, $mapped['customs']['customsItem'][0]['weight']);
+        $this->assertSame(10.5, $mapped['customs']['customsItem'][0]['value']);
+    }
+
     public function testMapToShipmentFullDataWithIndividualCustomsBase64Invoice(): void
     {
         $sender = new SenderData(name: 'Sender Corp');

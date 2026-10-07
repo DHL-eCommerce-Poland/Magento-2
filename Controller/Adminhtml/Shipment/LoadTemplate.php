@@ -246,20 +246,22 @@ class LoadTemplate extends Action
                     return (float)$v;
                 };
 
-                // Ensure item defaults if missing in individual row
-                $formattedItems = array_map(function ($item) use ($defaultTariff, $countryOrigin, $toFloat) {
+                // Preserve empty item values when applying a customs template to the shipment modal.
+                $formattedItems = array_map(function ($item) use ($toFloat) {
                     return [
                         'namePl' => (string)($item['namePl'] ?? ''),
                         'nameEn' => (string)($item['nameEn'] ?? ''),
-                        'quantity' => isset($item['quantity'])
+                        'quantity' => isset($item['quantity']) && trim((string)$item['quantity']) !== ''
                             ? (int)str_replace(',', '.', (string)$item['quantity'])
-                            : 1,
-                        'weight' => isset($item['weight']) ? ($toFloat($item['weight']) ?? 0.0) : 0.0,
-                        'value' => isset($item['value']) ? ($toFloat($item['value']) ?? 0.0) : 0.0,
-                        'tariffCode' => (string)(!empty($item['tariffCode']) ? $item['tariffCode'] : $defaultTariff),
-                        'countryOfOrigin' => (string)(!empty($item['countryOfOrigin'])
-                            ? $item['countryOfOrigin']
-                            : $countryOrigin),
+                            : '',
+                        'weight' => isset($item['weight']) && trim((string)$item['weight']) !== ''
+                            ? ($toFloat($item['weight']) ?? '')
+                            : '',
+                        'value' => isset($item['value']) && trim((string)$item['value']) !== ''
+                            ? ($toFloat($item['value']) ?? '')
+                            : '',
+                        'tariffCode' => (string)($item['tariffCode'] ?? ''),
+                        'countryOfOrigin' => (string)($item['countryOfOrigin'] ?? ''),
                     ];
                 }, $customsItems);
 

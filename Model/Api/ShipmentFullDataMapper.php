@@ -298,9 +298,15 @@ class ShipmentFullDataMapper
                     $items[] = [
                         'namePl' => mb_substr($this->sanitizeString((string)($item['namePl'] ?? '')), 0, 35),
                         'nameEn' => mb_substr($this->sanitizeString((string)($item['nameEn'] ?? '')), 0, 35),
-                        'quantity' => (int)($item['quantity'] ?? 1),
-                        'weight' => (float)($item['weight'] ?? 0.0),
-                        'value' => (float)($item['value'] ?? 0.0),
+                        'quantity' => isset($item['quantity']) && trim((string)$item['quantity']) !== ''
+                            ? (int)str_replace(',', '.', trim((string)$item['quantity']))
+                            : '',
+                        'weight' => isset($item['weight']) && trim((string)$item['weight']) !== ''
+                            ? (float)str_replace(',', '.', trim((string)$item['weight']))
+                            : '',
+                        'value' => isset($item['value']) && trim((string)$item['value']) !== ''
+                            ? (float)str_replace(',', '.', trim((string)$item['value']))
+                            : '',
                         'tariffCode' => mb_substr($this->sanitizeString((string)($item['tariffCode'] ?? '')), 0, 10),
                         'countryOfOrigin' => mb_substr(
                             $this->sanitizeString((string)($item['countryOfOrigin'] ?? '')),

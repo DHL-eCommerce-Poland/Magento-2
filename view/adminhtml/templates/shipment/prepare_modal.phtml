@@ -583,25 +583,25 @@ $todayIsoDate = $viewModel->getIsoDate();
                                     <tbody data-bind="foreach: customsItems">
                                         <tr>
                                             <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" maxlength="35" class="admin__control-text" data-bind="value: nameEn" style="width: 100%; box-sizing: border-box;" required />
+                                                <input type="text" maxlength="35" class="admin__control-text" data-bind="value: nameEn" style="width: 100%; box-sizing: border-box;" />
                                             </td>
                                             <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" maxlength="35" class="admin__control-text" data-bind="value: namePl" style="width: 100%; box-sizing: border-box;" required />
+                                                <input type="text" maxlength="35" class="admin__control-text" data-bind="value: namePl" style="width: 100%; box-sizing: border-box;" />
                                             </td>
                                             <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" class="admin__control-text" data-bind="value: quantity" style="width: 100%; box-sizing: border-box;" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true, 'validate-no-comma':true}" required />
+                                                <input type="text" class="admin__control-text" data-bind="value: quantity" style="width: 100%; box-sizing: border-box;" />
                                             </td>
                                             <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" class="admin__control-text" data-bind="value: weight" style="width: 100%; box-sizing: border-box;" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true, 'validate-no-comma': true}" />
+                                                <input type="text" class="admin__control-text" data-bind="value: weight" style="width: 100%; box-sizing: border-box;" />
                                             </td>
                                             <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" class="admin__control-text" data-bind="value: value" style="width: 100%; box-sizing: border-box;" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true, 'validate-no-comma': true}" />
+                                                <input type="text" class="admin__control-text" data-bind="value: value" style="width: 100%; box-sizing: border-box;" />
                                             </td>
                                             <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" maxlength="10" class="admin__control-text" data-bind="value: tariffCode, attr: { required: ($parent.customsType() === 'I' || $parent.customsType() === 'S') ? 'required' : null }" style="width: 100%; box-sizing: border-box;" />
+                                                <input type="text" maxlength="10" class="admin__control-text" data-bind="value: tariffCode" style="width: 100%; box-sizing: border-box;" />
                                             </td>
                                             <td style="padding: 6px 4px; vertical-align: top;">
-                                                <select class="admin__control-select" data-bind="options: $parents[1].countryOptions, optionsText: 'label', optionsValue: 'value', value: countryOfOrigin, attr: { required: $parent.customsType() === 'I' ? 'required' : null }" style="width: 100%; box-sizing: border-box;"></select>
+                                                <select class="admin__control-select" data-bind="options: $parents[1].customsItemCountryOptions, optionsText: 'label', optionsValue: 'value', value: countryOfOrigin" style="width: 100%; box-sizing: border-box;"></select>
                                             </td>
                                             <td style="padding: 6px 4px; vertical-align: middle; text-align: center;">
                                                 <button type="button" class="action-delete" data-bind="click: function() { $parent.removeCustomsItemRow($index()) }" title="<?= $escaper->escapeHtmlAttr(__('Delete Row')) ?>">

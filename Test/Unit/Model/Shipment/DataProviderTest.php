@@ -291,6 +291,9 @@ class DataProviderTest extends TestCase
                         'tariffCode' => '61091000',
                         'countryOfOrigin' => 'DE',
                     ],
+                    [
+                        'nameEn' => 'Blank fields',
+                    ],
                 ],
             ],
         ];
@@ -337,10 +340,16 @@ class DataProviderTest extends TestCase
         $this->assertEquals('1', $customs['notProhibitedGoods']);
         $this->assertEquals('0', $customs['notRestrictedGoods']);
 
-        $this->assertCount(1, $customs['customsItems']);
+        $this->assertCount(2, $customs['customsItems']);
         $this->assertEquals('0', $customs['customsItems'][0]['record_id']);
         $this->assertEquals('T-Shirt Cotton', $customs['customsItems'][0]['nameEn']);
         $this->assertEquals('61091000', $customs['customsItems'][0]['tariffCode']);
+        $this->assertSame('', $customs['customsItems'][1]['namePl']);
+        $this->assertSame('', $customs['customsItems'][1]['quantity']);
+        $this->assertSame('', $customs['customsItems'][1]['weight']);
+        $this->assertSame('', $customs['customsItems'][1]['value']);
+        $this->assertSame('', $customs['customsItems'][1]['tariffCode']);
+        $this->assertSame('', $customs['customsItems'][1]['countryOfOrigin']);
     }
 }
 

@@ -176,7 +176,7 @@ define([
     function createCustomsItemObservable(item) {
         item = item || {};
         var valStr = (item.value !== undefined && item.value !== null && item.value !== '') ? String(item.value).replace(',', '.') : '';
-        var qtyStr = (item.quantity !== undefined && item.quantity !== null && item.quantity !== '') ? String(item.quantity).replace(',', '.') : 1;
+        var qtyStr = (item.quantity !== undefined && item.quantity !== null && item.quantity !== '') ? String(item.quantity).replace(',', '.') : '';
         return {
             namePl: ko.observable(item.namePl || ''),
             nameEn: ko.observable(item.nameEn || ''),
@@ -184,7 +184,7 @@ define([
             weight: ko.observable(formatDecimal4(item.weight)),
             value: ko.observable(valStr),
             tariffCode: ko.observable(item.tariffCode || ''),
-            countryOfOrigin: ko.observable(item.countryOfOrigin || 'PL')
+            countryOfOrigin: ko.observable(item.countryOfOrigin || '')
         };
     }
 
@@ -262,11 +262,11 @@ define([
             customsObj.customsItems.push(createCustomsItemObservable({
                 namePl: '',
                 nameEn: '',
-                quantity: 1,
+                quantity: '',
                 weight: '',
                 value: '',
-                tariffCode: customsObj.defaultTariffCode() || '',
-                countryOfOrigin: customsObj.countryOfOrigin() || 'PL'
+                tariffCode: '',
+                countryOfOrigin: ''
             }));
         };
 
@@ -520,6 +520,7 @@ define([
             this.shipmentData = ko.observable(createShipmentData({}, this.todayDate));
             this.senderTemplates = ko.observableArray([]);
             this.countryOptions = ko.observableArray([]);
+            this.customsItemCountryOptions = ko.observableArray([{ value: '', label: '' }]);
             this.shipmentTemplates = ko.observableArray([]);
             this.serviceCodeOptions = ko.observableArray([]);
             this.labelTypeOptions = ko.observableArray([]);
@@ -1261,6 +1262,7 @@ define([
                         // 1. Populate dropdown options FIRST
                         self.senderTemplates(response.senderTemplates || []);
                         self.countryOptions(response.countryOptions || []);
+                        self.customsItemCountryOptions([{ value: '', label: '' }].concat(response.countryOptions || []));
                         self.shipmentTemplates(response.shipmentTemplates || []);
                         self.serviceCodeOptions(response.serviceCodeOptions || []);
                         self.labelTypeOptions(response.labelTypeOptions || []);
