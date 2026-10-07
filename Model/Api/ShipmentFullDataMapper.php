@@ -335,7 +335,7 @@ class ShipmentFullDataMapper
     }
 
     /**
-     * Format postal code: remove hyphen for PL, return unchanged for international countries.
+     * Remove spaces from postal codes and hyphens from Polish postal codes for DHL.
      *
      * @param string $postalCode
      * @param string $countryCode
@@ -344,7 +344,7 @@ class ShipmentFullDataMapper
      */
     public function sanitizePostalCode(string $postalCode, string $countryCode = 'PL'): string
     {
-        $postalCode = trim($postalCode);
+        $postalCode = str_replace(' ', '', trim($postalCode));
         if (strtoupper($countryCode) === 'PL') {
             return str_replace('-', '', $postalCode);
         }

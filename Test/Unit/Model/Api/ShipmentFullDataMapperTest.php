@@ -757,6 +757,22 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertSame($expected, $this->mapper->sanitizePostalCode($inputCode, $countryCode));
     }
 
+    public function testMapRemovesInternalSpaceFromCzechSenderAndRecipientPostalCodes(): void
+    {
+        $shipmentData = new DhlShipmentData(
+            orderId: 108,
+            sender: new SenderData(postalCode: '100 00', country: 'CZ'),
+            recipient: new RecipientData(postalCode: '110 00', country: 'CZ'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(packages: [new PackageData()])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertSame('10000', $mapped['ship']['shipper']['address']['postalCode']);
+        $this->assertSame('11000', $mapped['ship']['receiver']['address']['postalCode']);
+    }
+
     public function testMapPreservesHouseNumberWithSlash(): void
     {
         $sender = new SenderData(
@@ -941,7 +957,8 @@ class ShipmentFullDataMapperTest extends TestCase
         return [
             'PL with hyphen' => ['00-950', 'PL', '00950'],
             'PL without hyphen' => ['00950', 'PL', '00950'],
-            'GB alphanumeric' => ['SW1A 1AA', 'GB', 'SW1A 1AA'],
+            'CZ with internal space' => ['100 00', 'CZ', '10000'],
+            'GB alphanumeric with space' => ['SW1A 1AA', 'GB', 'SW1A1AA'],
             'DE with hyphen' => ['D-10115', 'DE', 'D-10115'],
             'US zip extended' => ['90210-1234', 'US', '90210-1234'],
         ];
