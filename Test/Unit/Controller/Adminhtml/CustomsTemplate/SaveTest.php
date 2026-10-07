@@ -125,12 +125,14 @@ class SaveTest extends TestCase
             'template_name' => 'Individual Clearance Template',
             'customs_type' => CustomsType::TYPE_INDIVIDUAL,
             'currency' => 'EUR',
+            'invoice_content' => 0,
         ];
 
         $expectedData = [
             'template_name' => 'Individual Clearance Template',
             'customs_type' => CustomsType::TYPE_INDIVIDUAL,
             'currency' => 'EUR',
+            'invoice_content' => 0,
         ];
 
         $this->request->method('getPostValue')->willReturn($postData);

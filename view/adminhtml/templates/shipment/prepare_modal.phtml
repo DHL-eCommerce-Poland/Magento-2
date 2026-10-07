@@ -560,6 +560,19 @@ $todayIsoDate = $viewModel->getIsoDate();
                                         <span><?= $escaper->escapeHtml(__('Shipment Does Not Contain Restricted Goods')) ?></span>
                                     </label>
                                 </div>
+                                <!-- ko if: customsType() === 'I' -->
+                                <div class="admin__field admin__field-option">
+                                    <input
+                                        type="checkbox"
+                                        class="admin__control-checkbox"
+                                        id="customs_invoice_content"
+                                        data-bind="checked: invoiceContent"
+                                    />
+                                    <label class="admin__field-label" for="customs_invoice_content">
+                                        <span><?= $escaper->escapeHtml(__('I declare that the information on the attached invoice is consistent with the customs data entered to generate the shipment')) ?></span>
+                                    </label>
+                                </div>
+                                <!-- /ko -->
                             </div>
                         </div>
 

@@ -485,6 +485,7 @@
 "Value Does Not Exceed Limit","Wartość nie przekracza limitu"
 "Shipment Does Not Contain Prohibited Goods","Przesyłka nie zawiera towarów zabronionych"
 "Shipment Does Not Contain Restricted Goods","Przesyłka nie zawiera towarów objętych ograniczeniami"
+"I declare that the information on the attached invoice is consistent with the customs data entered to generate the shipment","Oświadczam, że dane na załączonej fakturze są zgodne z danymi celnymi wprowadzonymi w celu wygenerowania przesyłki"
 "Customs Items (Goods)","Pozycje celne (Towary)"
 "Add Goods Item","Dodaj pozycję towaru"
 "Goods List","Lista towarów"

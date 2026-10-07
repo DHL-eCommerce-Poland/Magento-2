@@ -339,6 +339,7 @@ class DataProviderTest extends TestCase
         $this->assertEquals('1', $customs['notExceedValue']);
         $this->assertEquals('1', $customs['notProhibitedGoods']);
         $this->assertEquals('0', $customs['notRestrictedGoods']);
+        $this->assertEquals('0', $customs['invoiceContent']);
 
         $this->assertCount(2, $customs['customsItems']);
         $this->assertEquals('0', $customs['customsItems'][0]['record_id']);

@@ -36,6 +36,7 @@ class CustomsTemplate extends AbstractModel
     public const NOT_EXCEED_VALUE = 'not_exceed_value';
     public const NOT_PROHIBITED_GOODS = 'not_prohibited_goods';
     public const NOT_RESTRICTED_GOODS = 'not_restricted_goods';
+    public const INVOICE_CONTENT = 'invoice_content';
     public const CUSTOMS_ITEMS = 'customs_items';
     public const COUNTRY_ID = 'country_id';
 
@@ -508,6 +509,29 @@ class CustomsTemplate extends AbstractModel
     public function setNotRestrictedGoods(bool|int|null $flag): static
     {
         return $this->setData(self::NOT_RESTRICTED_GOODS, $flag !== null ? (int)(bool)$flag : null);
+    }
+
+    /**
+     * Get the invoice content agreement flag.
+     *
+     * @return bool|null
+     */
+    public function getInvoiceContent(): ?bool
+    {
+        $value = $this->getData(self::INVOICE_CONTENT);
+        return $value !== null ? (bool)$value : null;
+    }
+
+    /**
+     * Set the invoice content agreement flag.
+     *
+     * @param bool|int|null $flag
+     *
+     * @return $this
+     */
+    public function setInvoiceContent(bool|int|null $flag): static
+    {
+        return $this->setData(self::INVOICE_CONTENT, $flag !== null ? (int)(bool)$flag : null);
     }
 
     /**

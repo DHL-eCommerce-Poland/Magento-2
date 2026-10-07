@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Model\Api;
 
 use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
+use Ideo\Dhl\Model\Shipment\Data\CustomsData;
 use Ideo\Dhl\Model\Shipment\Data\PackageData;
 use Ideo\Dhl\Model\Shipment\Data\RecipientData;
 use Ideo\Dhl\Model\Shipment\Data\SenderData;
@@ -644,7 +645,7 @@ class ShipmentFullDataMapperTest extends TestCase
             country: 'GB'
         );
 
-        $customs = new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
+        $customs = new CustomsData(
             selectedCustomsTemplateId: 5,
             customsType: 'U',
             categoryOfItem: '11',
@@ -708,6 +709,7 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertTrue($c['customAgreements']['notExceedValue']);
         $this->assertTrue($c['customAgreements']['notProhibitedGoods']);
         $this->assertTrue($c['customAgreements']['notRestrictedGoods']);
+        $this->assertFalse($c['customAgreements']['invoiceContent']);
         $this->assertCount(1, $c['customsItem']);
         $this->assertSame('Koszulka', $c['customsItem'][0]['namePl']);
         $this->assertSame('T-Shirt', $c['customsItem'][0]['nameEn']);
@@ -798,6 +800,7 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $customs = new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
             customsType: 'I',
+            invoiceContent: true,
             invoiceNr: 'INV-2026-001',
             invoiceDate: '2026-09-23',
             invoiceFile: 'data:application/pdf;base64,' . $base64Content,
@@ -824,6 +827,64 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertSame('2026-09-23', $c['invoiceDate']);
         $this->assertSame($base64Content, $c['invoice']);
         $this->assertTrue($c['customAgreements']['invoiceContent']);
+    }
+
+    /**
+     * Verify the individual customs agreement follows the selected checkbox value.
+     *
+     * @return void
+     */
+    public function testInvoiceContentAgreementUsesCheckboxValueForIndividualClearance(): void
+    {
+        $shipmentData = new DhlShipmentData(
+            orderId: 107,
+            sender: new SenderData(name: 'Sender Corp'),
+            recipient: new RecipientData(name: 'UK Customer Ltd', country: 'GB'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
+            customs: new CustomsData(customsType: 'I', invoiceContent: false)
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertFalse($mapped['customs']['customAgreements']['invoiceContent']);
+    }
+
+    /**
+     * Verify non-individual customs types never send the invoice content agreement.
+     *
+     * @param string $customsType
+     *
+     * @return void
+     */
+    #[DataProvider('nonIndividualCustomsTypesDataProvider')]
+    public function testInvoiceContentAgreementIsFalseForNonIndividualClearance(string $customsType): void
+    {
+        $shipmentData = new DhlShipmentData(
+            orderId: 108,
+            sender: new SenderData(name: 'Sender Corp'),
+            recipient: new RecipientData(name: 'UK Customer Ltd', country: 'GB'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
+            customs: new CustomsData(customsType: $customsType, invoiceContent: true)
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertFalse($mapped['customs']['customAgreements']['invoiceContent']);
+    }
+
+    /**
+     * Provide customs types that do not use the invoice content agreement.
+     *
+     * @return array
+     */
+    public static function nonIndividualCustomsTypesDataProvider(): array
+    {
+        return [
+            'simplified clearance' => ['U'],
+            'short declaration' => ['S'],
+        ];
     }
 
     #[DataProvider('postalCodeDataProvider')]

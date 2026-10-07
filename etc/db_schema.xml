@@ -114,6 +114,7 @@
         <column xsi:type="smallint" name="not_exceed_value" unsigned="true" nullable="true" default="1" comment="Agreement: Not Exceed Value Limit"/>
         <column xsi:type="smallint" name="not_prohibited_goods" unsigned="true" nullable="true" default="1" comment="Agreement: Not Prohibited Goods"/>
         <column xsi:type="smallint" name="not_restricted_goods" unsigned="true" nullable="true" default="1" comment="Agreement: Not Restricted Goods"/>
+        <column xsi:type="smallint" name="invoice_content" unsigned="true" nullable="true" default="1" comment="Agreement: Invoice Content Matches Customs Data"/>
         <column xsi:type="text" name="customs_items" nullable="true" comment="Customs Items JSON Array"/>
         <column xsi:type="text" name="country_id" nullable="true" comment="Destination Countries (comma-separated ISO codes)"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>

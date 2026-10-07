@@ -289,7 +289,7 @@ class ShipmentFullDataMapper
                 'notExceedValue' => $customs->isNotExceedValue(),
                 'notProhibitedGoods' => $customs->isNotProhibitedGoods(),
                 'notRestrictedGoods' => $customs->isNotRestrictedGoods(),
-                'invoiceContent' => ($customsType === 'I') || $customs->isInvoiceContent(),
+                'invoiceContent' => $customsType === 'I' && $customs->isInvoiceContent(),
             ];
 
             $items = [];

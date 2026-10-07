@@ -297,7 +297,7 @@ class LoadTemplate extends Action
                             ? (bool)$template->getNotProhibitedGoods() : true,
                         'notRestrictedGoods' => $template->getNotRestrictedGoods() !== null
                             ? (bool)$template->getNotRestrictedGoods() : true,
-                        'invoiceContent' => $isIndividual,
+                        'invoiceContent' => $isIndividual && ($template->getInvoiceContent() ?? true),
                         'customsItems' => $formattedItems,
                     ],
                 ]);

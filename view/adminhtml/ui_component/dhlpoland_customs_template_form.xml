@@ -100,6 +100,13 @@
                                         <param name="0" xsi:type="boolean">true</param>
                                     </params>
                                 </action>
+                                <action name="1">
+                                    <target>dhlpoland_customs_template_form.dhlpoland_customs_template_form.agreements.invoice_content_agreement</target>
+                                    <callback>visible</callback>
+                                    <params>
+                                        <param name="0" xsi:type="boolean">true</param>
+                                    </params>
+                                </action>
                             </actions>
                         </rule>
                         <rule name="1">
@@ -112,6 +119,13 @@
                                         <param name="0" xsi:type="boolean">false</param>
                                     </params>
                                 </action>
+                                <action name="1">
+                                    <target>dhlpoland_customs_template_form.dhlpoland_customs_template_form.agreements.invoice_content_agreement</target>
+                                    <callback>visible</callback>
+                                    <params>
+                                        <param name="0" xsi:type="boolean">false</param>
+                                    </params>
+                                </action>
                             </actions>
                         </rule>
                         <rule name="2">
@@ -119,6 +133,13 @@
                             <actions>
                                 <action name="0">
                                     <target>dhlpoland_customs_template_form.dhlpoland_customs_template_form.individual_customs</target>
+                                    <callback>visible</callback>
+                                    <params>
+                                        <param name="0" xsi:type="boolean">false</param>
+                                    </params>
+                                </action>
+                                <action name="1">
+                                    <target>dhlpoland_customs_template_form.dhlpoland_customs_template_form.agreements.invoice_content_agreement</target>
                                     <callback>visible</callback>
                                     <params>
                                         <param name="0" xsi:type="boolean">false</param>
@@ -217,7 +238,7 @@
         </field>
     </fieldset>
 
-    <fieldset name="individual_customs" component="Ideo_Dhl/js/form/components/individual-customs">
+    <fieldset name="individual_customs" component="Ideo_Dhl/js/form/components/individual-customs-fieldset">
         <settings>
             <label translate="true">Data for Individual Clearance</label>
             <collapsible>true</collapsible>
@@ -397,6 +418,41 @@
                 </checkbox>
             </formElements>
         </field>
+        <container name="invoice_content_agreement" component="Ideo_Dhl/js/form/components/individual-customs">
+            <argument name="data" xsi:type="array">
+                <item name="type" xsi:type="string">group</item>
+                <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="template" xsi:type="string">ui/collection</item>
+                </item>
+            </argument>
+            <field name="invoice_content" formElement="checkbox">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="default" xsi:type="number">1</item>
+                    </item>
+                </argument>
+                <settings>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                    </validation>
+                    <dataType>boolean</dataType>
+                    <label translate="true">I declare that the information on the attached invoice is consistent with the customs data entered to generate the shipment</label>
+                    <dataScope>invoice_content</dataScope>
+                </settings>
+                <formElements>
+                    <checkbox>
+                        <settings>
+                            <valueMap>
+                                <map name="false" xsi:type="number">0</map>
+                                <map name="true" xsi:type="number">1</map>
+                            </valueMap>
+                            <prefer>toggle</prefer>
+                        </settings>
+                    </checkbox>
+                </formElements>
+            </field>
+        </container>
     </fieldset>
 
     <fieldset name="customs_items_fieldset">

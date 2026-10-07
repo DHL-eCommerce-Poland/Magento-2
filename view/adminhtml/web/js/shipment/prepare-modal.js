@@ -255,6 +255,7 @@ define([
             notExceedValue: ko.observable(c.notExceedValue !== undefined ? isTruthy(c.notExceedValue) : true),
             notProhibitedGoods: ko.observable(c.notProhibitedGoods !== undefined ? isTruthy(c.notProhibitedGoods) : true),
             notRestrictedGoods: ko.observable(c.notRestrictedGoods !== undefined ? isTruthy(c.notRestrictedGoods) : true),
+            invoiceContent: ko.observable(c.invoiceContent !== undefined ? isTruthy(c.invoiceContent) : true),
             customsItems: itemsObsArr
         };
 
@@ -837,6 +838,7 @@ define([
             customs.notExceedValue(true);
             customs.notProhibitedGoods(true);
             customs.notRestrictedGoods(true);
+            customs.invoiceContent(true);
             if (customs.customsItems) {
                 customs.customsItems.removeAll();
             }
@@ -868,6 +870,11 @@ define([
             if (data.notExceedValue !== undefined) customs.notExceedValue(isTruthy(data.notExceedValue));
             if (data.notProhibitedGoods !== undefined) customs.notProhibitedGoods(isTruthy(data.notProhibitedGoods));
             if (data.notRestrictedGoods !== undefined) customs.notRestrictedGoods(isTruthy(data.notRestrictedGoods));
+            if (data.customsType === 'I') {
+                customs.invoiceContent(data.invoiceContent !== undefined ? isTruthy(data.invoiceContent) : true);
+            } else if (data.customsType !== undefined) {
+                customs.invoiceContent(false);
+            }
 
             if (customs.customsItems) {
                 customs.customsItems.removeAll();
