@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\Shipment;
 
 use Ideo\Dhl\Model\Carrier;
+use Ideo\Dhl\Model\Config\Source\InternationalMapPointType;
 use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\ServicePoint\NearestPointResolver;
 use Ideo\Dhl\Model\Shipment\Data\PackageData;
@@ -159,32 +160,31 @@ class OrderToShipmentDataMapper
             }
         }
 
-        $isPackstation = false;
-        $isPostfiliale = false;
-        $postnummer = null;
-
-        $cleanMethodCode = strtolower(trim((string)($order->getShippingMethod() ?? '')));
+        $shippingMethod = (string)($order->getShippingMethod() ?? '');
+        $cleanMethodCode = strtolower(trim($shippingMethod));
         if (str_starts_with($cleanMethodCode, Carrier::CODE_PREFIX)) {
             $cleanMethodCode = substr($cleanMethodCode, strlen(Carrier::CODE_PREFIX));
         }
 
-        $isInternationalPointMethod = in_array(
-            $cleanMethodCode,
-            [
-                MethodCatalog::METHOD_CONNECT_PARCELSHOP,
-                MethodCatalog::METHOD_CONNECT_PARCELSHOP_COD,
-                MethodCatalog::METHOD_CONNECT_PACKSTATION,
-                MethodCatalog::METHOD_CONNECT_PACKSTATION_COD,
-            ],
-            true
-        );
-
-        if ($shippingAddress && $isInternationalPointMethod) {
+        $mapPointType = null;
+        $isPackstation = false;
+        $isPostfiliale = false;
+        if (strtoupper($country) !== 'PL') {
+            $mapPointType = $this->methodCatalog->getInternationalMapPointTypeForMethod($shippingMethod);
+            $isPackstation = $mapPointType === InternationalMapPointType::TYPE_PACKSTATION;
+        } elseif ($shippingAddress && (
+            $this->methodCatalog->isPackstationMethod($cleanMethodCode)
+            || $this->methodCatalog->isParcelShopMethod($cleanMethodCode)
+        )) {
             $isPackstation = (bool)($shippingAddress->getData('dhl_is_packstation') ?? false);
             $isPostfiliale = (bool)($shippingAddress->getData('dhl_is_postfiliale') ?? false);
+        }
+        $postnummer = null;
+
+        if ($shippingAddress && $isPackstation) {
             $countryUpper = strtoupper((string)($shippingAddress->getCountryId() ?? ''));
             $postnummerVal = (string)($shippingAddress->getData('dhl_postnummer') ?? '');
-            $postnummer = ($isPackstation && $countryUpper === 'DE' && $postnummerVal !== '') ? $postnummerVal : null;
+            $postnummer = ($countryUpper === 'DE' && $postnummerVal !== '') ? $postnummerVal : null;
         }
 
         $recipientData = new RecipientData(
@@ -208,7 +208,8 @@ class OrderToShipmentDataMapper
             postnummer: $postnummer,
             popStreet: $popStreet,
             popCity: $popCity,
-            popPostcode: $popPostcode
+            popPostcode: $popPostcode,
+            mapPointType: $mapPointType
         );
 
         // 2. Sender mapping

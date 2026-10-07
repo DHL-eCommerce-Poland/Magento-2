@@ -27,14 +27,15 @@ class RecipientDataTest extends TestCase
             flatNumber: '2B',
             city: 'Warszawa',
             postalCode: '00-001',
-            country: 'PL',
+            country: 'DE',
             phone: '123456789',
             email: 'jan@example.com',
             popId: 'POP-123',
             popName: 'DHL POP Point - Warszawa',
             isPackstation: true,
             isPostfiliale: false,
-            postnummer: '123456'
+            postnummer: '123456',
+            mapPointType: 'packStation'
         );
 
         $this->assertEquals('Acme Corp', $recipient->getName());
@@ -47,13 +48,14 @@ class RecipientDataTest extends TestCase
         $this->assertEquals('2B', $recipient->getFlatNumber());
         $this->assertEquals('Warszawa', $recipient->getCity());
         $this->assertEquals('00-001', $recipient->getPostalCode());
-        $this->assertEquals('PL', $recipient->getCountry());
+        $this->assertEquals('DE', $recipient->getCountry());
         $this->assertEquals('123456789', $recipient->getPhone());
         $this->assertEquals('jan@example.com', $recipient->getEmail());
         $this->assertEquals('POP-123', $recipient->getPopId());
         $this->assertEquals('DHL POP Point - Warszawa', $recipient->getPopName());
         $this->assertTrue($recipient->isPackstation());
         $this->assertFalse($recipient->isPostfiliale());
+        $this->assertSame('packStation', $recipient->getMapPointType());
         $this->assertEquals('123456', $recipient->getPostnummer());
     }
 
@@ -73,6 +75,7 @@ class RecipientDataTest extends TestCase
         $this->assertNull($recipient->getPopName());
         $this->assertFalse($recipient->isPackstation());
         $this->assertFalse($recipient->isPostfiliale());
+        $this->assertNull($recipient->getMapPointType());
         $this->assertNull($recipient->getPostnummer());
     }
 
@@ -94,7 +97,7 @@ class RecipientDataTest extends TestCase
             'flatNumber' => '',
             'city' => 'Krakow',
             'postalCode' => '30-001',
-            'country' => 'PL',
+            'country' => 'DE',
             'phone' => '987654321',
             'email' => 'anna@example.com',
             'popId' => 'POP-999',
@@ -105,6 +108,7 @@ class RecipientDataTest extends TestCase
             'popStreet' => null,
             'popCity' => null,
             'popPostcode' => null,
+            'mapPointType' => 'courier',
         ];
 
         $recipient = RecipientData::fromArray($data);
@@ -138,17 +142,25 @@ class RecipientDataTest extends TestCase
      */
     public function testFromArrayWithMapPointType(): void
     {
-        $recipientPackstation = RecipientData::fromArray(['mapPointType' => 'packstation']);
+        $recipientPackstation = RecipientData::fromArray(['country' => 'DE', 'mapPointType' => 'packstation']);
         $this->assertTrue($recipientPackstation->isPackstation());
         $this->assertFalse($recipientPackstation->isPostfiliale());
+        $this->assertSame('packStation', $recipientPackstation->getMapPointType());
+        $this->assertSame('packStation', $recipientPackstation->toArray()['mapPointType']);
 
-        $recipientParcelshop = RecipientData::fromArray(['mapPointType' => 'parcelshop']);
+        $recipientParcelshop = RecipientData::fromArray(['country' => 'DE', 'mapPointType' => 'parcelshop']);
         $this->assertFalse($recipientParcelshop->isPackstation());
         $this->assertTrue($recipientParcelshop->isPostfiliale());
+        $this->assertSame('parcelShop', $recipientParcelshop->getMapPointType());
 
-        $recipientCourier = RecipientData::fromArray(['mapPointType' => 'courier']);
+        $recipientCourier = RecipientData::fromArray(['country' => 'DE', 'mapPointType' => 'courier']);
         $this->assertFalse($recipientCourier->isPackstation());
         $this->assertFalse($recipientCourier->isPostfiliale());
+        $this->assertSame('courier', $recipientCourier->getMapPointType());
+
+        $recipientDomestic = RecipientData::fromArray(['country' => 'PL', 'mapPointType' => 'parcelShop']);
+        $this->assertNull($recipientDomestic->getMapPointType());
+        $this->assertArrayNotHasKey('mapPointType', $recipientDomestic->toArray());
     }
 
     /**

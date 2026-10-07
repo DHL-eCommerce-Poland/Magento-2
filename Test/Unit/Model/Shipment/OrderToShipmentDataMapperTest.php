@@ -6,6 +6,7 @@ namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
 use DateTime;
 use Ideo\Dhl\Model\ServicePoint\NearestPointResolver;
+use Ideo\Dhl\Model\Shipment\Data\RecipientData;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use Ideo\Dhl\Model\Shipment\OrderWeightAggregator;
 use Ideo\Dhl\Model\Shipment\StreetAddressParser;
@@ -514,5 +515,69 @@ class OrderToShipmentDataMapperTest extends TestCase
         $this->assertSame('ZBLP300', $settings->getReturnLabelType());
         $this->assertSame('QR4_IMG', $settings->getReturnQrCodeType());
         $this->assertSame(1, $settings->getReturnBookCourier());
+    }
+
+    /**
+     * Verify international recipient point type and DHL flags follow the order shipping method.
+     *
+     * @return void
+     */
+    public function testMapInternationalPointTypeFromShippingMethod(): void
+    {
+        $cases = [
+            ['dhlpoland_connect', 'DE', 'courier', false, false],
+            ['dhlpoland_connect_cod', 'DE', 'courier', false, false],
+            ['dhlpoland_connect_parcelshop', 'DE', 'parcelShop', false, true],
+            ['dhlpoland_connect_parcelshop_cod', 'DE', 'parcelShop', false, true],
+            ['dhlpoland_connect_packstation', 'DE', 'packStation', true, false],
+            ['dhlpoland_connect_packstation_cod', 'DE', 'packStation', true, false],
+            ['unknown_method', 'DE', 'courier', false, false],
+            ['dhlpoland_connect_parcelshop', 'PL', null, false, false],
+        ];
+
+        foreach ($cases as [$shippingMethod, $country, $expectedType, $isPackstation, $isPostfiliale]) {
+            $recipient = $this->mapOrderRecipient($shippingMethod, $country);
+
+            self::assertSame($expectedType, $recipient->getMapPointType(), $shippingMethod);
+            if ($country === 'PL') {
+                self::assertArrayNotHasKey('mapPointType', $recipient->toArray(), $shippingMethod);
+            } else {
+                self::assertSame($expectedType, $recipient->toArray()['mapPointType'], $shippingMethod);
+            }
+            self::assertSame($isPackstation, $recipient->isPackstation(), $shippingMethod);
+            self::assertSame($isPostfiliale, $recipient->isPostfiliale(), $shippingMethod);
+            self::assertSame($isPackstation ? '123456' : null, $recipient->getPostnummer(), $shippingMethod);
+        }
+    }
+
+    /**
+     * Map a minimal order and return its recipient data for point type assertions.
+     *
+     * @param string $shippingMethod
+     * @param string $country
+     *
+     * @return RecipientData
+     */
+    private function mapOrderRecipient(string $shippingMethod, string $country): RecipientData
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getFirstname')->willReturn('Test');
+        $address->method('getLastname')->willReturn('Recipient');
+        $address->method('getStreet')->willReturn(['Example Street 1']);
+        $address->method('getCity')->willReturn('Berlin');
+        $address->method('getPostcode')->willReturn('10115');
+        $address->method('getCountryId')->willReturn($country);
+        $address->method('getData')->willReturnMap([
+            ['dhl_service_point_id', null, 'DE-POINT-1'],
+            ['dhl_postnummer', null, '123456'],
+        ]);
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getShippingMethod')->willReturn($shippingMethod);
+        $order->method('getItems')->willReturn([]);
+
+        return $this->mapper->map($order)->getRecipient();
     }
 }

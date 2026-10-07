@@ -240,8 +240,8 @@ define([
 
             if (country !== 'PL') {
                 params.push('country=' + encodeURIComponent(country));
-                var pType = this.source ? this.source.get('data.recipient.mapPointType') : 'parcelShop';
-                pType = pType || 'parcelShop';
+                var pType = this.source ? this.source.get('data.recipient.mapPointType') : 'courier';
+                pType = pType || 'courier';
                 params.push('ptype=' + encodeURIComponent(pType));
             }
 

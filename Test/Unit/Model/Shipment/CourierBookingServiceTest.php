@@ -174,12 +174,13 @@ class CourierBookingServiceTest extends TestCase
             )
             ->willReturn(new CourierBookingResult(true, ['90002561026WWW', '90002571026WWW']));
 
+        $timezone = $this->createFixedTimezone('2026-10-05');
         $service = new CourierBookingService(
             $client,
             $this->credentialsProviderStub,
             $repository,
-            $this->timezoneMock,
-            new ShipmentDateSanitizer($this->timezoneMock),
+            $timezone,
+            new ShipmentDateSanitizer($timezone),
             $this->createStub(\Psr\Log\LoggerInterface::class),
             new ShipmentDataPayloadReader(new Json())
         );
@@ -307,12 +308,13 @@ class CourierBookingServiceTest extends TestCase
             )
             ->willReturn(new CourierBookingResult(true, ['ORDER_AH']));
 
+        $timezone = $this->createFixedTimezone('2026-10-05');
         $service = new CourierBookingService(
             $client,
             $this->credentialsProviderStub,
             $repository,
-            $this->timezoneMock,
-            new ShipmentDateSanitizer($this->timezoneMock),
+            $timezone,
+            new ShipmentDateSanitizer($timezone),
             $this->createStub(\Psr\Log\LoggerInterface::class),
             new ShipmentDataPayloadReader(new Json())
         );
@@ -359,12 +361,13 @@ class CourierBookingServiceTest extends TestCase
             )
             ->willReturn(new CourierBookingResult(true, ['ORDER_AH', 'ORDER_EK']));
 
+        $timezone = $this->createFixedTimezone('2026-10-05');
         $service = new CourierBookingService(
             $client,
             $this->credentialsProviderStub,
             $repository,
-            $this->timezoneMock,
-            new ShipmentDateSanitizer($this->timezoneMock),
+            $timezone,
+            new ShipmentDateSanitizer($timezone),
             $this->createStub(\Psr\Log\LoggerInterface::class),
             new ShipmentDataPayloadReader(new Json())
         );
@@ -405,5 +408,20 @@ class CourierBookingServiceTest extends TestCase
     private function shipmentPayload(string $serviceType): string
     {
         return (new Json())->serialize(['shipmentSettings' => ['serviceType' => $serviceType]]);
+    }
+
+    /**
+     * Create a timezone stub with a fixed current date for pickup-date assertions.
+     *
+     * @param string $date
+     *
+     * @return TimezoneInterface
+     */
+    private function createFixedTimezone(string $date): TimezoneInterface
+    {
+        $timezone = $this->createStub(TimezoneInterface::class);
+        $timezone->method('scopeDate')->willReturn(new DateTime($date));
+
+        return $timezone;
     }
 }

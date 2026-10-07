@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment\Data;
 
+use Ideo\Dhl\Model\Config\Source\InternationalMapPointType;
+
 class RecipientData
 {
     /**
@@ -28,6 +30,7 @@ class RecipientData
      * @param string|null $popStreet
      * @param string|null $popCity
      * @param string|null $popPostcode
+     * @param string|null $mapPointType
      */
     public function __construct(
         private string $name = '',
@@ -50,8 +53,22 @@ class RecipientData
         private ?string $postnummer = null,
         private ?string $popStreet = null,
         private ?string $popCity = null,
-        private ?string $popPostcode = null
+        private ?string $popPostcode = null,
+        private ?string $mapPointType = null
     ) {
+        // International map point selection does not apply to Polish recipients.
+        if ($this->mapPointType === null || strtoupper($this->country) === 'PL') {
+            $this->mapPointType = null;
+            return;
+        }
+
+        $this->mapPointType = match (strtolower(trim($this->mapPointType))) {
+            strtolower(InternationalMapPointType::TYPE_PACKSTATION) => InternationalMapPointType::TYPE_PACKSTATION,
+            strtolower(InternationalMapPointType::TYPE_PARCELSHOP) => InternationalMapPointType::TYPE_PARCELSHOP,
+            default => InternationalMapPointType::TYPE_COURIER,
+        };
+        $this->isPackstation = $this->mapPointType === InternationalMapPointType::TYPE_PACKSTATION;
+        $this->isPostfiliale = $this->mapPointType === InternationalMapPointType::TYPE_PARCELSHOP;
     }
 
     /**
@@ -265,13 +282,23 @@ class RecipientData
     }
 
     /**
+     * Get the international delivery point type selected for the recipient.
+     *
+     * @return string|null
+     */
+    public function getMapPointType(): ?string
+    {
+        return $this->mapPointType;
+    }
+
+    /**
      * Convert recipient object to array format.
      *
      * @return array
      */
     public function toArray(): array
     {
-        return [
+        $data = [
             'name' => $this->name,
             'type' => $this->type,
             'firstName' => $this->firstName,
@@ -294,6 +321,12 @@ class RecipientData
             'popCity' => $this->popCity,
             'popPostcode' => $this->popPostcode,
         ];
+
+        if ($this->mapPointType !== null) {
+            $data['mapPointType'] = $this->mapPointType;
+        }
+
+        return $data;
     }
 
     /**
@@ -314,20 +347,7 @@ class RecipientData
 
         $isPackstation = !empty($data['isPackstation']);
         $isPostfiliale = !empty($data['isPostfiliale']);
-
-        if (isset($data['mapPointType'])) {
-            $mapPointType = strtolower(trim((string)$data['mapPointType']));
-            if ($mapPointType === 'packstation') {
-                $isPackstation = true;
-                $isPostfiliale = false;
-            } elseif ($mapPointType === 'parcelshop') {
-                $isPackstation = false;
-                $isPostfiliale = true;
-            } elseif ($mapPointType === 'courier' || $mapPointType === '') {
-                $isPackstation = false;
-                $isPostfiliale = false;
-            }
-        }
+        $mapPointType = isset($data['mapPointType']) ? (string)$data['mapPointType'] : null;
 
         $firstName = (string)($data['firstName'] ?? '');
         $lastName = (string)($data['lastName'] ?? '');
@@ -355,7 +375,8 @@ class RecipientData
             isset($data['postnummer']) ? (string)$data['postnummer'] : null,
             isset($data['popStreet']) ? (string)$data['popStreet'] : null,
             isset($data['popCity']) ? (string)$data['popCity'] : null,
-            isset($data['popPostcode']) ? (string)$data['popPostcode'] : null
+            isset($data['popPostcode']) ? (string)$data['popPostcode'] : null,
+            $mapPointType
         );
     }
 }

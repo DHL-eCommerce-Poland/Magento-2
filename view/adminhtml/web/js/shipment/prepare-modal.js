@@ -315,7 +315,7 @@ define([
             popCity: ko.observable(r.popCity || ''),
             popPostcode: ko.observable(r.popPostcode || ''),
             postnummer: ko.observable(r.postnummer || ''),
-            mapPointType: ko.observable(r.mapPointType || 'parcelShop'),
+            mapPointType: ko.observable(r.mapPointType || 'courier'),
             phone: ko.observable(r.phone || ''),
             email: ko.observable(r.email || '')
         };
@@ -533,9 +533,9 @@ define([
             this.categoryOfItemOptions = ko.observableArray([]);
             this.customsCurrencyOptions = ko.observableArray([]);
             this.internationalMapPointTypeOptions = ko.observableArray([
+                { value: 'courier', label: $.mage.__('Courier') },
                 { value: 'packStation', label: $.mage.__('Packstation') },
-                { value: 'parcelShop', label: $.mage.__('Parcelshop') },
-                { value: 'courier', label: $.mage.__('Courier') }
+                { value: 'parcelShop', label: $.mage.__('Parcelshop') }
             ]);
 
             var self = this;
@@ -698,7 +698,7 @@ define([
             if (country !== 'PL') {
                 params.push('country=' + encodeURIComponent(country));
                 var pType = typeof draft.recipient.mapPointType === 'function' ? draft.recipient.mapPointType() : draft.recipient.mapPointType;
-                pType = pType || 'parcelShop';
+                pType = pType || 'courier';
                 params.push('ptype=' + encodeURIComponent(pType));
             }
 
