@@ -1547,11 +1547,16 @@ define([
                                             selfModal.closeModal();
                                             var successMsg = saveRes.message || ($.mage.__('DHL shipment %1 has been created successfully.').replace('%1', saveRes.shipmentId || ''));
                                             showAdminMessage('success', successMsg);
-                                            // Keep full-page loader active until page reload finishes
+                                            // Keep full-page loader active until redirect finishes
                                             $('body').trigger('processStart');
-                                            setTimeout(function () {
-                                                window.location.reload();
-                                            }, 300);
+                                            var redirectUrl = saveRes.redirectUrl || saveRes.redirect_url;
+                                            if (redirectUrl) {
+                                                window.location.href = redirectUrl;
+                                            } else {
+                                                setTimeout(function () {
+                                                    window.location.reload();
+                                                }, 300);
+                                            }
                                         } else {
                                             $('body').trigger('processStop');
                                             $btn.prop('disabled', false);

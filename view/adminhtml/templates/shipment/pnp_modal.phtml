@@ -22,22 +22,22 @@ $generateUrl = $block->getUrl('dhlpoland/shipment/generatePnpReport');
 $pnpPackageTypeSource = $block->getData('pnp_package_type_source') ?? new PnpPackageType();
 $packageTypeOptions = $pnpPackageTypeSource->toOptionArray();
 ?>
-<div id="ideo-dhl-pnp-modal" style="display: none;" data-bind="scope: 'dhlPnpModal'">
+<div id="ideo-dhl-pnp-modal" class="dhl-modal-hidden" data-bind="scope: 'dhlPnpModal'">
     <form id="ideo-dhl-pnp-form" action="<?= $escaper->escapeUrl($generateUrl) ?>" method="post">
         <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>" />
-        <div class="admin__fieldset" style="margin-bottom: 0;">
+        <div class="admin__fieldset dhl-fieldset-no-margin">
 
             <div class="admin__field required">
                 <label class="admin__field-label" for="pnp_date"><span><?= $escaper->escapeHtml(__('Date')) ?></span></label>
                 <div class="admin__field-control">
-                    <input type="text" id="pnp_date" name="pnp[date]" class="admin__control-text" value="<?= $escaper->escapeHtmlAttr($todayDate) ?>" data-bind="dhlDatepicker: date, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', maxDate: new Date() }" style="width: 200px; box-sizing: border-box;" required />
+                    <input type="text" id="pnp_date" name="pnp[date]" class="admin__control-text dhl-input-w200" value="<?= $escaper->escapeHtmlAttr($todayDate) ?>" data-bind="dhlDatepicker: date, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', maxDate: new Date() }" required />
                 </div>
             </div>
 
             <div class="form-group row admin__field required">
                 <label class="form-control-label required admin__field-label" for="pnp_typePackage"><span><?= $escaper->escapeHtml(__('Package Type')) ?></span></label>
                 <div class="col-sm admin__field-control">
-                    <select id="pnp_typePackage" name="pnp[typePackage]" class="custom-select admin__control-select" aria-label="pnp_typePackage input" style="width: 320px;">
+                    <select id="pnp_typePackage" name="pnp[typePackage]" class="custom-select admin__control-select dhl-select-w320" aria-label="pnp_typePackage input">
                         <?php foreach ($packageTypeOptions as $option): ?>
                             <option value="<?= $escaper->escapeHtmlAttr($option['value']) ?>"<?= $option['value'] === PnpPackageType::TYPE_ALL ? ' selected="selected"' : '' ?>>
                                 <?= $escaper->escapeHtml($option['label']) ?>

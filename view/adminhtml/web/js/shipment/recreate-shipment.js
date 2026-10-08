@@ -125,7 +125,7 @@ define([
                         payload = formComponent.source.get('data');
                     }
 
-                    // 3. Pre-submit comma validation check (analogous to prepare-modal.js)
+                    // 3. Pre-submit comma validation check (analogous to shipment-modal.js)
                     if (payload && validateCommas(payload)) {
                         alert({
                             title: $t('Error'),

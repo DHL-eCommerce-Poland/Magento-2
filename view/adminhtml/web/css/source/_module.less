@@ -1,3 +1,12 @@
+// Color & Theme Variables
+@dhl-color-modal-bg: #ffffff;
+@dhl-color-border-light: #e3e3e3;
+@dhl-color-border-table: #d6d6d6;
+@dhl-color-primary-blue: #007bdb;
+@dhl-color-note-dark: #555555;
+@dhl-shadow-modal: rgba(0, 0, 0, 0.3);
+@dhl-shadow-header: rgba(0, 0, 0, 0.05);
+
 .admin__field {
     &.dhl-map-point-button-field {
         .admin__field-control {
@@ -19,7 +28,7 @@
         left: 50% !important;
         transform: translate(-50%, -50%) !important;
         margin: 0 !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+        box-shadow: 0 10px 30px @dhl-shadow-modal !important;
     }
 
     .modal-content {
@@ -47,9 +56,9 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background-color: #fff;
-            border-bottom: 1px solid #e3e3e3;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            background-color: @dhl-color-modal-bg;
+            border-bottom: 1px solid @dhl-color-border-light;
+            box-shadow: 0 2px 4px @dhl-shadow-header;
         }
 
         .modal-content {
@@ -83,6 +92,7 @@
 
 .dhl-postnummer-wrapper {
     margin-top: 6px;
+    display: none;
 
     .dhl-postnummer-label {
         font-weight: bold;
@@ -93,3 +103,238 @@
         width: 160px;
     }
 }
+
+// Modal & Component Styling for DHL eCommerce Admin Templates
+
+.dhl-modal-hidden {
+    display: none;
+}
+
+.dhl-fieldset-no-margin {
+    margin-bottom: 0 !important;
+}
+
+.dhl-margin-bottom-15 {
+    margin-bottom: 15px;
+}
+
+.dhl-margin-top-8 {
+    margin-top: 8px;
+}
+
+.dhl-margin-top-15 {
+    margin-top: 15px;
+}
+
+.dhl-padding-left-20 {
+    padding-left: 20px;
+}
+
+.dhl-relative {
+    position: relative;
+}
+
+.dhl-field-control-pt {
+    padding-top: 6px;
+}
+
+.dhl-input-w100 {
+    width: 100px;
+}
+
+.dhl-input-w200 {
+    width: 200px;
+    box-sizing: border-box;
+}
+
+.dhl-select-w320 {
+    width: 320px;
+}
+
+.dhl-input-full {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dhl-flex-row {
+    display: flex;
+    gap: 8px;
+
+    &.dhl-flex-row-260 {
+        width: 260px;
+    }
+}
+
+.dhl-flex-1 {
+    flex: 1;
+}
+
+.dhl-flex-1-5 {
+    flex: 1.5;
+}
+
+.dhl-flex-2 {
+    flex: 2;
+}
+
+.dhl-shipment-prepare-form {
+    padding: 0 30px 30px 30px;
+    box-sizing: border-box;
+}
+
+.dhl-layout-two-columns {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 15px;
+
+    &.dhl-margin-top {
+        margin-top: 15px;
+        margin-bottom: 0;
+    }
+}
+
+.dhl-layout-column {
+    flex: 1;
+    min-width: 0;
+
+    &.dhl-layout-column-half {
+        max-width: ~"calc(50% - 10px)";
+    }
+
+    &.dhl-layout-column-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+.dhl-services-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 6px;
+}
+
+.dhl-service-subfield {
+    margin-left: 24px;
+    margin-top: 2px;
+    margin-bottom: 6px;
+    max-width: 250px;
+}
+
+.dhl-nested-field {
+    margin-top: 8px;
+    padding-left: 20px;
+}
+
+.dhl-table-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    float: none;
+    overflow-x: auto;
+    padding-right: 30px;
+    box-sizing: border-box;
+}
+
+.dhl-table-label {
+    width: 100%;
+    max-width: 100%;
+    float: none;
+    margin-bottom: 6px;
+}
+
+.dhl-admin-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+        padding: 8px;
+        border-bottom: 2px solid @dhl-color-border-table;
+        text-align: left;
+
+        &.dhl-th-center {
+            text-align: center;
+        }
+
+        &.dhl-col-w60 {
+            width: 60px;
+        }
+
+        &.dhl-col-w65 {
+            width: 65px;
+        }
+
+        &.dhl-col-w70 {
+            width: 70px;
+        }
+
+        &.dhl-col-w80 {
+            width: 80px;
+        }
+
+        &.dhl-col-w85 {
+            width: 85px;
+        }
+
+        &.dhl-col-w110 {
+            width: 110px;
+        }
+
+        &.dhl-col-w130 {
+            width: 130px;
+        }
+
+        &.dhl-col-w140 {
+            width: 140px;
+        }
+    }
+
+    td {
+        padding: 6px 4px;
+        vertical-align: top;
+
+        &.dhl-td-center {
+            vertical-align: middle;
+            text-align: center;
+        }
+    }
+
+    tfoot td {
+        padding-top: 10px;
+    }
+}
+
+.dhl-table-checkbox-field {
+    margin: 0;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.dhl-invoice-upload-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dhl-invoice-file-name {
+    font-weight: bold;
+    color: @dhl-color-primary-blue;
+}
+
+.dhl-invoice-note {
+    margin: 0;
+    align-self: center;
+}
+
+.dhl-shipment-ids-note {
+    margin-top: 4px;
+    color: @dhl-color-note-dark;
+    font-size: 1.2rem;
+}
+
+.dhl-tracking-link {
+    text-decoration: none;
+}
+
+

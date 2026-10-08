@@ -12,13 +12,12 @@ $events = $block->getTrackingEvents();
 $shipmentId = $block->getShipmentId();
 ?>
 
-<div class="admin__page-section-content" style="margin-bottom: 15px;">
+<div class="admin__page-section-content dhl-margin-bottom-15">
     <?php if (!empty($shipmentId)): ?>
-        <div style="margin-bottom: 15px;">
+        <div class="dhl-margin-bottom-15">
             <a href="https://mojdhl.pl/sprawdz?paczki=<?= $escaper->escapeHtmlAttr($shipmentId) ?>"
                target="_blank"
-               class="action-secondary"
-               style="text-decoration: none;">
+               class="action-secondary dhl-tracking-link">
                 <?= $escaper->escapeHtml(__('Track on DHL (https://mojdhl.pl/sprawdz?paczki=%1)', $shipmentId)) ?>
             </a>
         </div>

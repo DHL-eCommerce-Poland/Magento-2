@@ -22,8 +22,8 @@ class CustomsAgreementUiTest extends TestCase
             $modulePath . '/view/adminhtml/ui_component/dhlpoland_customs_template_form.xml'
         );
         $shipmentForm = file_get_contents($modulePath . '/view/adminhtml/ui_component/dhlpoland_shipment_form.xml');
-        $prepareModal = file_get_contents($modulePath . '/view/adminhtml/templates/shipment/prepare_modal.phtml');
-        $prepareModalJs = file_get_contents($modulePath . '/view/adminhtml/web/js/shipment/prepare-modal.js');
+        $prepareModal = file_get_contents($modulePath . '/view/adminhtml/templates/shipment/shipment_modal.phtml');
+        $prepareModalJs = file_get_contents($modulePath . '/view/adminhtml/web/js/shipment/shipment-modal.js');
 
         $this->assertIsString($templateForm);
         $this->assertSwitcherControlsVisibility(

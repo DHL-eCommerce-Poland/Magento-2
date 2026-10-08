@@ -87,4 +87,23 @@ class CreateShipmentResultTest extends TestCase
         $this->assertEquals('TIMEOUT', $result->getErrorCode());
         $this->assertEquals('Connection timed out', $result->getErrorMessage());
     }
+
+    /**
+     * Test result with entity ID and withEntityId immutability.
+     *
+     * @return void
+     */
+    public function testResultWithEntityIdAndWithEntityId(): void
+    {
+        $result = new CreateShipmentResult(true, false, '1234567890', null, [], null, null, null, null, null, 42);
+
+        $this->assertEquals(42, $result->getEntityId());
+
+        $updatedResult = $result->withEntityId(99);
+        $this->assertNotSame($result, $updatedResult);
+        $this->assertEquals(42, $result->getEntityId());
+        $this->assertEquals(99, $updatedResult->getEntityId());
+        $this->assertEquals('1234567890', $updatedResult->getShipmentId());
+        $this->assertTrue($updatedResult->isSuccess());
+    }
 }

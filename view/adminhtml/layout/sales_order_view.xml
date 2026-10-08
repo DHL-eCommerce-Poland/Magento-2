@@ -3,10 +3,11 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="content">
-            <block name="dhlpoland_prepare_modal"
-                   template="Ideo_Dhl::shipment/prepare_modal.phtml">
+            <block name="dhlpoland_shipment_modal"
+                   template="Ideo_Dhl::shipment/shipment_modal.phtml">
                 <arguments>
-                    <argument name="view_model" xsi:type="object">Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig</argument>
+                    <argument name="view_model"
+                              xsi:type="object">Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig</argument>
                 </arguments>
             </block>
         </referenceContainer>

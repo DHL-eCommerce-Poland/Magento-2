@@ -244,20 +244,29 @@ class Save extends Action implements HttpPostActionInterface
             }
 
             $createdShipmentId = (string) $dispatchResult->getShipmentId();
+            $createdEntityId = $dispatchResult->getEntityId() ?? ($entityId > 0 ? $entityId : null);
             $successMsg = __('DHL shipment %1 has been created successfully.', $createdShipmentId)->render();
 
             $this->messageManager->addSuccessMessage($successMsg);
+
+            $redirectUrl = $createdEntityId
+                ? $this->getUrl('*/*/edit', ['entity_id' => $createdEntityId])
+                : null;
 
             if ($isAjax) {
                 return $resultJson->setData([
                     'success' => true,
                     'shipmentId' => $createdShipmentId,
+                    'entityId' => $createdEntityId,
+                    'redirectUrl' => $redirectUrl,
                     'status' => $dispatchResult->getOrderStatus() ?: 'created',
                     'message' => $successMsg,
                 ]);
             }
 
-            return $this->resultRedirectFactory->create()->setPath('*/*/index');
+            $redirectPath = $createdEntityId ? '*/*/edit' : '*/*/index';
+            return $this->resultRedirectFactory->create()
+                ->setPath($redirectPath, $createdEntityId ? ['entity_id' => $createdEntityId] : []);
         } catch (Exception $e) {
             $this->logger->error(
                 'Error saving and dispatching DHL shipment: ' . $e->getMessage(),
