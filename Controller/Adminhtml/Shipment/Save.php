@@ -168,25 +168,6 @@ class Save extends Action implements HttpPostActionInterface
         try {
             $shipmentData = DhlShipmentData::fromArray($payload);
 
-            // Extract template IDs from request or nested draft payload
-            $rawSenderId = $this->getRequest()->getParam('drop_off_point_template_id')
-                ?? ($payload['sender']['selectedDropOffPointId'] ?? $payload['drop_off_point_template_id'] ?? null);
-            $rawShipmentId = $this->getRequest()->getParam('delivery_service_template_id')
-                ?? ($payload['shipmentSettings']['selectedDeliveryServiceId']
-                    ?? $payload['delivery_service_template_id'] ?? null);
-            $rawCustomsId = $this->getRequest()->getParam('customs_template_id')
-                ?? ($payload['customs']['selectedCustomsTemplateId'] ?? $payload['customs_template_id'] ?? null);
-
-            $dropOffPointTemplateId = (!empty($rawSenderId) && trim((string)$rawSenderId) !== '')
-                ? (string)$rawSenderId
-                : null;
-            $deliveryServiceTemplateId = (!empty($rawShipmentId) && trim((string)$rawShipmentId) !== '')
-                ? (string)$rawShipmentId
-                : null;
-            $customsTemplateId = (!empty($rawCustomsId) && trim((string)$rawCustomsId) !== '')
-                ? (string)$rawCustomsId
-                : null;
-
             // 1. Resolve environment configuration (sandbox vs production)
             $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlpoland/sandbox');
             $environment = $isSandbox ? 'sandbox' : 'production';
@@ -200,10 +181,7 @@ class Save extends Action implements HttpPostActionInterface
             } else {
                 $dispatchResult = $this->shipmentCreationService->createShipment(
                     $shipmentData,
-                    $environment,
-                    $dropOffPointTemplateId,
-                    $deliveryServiceTemplateId,
-                    $customsTemplateId
+                    $environment
                 );
             }
 

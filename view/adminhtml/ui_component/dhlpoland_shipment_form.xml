@@ -66,21 +66,6 @@
             <collapsible>true</collapsible>
             <opened>true</opened>
         </settings>
-        <field name="sender[presetSenderId]" formElement="select">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Drop-Off Point Template</label>
-                <dataScope>sender.presetSenderId</dataScope>
-            </settings>
-            <formElements>
-                <select>
-                    <settings>
-                        <caption translate="true">Select Template...</caption>
-                        <options class="Ideo\Dhl\Model\Config\Source\DropOffPoint"/>
-                    </settings>
-                </select>
-            </formElements>
-        </field>
         <field name="sender[sapNumber]" formElement="input">
             <settings>
                 <dataType>text</dataType>

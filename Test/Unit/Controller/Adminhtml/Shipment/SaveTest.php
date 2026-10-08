@@ -178,12 +178,6 @@ class SaveTest extends TestCase
                 if ($param === 'shipment_data') {
                     return json_encode($payloadData);
                 }
-                if ($param === 'drop_off_point_template_id') {
-                    return '1';
-                }
-                if ($param === 'delivery_service_template_id') {
-                    return '2';
-                }
                 return null;
             });
 
@@ -198,7 +192,7 @@ class SaveTest extends TestCase
             ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData
                 && $arg->getShipmentSettings()->getLabelType() === 'LBLP'
                 && $arg->getShipmentSettings()->getReturnLabelType() === 'ZBLP300'
-                && $arg->getShipmentSettings()->getReturnQrCodeType() === 'QR6_IMG'), 'sandbox', '1', '2', null)
+                && $arg->getShipmentSettings()->getReturnQrCodeType() === 'QR6_IMG'), 'sandbox')
             ->willReturn($apiResult);
 
         $this->jsonResultMock->expects(self::once())
@@ -248,7 +242,7 @@ class SaveTest extends TestCase
         $apiResult = new CreateShipmentResult(false, false, null, null, [], 'ERR_01', 'Nieprawidłowy kod pocztowy');
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('createShipment')
-            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'production', null, null, null)
+            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'production')
             ->willReturn($apiResult);
 
         $this->jsonResultMock->expects(self::once())
@@ -294,7 +288,7 @@ class SaveTest extends TestCase
 
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('createShipment')
-            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'sandbox', null, null, null)
+            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'sandbox')
             ->willReturn(new CreateShipmentResult(true, false, '90039521201'));
 
         $this->jsonResultMock->expects(self::once())

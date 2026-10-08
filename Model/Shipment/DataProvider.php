@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
-use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
 use Ideo\Dhl\Model\Shipment\Data\CustomsData;
 use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
@@ -31,7 +30,6 @@ class DataProvider extends AbstractDataProvider
      * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
      * @param LoggerInterface $logger
-     * @param DeliveryServiceRepositoryInterface $deliveryServiceRepository
      * @param array $meta
      * @param array $data
      */
@@ -44,7 +42,6 @@ class DataProvider extends AbstractDataProvider
         private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
         private readonly LoggerInterface $logger,
-        private readonly DeliveryServiceRepositoryInterface $deliveryServiceRepository,
         array $meta = [],
         array $data = []
     ) {
@@ -85,15 +82,6 @@ class DataProvider extends AbstractDataProvider
                     if (isset($payload['sender']) && is_array($payload['sender'])) {
                         $data['sender'] = $payload['sender'];
                     }
-                    if (isset($data['sender']) && is_array($data['sender'])) {
-                        $presetId = $item->getDropOffPointTemplateId();
-                        $hasPreset = !isset($data['sender']['presetSenderId'])
-                            && !empty($presetId)
-                            && is_scalar($presetId);
-                        if ($hasPreset) {
-                            $data['sender']['presetSenderId'] = (string) $presetId;
-                        }
-                    }
                     if (isset($payload['recipient']) && is_array($payload['recipient'])) {
                         $data['recipient'] = $payload['recipient'];
                     }
@@ -109,9 +97,6 @@ class DataProvider extends AbstractDataProvider
                             $createdAt = (string) ($item->getCreatedAt() ?? '');
                             $dispatchNumber = (string) ($item->getDispatchNumber() ?? '');
                             $returnShipmentId = (string) ($item->getReturnShipmentId() ?? '');
-                            $deliveryServiceTemplateId = (string) ($item->getDeliveryServiceTemplateId()
-                                ?? ($payload['deliveryServiceTemplateId']
-                                ?? ($payload['shipmentSettings']['selectedDeliveryServiceId'] ?? '')));
                             $data['shipmentSettings'] = $this->normalizeShipmentSettings(
                                 $payload['shipmentSettings'],
                                 $shipmentId,
@@ -119,8 +104,7 @@ class DataProvider extends AbstractDataProvider
                                 $createdAt,
                                 $payload['sender'] ?? [],
                                 $dispatchNumber,
-                                $returnShipmentId,
-                                $deliveryServiceTemplateId
+                                $returnShipmentId
                             );
                             $hasPackages = isset($payload['shipmentSettings']['packages'])
                                 && is_array($payload['shipmentSettings']['packages']);
@@ -163,10 +147,7 @@ class DataProvider extends AbstractDataProvider
                     }
                     if (isset($payload['customs']) && is_array($payload['customs'])) {
                         try {
-                            $customsTemplateId = (string) ($item->getCustomsTemplateId()
-                                ?? ($payload['customs_template_id']
-                                ?? ($payload['customs']['selectedCustomsTemplateId'] ?? '')));
-                            $data['customs'] = $this->normalizeCustoms($payload['customs'], $customsTemplateId);
+                            $data['customs'] = $this->normalizeCustoms($payload['customs']);
                             $data['customs_fieldset'] = $data['customs'];
                         } catch (Throwable $e) {
                             $this->logger->error(sprintf(
@@ -252,7 +233,6 @@ class DataProvider extends AbstractDataProvider
      * @param array $sender
      * @param string $dispatchNumber
      * @param string $returnShipmentId
-     * @param string $deliveryServiceTemplateId
      * @return array
      */
     private function normalizeShipmentSettings(
@@ -262,35 +242,24 @@ class DataProvider extends AbstractDataProvider
         string $createdAt = '',
         array $sender = [],
         string $dispatchNumber = '',
-        string $returnShipmentId = '',
-        string $deliveryServiceTemplateId = ''
+        string $returnShipmentId = ''
     ): array {
         $settings['autoCreateReturnShipment'] = !empty($settings['autoCreateReturnShipment']) ? '1' : '0';
 
-        $tpl = null;
-        if (!empty($deliveryServiceTemplateId)) {
-            try {
-                $tpl = $this->deliveryServiceRepository->getById((int)$deliveryServiceTemplateId);
-            } catch (Throwable) {
-                $tpl = null;
-            }
-        }
-
         if (empty($settings['returnLabelExpDays']) || (int)$settings['returnLabelExpDays'] <= 0) {
-            $settings['returnLabelExpDays'] = $tpl?->getReturnLabelExpDays()
-                ?: ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS;
+            $settings['returnLabelExpDays'] = ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS;
         }
 
         if (empty($settings['returnLabelType'])) {
-            $settings['returnLabelType'] = $tpl?->getReturnLabelType() ?: 'BLP';
+            $settings['returnLabelType'] = 'BLP';
         }
 
         if (empty($settings['returnQrCodeType'])) {
-            $settings['returnQrCodeType'] = $tpl?->getReturnQrCodeType() ?: 'QR_PDF';
+            $settings['returnQrCodeType'] = 'QR_PDF';
         }
 
         if (!isset($settings['returnBookCourier']) || $settings['returnBookCourier'] === '') {
-            $settings['returnBookCourier'] = $tpl?->getReturnBookCourier() ?? 0;
+            $settings['returnBookCourier'] = 0;
         }
         if (empty($settings['shipmentId']) && !empty($shipmentId)) {
             $settings['shipmentId'] = $shipmentId;
@@ -420,18 +389,13 @@ class DataProvider extends AbstractDataProvider
      * Normalize customs clearance array flags to string '1'/'0' and assign record_id to dynamic row items.
      *
      * @param array $customs
-     * @param string $customsTemplateId
      *
      * @return array
      */
-    private function normalizeCustoms(array $customs, string $customsTemplateId = ''): array
+    private function normalizeCustoms(array $customs): array
     {
         $dto = CustomsData::fromArray($customs);
         $result = $dto->toArray();
-
-        if (empty($result['selectedCustomsTemplateId']) && !empty($customsTemplateId)) {
-            $result['selectedCustomsTemplateId'] = (int)$customsTemplateId;
-        }
 
         $result['notExceedValue'] = $dto->isNotExceedValue() ? '1' : '0';
         $result['notProhibitedGoods'] = $dto->isNotProhibitedGoods() ? '1' : '0';

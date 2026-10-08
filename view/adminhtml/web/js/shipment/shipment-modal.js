@@ -1533,15 +1533,8 @@ define([
                                     }
                                     $('body').trigger('processStart');
 
-                                    var senderTemplateId = (shipmentDataPayload.sender && shipmentDataPayload.sender.selectedDropOffPointId) ? shipmentDataPayload.sender.selectedDropOffPointId : null;
-                                    var shipmentTemplateId = (shipmentDataPayload.shipmentSettings && shipmentDataPayload.shipmentSettings.selectedDeliveryServiceId) ? shipmentDataPayload.shipmentSettings.selectedDeliveryServiceId : null;
-                                    var customsTemplateId = (shipmentDataPayload.customs && shipmentDataPayload.customs.selectedCustomsTemplateId) ? shipmentDataPayload.customs.selectedCustomsTemplateId : null;
-
                                     $.post(self.saveUrl, {
-                                        shipment_data: JSON.stringify(shipmentDataPayload),
-                                        drop_off_point_template_id: senderTemplateId,
-                                        delivery_service_template_id: shipmentTemplateId,
-                                        customs_template_id: customsTemplateId
+                                        shipment_data: JSON.stringify(shipmentDataPayload)
                                     }).done(function (saveRes) {
                                         if (saveRes.success) {
                                             selfModal.closeModal();

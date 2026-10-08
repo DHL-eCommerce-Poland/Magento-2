@@ -389,8 +389,6 @@ class ShipmentDataServiceTest extends TestCase
         $service->saveShipmentDataWithStatus(
             $shipmentData,
             'Utworzono',
-            null,
-            null,
             '90040027827',
             null,
             $packageNumbers
@@ -531,8 +529,6 @@ class ShipmentDataServiceTest extends TestCase
         $service->saveShipmentDataWithStatus(
             $shipmentData,
             'Utworzono',
-            null,
-            null,
             '90040027827',
             null,
             $packageNumbers
@@ -602,8 +598,6 @@ class ShipmentDataServiceTest extends TestCase
         $service->saveShipmentDataWithStatus(
             $shipmentData,
             'Utworzono',
-            null,
-            null,
             '90040027827',
             null,
             $packageNumbers
