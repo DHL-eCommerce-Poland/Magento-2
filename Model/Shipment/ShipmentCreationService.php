@@ -183,6 +183,11 @@ class ShipmentCreationService
                 }
             }
 
+            $savedEntityId = $savedEntity ? (int) $savedEntity->getEntityId() : null;
+            if ($savedEntityId) {
+                $apiResult = $apiResult->withEntityId($savedEntityId);
+            }
+
             return $apiResult;
         } finally {
             if (!$this->lockManager->unlock($lockName)) {
@@ -343,7 +348,7 @@ class ShipmentCreationService
                 }
             }
 
-            return $apiResult;
+            return $apiResult->withEntityId($entityId);
         } finally {
             if (!$this->lockManager->unlock($lockName)) {
                 $this->logger->warning(sprintf('[ShipmentCreation] Failed to release lock: %s', $lockName));

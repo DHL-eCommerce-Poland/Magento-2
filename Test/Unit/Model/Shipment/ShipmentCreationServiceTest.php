@@ -140,13 +140,18 @@ class ShipmentCreationServiceTest extends TestCase
         $this->clientStub->method('createShipment')->willReturn($apiResult);
 
         // Expect DB save with status Nowa
+        $savedEntityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $savedEntityStub->method('getEntityId')->willReturn(55);
+
         $this->shipmentDataServiceMock->expects($this->once())
             ->method('saveShipmentDataWithStatus')
-            ->with($shipmentData, 'Nowa', '1', '2', '90039521201', null, []);
+            ->with($shipmentData, 'Nowa', '1', '2', '90039521201', null, [])
+            ->willReturn($savedEntityStub);
 
         $result = $this->service->createShipment($shipmentData, 'sandbox', '1', '2');
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('90039521201', $result->getShipmentId());
+        $this->assertEquals(55, $result->getEntityId());
     }
 
     /**
@@ -226,6 +231,7 @@ class ShipmentCreationServiceTest extends TestCase
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('999888777', $result->getShipmentId());
+        $this->assertEquals(123, $result->getEntityId());
     }
 
     /**

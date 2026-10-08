@@ -18,6 +18,7 @@ class CreateShipmentResult
      * @param string|null $labelContent Base64 encoded label content if returned by API
      * @param string|null $labelFormat Label MIME format (e.g., application/pdf)
      * @param string|null $labelType Label type (e.g., BLP)
+     * @param int|null $entityId Database entity ID of the shipment
      */
     public function __construct(
         private readonly bool $success,
@@ -29,7 +30,8 @@ class CreateShipmentResult
         private readonly ?string $errorMessage = null,
         private readonly ?string $labelContent = null,
         private readonly ?string $labelFormat = null,
-        private readonly ?string $labelType = null
+        private readonly ?string $labelType = null,
+        private readonly ?int $entityId = null
     ) {
     }
 
@@ -131,5 +133,39 @@ class CreateShipmentResult
     public function getLabelType(): ?string
     {
         return $this->labelType;
+    }
+
+    /**
+     * Get database entity ID.
+     *
+     * @return int|null
+     */
+    public function getEntityId(): ?int
+    {
+        return $this->entityId;
+    }
+
+    /**
+     * Return a new instance with the specified database entity ID.
+     *
+     * @param int $entityId
+     *
+     * @return self
+     */
+    public function withEntityId(int $entityId): self
+    {
+        return new self(
+            $this->success,
+            $this->timeout,
+            $this->shipmentId,
+            $this->orderStatus,
+            $this->packageNumbers,
+            $this->errorCode,
+            $this->errorMessage,
+            $this->labelContent,
+            $this->labelFormat,
+            $this->labelType,
+            $entityId
+        );
     }
 }
