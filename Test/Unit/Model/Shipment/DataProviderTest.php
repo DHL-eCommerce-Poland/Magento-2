@@ -66,8 +66,7 @@ class DataProviderTest extends TestCase
             $serializer,
             $timezoneStub,
             $dateSanitizer,
-            $this->createStub(\Psr\Log\LoggerInterface::class),
-            $this->createStub(\Ideo\Dhl\Api\DeliveryServiceRepositoryInterface::class)
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $data = $dataProvider->getData();
@@ -124,8 +123,7 @@ class DataProviderTest extends TestCase
             $serializer,
             $timezoneStub,
             $dateSanitizer,
-            $this->createStub(\Psr\Log\LoggerInterface::class),
-            $this->createStub(\Ideo\Dhl\Api\DeliveryServiceRepositoryInterface::class)
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $data = $dataProvider->getData();
@@ -134,7 +132,7 @@ class DataProviderTest extends TestCase
         $this->assertEquals('JJD000030025688110000001117', $data[10]['packages'][1]['packageNumber']);
     }
 
-    public function testGetDataLoadsReturnLabelExpDaysFromTemplateWhenEmpty(): void
+    public function testGetDataLoadsDefaultReturnLabelExpDaysWhenEmpty(): void
     {
         $collectionFactory = $this->createStub(CollectionFactory::class);
         $collection = $this->createStub(Collection::class);
@@ -145,7 +143,6 @@ class DataProviderTest extends TestCase
         $shipmentDataModel->method('getData')->willReturn(['entity_id' => 3]);
         $shipmentDataModel->method('getStatus')->willReturn('CREATED');
         $shipmentDataModel->method('getReturnShipmentId')->willReturn('90040150425');
-        $shipmentDataModel->method('getDeliveryServiceTemplateId')->willReturn('1');
         $shipmentDataModel->method('getShipmentData')->willReturn('{"test":true}');
 
         $collection->method('getItems')->willReturn([$shipmentDataModel]);
@@ -163,15 +160,6 @@ class DataProviderTest extends TestCase
         $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
         $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
 
-        $deliveryServiceTemplate = $this->createStub(\Ideo\Dhl\Api\Data\DeliveryServiceInterface::class);
-        $deliveryServiceTemplate->method('getReturnLabelExpDays')->willReturn(21);
-        $deliveryServiceTemplate->method('getReturnLabelType')->willReturn('BLP');
-        $deliveryServiceTemplate->method('getReturnQrCodeType')->willReturn('QR_PDF');
-        $deliveryServiceTemplate->method('getReturnBookCourier')->willReturn(1);
-
-        $deliveryServiceRepo = $this->createStub(\Ideo\Dhl\Api\DeliveryServiceRepositoryInterface::class);
-        $deliveryServiceRepo->method('getById')->willReturn($deliveryServiceTemplate);
-
         $dataProvider = new DataProvider(
             'dhlpoland_shipment_form_data_source',
             'entity_id',
@@ -180,17 +168,16 @@ class DataProviderTest extends TestCase
             $serializer,
             $timezoneStub,
             $dateSanitizer,
-            $this->createStub(\Psr\Log\LoggerInterface::class),
-            $deliveryServiceRepo
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $data = $dataProvider->getData();
 
-        $this->assertEquals(21, $data[3]['shipmentSettings']['returnLabelExpDays']);
+        $this->assertEquals(14, $data[3]['shipmentSettings']['returnLabelExpDays']);
         $this->assertEquals('0', $data[3]['shipmentSettings']['autoCreateReturnShipment']);
         $this->assertEquals('BLP', $data[3]['shipmentSettings']['returnLabelType']);
         $this->assertEquals('QR_PDF', $data[3]['shipmentSettings']['returnQrCodeType']);
-        $this->assertEquals(1, $data[3]['shipmentSettings']['returnBookCourier']);
+        $this->assertEquals(0, $data[3]['shipmentSettings']['returnBookCourier']);
     }
 
     public function testGetDataNormalizesPackagesWithQuantityGreaterThanOne(): void
@@ -233,8 +220,7 @@ class DataProviderTest extends TestCase
             $serializer,
             $timezoneStub,
             $dateSanitizer,
-            $this->createStub(\Psr\Log\LoggerInterface::class),
-            $this->createStub(\Ideo\Dhl\Api\DeliveryServiceRepositoryInterface::class)
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $data = $dataProvider->getData();
@@ -255,7 +241,6 @@ class DataProviderTest extends TestCase
         $shipmentDataModel->method('getId')->willReturn(15);
         $shipmentDataModel->method('getData')->willReturn(['entity_id' => 15]);
         $shipmentDataModel->method('getStatus')->willReturn('CREATED');
-        $shipmentDataModel->method('getCustomsTemplateId')->willReturn('5');
         $shipmentDataModel->method('getShipmentData')->willReturn('{"customs":{}}');
 
         $collection->method('getItems')->willReturn([$shipmentDataModel]);
@@ -312,8 +297,7 @@ class DataProviderTest extends TestCase
             $serializer,
             $timezoneStub,
             $dateSanitizer,
-            $this->createStub(\Psr\Log\LoggerInterface::class),
-            $this->createStub(\Ideo\Dhl\Api\DeliveryServiceRepositoryInterface::class)
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
         $data = $dataProvider->getData();
@@ -323,7 +307,6 @@ class DataProviderTest extends TestCase
         $this->assertArrayHasKey('customs_fieldset', $data[15]);
 
         $customs = $data[15]['customs'];
-        $this->assertEquals(5, $customs['selectedCustomsTemplateId']);
         $this->assertEquals('I', $customs['customsType']);
         $this->assertEquals('11', $customs['categoryOfItem']);
         $this->assertEquals('EUR', $customs['currency']);

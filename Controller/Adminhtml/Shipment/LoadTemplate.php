@@ -87,7 +87,6 @@ class LoadTemplate extends Action
                 return $resultJson->setData([
                     'success' => true,
                     'data' => [
-                        'presetSenderId' => (string)($point->getEntityId() ?? $point->getId()),
                         'sapNumber' => $point->getSapNumber() ?? '',
                         'name' => $point->getSenderName() ?? '',
                         'firstName' => $point->getFirstName() ?? '',

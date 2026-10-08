@@ -132,9 +132,6 @@
         <column xsi:type="varchar" name="package_numbers" length="1024" nullable="true" comment="DHL Package Numbers"/>
         <column xsi:type="varchar" name="dispatch_number" length="64" nullable="true" comment="DHL Courier Order / Dispatch Number"/>
         <column xsi:type="varchar" name="status" length="512" nullable="false" default="pending" comment="Shipment Status"/>
-        <column xsi:type="varchar" name="drop_off_point_template_id" length="64" nullable="true" comment="Selected Drop-Off Point Template ID"/>
-        <column xsi:type="varchar" name="delivery_service_template_id" length="64" nullable="true" comment="Selected Delivery Service Template ID"/>
-        <column xsi:type="varchar" name="customs_template_id" length="64" nullable="true" comment="Selected Customs Template ID"/>
         <column xsi:type="text" name="shipment_data" nullable="true" comment="Serialized DhlShipmentData JSON"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Update Time"/>

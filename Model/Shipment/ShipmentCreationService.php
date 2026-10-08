@@ -57,19 +57,13 @@ class ShipmentCreationService
      *
      * @param DhlShipmentData $shipmentData
      * @param string $environment ('sandbox' or 'production')
-     * @param string|null $dropOffPointTemplateId
-     * @param string|null $deliveryServiceTemplateId
-     * @param string|null $customsTemplateId
      *
      * @return CreateShipmentResult
      * @throws LocalizedException
      */
     public function createShipment(
         DhlShipmentData $shipmentData,
-        string $environment = 'sandbox',
-        ?string $dropOffPointTemplateId = null,
-        ?string $deliveryServiceTemplateId = null,
-        ?string $customsTemplateId = null
+        string $environment = 'sandbox'
     ): CreateShipmentResult {
         $orderId = $shipmentData->getOrderId();
         if ($orderId !== null && $this->shipmentDataService->hasShipmentForOrder($orderId)) {
@@ -144,13 +138,10 @@ class ShipmentCreationService
             $savedEntity = $this->shipmentDataService->saveShipmentDataWithStatus(
                 $shipmentData,
                 $status,
-                $dropOffPointTemplateId,
-                $deliveryServiceTemplateId,
                 $apiResult->getShipmentId(),
                 null,
                 $packageNumbers,
-                $magentoShipmentId,
-                $customsTemplateId
+                $magentoShipmentId
             );
 
             // 7. Auto-create return shipment if requested

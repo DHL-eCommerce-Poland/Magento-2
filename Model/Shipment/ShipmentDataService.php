@@ -183,13 +183,10 @@ class ShipmentDataService
      *
      * @param DhlShipmentData $shipmentData
      * @param string $status
-     * @param string|null $dropOffPointTemplateId
-     * @param string|null $deliveryServiceTemplateId
      * @param string|null $shipmentId
      * @param string|null $returnShipmentId
      * @param array|null $packageNumbers
      * @param int|null $magentoShipmentId
-     * @param string|null $customsTemplateId
      *
      * @return ShipmentDataInterface
      * @throws CouldNotSaveException
@@ -198,13 +195,10 @@ class ShipmentDataService
     public function saveShipmentDataWithStatus(
         DhlShipmentData $shipmentData,
         string $status = ShipmentDataInterface::DEFAULT_STATUS,
-        ?string $dropOffPointTemplateId = null,
-        ?string $deliveryServiceTemplateId = null,
         ?string $shipmentId = null,
         ?string $returnShipmentId = null,
         ?array $packageNumbers = null,
-        ?int $magentoShipmentId = null,
-        ?string $customsTemplateId = null
+        ?int $magentoShipmentId = null
     ): ShipmentDataInterface {
         $this->validator->validate($shipmentData);
 
@@ -259,9 +253,6 @@ class ShipmentDataService
                 }
             }
         }
-        $entity->setDropOffPointTemplateId($dropOffPointTemplateId);
-        $entity->setDeliveryServiceTemplateId($deliveryServiceTemplateId);
-        $entity->setCustomsTemplateId($customsTemplateId);
         $entity->setShipmentData($this->serializer->serialize($payloadArr));
 
         return $this->shipmentDataRepository->save($entity);
@@ -471,22 +462,16 @@ class ShipmentDataService
      * Save DhlShipmentData object into database persistence.
      *
      * @param DhlShipmentData $shipmentData
-     * @param string|null $presetSenderId
-     * @param string|null $presetShipmentId
      *
      * @return ShipmentDataInterface
      * @throws LocalizedException
      */
     public function saveShipmentData(
-        DhlShipmentData $shipmentData,
-        ?string $presetSenderId = null,
-        ?string $presetShipmentId = null
+        DhlShipmentData $shipmentData
     ): ShipmentDataInterface {
         return $this->saveShipmentDataWithStatus(
             $shipmentData,
-            ShipmentDataInterface::DEFAULT_STATUS,
-            $presetSenderId,
-            $presetShipmentId
+            ShipmentDataInterface::DEFAULT_STATUS
         );
     }
 

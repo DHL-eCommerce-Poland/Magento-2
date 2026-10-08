@@ -145,10 +145,10 @@ class ShipmentCreationServiceTest extends TestCase
 
         $this->shipmentDataServiceMock->expects($this->once())
             ->method('saveShipmentDataWithStatus')
-            ->with($shipmentData, 'Nowa', '1', '2', '90039521201', null, [])
+            ->with($shipmentData, 'Nowa', '90039521201', null, [])
             ->willReturn($savedEntityStub);
 
-        $result = $this->service->createShipment($shipmentData, 'sandbox', '1', '2');
+        $result = $this->service->createShipment($shipmentData, 'sandbox');
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('90039521201', $result->getShipmentId());
         $this->assertEquals(55, $result->getEntityId());
@@ -180,7 +180,7 @@ class ShipmentCreationServiceTest extends TestCase
         $this->shipmentDataServiceMock->expects($this->never())
             ->method('saveShipmentDataWithStatus');
 
-        $result = $this->service->createShipment($shipmentData, 'sandbox', '1', '2');
+        $result = $this->service->createShipment($shipmentData, 'sandbox');
         $this->assertFalse($result->isSuccess());
         $this->assertEquals('Błędny kod pocztowy', $result->getErrorMessage());
     }
@@ -508,8 +508,6 @@ class ShipmentCreationServiceTest extends TestCase
             ->with(
                 $shipmentData,
                 'Utworzono',
-                null,
-                null,
                 '90040027827',
                 null,
                 ['JJD000030025688110000001106', 'JJD000030025688110000001117'],
