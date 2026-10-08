@@ -9,6 +9,7 @@ use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
 use Ideo\Dhl\Model\CustomsTemplateRepository;
 use Ideo\Dhl\Model\MethodCatalog;
+use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Source\CustomsType;
 use Ideo\Dhl\Model\Template\TemplateManager;
 use Ideo\Dhl\Model\Template\TemplateVariableResolver;
@@ -68,8 +69,11 @@ class LoadTemplate extends Action
         $templateId = (int)$this->getRequest()->getParam('template_id');
         $templateType = (string)$this->getRequest()->getParam('template_type');
         $orderId = (int)$this->getRequest()->getParam('order_id');
+        $countryId = strtoupper(trim((string)$this->getRequest()->getParam('country_id')));
 
-        if (!$templateId || empty($templateType)) {
+        if (empty($templateType)
+            || (!$templateId && ($templateType !== 'customs' || $countryId === ''))
+        ) {
             return $resultJson->setData([
                 'success' => false,
                 'message' => __('Missing template_id or template_type parameter.'),
@@ -181,7 +185,8 @@ class LoadTemplate extends Action
                         'autoCreateReturnShipment' => !empty($serviceData['auto_create_return_shipment']),
                         'returnLabelType' => $service->getReturnLabelType() ?: 'BLP',
                         'returnQrCodeType' => $service->getReturnQrCodeType() ?: 'QR_PDF',
-                        'returnLabelExpDays' => $service->getReturnLabelExpDays() ?? 14,
+                        'returnLabelExpDays' => $service->getReturnLabelExpDays()
+                            ?: ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS,
                         'returnBookCourier' => $service->getReturnBookCourier() ?? 0,
                         'packages' => $cleanPackages,
                         'addressType' => $serviceData['address_type'] ?? 'N',
@@ -192,6 +197,16 @@ class LoadTemplate extends Action
             }
 
             if ($templateType === 'customs') {
+                if (!$templateId) {
+                    $templateId = $this->templateManager->getMatchingCustomsTemplateIdForCountry($countryId) ?? 0;
+                    if (!$templateId) {
+                        return $resultJson->setData([
+                            'success' => true,
+                            'data' => null,
+                        ]);
+                    }
+                }
+
                 $template = $this->customsTemplateRepository->getById($templateId);
                 $customsItems = [];
                 $rawItems = $template->getCustomsItems();
@@ -231,20 +246,22 @@ class LoadTemplate extends Action
                     return (float)$v;
                 };
 
-                // Ensure item defaults if missing in individual row
-                $formattedItems = array_map(function ($item) use ($defaultTariff, $countryOrigin, $toFloat) {
+                // Preserve empty item values when applying a customs template to the shipment modal.
+                $formattedItems = array_map(function ($item) use ($toFloat) {
                     return [
                         'namePl' => (string)($item['namePl'] ?? ''),
                         'nameEn' => (string)($item['nameEn'] ?? ''),
-                        'quantity' => isset($item['quantity'])
+                        'quantity' => isset($item['quantity']) && trim((string)$item['quantity']) !== ''
                             ? (int)str_replace(',', '.', (string)$item['quantity'])
-                            : 1,
-                        'weight' => isset($item['weight']) ? ($toFloat($item['weight']) ?? 0.0) : 0.0,
-                        'value' => isset($item['value']) ? ($toFloat($item['value']) ?? 0.0) : 0.0,
-                        'tariffCode' => (string)(!empty($item['tariffCode']) ? $item['tariffCode'] : $defaultTariff),
-                        'countryOfOrigin' => (string)(!empty($item['countryOfOrigin'])
-                            ? $item['countryOfOrigin']
-                            : $countryOrigin),
+                            : '',
+                        'weight' => isset($item['weight']) && trim((string)$item['weight']) !== ''
+                            ? ($toFloat($item['weight']) ?? '')
+                            : '',
+                        'value' => isset($item['value']) && trim((string)$item['value']) !== ''
+                            ? ($toFloat($item['value']) ?? '')
+                            : '',
+                        'tariffCode' => (string)($item['tariffCode'] ?? ''),
+                        'countryOfOrigin' => (string)($item['countryOfOrigin'] ?? ''),
                     ];
                 }, $customsItems);
 
@@ -280,7 +297,7 @@ class LoadTemplate extends Action
                             ? (bool)$template->getNotProhibitedGoods() : true,
                         'notRestrictedGoods' => $template->getNotRestrictedGoods() !== null
                             ? (bool)$template->getNotRestrictedGoods() : true,
-                        'invoiceContent' => $isIndividual,
+                        'invoiceContent' => $isIndividual && ($template->getInvoiceContent() ?? true),
                         'customsItems' => $formattedItems,
                     ],
                 ]);

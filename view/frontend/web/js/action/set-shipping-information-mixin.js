@@ -17,7 +17,7 @@ define([
                     if (errorMsg) {
                         globalMessageList.addErrorMessage({ message: errorMsg });
                     }
-                    var $input = $('#dhl_postnummer_inline:visible, #dhl_postnummer_inline_opt:visible');
+                    var $input = $('#dhl_postnummer_inline:visible');
                     if (pointState.postnummerErrorMessage() && $input.length) {
                         $input.first().focus();
                         $('html, body').stop().animate({ scrollTop: $input.first().offset().top - 120 }, 300);

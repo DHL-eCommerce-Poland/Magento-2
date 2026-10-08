@@ -30,16 +30,7 @@
                 </div>
                 <!-- /ko -->
 
-                <!-- ko if: isDePointSelected() -->
-                <div class="dhl-postnummer-field field" data-bind="click: stopPropagation">
-                    <label for="dhl_postnummer_inline_opt" data-bind="i18n: 'German Customer Number (Postnummer):'"></label>
-                    <input type="text" id="dhl_postnummer_inline_opt" name="dhl_postnummer" class="input-text dhl-postnummer-input"
-                           data-bind="value: postnummerInput, valueUpdate: 'afterkeydown'" placeholder="12345678" />
-                    <!-- ko if: postnummerErrorMessage() -->
-                    <div class="dhl-postnummer-error mage-error" data-bind="text: postnummerErrorMessage()"></div>
-                    <!-- /ko -->
-                </div>
-                <!-- /ko -->
+
 
                 <button type="button" class="action secondary small dhl-select-point-btn" data-bind="click: openMapModal">
                     <span data-bind="i18n: 'Change DHL pickup point'"></span>

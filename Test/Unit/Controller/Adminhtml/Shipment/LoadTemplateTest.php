@@ -183,7 +183,8 @@ class LoadTemplateTest extends TestCase
 
         $customsTemplate = $this->createMock(CustomsTemplate::class);
         $customsTemplate->method('getId')->willReturn(12);
-        $customsTemplate->method('getCustomsType')->willReturn('U');
+        $customsTemplate->method('getCustomsType')->willReturn('I');
+        $customsTemplate->method('getInvoiceContent')->willReturn(false);
         $customsTemplate->method('getCurrency')->willReturn('EUR');
         $customsTemplate->method('getCategoryOfItem')->willReturn('11');
         $customsTemplate->method('getCountryOfOrigin')->willReturn('PL');
@@ -226,7 +227,8 @@ class LoadTemplateTest extends TestCase
             ->with(self::callback(function ($data) {
                 return ($data['success'] ?? false) === true
                     && ($data['data']['selectedCustomsTemplateId'] ?? null) === 12
-                    && ($data['data']['customsType'] ?? '') === 'U'
+                    && ($data['data']['customsType'] ?? '') === 'I'
+                    && ($data['data']['invoiceContent'] ?? null) === false
                     && ($data['data']['currency'] ?? '') === 'EUR'
                     && ($data['data']['nipNr'] ?? '') === '5218487281'
                     && ($data['data']['eoriNr'] ?? '') === 'PL52184872810000'

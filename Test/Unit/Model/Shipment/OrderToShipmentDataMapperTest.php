@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Model\Shipment;
 
 use DateTime;
-use Ideo\Dhl\Model\ServicePoint\NearestPointResolver;
+use Ideo\Dhl\Model\Shipment\Data\RecipientData;
 use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
 use Ideo\Dhl\Model\Shipment\OrderWeightAggregator;
 use Ideo\Dhl\Model\Shipment\StreetAddressParser;
@@ -26,11 +26,6 @@ class OrderToShipmentDataMapperTest extends TestCase
      */
     private $mapper;
 
-    /**
-     * @var NearestPointResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $nearestPointResolverMock;
-
     protected function setUp(): void
     {
         $addressParser = new StreetAddressParser();
@@ -42,17 +37,13 @@ class OrderToShipmentDataMapperTest extends TestCase
         $timezoneMock->method('scopeDate')
             ->willReturn(new DateTime('2026-09-02'));
 
-        $this->nearestPointResolverMock = $this->createMock(NearestPointResolver::class);
-
         $this->mapper = new OrderToShipmentDataMapper(
             $addressParser,
             $weightAggregator,
             $variableResolver,
             $serializer,
             $timezoneMock,
-            $this->nearestPointResolverMock,
-            new \Ideo\Dhl\Model\MethodCatalog(),
-            $this->createStub(\Psr\Log\LoggerInterface::class)
+            new \Ideo\Dhl\Model\MethodCatalog()
         );
     }
 
@@ -439,5 +430,144 @@ class OrderToShipmentDataMapperTest extends TestCase
 
         $this->assertFalse($shipmentData->getRecipient()->isPostfiliale());
         $this->assertFalse($shipmentData->getRecipient()->isPackstation());
+    }
+
+    public function testConnectParcelshopSetsPostnummerToNullEvenIfAddressDataHasPostnummer(): void
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getFirstname')->willReturn('Hans');
+        $address->method('getLastname')->willReturn('Schmidt');
+        $address->method('getStreet')->willReturn(['Hauptstrasse 1']);
+        $address->method('getCity')->willReturn('Berlin');
+        $address->method('getPostcode')->willReturn('10115');
+        $address->method('getCountryId')->willReturn('DE');
+        $address->method('getData')->willReturnMap([
+            ['dhl_is_postfiliale', null, 1],
+            ['dhl_is_packstation', null, 0],
+            ['dhl_postnummer', null, '123456'],
+            ['dhl_service_point_id', null, 'DE123'],
+        ]);
+
+        $payment = $this->createStub(Payment::class);
+        $payment->method('getMethod')->willReturn('checkmo');
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getEntityId')->willReturn(112);
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getPayment')->willReturn($payment);
+        $order->method('getShippingMethod')->willReturn('dhlpoland_connect_parcelshop');
+
+        $shipmentData = $this->mapper->map($order);
+
+        $this->assertTrue($shipmentData->getRecipient()->isPostfiliale());
+        $this->assertFalse($shipmentData->getRecipient()->isPackstation());
+        $this->assertNull($shipmentData->getRecipient()->getPostnummer());
+    }
+
+    public function testMapAutoCreateReturnShipmentDefaultsReturnLabelExpDaysTo14(): void
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getFirstname')->willReturn('Jan');
+        $address->method('getLastname')->willReturn('Kowalski');
+        $address->method('getStreet')->willReturn(['Testowa 1']);
+        $address->method('getCity')->willReturn('Warszawa');
+        $address->method('getPostcode')->willReturn('00-001');
+        $address->method('getCountryId')->willReturn('PL');
+        $address->method('getTelephone')->willReturn('500600700');
+        $address->method('getEmail')->willReturn('jan@example.com');
+
+        $payment = $this->createStub(Payment::class);
+        $payment->method('getMethod')->willReturn('checkmo');
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getEntityId')->willReturn(113);
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getPayment')->willReturn($payment);
+        $order->method('getShippingMethod')->willReturn('dhlpoland_parcel_polska');
+
+        $shipmentDefaults = [
+            'autoCreateReturnShipment' => 1,
+            'returnLabelExpDays' => 0,
+            'labelType' => 'LBLP',
+            'returnLabelType' => 'ZBLP300',
+            'returnQrCodeType' => 'QR4_IMG',
+            'returnBookCourier' => 1,
+        ];
+
+        $shipmentData = $this->mapper->map($order, [], $shipmentDefaults);
+
+        $settings = $shipmentData->getShipmentSettings();
+        $this->assertTrue($settings->autoCreateReturnShipment());
+        $this->assertSame('LBLP', $settings->getLabelType());
+        $this->assertSame(14, $settings->getReturnLabelExpDays());
+        $this->assertSame('ZBLP300', $settings->getReturnLabelType());
+        $this->assertSame('QR4_IMG', $settings->getReturnQrCodeType());
+        $this->assertSame(1, $settings->getReturnBookCourier());
+    }
+
+    /**
+     * Verify international recipient point type and DHL flags follow the order shipping method.
+     *
+     * @return void
+     */
+    public function testMapInternationalPointTypeFromShippingMethod(): void
+    {
+        $cases = [
+            ['dhlpoland_connect', 'DE', 'courier', false, false],
+            ['dhlpoland_connect_cod', 'DE', 'courier', false, false],
+            ['dhlpoland_connect_parcelshop', 'DE', 'parcelShop', false, true],
+            ['dhlpoland_connect_parcelshop_cod', 'DE', 'parcelShop', false, true],
+            ['dhlpoland_connect_packstation', 'DE', 'packStation', true, false],
+            ['dhlpoland_connect_packstation_cod', 'DE', 'packStation', true, false],
+            ['unknown_method', 'DE', 'courier', false, false],
+            ['dhlpoland_connect_parcelshop', 'PL', null, false, false],
+        ];
+
+        foreach ($cases as [$shippingMethod, $country, $expectedType, $isPackstation, $isPostfiliale]) {
+            $recipient = $this->mapOrderRecipient($shippingMethod, $country);
+
+            self::assertSame($expectedType, $recipient->getMapPointType(), $shippingMethod);
+            if ($country === 'PL') {
+                self::assertArrayNotHasKey('mapPointType', $recipient->toArray(), $shippingMethod);
+            } else {
+                self::assertSame($expectedType, $recipient->toArray()['mapPointType'], $shippingMethod);
+            }
+            self::assertSame($isPackstation, $recipient->isPackstation(), $shippingMethod);
+            self::assertSame($isPostfiliale, $recipient->isPostfiliale(), $shippingMethod);
+            self::assertSame($isPackstation ? '123456' : null, $recipient->getPostnummer(), $shippingMethod);
+        }
+    }
+
+    /**
+     * Map a minimal order and return its recipient data for point type assertions.
+     *
+     * @param string $shippingMethod
+     * @param string $country
+     *
+     * @return RecipientData
+     */
+    private function mapOrderRecipient(string $shippingMethod, string $country): RecipientData
+    {
+        $address = $this->createStub(Address::class);
+        $address->method('getFirstname')->willReturn('Test');
+        $address->method('getLastname')->willReturn('Recipient');
+        $address->method('getStreet')->willReturn(['Example Street 1']);
+        $address->method('getCity')->willReturn('Berlin');
+        $address->method('getPostcode')->willReturn('10115');
+        $address->method('getCountryId')->willReturn($country);
+        $address->method('getData')->willReturnMap([
+            ['dhl_service_point_id', null, 'DE-POINT-1'],
+            ['dhl_postnummer', null, '123456'],
+        ]);
+
+        $order = $this->createStub(Order::class);
+        $order->method('getIsVirtual')->willReturn(false);
+        $order->method('getShippingAddress')->willReturn($address);
+        $order->method('getShippingMethod')->willReturn($shippingMethod);
+        $order->method('getItems')->willReturn([]);
+
+        return $this->mapper->map($order)->getRecipient();
     }
 }

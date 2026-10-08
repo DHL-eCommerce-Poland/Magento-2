@@ -65,6 +65,77 @@ define([
         };
     }
 
+    function setDateOnElement($el, rawVal, dateFormat, onFormatted) {
+        if (!rawVal) {
+            $el.val('');
+            if (typeof onFormatted === 'function') {
+                onFormatted('');
+            }
+            return;
+        }
+
+        require(['moment', 'mage/utils/misc', 'mage/calendar'], function (moment, utils) {
+            var dateObj = null;
+            if (rawVal instanceof Date) {
+                dateObj = rawVal;
+            } else {
+                var strVal = String(rawVal).trim();
+                if (!strVal) {
+                    $el.val('');
+                    if (typeof onFormatted === 'function') {
+                        onFormatted('');
+                    }
+                    return;
+                }
+
+                if (dateFormat && utils && utils.convertToMomentFormat) {
+                    var mFormat = utils.convertToMomentFormat(dateFormat);
+                    var mDate = moment(strVal, mFormat, true);
+                    if (mDate.isValid()) {
+                        dateObj = mDate.toDate();
+                    }
+                }
+
+                if (!dateObj) {
+                    var mIso = moment(strVal, ['YYYY-MM-DD', 'YYYY/MM/DD', moment.ISO_8601], true);
+                    if (mIso.isValid()) {
+                        dateObj = mIso.toDate();
+                    }
+                }
+
+                if (!dateObj && $el.data('datepicker')) {
+                    try {
+                        var activeFormat = $el.datepicker('option', 'dateFormat');
+                        dateObj = $.datepicker.parseDate(activeFormat, strVal);
+                    } catch (e) {}
+                }
+
+                if (!dateObj) {
+                    var mLoose = moment(strVal);
+                    if (mLoose.isValid()) {
+                        dateObj = mLoose.toDate();
+                    }
+                }
+            }
+
+            if (dateObj && $el.data('datepicker')) {
+                $el.datepicker('setDate', dateObj);
+            } else if (dateObj && typeof $.datepicker !== 'undefined') {
+                try {
+                    $el.val($.datepicker.formatDate(dateFormat || 'yy-mm-dd', dateObj));
+                } catch (e) {
+                    $el.val(String(rawVal));
+                }
+            } else {
+                $el.val(String(rawVal));
+            }
+
+            if (typeof onFormatted === 'function') {
+                onFormatted($el.val());
+            }
+        });
+    }
+
     if (!ko.bindingHandlers.dhlDatepicker) {
         ko.bindingHandlers.dhlDatepicker = {
             init: function (element, valueAccessor, allBindings) {
@@ -87,6 +158,15 @@ define([
                     $el.calendar(config);
                     $el.next('.ui-datepicker-trigger').addClass('v-middle').empty();
 
+                    var initialVal = ko.unwrap(value) || $el.val();
+                    if (initialVal) {
+                        setDateOnElement($el, initialVal, config.dateFormat, function (formattedVal) {
+                            if (ko.isObservable(value) && formattedVal && formattedVal !== ko.unwrap(value)) {
+                                value(formattedVal);
+                            }
+                        });
+                    }
+
                     $el.on('change.dhldatepicker', function () {
                         if (ko.isObservable(value)) {
                             value($el.val());
@@ -100,11 +180,21 @@ define([
                     });
                 });
             },
-            update: function (element, valueAccessor) {
+            update: function (element, valueAccessor, allBindings) {
                 var value = ko.unwrap(valueAccessor());
+                var options = allBindings.get('datepickerOptions') || {};
                 var $el = $(element);
-                if ($el.val() !== (value || '')) {
-                    $el.val(value || '');
+                if (value === $el.val()) {
+                    return;
+                }
+                if ($el.data('datepicker')) {
+                    setDateOnElement($el, value, options.dateFormat, function (formattedVal) {
+                        if (ko.isObservable(valueAccessor()) && formattedVal && formattedVal !== value) {
+                            valueAccessor()(formattedVal);
+                        }
+                    });
+                } else if (value) {
+                    $el.val(value);
                 }
             }
         };
@@ -141,22 +231,33 @@ define([
         var isEuro = p.hasEuroReturn !== undefined ? p.hasEuroReturn : p.has_euro_return;
         var euroReturnObs = ko.observable(pkgTypeObs() === 'PALLET' ? isTruthy(isEuro) : false);
 
+        var isNonStd = p.isNonStandard !== undefined ? p.isNonStandard : p.is_non_standard;
+        var qtyVal = (p.quantity !== undefined && p.quantity !== null && p.quantity !== '') ? String(p.quantity).replace(',', '.') : '';
+
+        var weightObs = ko.observable(formatDecimal4(p.weight));
+        var widthObs = ko.observable(formatDecimal4(p.width));
+        var lengthObs = ko.observable(formatDecimal4(p.length));
+        var heightObs = ko.observable(formatDecimal4(p.height));
+
         pkgTypeObs.subscribe(function (newType) {
             if (newType !== 'PALLET') {
                 euroReturnObs(false);
             }
+            if (newType === 'ENVELOPE') {
+                weightObs('');
+                widthObs('');
+                lengthObs('');
+                heightObs('');
+            }
         });
-
-        var isNonStd = p.isNonStandard !== undefined ? p.isNonStandard : p.is_non_standard;
-        var qtyVal = (p.quantity !== undefined && p.quantity !== null && p.quantity !== '') ? String(p.quantity).replace(',', '.') : '';
 
         return {
             packageType: pkgTypeObs,
             quantity: ko.observable(qtyVal),
-            weight: ko.observable(formatDecimal4(p.weight)),
-            width: ko.observable(formatDecimal4(p.width)),
-            length: ko.observable(formatDecimal4(p.length)),
-            height: ko.observable(formatDecimal4(p.height)),
+            weight: weightObs,
+            width: widthObs,
+            length: lengthObs,
+            height: heightObs,
             isNonStandard: ko.observable(isTruthy(isNonStd)),
             hasEuroReturn: euroReturnObs
         };
@@ -165,7 +266,7 @@ define([
     function createCustomsItemObservable(item) {
         item = item || {};
         var valStr = (item.value !== undefined && item.value !== null && item.value !== '') ? String(item.value).replace(',', '.') : '';
-        var qtyStr = (item.quantity !== undefined && item.quantity !== null && item.quantity !== '') ? String(item.quantity).replace(',', '.') : 1;
+        var qtyStr = (item.quantity !== undefined && item.quantity !== null && item.quantity !== '') ? String(item.quantity).replace(',', '.') : '';
         return {
             namePl: ko.observable(item.namePl || ''),
             nameEn: ko.observable(item.nameEn || ''),
@@ -173,7 +274,7 @@ define([
             weight: ko.observable(formatDecimal4(item.weight)),
             value: ko.observable(valStr),
             tariffCode: ko.observable(item.tariffCode || ''),
-            countryOfOrigin: ko.observable(item.countryOfOrigin || 'PL')
+            countryOfOrigin: ko.observable(item.countryOfOrigin || '')
         };
     }
 
@@ -244,6 +345,7 @@ define([
             notExceedValue: ko.observable(c.notExceedValue !== undefined ? isTruthy(c.notExceedValue) : true),
             notProhibitedGoods: ko.observable(c.notProhibitedGoods !== undefined ? isTruthy(c.notProhibitedGoods) : true),
             notRestrictedGoods: ko.observable(c.notRestrictedGoods !== undefined ? isTruthy(c.notRestrictedGoods) : true),
+            invoiceContent: ko.observable(c.invoiceContent !== undefined ? isTruthy(c.invoiceContent) : true),
             customsItems: itemsObsArr
         };
 
@@ -251,11 +353,11 @@ define([
             customsObj.customsItems.push(createCustomsItemObservable({
                 namePl: '',
                 nameEn: '',
-                quantity: 1,
+                quantity: '',
                 weight: '',
                 value: '',
-                tariffCode: customsObj.defaultTariffCode() || '',
-                countryOfOrigin: customsObj.countryOfOrigin() || 'PL'
+                tariffCode: '',
+                countryOfOrigin: ''
             }));
         };
 
@@ -304,7 +406,7 @@ define([
             popCity: ko.observable(r.popCity || ''),
             popPostcode: ko.observable(r.popPostcode || ''),
             postnummer: ko.observable(r.postnummer || ''),
-            mapPointType: ko.observable(r.mapPointType || 'parcelShop'),
+            mapPointType: ko.observable(r.mapPointType || 'courier'),
             phone: ko.observable(r.phone || ''),
             email: ko.observable(r.email || '')
         };
@@ -364,11 +466,17 @@ define([
             autoCreateReturnShipment: ko.observable(isTruthy(st.autoCreateReturnShipment)),
             returnLabelType: ko.observable(st.returnLabelType || 'BLP'),
             returnQrCodeType: ko.observable(st.returnQrCodeType || 'QR_PDF'),
-            returnLabelExpDays: ko.observable(st.returnLabelExpDays !== undefined && st.returnLabelExpDays !== null ? st.returnLabelExpDays : 14),
+            returnLabelExpDays: ko.observable(st.returnLabelExpDays && parseInt(st.returnLabelExpDays, 10) > 0 ? parseInt(st.returnLabelExpDays, 10) : 14),
             returnBookCourier: ko.observable(st.returnBookCourier !== undefined && st.returnBookCourier !== null ? st.returnBookCourier : 0),
             addressType: ko.observable(st.addressType || 'N'),
             packages: packagesObsArr
         };
+
+        shipmentSettingsObj.autoCreateReturnShipment.subscribe(function (enabled) {
+            if (enabled && (!shipmentSettingsObj.returnLabelExpDays() || parseInt(shipmentSettingsObj.returnLabelExpDays(), 10) <= 0)) {
+                shipmentSettingsObj.returnLabelExpDays(14);
+            }
+        });
 
         shipmentSettingsObj.addPackageRow = function () {
             shipmentSettingsObj.packages.push(createPackageObservable({
@@ -418,7 +526,6 @@ define([
         var rodDocumentTextObs = ko.observable(rodDocumentTextVal);
         var podObs = ko.observable(isTruthy(ss.proofOfDelivery));
         var ageverObs = ko.observable(isTruthy(ss.ageVer));
-        var odbObs = ko.observable(isTruthy(ss.selfCollect));
 
         insuranceObs.subscribe(function (checked) {
             if (checked) {
@@ -469,8 +576,7 @@ define([
                 returnOnDelivery: rodObs,
                 returnOnDeliveryReference: rodDocumentTextObs,
                 proofOfDelivery: podObs,
-                ageVer: ageverObs,
-                selfCollect: odbObs
+                ageVer: ageverObs
             },
             shipmentSettings: shipmentSettingsObj,
             customs: createCustomsData(data.customs || {})
@@ -505,6 +611,7 @@ define([
             this.shipmentData = ko.observable(createShipmentData({}, this.todayDate));
             this.senderTemplates = ko.observableArray([]);
             this.countryOptions = ko.observableArray([]);
+            this.customsItemCountryOptions = ko.observableArray([{ value: '', label: '' }]);
             this.shipmentTemplates = ko.observableArray([]);
             this.serviceCodeOptions = ko.observableArray([]);
             this.labelTypeOptions = ko.observableArray([]);
@@ -518,9 +625,9 @@ define([
             this.categoryOfItemOptions = ko.observableArray([]);
             this.customsCurrencyOptions = ko.observableArray([]);
             this.internationalMapPointTypeOptions = ko.observableArray([
+                { value: 'courier', label: $.mage.__('Courier') },
                 { value: 'packStation', label: $.mage.__('Packstation') },
-                { value: 'parcelShop', label: $.mage.__('Parcelshop') },
-                { value: 'courier', label: $.mage.__('Courier') }
+                { value: 'parcelShop', label: $.mage.__('Parcelshop') }
             ]);
 
             var self = this;
@@ -683,7 +790,7 @@ define([
             if (country !== 'PL') {
                 params.push('country=' + encodeURIComponent(country));
                 var pType = typeof draft.recipient.mapPointType === 'function' ? draft.recipient.mapPointType() : draft.recipient.mapPointType;
-                pType = pType || 'parcelShop';
+                pType = pType || 'courier';
                 params.push('ptype=' + encodeURIComponent(pType));
             }
 
@@ -760,11 +867,11 @@ define([
                 return;
             }
 
-            var maxSizeBytes = 10 * 1024 * 1024; // 10MB limit
+            var maxSizeBytes = 3 * 1024 * 1024; // 3MB limit
             if (file.size > maxSizeBytes) {
                 alert({
                     title: $.mage.__('Error'),
-                    content: $.mage.__('File size exceeds the 10MB limit.')
+                    content: $.mage.__('File size exceeds the 3MB limit.')
                 });
                 event.target.value = '';
                 return;
@@ -798,6 +905,7 @@ define([
             var customs = this.shipmentData() ? this.shipmentData().customs : null;
             if (!customs) return;
 
+            this._customsTemplateMatchRequestId = (this._customsTemplateMatchRequestId || 0) + 1;
             customs.selectedCustomsTemplateId(null);
             customs.customsType('U');
             customs.categoryOfItem('11');
@@ -820,6 +928,7 @@ define([
             customs.notExceedValue(true);
             customs.notProhibitedGoods(true);
             customs.notRestrictedGoods(true);
+            customs.invoiceContent(true);
             if (customs.customsItems) {
                 customs.customsItems.removeAll();
             }
@@ -851,6 +960,11 @@ define([
             if (data.notExceedValue !== undefined) customs.notExceedValue(isTruthy(data.notExceedValue));
             if (data.notProhibitedGoods !== undefined) customs.notProhibitedGoods(isTruthy(data.notProhibitedGoods));
             if (data.notRestrictedGoods !== undefined) customs.notRestrictedGoods(isTruthy(data.notRestrictedGoods));
+            if (data.customsType === 'I') {
+                customs.invoiceContent(data.invoiceContent !== undefined ? isTruthy(data.invoiceContent) : true);
+            } else if (data.customsType !== undefined) {
+                customs.invoiceContent(false);
+            }
 
             if (customs.customsItems) {
                 customs.customsItems.removeAll();
@@ -867,6 +981,7 @@ define([
             if (!customs) return;
 
             if (event && event.target) {
+                this._customsTemplateMatchRequestId = (this._customsTemplateMatchRequestId || 0) + 1;
                 templateId = event.target.value;
             } else if (templateId === undefined || templateId === null || typeof templateId === 'object') {
                 templateId = (typeof customs.selectedCustomsTemplateId === 'function')
@@ -903,9 +1018,46 @@ define([
                 template_type: 'customs',
                 order_id: self.shipmentData().orderId
             }).done(function (res) {
-                if (res.success && res.data) {
+                if (self._activeCustomsTemplateId === templateId && res.success && res.data) {
                     self.populateCustomsData(res.data);
                 }
+            });
+        },
+
+        onRecipientCountryChange: function (countryId) {
+            var customs = this.shipmentData() ? this.shipmentData().customs : null,
+                country = countryId ? String(countryId).trim().toUpperCase() : '',
+                url = this.loadTemplateUrl,
+                self = this,
+                requestId;
+
+            if (!customs) return;
+
+            this.resetCustomsData();
+            if (country === '' || country === 'PL' || !url) {
+                return;
+            }
+
+            requestId = this._customsTemplateMatchRequestId;
+            $.getJSON(url, {
+                template_type: 'customs',
+                country_id: country,
+                order_id: this.shipmentData().orderId
+            }).done(function (response) {
+                var templateId;
+
+                if (requestId !== self._customsTemplateMatchRequestId || !response.success || !response.data) {
+                    return;
+                }
+
+                templateId = response.data.selectedCustomsTemplateId;
+                if (!templateId) {
+                    return;
+                }
+
+                self._activeCustomsTemplateId = String(templateId);
+                customs.selectedCustomsTemplateId(templateId);
+                self.populateCustomsData(response.data);
             });
         },
 
@@ -1049,7 +1201,6 @@ define([
                     ssReset.returnOnDeliveryReference('');
                     ssReset.proofOfDelivery(false);
                     ssReset.ageVer(false);
-                    ssReset.selfCollect(false);
                 }
                 return;
             }
@@ -1154,10 +1305,6 @@ define([
                             currentSS.ageVer(isTruthy(specialServices.ageVer));
                         }
 
-                        if (specialServices.selfCollect !== undefined && typeof currentSS.selfCollect === 'function') {
-                            currentSS.selfCollect(isTruthy(specialServices.selfCollect));
-                        }
-
                         if (specialServices.collectOnDelivery !== undefined && typeof currentSS.collectOnDelivery === 'function') {
                             currentSS.collectOnDelivery(isTruthy(specialServices.collectOnDelivery));
                         }
@@ -1212,6 +1359,7 @@ define([
                         // 1. Populate dropdown options FIRST
                         self.senderTemplates(response.senderTemplates || []);
                         self.countryOptions(response.countryOptions || []);
+                        self.customsItemCountryOptions([{ value: '', label: '' }].concat(response.countryOptions || []));
                         self.shipmentTemplates(response.shipmentTemplates || []);
                         self.serviceCodeOptions(response.serviceCodeOptions || []);
                         self.labelTypeOptions(response.labelTypeOptions || []);
@@ -1239,7 +1387,7 @@ define([
                             response.data.shipmentSettings.selectedDeliveryServiceId = defaultDeliveryServiceId;
                         }
 
-                        var defaultCustomsTemplateId = response.defaultCustomsTemplateId || (response.data.customs ? response.data.customs.selectedCustomsTemplateId : null);
+                        var defaultCustomsTemplateId = response.defaultCustomsTemplateId;
                         if (response.data.customs) {
                             response.data.customs.selectedCustomsTemplateId = defaultCustomsTemplateId;
                         }
@@ -1247,6 +1395,7 @@ define([
                         self._activeSenderTemplateId = null;
                         self._activeShipmentTemplateId = null;
                         self._activeCustomsTemplateId = null;
+                        self._customsTemplateMatchRequestId = (self._customsTemplateMatchRequestId || 0) + 1;
 
                         // 3. Create reactive shipmentData instance AFTER options are set
                         var newShipmentData = createShipmentData(response.data, self.todayDate);
@@ -1271,9 +1420,7 @@ define([
                             self.onShipmentTemplateChange(newVal);
                         });
                         newShipmentData.recipient.country.subscribe(function (newCountry) {
-                            if (newCountry && newCountry.toUpperCase() === 'PL') {
-                                self.resetCustomsData();
-                            }
+                            self.onRecipientCountryChange(newCountry);
                         });
                         newShipmentData.customs.selectedCustomsTemplateId.subscribe(function (newVal) {
                             self.onCustomsTemplateChange(newVal);
@@ -1282,6 +1429,7 @@ define([
                         var modalOptions = {
                             type: 'slide',
                             title: $.mage.__('Create DHL Shipment'),
+                            modalClass: 'dhl-prepare-shipment-modal',
                             buttons: [{
                                 text: $.mage.__('Create DHL Shipment'),
                                 class: 'action-primary',

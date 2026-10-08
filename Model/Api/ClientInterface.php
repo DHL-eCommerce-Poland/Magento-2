@@ -40,32 +40,19 @@ interface ClientInterface
     ): CreateShipmentResult;
 
     /**
-     * Delete shipment via DHL WebAPI2 API.
+     * Delete shipment and optional return shipments via DHL WebAPI2 API.
      *
      * @param Credentials $credentials
      * @param string $shipmentId
+     * @param string[] $returnShipmentIds
      *
      * @return DeleteShipmentResult
      */
     public function deleteShipment(
         Credentials $credentials,
-        string $shipmentId
+        string $shipmentId,
+        array $returnShipmentIds = []
     ): DeleteShipmentResult;
-
-    /**
-     * Get postal code services and pickup windows via DHL WebAPI2 API.
-     *
-     * @param Credentials $credentials
-     * @param string $postCode
-     * @param string $pickupDate Format YYYY-MM-DD
-     *
-     * @return PostalCodeServicesResult
-     */
-    public function getPostalCodeServices(
-        Credentials $credentials,
-        string $postCode,
-        string $pickupDate
-    ): PostalCodeServicesResult;
 
     /**
      * Book courier for existing generated shipments via DHL WebAPI2 API.
@@ -182,25 +169,6 @@ interface ClientInterface
         array $returnShipmentFullData,
         ?int $orderId = null
     ): CreateShipmentReturnResult;
-
-    /**
-     * Get nearest DHL service points for recipient address via DHL WebAPI2 API.
-     *
-     * @param Credentials $credentials
-     * @param string $country
-     * @param string $postCode
-     * @param string $city
-     * @param int $radius
-     *
-     * @return GetNearestServicepointsResult
-     */
-    public function getNearestServicepoints(
-        Credentials $credentials,
-        string $country,
-        string $postCode,
-        string $city = '',
-        int $radius = 15
-    ): GetNearestServicepointsResult;
 
     /**
      * Get piece IDs / package tracking numbers for a shipment via DHL WebAPI2 getPieceId endpoint.

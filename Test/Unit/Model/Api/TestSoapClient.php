@@ -10,8 +10,19 @@ use SoapFault;
 class TestSoapClient extends SoapClient
 {
     /**
+     * @var int
+     */
+    public int $getLabelsCallCount = 0;
+
+    /**
+     * @var array
+     */
+    public array $getLabelsCalls = [];
+
+    /**
      * @param bool $shouldThrowFault
      * @param string $faultMessage
+     * @throws SoapFault
      */
     public function __construct(
         private readonly bool $shouldThrowFault = false,
@@ -42,30 +53,6 @@ class TestSoapClient extends SoapClient
                 'params' => (object) [
                     'item' => [],
                 ],
-            ],
-        ];
-    }
-
-    /**
-     * Dummy getPostalCodeServices method for SoapClient mocking.
-     *
-     * @param mixed $args
-     * @return mixed
-     * @throws SoapFault
-     */
-    public function getPostalCodeServices(mixed $args): mixed
-    {
-        if ($this->shouldThrowFault) {
-            throw new SoapFault('AUTH_ERR', 'Invalid credentials');
-        }
-
-        return (object) [
-            'getPostalCodeServicesResult' => (object) [
-                'drPickupFrom' => '10:00',
-                'drPickupTo' => '16:00',
-                'exPickupFrom' => '10:00',
-                'exPickupTo' => '15:00',
-                'pickupOnSaturday' => true,
             ],
         ];
     }
@@ -290,52 +277,41 @@ class TestSoapClient extends SoapClient
     }
 
     /**
-     * Dummy getNearestServicepoints method for SoapClient mocking.
+     * Dummy getLabels method for SoapClient mocking.
      *
      * @param mixed $args
      * @return mixed
      * @throws SoapFault
      */
-    public function getNearestServicepoints(mixed $args): mixed
+    public function getLabels(mixed $args): mixed
     {
+        $this->getLabelsCallCount++;
+        $this->getLabelsCalls[] = $args;
+
         if ($this->shouldThrowFault) {
-            throw new SoapFault('POINTS_ERR', 'Error fetching nearest service points');
+            throw new SoapFault('GET_LABELS_ERR', $this->faultMessage);
+        }
+
+        $items = [];
+        $itemsToPrint = $args['itemsToPrint'] ?? [];
+        if (!is_array($itemsToPrint)) {
+            $itemsToPrint = [$itemsToPrint];
+        }
+
+        foreach ($itemsToPrint as $item) {
+            $shipmentId = is_array($item) ? ($item['shipmentId'] ?? '1234567890') : ($item->shipmentId ?? '1234567890');
+            $labelType = is_array($item) ? ($item['labelType'] ?? 'BLP') : ($item->labelType ?? 'BLP');
+            $items[] = (object) [
+                'shipmentId' => (string) $shipmentId,
+                'labelType' => (string) $labelType,
+                'labelData' => base64_encode('%PDF-1.4 dummy label for ' . $shipmentId),
+                'labelMimeType' => 'application/pdf',
+            ];
         }
 
         return (object) [
-            'getNearestServicepointsResult' => (object) [
-                'points' => (object) [
-                    'item' => [
-                        (object) [
-                            'sap' => 'POP-WAW-100',
-                            'name' => 'Sklep Żabka 100',
-                            'type' => 'POP',
-                            'description' => 'Opis punktu 100',
-                            'longitude' => '21.01',
-                            'latitude' => '52.23',
-                            'address' => (object) [
-                                'street' => 'Marszałkowska',
-                                'houseNumber' => '10',
-                                'postcode' => '00-001',
-                                'city' => 'Warszawa',
-                            ],
-                        ],
-                        (object) [
-                            'sap' => 'POP-WAW-101',
-                            'name' => 'Sklep Żabka 101',
-                            'type' => 'POP',
-                            'description' => 'Opis punktu 101',
-                            'longitude' => '21.02',
-                            'latitude' => '52.24',
-                            'address' => (object) [
-                                'street' => 'Aleje Jerozolimskie',
-                                'houseNumber' => '20',
-                                'postcode' => '00-002',
-                                'city' => 'Warszawa',
-                            ],
-                        ],
-                    ],
-                ],
+            'getLabelsResult' => (object) [
+                'item' => $items,
             ],
         ];
     }

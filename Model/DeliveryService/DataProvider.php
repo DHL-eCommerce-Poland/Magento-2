@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\DeliveryService;
 
 use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory;
+use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use InvalidArgumentException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
@@ -74,6 +75,9 @@ class DataProvider extends AbstractDataProvider
             $data['packages'] = $packages;
             if (isset($data['method_code']) && is_string($data['method_code']) && $data['method_code'] !== '') {
                 $data['method_code'] = explode(',', $data['method_code']);
+            }
+            if (empty($data['return_label_exp_days']) || (int)$data['return_label_exp_days'] <= 0) {
+                $data['return_label_exp_days'] = ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS;
             }
             $this->loadedData[$item->getId()] = $data;
         }

@@ -7,9 +7,11 @@ namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 use Ideo\Dhl\Controller\Adminhtml\Shipment\DownloadScan;
 use Ideo\Dhl\Model\Shipment\DocumentDownloadService;
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\Result\Json;
+use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Exception\LocalizedException;
@@ -48,6 +50,10 @@ class DownloadScanTest extends TestCase
      */
     private $fileFactoryStub;
     /**
+     * @var Stub
+     */
+    private $jsonFactoryStub;
+    /**
      * @var DownloadScan
      */
     private $controller;
@@ -55,12 +61,14 @@ class DownloadScanTest extends TestCase
     protected function setUp(): void
     {
         $this->contextStub = $this->createStub(Context::class);
-        $this->requestStub = $this->createStub(RequestInterface::class);
+        $this->requestStub = $this->createStub(HttpRequest::class);
         $this->redirectFactoryStub = $this->createStub(RedirectFactory::class);
         $this->redirectStub = $this->createStub(Redirect::class);
+        $this->redirectStub->method('setPath')->willReturnSelf();
         $this->messageManagerStub = $this->createStub(ManagerInterface::class);
         $this->serviceStub = $this->createStub(DocumentDownloadService::class);
         $this->fileFactoryStub = $this->createStub(FileFactory::class);
+        $this->jsonFactoryStub = $this->createStub(JsonFactory::class);
 
         $this->contextStub->method('getRequest')->willReturn($this->requestStub);
         $this->contextStub->method('getResultRedirectFactory')->willReturn($this->redirectFactoryStub);
@@ -70,21 +78,51 @@ class DownloadScanTest extends TestCase
         $this->controller = new DownloadScan(
             $this->contextStub,
             $this->serviceStub,
-            $this->fileFactoryStub
+            $this->fileFactoryStub,
+            $this->jsonFactoryStub
         );
     }
 
     public function testExecuteWithInvalidEntityIdRedirects(): void
     {
-        $this->requestStub->method('getParam')->willReturn(0);
-        $this->redirectStub->method('setPath')->willReturnSelf();
+        $this->requestStub->method('isXmlHttpRequest')->willReturn(false);
+        $this->requestStub->method('getParam')->willReturnCallback(function (string $param) {
+            return $param === 'entity_id' ? 0 : null;
+        });
+
+        $calledPath = null;
+        $this->redirectStub->method('setPath')->willReturnCallback(function (string $path) use (&$calledPath) {
+            $calledPath = $path;
+            return $this->redirectStub;
+        });
 
         $this->assertSame($this->redirectStub, $this->controller->execute());
+        $this->assertEquals('*/*/index', $calledPath);
+    }
+
+    public function testExecuteAjaxWithInvalidEntityIdReturnsJson(): void
+    {
+        $this->requestStub->method('isXmlHttpRequest')->willReturn(true);
+        $this->requestStub->method('getParam')->willReturnCallback(function (string $param) {
+            return $param === 'entity_id' ? 0 : null;
+        });
+
+        $jsonMock = $this->createMock(Json::class);
+        $jsonMock->expects($this->once())->method('setData')->with([
+            'success' => false,
+            'message' => (string) __('Invalid shipment entity ID.'),
+        ])->willReturnSelf();
+        $this->jsonFactoryStub->method('create')->willReturn($jsonMock);
+
+        $this->assertSame($jsonMock, $this->controller->execute());
     }
 
     public function testExecuteSuccessStreamsFile(): void
     {
-        $this->requestStub->method('getParam')->willReturn(10);
+        $this->requestStub->method('isXmlHttpRequest')->willReturn(false);
+        $this->requestStub->method('getParam')->willReturnCallback(function (string $param) {
+            return $param === 'entity_id' ? 10 : null;
+        });
 
         $scanData = [
             'content' => 'binary_pdf_content',
@@ -101,13 +139,47 @@ class DownloadScanTest extends TestCase
         $this->assertSame($responseStub, $result);
     }
 
-    public function testExecuteServiceExceptionRedirectsWithError(): void
+    public function testExecuteServiceExceptionRedirectsToEdit(): void
     {
-        $this->requestStub->method('getParam')->willReturn(10);
+        $this->requestStub->method('isXmlHttpRequest')->willReturn(false);
+        $this->requestStub->method('getParam')->willReturnCallback(function (string $param) {
+            return $param === 'entity_id' ? 10 : null;
+        });
         $this->serviceStub->method('getScanContent')->willThrowException(new LocalizedException(__('Scan error')));
-        $this->redirectStub->method('setPath')->willReturnSelf();
+
+        $calledPath = null;
+        $calledParams = null;
+        $this->redirectStub->method('setPath')->willReturnCallback(
+            function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
+                $calledPath = $path;
+                $calledParams = $params;
+                return $this->redirectStub;
+            }
+        );
 
         $result = $this->controller->execute();
         $this->assertSame($this->redirectStub, $result);
+        $this->assertEquals('*/*/edit', $calledPath);
+        $this->assertEquals(['entity_id' => 10], $calledParams);
+    }
+
+    public function testExecuteAjaxServiceExceptionReturnsJson(): void
+    {
+        $this->requestStub->method('isXmlHttpRequest')->willReturn(true);
+        $this->requestStub->method('getParam')->willReturnCallback(function (string $param) {
+            return $param === 'entity_id' ? 10 : null;
+        });
+        $this->serviceStub->method('getScanContent')
+            ->willThrowException(new LocalizedException(__('Brak skanu lp do pobrania')));
+
+        $jsonMock = $this->createMock(Json::class);
+        $jsonMock->expects($this->once())->method('setData')->with($this->callback(function (array $data): bool {
+            return $data['success'] === false
+                && str_contains($data['message'], 'Brak skanu lp do pobrania');
+        }))->willReturnSelf();
+        $this->jsonFactoryStub->method('create')->willReturn($jsonMock);
+
+        $result = $this->controller->execute();
+        $this->assertSame($jsonMock, $result);
     }
 }

@@ -345,6 +345,7 @@ class TemplateManager
     public function getCustomsTemplatesOptions(): array
     {
         $collection = $this->customsTemplateCollectionFactory->create();
+        $collection->setOrder('entity_id', 'ASC');
         $options = [];
 
         foreach ($collection as $item) {
@@ -395,6 +396,7 @@ class TemplateManager
         }
 
         $collection = $this->customsTemplateCollectionFactory->create();
+        $collection->setOrder('entity_id', 'ASC');
         foreach ($collection as $item) {
             $rawCountryId = (string)($item->getCountryId() ?? '');
             if (empty($rawCountryId)) {
@@ -601,7 +603,6 @@ class TemplateManager
             $isRodVal = $this->isTrueValue($addServices['returnOnDelivery'] ?? false);
             $isPodVal = $this->isTrueValue($addServices['proofOfDelivery'] ?? false);
             $isAgeverVal = $this->isTrueValue($addServices['ageVer'] ?? false);
-            $isOdbVal = $this->isTrueValue($addServices['selfCollect'] ?? false);
             $isCodVal = $this->isTrueValue($addServices['collectOnDelivery'] ?? false);
             $rodDocText = (string)($addServices['returnOnDeliveryReference'] ?? '');
 
@@ -619,7 +620,6 @@ class TemplateManager
                 'returnOnDeliveryReference' => $rodDocText,
                 'proofOfDelivery' => $isPodVal,
                 'ageVer' => $isAgeverVal,
-                'selfCollect' => $isOdbVal,
             ];
         } catch (Exception $e) {
             $this->logger->error('Error loading special services template: ' . $e->getMessage(), ['exception' => $e]);

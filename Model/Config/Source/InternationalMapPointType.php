@@ -21,16 +21,16 @@ class InternationalMapPointType implements OptionSourceInterface
     {
         return [
             [
+                'value' => self::TYPE_COURIER,
+                'label' => __('Courier'),
+            ],
+            [
                 'value' => self::TYPE_PACKSTATION,
                 'label' => __('Packstation'),
             ],
             [
                 'value' => self::TYPE_PARCELSHOP,
                 'label' => __('Parcelshop'),
-            ],
-            [
-                'value' => self::TYPE_COURIER,
-                'label' => __('Courier'),
             ],
         ];
     }

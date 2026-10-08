@@ -97,7 +97,11 @@ class SaveServicePointToQuoteAddress
             $shippingAddress->setData('dhl_service_point_city', $servicePoint->getCity());
             $shippingAddress->setData('dhl_is_packstation', $servicePoint->isPackstation() ? 1 : 0);
             $shippingAddress->setData('dhl_is_postfiliale', $servicePoint->isPostfiliale() ? 1 : 0);
-            $shippingAddress->setData('dhl_postnummer', $servicePoint->getPostnummer());
+            $pointCountry = $servicePoint->getCountry();
+            $fallbackCountry = $shippingAddress ? $shippingAddress->getCountryId() : '';
+            $country = strtoupper((string) ($pointCountry ?: $fallbackCountry));
+            $postnummer = ($servicePoint->isPackstation() && $country === 'DE') ? $servicePoint->getPostnummer() : null;
+            $shippingAddress->setData('dhl_postnummer', $postnummer);
         } else {
             $shippingAddress->setData('dhl_service_point_id', null);
             $shippingAddress->setData('dhl_service_point_name', null);

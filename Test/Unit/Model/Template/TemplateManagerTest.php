@@ -492,7 +492,8 @@ class TemplateManagerTest extends TestCase
         $service = $this->createMock(DeliveryService::class);
         $service->method('getAdditionalServices')->willReturn([
             'insurance' => 1,
-            'collectOnDelivery' => 1
+            'collectOnDelivery' => 1,
+            'selfCollect' => 1
         ]);
 
         $this->deliveryServiceRepository->method('getById')->willReturn($service);
@@ -504,5 +505,6 @@ class TemplateManagerTest extends TestCase
         $this->assertNull($result['insuranceValue']);
         $this->assertTrue($result['collectOnDelivery']);
         $this->assertNull($result['collectOnDeliveryValue']);
+        $this->assertArrayNotHasKey('selfCollect', $result);
     }
 }

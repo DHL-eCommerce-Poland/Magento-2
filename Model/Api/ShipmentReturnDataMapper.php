@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\Api;
 
 use Ideo\Dhl\Model\Config\Source\ReturnBookCourier;
+use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class ShipmentReturnDataMapper
 {
-    private const DEFAULT_EXPIRATION_DAYS = 14;
-
     /**
      * @param TimezoneInterface $timezone
      */
@@ -25,14 +24,14 @@ class ShipmentReturnDataMapper
      * Map inverted DhlShipmentData into DHL WebAPI2 createShipmentReturn SOAP request array.
      *
      * @param DhlShipmentData $shipmentData
-     * @param int $expirationDays Days until return label expires (default 14)
+     * @param int $expirationDays Days until return label expires
      * @param string|null $primaryWaybillNumber Primary shipment waybill if linking return
      *
      * @return array
      */
     public function map(
         DhlShipmentData $shipmentData,
-        int $expirationDays = self::DEFAULT_EXPIRATION_DAYS,
+        int $expirationDays = ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS,
         ?string $primaryWaybillNumber = null
     ): array {
         $customerSender = $shipmentData->getSender();
@@ -51,7 +50,7 @@ class ShipmentReturnDataMapper
                 'height' => $pkg->getHeight(),
                 'length' => $pkg->getLength(),
                 'nonStandard' => $pkg->isNonStandard() || $services->isNonStandard(),
-                'euroReturn' => $services->isEuroReturn(),
+                'euroReturn' => $pkg->hasEuroReturn(),
             ];
         }
 
@@ -59,11 +58,15 @@ class ShipmentReturnDataMapper
         $customerFullName = trim($customerSender->getFirstName() . ' ' . $customerSender->getLastName());
 
         $customerName = $customerCompanyName !== '' ? $customerCompanyName : $customerFullName;
-        $customerContact = $customerFullName;
+        $customerContact = $customerFullName !== '' ? $customerFullName : $customerCompanyName;
 
         $merchantContact = $merchantRecipient->getContactPerson() !== ''
             ? $merchantRecipient->getContactPerson()
-            : ($merchantRecipient->getFirstName() . ' ' . $merchantRecipient->getLastName());
+            : trim($merchantRecipient->getFirstName() . ' ' . $merchantRecipient->getLastName());
+
+        if ($merchantContact === '') {
+            $merchantContact = $merchantRecipient->getName();
+        }
 
         $merchantName = $merchantRecipient->getName() !== ''
             ? $merchantRecipient->getName()
@@ -76,7 +79,9 @@ class ShipmentReturnDataMapper
             ->format('Y-m-d');
 
         $countryCode = strtoupper($merchantRecipient->getCountry() ?: 'PL');
-        $serviceType = ($countryCode === 'PL') ? 'ZK' : 'ZC';
+        $customerCountry = strtoupper($customerSender->getCountry() ?: 'PL');
+        $configuredServiceType = strtoupper(trim((string) $settings->getServiceType()));
+        $serviceType = ($customerCountry !== 'PL' || $configuredServiceType === 'ZC') ? 'ZC' : 'ZK';
 
         $billingAccount = $customerSender->getSapNumber() !== ''
             ? $customerSender->getSapNumber()
@@ -92,9 +97,15 @@ class ShipmentReturnDataMapper
             $billing['costsCenter'] = $this->sanitizeString($settings->getMpk());
         }
 
-        $returnBookCourierVal = (string) ($settings->getReturnBookCourier() ?? ReturnBookCourier::DROP_OFF_OR_COURIER);
-        $bookCourier = $returnBookCourierVal === ReturnBookCourier::DROP_OFF_OR_COURIER;
-        $labelType = $settings->getReturnLabelType() ?: ($settings->getLabelType() ?: 'BLP');
+        if ($serviceType === 'ZC') {
+            $bookCourier = false;
+        } else {
+            $returnBookCourierVal = (string) (
+                $settings->getReturnBookCourier() ?? ReturnBookCourier::DROP_OFF_OR_COURIER
+            );
+            $bookCourier = $returnBookCourierVal === ReturnBookCourier::DROP_OFF_OR_COURIER;
+        }
+        $labelType = $settings->getReturnLabelType() ?: 'BLP';
 
         $shipmentInfo = [
             'serviceType' => $serviceType,
@@ -122,11 +133,25 @@ class ShipmentReturnDataMapper
 
         $customerCountry = strtoupper($customerSender->getCountry() ?: 'PL');
 
+        $customerContactInfo = [
+            'personName' => $this->sanitizeString($customerContact),
+            'phoneNumber' => $this->sanitizeString($customerSender->getPhone()),
+            'emailAddress' => $this->sanitizeString($customerSender->getEmail()),
+        ];
+
+        $merchantContactInfo = [
+            'personName' => $this->sanitizeString($merchantContact),
+            'phoneNumber' => $this->sanitizeString($merchantRecipient->getPhone()),
+            'emailAddress' => $this->sanitizeString($merchantRecipient->getEmail()),
+        ];
+
         $result = [
             'shipmentInfo' => $shipmentInfo,
-            'content' => $this->sanitizeString($settings->getContent() ?: __('Order Return')),
+            'content' => $this->sanitizeString($settings->getContent()),
             'ship' => [
                 'shipper' => [
+                    'preaviso' => $customerContactInfo,
+                    'contact' => $customerContactInfo,
                     'address' => [
                         'country' => $customerCountry,
                         'name' => $this->sanitizeString($customerName),
@@ -136,13 +161,10 @@ class ShipmentReturnDataMapper
                         'houseNumber' => $this->sanitizeString($customerSender->getHouseNumber()),
                         'apartmentNumber' => $this->sanitizeString($customerSender->getFlatNumber()),
                     ],
-                    'contact' => [
-                        'personName' => $this->sanitizeString($customerContact),
-                        'phoneNumber' => $this->sanitizeString($customerSender->getPhone()),
-                        'emailAddress' => $this->sanitizeString($customerSender->getEmail()),
-                    ],
                 ],
                 'receiver' => [
+                    'preaviso' => $merchantContactInfo,
+                    'contact' => $merchantContactInfo,
                     'address' => [
                         'country' => $countryCode,
                         'name' => $this->sanitizeString($merchantName),
@@ -151,11 +173,6 @@ class ShipmentReturnDataMapper
                         'street' => $this->sanitizeString($merchantRecipient->getStreet()),
                         'houseNumber' => $this->sanitizeString($merchantRecipient->getHouseNumber()),
                         'apartmentNumber' => $this->sanitizeString($merchantRecipient->getFlatNumber()),
-                    ],
-                    'contact' => [
-                        'personName' => $this->sanitizeString($merchantContact),
-                        'phoneNumber' => $this->sanitizeString($merchantRecipient->getPhone()),
-                        'emailAddress' => $this->sanitizeString($merchantRecipient->getEmail()),
                     ],
                 ],
             ],

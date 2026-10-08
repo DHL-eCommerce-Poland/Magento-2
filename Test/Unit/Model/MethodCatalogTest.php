@@ -125,4 +125,25 @@ class MethodCatalogTest extends TestCase
         $this->assertTrue($catalog->isParcelShopMethod('connect_parcelshop_cod'));
         $this->assertFalse($catalog->isParcelShopMethod('connect_packstation'));
     }
+
+    /**
+     * Verify international point type resolution handles carrier prefixes, COD variants, and unknown methods.
+     */
+    public function testInternationalMapPointTypeResolution(): void
+    {
+        $catalog = new MethodCatalog();
+
+        self::assertSame('courier', $catalog->getInternationalMapPointTypeForMethod('dhlpoland_connect'));
+        self::assertSame('courier', $catalog->getInternationalMapPointTypeForMethod('connect_cod'));
+        self::assertSame(
+            'parcelShop',
+            $catalog->getInternationalMapPointTypeForMethod('dhlpoland_connect_parcelshop_cod')
+        );
+        self::assertSame(
+            'packStation',
+            $catalog->getInternationalMapPointTypeForMethod('dhlpoland_connect_packstation_cod')
+        );
+        self::assertSame('courier', $catalog->getInternationalMapPointTypeForMethod('unknown_method'));
+        self::assertSame('courier', $catalog->getInternationalMapPointTypeForMethod(null));
+    }
 }

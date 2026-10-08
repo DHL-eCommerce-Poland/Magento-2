@@ -17,13 +17,11 @@ class ReturnShipmentDataBuilder
      * Inverts Sender (now Customer) and Recipient (now Merchant/Warehouse).
      *
      * @param DhlShipmentData $originalShipmentData
-     * @param string|null $content Custom content description for return parcel
      *
      * @return DhlShipmentData
      */
     public function buildReturnShipmentData(
-        DhlShipmentData $originalShipmentData,
-        ?string $content = null
+        DhlShipmentData $originalShipmentData
     ): DhlShipmentData {
         $origSender = $originalShipmentData->getSender();
         $origRecipient = $originalShipmentData->getRecipient();
@@ -64,19 +62,17 @@ class ReturnShipmentDataBuilder
             email: $origSender->getEmail()
         );
 
-        $countryCode = strtoupper($origSender->getCountry() ?: 'PL');
-        $serviceType = ($countryCode === 'PL') ? 'ZK' : 'ZC';
+        $customerCountry = strtoupper($origRecipient->getCountry() ?: 'PL');
+        $serviceType = ($customerCountry === 'PL') ? 'ZK' : 'ZC';
 
-        $origContent = $origSettings->getContent() ?: ('Zamówienie #' . $originalShipmentData->getOrderId());
-        $defaultContent = 'Zwrot: ' . $origContent;
         $returnSettings = new ShipmentSettingsData(
             serviceType: $serviceType,
             pickupType: 'COURIER',
-            content: $content ?? $defaultContent,
+            content: $origSettings->getContent(),
             mpk: $origSettings->getMpk(),
             comment: $origSettings->getComment(),
-            reference: $origSettings->getReference() ?: (string) $originalShipmentData->getOrderId(),
-            labelType: $origSettings->getReturnLabelType() ?: ($origSettings->getLabelType() ?: 'BLP'),
+            reference: $origSettings->getReference(),
+            labelType: $origSettings->getReturnLabelType() ?: 'BLP',
             returnLabelType: $origSettings->getReturnLabelType(),
             returnQrCodeType: $origSettings->getReturnQrCodeType(),
             returnLabelExpDays: $origSettings->getReturnLabelExpDays(),

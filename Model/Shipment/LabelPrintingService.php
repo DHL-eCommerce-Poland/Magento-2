@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
@@ -14,11 +15,11 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem\Driver\File as FileDriver;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Shipping\Model\Shipping\LabelGenerator;
 use Psr\Log\LoggerInterface;
 use Zend_Pdf_Exception;
 use ZipArchive;
-use Zend_Pdf;
 
 class LabelPrintingService
 {
@@ -31,8 +32,9 @@ class LabelPrintingService
      * @param CredentialsProvider $credentialsProvider
      * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
-     * @param LabelGenerator|null $labelGenerator
-     * @param FileDriver|null $fileDriver
+     * @param SerializerInterface $serializer
+     * @param LabelGenerator $labelGenerator
+     * @param FileDriver $fileDriver
      */
     public function __construct(
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
@@ -40,10 +42,10 @@ class LabelPrintingService
         private readonly CredentialsProvider $credentialsProvider,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly LoggerInterface $logger,
-        private readonly ?LabelGenerator $labelGenerator = null,
-        private ?FileDriver $fileDriver = null
+        private readonly SerializerInterface $serializer,
+        private readonly LabelGenerator $labelGenerator,
+        private readonly FileDriver $fileDriver
     ) {
-        $this->fileDriver = $fileDriver ?? new FileDriver();
     }
 
     /**
@@ -75,17 +77,10 @@ class LabelPrintingService
 
                 $labelType = $overrideLabelType;
                 if (empty($labelType)) {
-                    $rawPayload = $shipment->getShipmentData();
-                    if (!empty($rawPayload) && is_string($rawPayload)) {
-                        try {
-                            $payload = (array) json_decode($rawPayload, true);
-                            if (!empty($payload['labelType'])) {
-                                $labelType = (string) $payload['labelType'];
-                            }
-                        } catch (Throwable) {
-                            $labelType = null;
-                        }
-                    }
+                    $shipmentSettings = $this->getShipmentSettings($shipment);
+                    $labelType = !empty($shipmentSettings['labelType'])
+                        ? (string) $shipmentSettings['labelType']
+                        : null;
                 }
 
                 $itemsToPrint[] = [
@@ -166,17 +161,12 @@ class LabelPrintingService
 
                 $labelType = $overrideLabelType;
                 if (empty($labelType)) {
-                    $rawPayload = $shipment->getShipmentData();
-                    if (!empty($rawPayload) && is_string($rawPayload)) {
-                        try {
-                            $payload = (array) json_decode($rawPayload, true);
-                            if (!empty($payload['labelType'])) {
-                                $labelType = (string) $payload['labelType'];
-                            }
-                        } catch (Throwable) {
-                            $labelType = null;
-                        }
-                    }
+                    $shipmentSettings = $this->getShipmentSettings($shipment);
+                    $labelType = !empty($shipmentSettings['returnLabelType'])
+                        ? (string) $shipmentSettings['returnLabelType']
+                        : (!empty($shipmentSettings['labelType'])
+                            ? (string) $shipmentSettings['labelType']
+                            : null);
                 }
 
                 $returnIds = array_filter(array_map('trim', explode(',', (string) $returnShipmentId)));
@@ -237,19 +227,18 @@ class LabelPrintingService
      * Get return QR code PDF/binary content for given shipment entity IDs.
      *
      * @param int[] $entityIds Array of Magento DHL shipment entity IDs
-     * @param string|null $overrideLabelType Defaults to 'QR_PDF'
+     * @param string|null $overrideLabelType Optional explicit QR code type override
      *
-     * @return array{content: string, mimeType: string, filename: string}
+     * @return array
      * @throws LocalizedException
      */
-    public function getReturnQrCodeContent(array $entityIds, ?string $overrideLabelType = 'QR_PDF'): array
+    public function getReturnQrCodeContent(array $entityIds, ?string $overrideLabelType = null): array
     {
         $entityIds = array_values(array_unique(array_filter(array_map('intval', $entityIds))));
         if (empty($entityIds)) {
             throw new LocalizedException(__('No shipments selected for return QR code printing.'));
         }
 
-        $qrLabelType = $overrideLabelType ?: 'QR_PDF';
         $itemsToPrint = [];
 
         foreach ($entityIds as $id) {
@@ -259,6 +248,12 @@ class LabelPrintingService
                 if (empty($returnShipmentId)) {
                     continue;
                 }
+
+                $shipmentSettings = $this->getShipmentSettings($shipment);
+                $qrLabelType = $overrideLabelType
+                    ?: (!empty($shipmentSettings['returnQrCodeType'])
+                        ? (string) $shipmentSettings['returnQrCodeType']
+                        : 'QR_PDF');
 
                 $returnIds = array_filter(array_map('trim', explode(',', (string) $returnShipmentId)));
                 foreach ($returnIds as $singleReturnId) {
@@ -388,7 +383,7 @@ class LabelPrintingService
     }
 
     /**
-     * Merge multiple PDF binary strings using available Laminas/Zend PDF classes or string fallback.
+     * Merge multiple PDF binary strings with Magento's label generator.
      *
      * @param array $items
      *
@@ -398,38 +393,33 @@ class LabelPrintingService
     private function mergePdfDocuments(array $items): string
     {
         $pdfStrings = array_column($items, 'labelData');
+        $combinedPdf = $this->labelGenerator->combineLabelsPdf($pdfStrings);
 
-        if ($this->labelGenerator !== null) {
-            try {
-                $combinedPdf = $this->labelGenerator->combineLabelsPdf($pdfStrings);
-                return $combinedPdf->render();
-            } catch (Throwable $e) {
-                $this->logger->warning('[LabelPrintingService] Magento LabelGenerator PDF merge failed: ' . $e->getMessage());
-            }
+        return $combinedPdf->render();
+    }
+
+    /**
+     * Read the saved shipment settings from the serialized shipment payload.
+     *
+     * @param ShipmentDataInterface $shipment
+     *
+     * @return array
+     */
+    private function getShipmentSettings(ShipmentDataInterface $shipment): array
+    {
+        $rawPayload = $shipment->getShipmentData();
+        if ($rawPayload === null || $rawPayload === '') {
+            return [];
         }
 
-        if (class_exists('\Zend_Pdf')) {
-            try {
-                $targetPdf = new Zend_Pdf();
-                foreach ($items as $item) {
-                    if (stripos($item['labelData'], '%PDF-') !== false) {
-                        $pdf = Zend_Pdf::parse($item['labelData']);
-                        foreach ($pdf->pages as $page) {
-                            $targetPdf->pages[] = clone $page;
-                        }
-                    }
-                }
-                return $targetPdf->render();
-            } catch (Throwable $e) {
-                $this->logger->warning('[LabelPrintingService] Zend PDF merge failed: ' . $e->getMessage());
-            }
+        try {
+            $payload = $this->serializer->unserialize($rawPayload);
+        } catch (Throwable) {
+            return [];
         }
 
-        $content = '';
-        foreach ($items as $item) {
-            $content .= $item['labelData'];
-        }
-
-        return $content;
+        return is_array($payload) && is_array($payload['shipmentSettings'] ?? null)
+            ? $payload['shipmentSettings']
+            : [];
     }
 }

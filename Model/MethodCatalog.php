@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model;
 
+use Ideo\Dhl\Model\Config\Source\InternationalMapPointType;
+
 class MethodCatalog
 {
     public const SERVICE_AH = 'AH';
@@ -59,6 +61,16 @@ class MethodCatalog
     private const PARCELSHOP_METHODS = [
         self::METHOD_CONNECT_PARCELSHOP,
         self::METHOD_CONNECT_PARCELSHOP_COD,
+    ];
+
+    /**
+     * @var array
+     */
+    private const INTERNATIONAL_MAP_POINT_METHODS = [
+        self::METHOD_CONNECT_PACKSTATION => InternationalMapPointType::TYPE_PACKSTATION,
+        self::METHOD_CONNECT_PACKSTATION_COD => InternationalMapPointType::TYPE_PACKSTATION,
+        self::METHOD_CONNECT_PARCELSHOP => InternationalMapPointType::TYPE_PARCELSHOP,
+        self::METHOD_CONNECT_PARCELSHOP_COD => InternationalMapPointType::TYPE_PARCELSHOP,
     ];
 
     /**
@@ -131,6 +143,20 @@ class MethodCatalog
     public function isParcelShopMethod(string $methodCode): bool
     {
         return in_array($methodCode, self::PARCELSHOP_METHODS, true);
+    }
+
+    /**
+     * Resolve the international map point type from a Magento shipping method code.
+     *
+     * @param string|null $shippingMethod
+     *
+     * @return string
+     */
+    public function getInternationalMapPointTypeForMethod(?string $shippingMethod): string
+    {
+        $code = $this->normalizeMethodCode($shippingMethod);
+
+        return self::INTERNATIONAL_MAP_POINT_METHODS[$code] ?? InternationalMapPointType::TYPE_COURIER;
     }
 
     /**
@@ -296,15 +322,7 @@ class MethodCatalog
      */
     public function getServiceCodeForMethod(?string $shippingMethod): string
     {
-        if ($shippingMethod === null || trim($shippingMethod) === '') {
-            return '';
-        }
-
-        $code = strtolower(trim($shippingMethod));
-        if (str_starts_with($code, Carrier::CODE_PREFIX)) {
-            $code = substr($code, strlen(Carrier::CODE_PREFIX));
-        }
-
+        $code = $this->normalizeMethodCode($shippingMethod);
         return self::METHOD_SERVICE_MAP[$code] ?? '';
     }
 
@@ -317,15 +335,24 @@ class MethodCatalog
      */
     public function isCodMethod(?string $shippingMethod): bool
     {
-        if ($shippingMethod === null || trim($shippingMethod) === '') {
-            return false;
-        }
-
-        $code = strtolower(trim($shippingMethod));
-        if (str_starts_with($code, Carrier::CODE_PREFIX)) {
-            $code = substr($code, strlen(Carrier::CODE_PREFIX));
-        }
-
+        $code = $this->normalizeMethodCode($shippingMethod);
         return str_ends_with($code, '_cod');
+    }
+
+    /**
+     * Normalize a Magento shipping method code to the DHL method code.
+     *
+     * @param string|null $shippingMethod
+     *
+     * @return string
+     */
+    private function normalizeMethodCode(?string $shippingMethod): string
+    {
+        $code = strtolower(trim((string)$shippingMethod));
+        if (str_starts_with($code, Carrier::CODE_PREFIX)) {
+            return substr($code, strlen(Carrier::CODE_PREFIX));
+        }
+
+        return $code;
     }
 }

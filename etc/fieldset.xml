@@ -18,6 +18,67 @@
             <field name="dhl_service_point_city">
                 <aspect name="to_order_address" />
             </field>
+            <field name="dhl_is_packstation">
+                <aspect name="to_order_address" />
+            </field>
+            <field name="dhl_is_postfiliale">
+                <aspect name="to_order_address" />
+            </field>
+            <field name="dhl_postnummer">
+                <aspect name="to_order_address" />
+            </field>
+        </fieldset>
+        <fieldset id="sales_copy_order_shipping_address">
+            <field name="dhl_service_point_id">
+                <aspect name="to_order" />
+            </field>
+            <field name="dhl_service_point_name">
+                <aspect name="to_order" />
+            </field>
+            <field name="dhl_service_point_street">
+                <aspect name="to_order" />
+            </field>
+            <field name="dhl_service_point_postcode">
+                <aspect name="to_order" />
+            </field>
+            <field name="dhl_service_point_city">
+                <aspect name="to_order" />
+            </field>
+            <field name="dhl_is_packstation">
+                <aspect name="to_order" />
+            </field>
+            <field name="dhl_is_postfiliale">
+                <aspect name="to_order" />
+            </field>
+            <field name="dhl_postnummer">
+                <aspect name="to_order" />
+            </field>
+        </fieldset>
+        <fieldset id="sales_convert_order_address">
+            <field name="dhl_service_point_id">
+                <aspect name="to_quote_address" />
+            </field>
+            <field name="dhl_service_point_name">
+                <aspect name="to_quote_address" />
+            </field>
+            <field name="dhl_service_point_street">
+                <aspect name="to_quote_address" />
+            </field>
+            <field name="dhl_service_point_postcode">
+                <aspect name="to_quote_address" />
+            </field>
+            <field name="dhl_service_point_city">
+                <aspect name="to_quote_address" />
+            </field>
+            <field name="dhl_is_packstation">
+                <aspect name="to_quote_address" />
+            </field>
+            <field name="dhl_is_postfiliale">
+                <aspect name="to_quote_address" />
+            </field>
+            <field name="dhl_postnummer">
+                <aspect name="to_quote_address" />
+            </field>
         </fieldset>
     </scope>
 </config>

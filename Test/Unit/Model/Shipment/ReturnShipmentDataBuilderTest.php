@@ -55,8 +55,9 @@ class ReturnShipmentDataBuilderTest extends TestCase
             content: 'Rzeczy',
             comment: '',
             reference: 'REF001',
-            labelType: 'BLP',
-            returnLabelType: 'ZBLP',
+            labelType: 'LBLP',
+            returnLabelType: 'ZBLP300',
+            returnQrCodeType: 'QR4_IMG',
             returnBookCourier: 0,
             returnLabelExpDays: 20,
             packages: [$pkg]
@@ -71,7 +72,7 @@ class ReturnShipmentDataBuilderTest extends TestCase
             shipmentSettings: $settings
         );
 
-        $returnShipment = $this->builder->buildReturnShipmentData($original, 'Zwrot butów');
+        $returnShipment = $this->builder->buildReturnShipmentData($original);
 
         $this->assertEquals(2002, $returnShipment->getOrderId());
 
@@ -87,9 +88,40 @@ class ReturnShipmentDataBuilderTest extends TestCase
 
         // Service type for domestic return = ZK
         $this->assertEquals('ZK', $returnShipment->getShipmentSettings()->getServiceType());
-        $this->assertEquals('Zwrot butów', $returnShipment->getShipmentSettings()->getContent());
-        $this->assertEquals('ZBLP', $returnShipment->getShipmentSettings()->getReturnLabelType());
+        $this->assertEquals('Rzeczy', $returnShipment->getShipmentSettings()->getContent());
+        $this->assertSame('ZBLP300', $returnShipment->getShipmentSettings()->getReturnLabelType());
+        $this->assertSame('ZBLP300', $returnShipment->getShipmentSettings()->getLabelType());
+        $this->assertSame('QR4_IMG', $returnShipment->getShipmentSettings()->getReturnQrCodeType());
         $this->assertEquals(0, $returnShipment->getShipmentSettings()->getReturnBookCourier());
         $this->assertEquals(20, $returnShipment->getShipmentSettings()->getReturnLabelExpDays());
+    }
+
+    public function testBuildReturnShipmentDataForInternationalCustomerSetsZcServiceType(): void
+    {
+        $sender = new SenderData(
+            name: 'Magazyn Sklepu',
+            postalCode: '00-999',
+            city: 'Warszawa',
+            country: 'PL'
+        );
+
+        $recipient = new RecipientData(
+            name: 'Hans Müller',
+            postalCode: '10115',
+            city: 'Berlin',
+            country: 'DE'
+        );
+
+        $original = new DhlShipmentData(
+            orderId: 3003,
+            sender: $sender,
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK')
+        );
+
+        $returnShipment = $this->builder->buildReturnShipmentData($original);
+
+        $this->assertEquals('ZC', $returnShipment->getShipmentSettings()->getServiceType());
     }
 }

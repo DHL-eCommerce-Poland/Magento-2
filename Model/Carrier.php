@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\DataObject;
 use Magento\Quote\Model\Quote\Address\RateRequest;
+use Magento\Quote\Model\Quote\Address\RateResult\Error;
 use Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory as RateErrorFactory;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory as RateMethodFactory;
 use Magento\Shipping\Model\Carrier\AbstractCarrier;
@@ -93,14 +95,7 @@ class Carrier extends AbstractCarrier implements CarrierInterface
 
             if ($this->isMethodDestinationRestricted($code, $destCountryId)) {
                 if ($this->getConfigFlag('method_' . $code . '_showmethod')) {
-                    $error = $this->_rateErrorFactory->create();
-                    $error->setCarrier(self::CODE);
-                    $error->setCarrierTitle('DHL eCommerce Poland');
-                    $error->setMethod($code);
-                    $errMsg = $this->getConfigData('method_' . $code . '_specificerrmsg')
-                        ?: __('This shipping method is currently unavailable.');
-                    $error->setErrorMessage((string)$errMsg);
-                    $result->append($error);
+                    $result->append($this->createRateError($code));
                 }
                 continue;
             }
@@ -128,6 +123,9 @@ class Carrier extends AbstractCarrier implements CarrierInterface
             );
 
             if ($price === null) {
+                if ($this->getConfigFlag('method_' . $code . '_showmethod')) {
+                    $result->append($this->createRateError($code));
+                }
                 continue;
             }
 
@@ -219,5 +217,57 @@ class Carrier extends AbstractCarrier implements CarrierInterface
         $status->setUrl($this->trackingUrlResolver->getUrl($trackingNumber));
 
         return $status;
+    }
+
+    /**
+     * Retrieve information from carrier configuration.
+     *
+     * Overrides showmethod to return 1 if any active shipping method has showmethod enabled.
+     *
+     * @param string $field
+     *
+     * @return mixed
+     */
+    public function getConfigData($field): mixed
+    {
+        if ($field === 'showmethod') {
+            $carrierShowMethod = parent::getConfigData('showmethod');
+            if ($carrierShowMethod !== null && $carrierShowMethod !== '') {
+                return $carrierShowMethod;
+            }
+            foreach ($this->methodCatalog->getMethods() as $method) {
+                if ($this->getConfigFlag('method_' . $method['code'] . '_active')
+                    && $this->getConfigFlag('method_' . $method['code'] . '_showmethod')
+                ) {
+                    return 1;
+                }
+            }
+            return 0;
+        }
+
+        return parent::getConfigData($field);
+    }
+
+    /**
+     * Create rate error object for an unavailable method when showmethod is enabled.
+     *
+     * @param string $code
+     *
+     * @return Error|DataObject
+     */
+    private function createRateError(string $code): Error|DataObject
+    {
+        $error = $this->_rateErrorFactory->create();
+        $error->setCarrier(self::CODE);
+        $methodTitle = (string)($this->getConfigData('method_' . $code . '_method_name')
+            ?: $this->getConfigData('method_' . $code . '_title'));
+        $error->setCarrierTitle($methodTitle);
+        $error->setMethod($code);
+        $error->setMethodTitle($methodTitle);
+        $errMsg = $this->getConfigData('method_' . $code . '_specificerrmsg')
+            ?: __('This shipping method is currently unavailable.');
+        $error->setErrorMessage((string)__($errMsg));
+
+        return $error;
     }
 }

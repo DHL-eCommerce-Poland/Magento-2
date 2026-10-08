@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Model\Api;
 
 use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
+use Ideo\Dhl\Model\Shipment\Data\CustomsData;
 use Ideo\Dhl\Model\Shipment\Data\PackageData;
 use Ideo\Dhl\Model\Shipment\Data\RecipientData;
 use Ideo\Dhl\Model\Shipment\Data\SenderData;
@@ -99,6 +100,7 @@ class ShipmentFullDataMapperTest extends TestCase
             shipmentDate: '2026-08-25',
             pickupHourFrom: '10:00',
             pickupHourTo: '14:00',
+            labelType: 'LBLP',
             packages: $packages
         );
 
@@ -143,8 +145,18 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('1234567', $mapped['shipmentInfo']['billing']['billingAccountNumber']);
         $this->assertEquals('MPK123', $mapped['shipmentInfo']['billing']['costsCenter']);
         $this->assertEquals('AH', $mapped['shipmentInfo']['serviceType']);
-        $this->assertTrue($mapped['shipmentInfo']['specialServices']['collectOnDelivery']);
-        $this->assertEquals(150.0, $mapped['shipmentInfo']['specialServices']['collectOnDeliveryValue']);
+        $this->assertSame('LBLP', $mapped['shipmentInfo']['labelType']);
+        $this->assertNotEmpty($mapped['shipmentInfo']['specialServices']['item']);
+        $items = $mapped['shipmentInfo']['specialServices']['item'];
+        $servicesByType = [];
+        foreach ($items as $item) {
+            $servicesByType[$item['serviceType']] = $item;
+        }
+        $this->assertArrayHasKey('UBEZP', $servicesByType);
+        $this->assertEquals(200.0, $servicesByType['UBEZP']['serviceValue']);
+        $this->assertArrayHasKey('COD', $servicesByType);
+        $this->assertEquals(150.0, $servicesByType['COD']['serviceValue']);
+        $this->assertEquals('BANK_TRANSFER', $servicesByType['COD']['collectOnDeliveryForm']);
 
         // Check control character sanitization
         $this->assertNull($mapped['ship']['servicePointAccountNumber']);
@@ -214,11 +226,11 @@ class ShipmentFullDataMapperTest extends TestCase
     }
 
     /**
-     * Test mapping of ageVer, selfCollect, and special services in service definition.
+     * Test mapping of ageVer and other special services in the service definition.
      *
      * @return void
      */
-    public function testMapIncludesAgeVerAndSelfCollectAndSpecialServicesInServiceDef(): void
+    public function testMapIncludesAgeVerAndSpecialServicesWithoutSelfCollect(): void
     {
         $sender = new SenderData();
         $recipient = new RecipientData(name: 'Test Recipient');
@@ -230,8 +242,7 @@ class ShipmentFullDataMapperTest extends TestCase
             returnOnDelivery: true,
             returnOnDeliveryReference: 'REF123',
             proofOfDelivery: true,
-            ageVer: true,
-            selfCollect: true
+            ageVer: true
         );
         $settings = new ShipmentSettingsData(serviceType: 'AH', packages: [new PackageData()]);
 
@@ -244,17 +255,47 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $mapped = $this->mapper->map($shipmentData);
 
-        $service = $mapped['shipmentInfo']['specialServices'];
         $this->assertEquals('AH', $mapped['shipmentInfo']['serviceType']);
-        $this->assertTrue($service['deliveryEvening']);
-        $this->assertTrue($service['deliveryOnSaturday']);
-        $this->assertTrue($service['pickupOnSaturday']);
-        $this->assertTrue($service['predeliveryInformation']);
-        $this->assertTrue($service['returnOnDelivery']);
-        $this->assertEquals('REF123', $service['returnOnDeliveryReference']);
-        $this->assertTrue($service['proofOfDelivery']);
-        $this->assertTrue($service['ageVer']);
-        $this->assertTrue($service['selfCollect']);
+        $this->assertNotEmpty($mapped['shipmentInfo']['specialServices']['item']);
+        $items = $mapped['shipmentInfo']['specialServices']['item'];
+        $servicesByType = [];
+        foreach ($items as $item) {
+            $servicesByType[$item['serviceType']] = $item;
+        }
+        $this->assertArrayHasKey('1722', $servicesByType);
+        $this->assertArrayHasKey('SOBOTA', $servicesByType);
+        $this->assertArrayHasKey('NAD_SOBOTA', $servicesByType);
+        $this->assertArrayHasKey('PDI', $servicesByType);
+        $this->assertArrayHasKey('ROD', $servicesByType);
+        $this->assertEquals('REF123', $servicesByType['ROD']['textInstruction']);
+        $this->assertArrayHasKey('POD', $servicesByType);
+        $this->assertArrayHasKey('AGEVER', $servicesByType);
+        $this->assertArrayNotHasKey('ODB', $servicesByType);
+    }
+
+    /**
+     * Test mapping when no special services are enabled.
+     *
+     * @return void
+     */
+    public function testMapWithNoSpecialServicesReturnsEmptyArray(): void
+    {
+        $sender = new SenderData();
+        $recipient = new RecipientData(name: 'Test Recipient');
+        $specialServices = new SpecialServicesData();
+        $settings = new ShipmentSettingsData(serviceType: 'AH', packages: [new PackageData()]);
+
+        $shipmentData = new DhlShipmentData(
+            sender: $sender,
+            recipient: $recipient,
+            specialServices: $specialServices,
+            shipmentSettings: $settings
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertIsArray($mapped['shipmentInfo']['specialServices']);
+        $this->assertEmpty($mapped['shipmentInfo']['specialServices']);
     }
 
     /**
@@ -304,7 +345,7 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('Montabaur', $mapped['ship']['receiver']['address']['city']);
         $this->assertEquals('Hospitalstr', $mapped['ship']['receiver']['address']['street']);
         $this->assertEquals('132', $mapped['ship']['receiver']['address']['houseNumber']);
-        $this->assertEquals('132', $mapped['ship']['servicePointAccountNumber']);
+        $this->assertNull($mapped['ship']['servicePointAccountNumber']);
     }
 
     /**
@@ -345,6 +386,43 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('Montabaur', $mapped['ship']['receiver']['address']['city']);
         $this->assertEquals('Hospitalstr 132', $mapped['ship']['receiver']['address']['street']);
         $this->assertEquals('132', $mapped['ship']['receiver']['address']['houseNumber']);
+        $this->assertNull($mapped['ship']['servicePointAccountNumber']);
+    }
+
+    /**
+     * Preserve an international Packstation street number supplied by the point address.
+     *
+     * @return void
+     */
+    public function testMapInternationalPackstationPreservesStreetNumberFromPointAddress(): void
+    {
+        $recipient = new RecipientData(
+            name: 'Norbert',
+            street: 'Home Street',
+            houseNumber: '1',
+            city: 'Berlin',
+            postalCode: '10115',
+            country: 'DE',
+            popId: '132',
+            isPackstation: true,
+            popStreet: 'Hospitalstr 12',
+            popCity: 'Montabaur',
+            popPostcode: '56410'
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 104,
+            sender: new SenderData(),
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertSame('Hospitalstr 12', $mapped['ship']['receiver']['address']['street']);
+        $this->assertSame('132', $mapped['ship']['receiver']['address']['houseNumber']);
+        $this->assertNull($mapped['ship']['servicePointAccountNumber']);
     }
 
     /**
@@ -387,6 +465,7 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertEquals('Montabaur', $mapped['ship']['receiver']['address']['city']);
         $this->assertEquals('Hospitalstr', $mapped['ship']['receiver']['address']['street']);
         $this->assertEquals('623', $mapped['ship']['receiver']['address']['houseNumber']);
+        $this->assertNull($mapped['ship']['servicePointAccountNumber']);
     }
 
     /**
@@ -566,7 +645,7 @@ class ShipmentFullDataMapperTest extends TestCase
             country: 'GB'
         );
 
-        $customs = new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
+        $customs = new CustomsData(
             selectedCustomsTemplateId: 5,
             customsType: 'U',
             categoryOfItem: '11',
@@ -630,10 +709,86 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertTrue($c['customAgreements']['notExceedValue']);
         $this->assertTrue($c['customAgreements']['notProhibitedGoods']);
         $this->assertTrue($c['customAgreements']['notRestrictedGoods']);
+        $this->assertFalse($c['customAgreements']['invoiceContent']);
         $this->assertCount(1, $c['customsItem']);
         $this->assertSame('Koszulka', $c['customsItem'][0]['namePl']);
         $this->assertSame('T-Shirt', $c['customsItem'][0]['nameEn']);
         $this->assertSame(2, $c['customsItem'][0]['quantity']);
+    }
+
+    /**
+     * Ensure empty customs item values stay empty in the DHL request data.
+     *
+     * @return void
+     */
+    public function testMapPreservesEmptyCustomsItemFields(): void
+    {
+        $shipmentData = new DhlShipmentData(
+            orderId: 109,
+            sender: new SenderData(name: 'Sender Corp'),
+            recipient: new RecipientData(name: 'DE Customer', country: 'DE'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
+            customs: new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
+                customsItems: [
+                    [
+                        'namePl' => '',
+                        'nameEn' => '',
+                        'quantity' => '',
+                        'weight' => '',
+                        'value' => '',
+                        'tariffCode' => '',
+                        'countryOfOrigin' => '',
+                    ],
+                ]
+            )
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertSame(
+            [
+                'namePl' => '',
+                'nameEn' => '',
+                'quantity' => '',
+                'weight' => '',
+                'value' => '',
+                'tariffCode' => '',
+                'countryOfOrigin' => '',
+            ],
+            $mapped['customs']['customsItem'][0]
+        );
+    }
+
+    /**
+     * Ensure comma decimal values are normalized before building the DHL request data.
+     *
+     * @return void
+     */
+    public function testMapConvertsCommaDecimalCustomsItemValues(): void
+    {
+        $shipmentData = new DhlShipmentData(
+            orderId: 110,
+            sender: new SenderData(name: 'Sender Corp'),
+            recipient: new RecipientData(name: 'DE Customer', country: 'DE'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
+            customs: new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
+                customsItems: [
+                    [
+                        'quantity' => '2',
+                        'weight' => '0,75',
+                        'value' => '10,50',
+                    ],
+                ]
+            )
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertSame(2, $mapped['customs']['customsItem'][0]['quantity']);
+        $this->assertSame(0.75, $mapped['customs']['customsItem'][0]['weight']);
+        $this->assertSame(10.5, $mapped['customs']['customsItem'][0]['value']);
     }
 
     public function testMapToShipmentFullDataWithIndividualCustomsBase64Invoice(): void
@@ -645,6 +800,7 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $customs = new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
             customsType: 'I',
+            invoiceContent: true,
             invoiceNr: 'INV-2026-001',
             invoiceDate: '2026-09-23',
             invoiceFile: 'data:application/pdf;base64,' . $base64Content,
@@ -673,10 +829,84 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertTrue($c['customAgreements']['invoiceContent']);
     }
 
+    /**
+     * Verify the individual customs agreement follows the selected checkbox value.
+     *
+     * @return void
+     */
+    public function testInvoiceContentAgreementUsesCheckboxValueForIndividualClearance(): void
+    {
+        $shipmentData = new DhlShipmentData(
+            orderId: 107,
+            sender: new SenderData(name: 'Sender Corp'),
+            recipient: new RecipientData(name: 'UK Customer Ltd', country: 'GB'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
+            customs: new CustomsData(customsType: 'I', invoiceContent: false)
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertFalse($mapped['customs']['customAgreements']['invoiceContent']);
+    }
+
+    /**
+     * Verify non-individual customs types never send the invoice content agreement.
+     *
+     * @param string $customsType
+     *
+     * @return void
+     */
+    #[DataProvider('nonIndividualCustomsTypesDataProvider')]
+    public function testInvoiceContentAgreementIsFalseForNonIndividualClearance(string $customsType): void
+    {
+        $shipmentData = new DhlShipmentData(
+            orderId: 108,
+            sender: new SenderData(name: 'Sender Corp'),
+            recipient: new RecipientData(name: 'UK Customer Ltd', country: 'GB'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
+            customs: new CustomsData(customsType: $customsType, invoiceContent: true)
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertFalse($mapped['customs']['customAgreements']['invoiceContent']);
+    }
+
+    /**
+     * Provide customs types that do not use the invoice content agreement.
+     *
+     * @return array
+     */
+    public static function nonIndividualCustomsTypesDataProvider(): array
+    {
+        return [
+            'simplified clearance' => ['U'],
+            'short declaration' => ['S'],
+        ];
+    }
+
     #[DataProvider('postalCodeDataProvider')]
     public function testSanitizePostalCode(string $inputCode, string $countryCode, string $expected): void
     {
         $this->assertSame($expected, $this->mapper->sanitizePostalCode($inputCode, $countryCode));
+    }
+
+    public function testMapRemovesInternalSpaceFromCzechSenderAndRecipientPostalCodes(): void
+    {
+        $shipmentData = new DhlShipmentData(
+            orderId: 108,
+            sender: new SenderData(postalCode: '100 00', country: 'CZ'),
+            recipient: new RecipientData(postalCode: '110 00', country: 'CZ'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(packages: [new PackageData()])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertSame('10000', $mapped['ship']['shipper']['address']['postalCode']);
+        $this->assertSame('11000', $mapped['ship']['receiver']['address']['postalCode']);
     }
 
     public function testMapPreservesHouseNumberWithSlash(): void
@@ -791,12 +1021,80 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertArrayNotHasKey('postnummer', $mapped['ship']['receiver']['address']);
     }
 
+    /**
+     * Test mapping uses recipient first and last name when provided over stale contactPerson.
+     *
+     * @return void
+     */
+    public function testMapUsesRecipientFirstAndLastNameWhenProvided(): void
+    {
+        $recipient = new RecipientData(
+            name: '',
+            type: 'C',
+            firstName: 'Piotr',
+            lastName: 'Nowak',
+            contactPerson: 'Jan Kowalski',
+            street: 'Warszawska',
+            houseNumber: '1',
+            city: 'Warszawa',
+            postalCode: '00-001',
+            country: 'PL'
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 201,
+            sender: new SenderData(),
+            recipient: $recipient,
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(packages: [new PackageData()])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertEquals('Piotr Nowak', $mapped['ship']['receiver']['contact']['personName']);
+        $this->assertEquals('Piotr Nowak', $mapped['ship']['receiver']['address']['name']);
+    }
+
+    /**
+     * Test mapping euroReturn flag for PALLET package with euro return enabled.
+     *
+     * @return void
+     */
+    public function testMapEuroReturnForPalletPackage(): void
+    {
+        $palletPackage = new PackageData(
+            packageType: 'PALLET',
+            quantity: 1,
+            weight: 150.0,
+            width: 80.0,
+            length: 120.0,
+            height: 100.0,
+            isNonStandard: false,
+            hasEuroReturn: true
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 301,
+            sender: new SenderData(),
+            recipient: new RecipientData(),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(packages: [$palletPackage])
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertCount(1, $mapped['pieceList']['item']);
+        $this->assertEquals('PALLET', $mapped['pieceList']['item'][0]['type']);
+        $this->assertTrue($mapped['pieceList']['item'][0]['euroReturn']);
+    }
+
     public static function postalCodeDataProvider(): array
     {
         return [
             'PL with hyphen' => ['00-950', 'PL', '00950'],
             'PL without hyphen' => ['00950', 'PL', '00950'],
-            'GB alphanumeric' => ['SW1A 1AA', 'GB', 'SW1A 1AA'],
+            'CZ with internal space' => ['100 00', 'CZ', '10000'],
+            'GB alphanumeric with space' => ['SW1A 1AA', 'GB', 'SW1A1AA'],
             'DE with hyphen' => ['D-10115', 'DE', 'D-10115'],
             'US zip extended' => ['90210-1234', 'US', '90210-1234'],
         ];

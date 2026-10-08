@@ -179,7 +179,14 @@ define([
             address.extension_attributes['dhl_service_point_city'] = point.city || '';
             address.extension_attributes['dhl_is_packstation'] = point.isPackstation ? 1 : 0;
             address.extension_attributes['dhl_is_postfiliale'] = point.isPostfiliale ? 1 : 0;
-            address.extension_attributes['dhl_postnummer'] = (point.postnummer || '').trim() || null;
+            var pointCountry = point.country ? String(point.country).toUpperCase() : '';
+            var destCountry = (address && (address.countryId || address.country_id))
+                ? String(address.countryId || address.country_id).toUpperCase()
+                : pointCountry;
+            var isGermany = destCountry === 'DE';
+            address.extension_attributes['dhl_postnummer'] = (point.isPackstation && isGermany)
+                ? ((point.postnummer || '').trim() || null)
+                : null;
         } else {
             delete address.extension_attributes['dhl_service_point_id'];
             delete address.extension_attributes['dhl_service_point_name'];
@@ -359,7 +366,12 @@ define([
      */
     function setPostnummer(postnummer) {
         var point = selectedPoint();
-        if (point) {
+        var pointCountry = point && point.country ? String(point.country).toUpperCase() : '';
+        var address = quote.shippingAddress();
+        var destCountry = (address && (address.countryId || address.country_id))
+            ? String(address.countryId || address.country_id).toUpperCase()
+            : pointCountry;
+        if (point && point.isPackstation && destCountry === 'DE') {
             point.postnummer = postnummer;
             setSelectedPoint(point, quote.shippingMethod());
         }
@@ -490,20 +502,6 @@ define([
         },
 
         /**
-         * Check if selected point is a German Postfiliale / ParcelShop.
-         *
-         * @return {Boolean} True if DE Point.
-         */
-        isDePointSelected: function () {
-            var point = selectedPoint();
-            if (!point) {
-                return false;
-            }
-            var country = this.getDestinationCountry();
-            return country === 'DE' && !this.isDePackstationSelected();
-        },
-
-        /**
          * Validate point selection for shipping method.
          *
          * @param {Object|null} method Shipping method object.
@@ -534,14 +532,15 @@ define([
             var country = this.getDestinationCountry();
             var postnummer = (point.postnummer || '').trim();
 
-            if (country === 'DE' && this.isDePackstationSelected() && !postnummer) {
-                postnummerErrorMessage($t('German Customer Number (Postnummer) is required for delivery to a German Packstation.'));
-                return false;
-            }
-
-            if (country === 'DE' && postnummer && !/^\d{6,10}$/.test(postnummer)) {
-                postnummerErrorMessage($t('Invalid German Customer Number (Postnummer). It must contain between 6 and 10 digits.'));
-                return false;
+            if (country === 'DE' && this.isDePackstationSelected()) {
+                if (!postnummer) {
+                    postnummerErrorMessage($t('German Customer Number (Postnummer) is required for delivery to a German Packstation.'));
+                    return false;
+                }
+                if (!/^\d{6,10}$/.test(postnummer)) {
+                    postnummerErrorMessage($t('Invalid German Customer Number (Postnummer). It must contain between 6 and 10 digits.'));
+                    return false;
+                }
             }
 
             return true;

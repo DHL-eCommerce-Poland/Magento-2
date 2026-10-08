@@ -51,6 +51,33 @@ class ShipmentDateSanitizerTest extends TestCase
         $this->assertEquals('2026-09-10', $this->sanitizer->sanitize('09/10/2026'));
     }
 
+    public function testSanitizeTwoDigitYearPolishDate(): void
+    {
+        $this->assertEquals('2026-09-10', $this->sanitizer->sanitize('10.09.26'));
+    }
+
+    public function testSanitizeTwoDigitYearUsDate(): void
+    {
+        $this->assertEquals('2026-09-10', $this->sanitizer->sanitize('09/10/26'));
+    }
+
+    public function testSanitizeHyphenatedEuropeanDate(): void
+    {
+        $this->assertEquals('2026-09-10', $this->sanitizer->sanitize('10-09-2026'));
+    }
+
+    public function testSanitizeSlashYearFirstDate(): void
+    {
+        $this->assertEquals('2026-09-10', $this->sanitizer->sanitize('2026/09/10'));
+    }
+
+    public function testSanitizePastDateAllowed(): void
+    {
+        $this->assertEquals('2025-08-10', $this->sanitizer->sanitize('10.08.2025', null, true));
+        $this->assertEquals('2025-08-10', $this->sanitizer->sanitize('08/10/2025', null, true));
+        $this->assertEquals('2025-08-10', $this->sanitizer->sanitize('2025-08-10', null, true));
+    }
+
     public function testSanitizeCorruptedYearReturnsToday(): void
     {
         $this->assertEquals('2026-09-07', $this->sanitizer->sanitize('2171-10-09'));

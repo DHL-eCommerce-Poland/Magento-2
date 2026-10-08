@@ -55,7 +55,7 @@ class CustomsData
         private readonly bool $notExceedValue = true,
         private readonly bool $notProhibitedGoods = true,
         private readonly bool $notRestrictedGoods = true,
-        private readonly bool $invoiceContent = false,
+        private readonly bool $invoiceContent = true,
         private readonly array $customsItems = []
     ) {
     }
@@ -393,7 +393,7 @@ class CustomsData
             isset($data['notExceedValue']) ? (bool)$data['notExceedValue'] : true,
             isset($data['notProhibitedGoods']) ? (bool)$data['notProhibitedGoods'] : true,
             isset($data['notRestrictedGoods']) ? (bool)$data['notRestrictedGoods'] : true,
-            isset($data['invoiceContent']) ? (bool)$data['invoiceContent'] : false,
+            isset($data['invoiceContent']) ? (bool)$data['invoiceContent'] : true,
             is_array($data['customsItems'] ?? null) ? $data['customsItems'] : []
         );
     }

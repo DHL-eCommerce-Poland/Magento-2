@@ -139,11 +139,11 @@ class ShipmentDataValidatorTest extends TestCase
     }
 
     /**
-     * Test validation throws LocalizedException when package weight is zero.
+     * Test validation does not throw exception when package weight is zero.
      *
      * @return void
      */
-    public function testValidateInvalidWeightThrowsException(): void
+    public function testValidateAllowsZeroWeightPackage(): void
     {
         $sender = new SenderData(
             name: 'Sender',
@@ -160,8 +160,8 @@ class ShipmentDataValidatorTest extends TestCase
             postalCode: '00-000',
             city: 'City'
         );
-        $invalidPackage = new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 0.0);
-        $settings = new ShipmentSettingsData(content: 'Test', packages: [$invalidPackage]);
+        $package = new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 0.0);
+        $settings = new ShipmentSettingsData(content: 'Test', packages: [$package]);
 
         $shipmentData = new DhlShipmentData(
             orderId: 1,
@@ -170,9 +170,44 @@ class ShipmentDataValidatorTest extends TestCase
             shipmentSettings: $settings
         );
 
-        $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('Package #1 weight must be greater than zero.');
         $this->validator->validate($shipmentData);
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * Test validation passes without exception when package contents description is empty.
+     *
+     * @return void
+     */
+    public function testValidateAllowsEmptyPackageContentDescription(): void
+    {
+        $sender = new SenderData(
+            name: 'Sender',
+            street: 'Street',
+            houseNumber: '1',
+            postalCode: '00-000',
+            city: 'City'
+        );
+        $recipient = new RecipientData(
+            firstName: 'Jan',
+            lastName: 'Kowalski',
+            street: 'Street',
+            houseNumber: '2',
+            postalCode: '00-000',
+            city: 'City'
+        );
+        $package = new PackageData(packageType: 'PACKAGE', quantity: 1, weight: 1.0);
+        $settings = new ShipmentSettingsData(content: '', packages: [$package]);
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 1,
+            sender: $sender,
+            recipient: $recipient,
+            shipmentSettings: $settings
+        );
+
+        $this->validator->validate($shipmentData);
+        $this->addToAssertionCount(1);
     }
 
     /**
@@ -293,6 +328,28 @@ class ShipmentDataValidatorTest extends TestCase
             'shipmentSettings' => [
                 'packages' => [
                     ['weight' => '2,5', 'quantity' => '1']
+                ]
+            ]
+        ];
+
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage(
+            'Field "Package #1 weight" cannot contain a comma. Please use a dot (.) as decimal separator.'
+        );
+        $this->validator->validateRawPayload($payload);
+    }
+
+    /**
+     * Test validateRawPayload throws LocalizedException when package inside packages_fieldset contains a comma.
+     *
+     * @return void
+     */
+    public function testValidateRawPayloadWithCommaInPackagesFieldsetThrowsException(): void
+    {
+        $payload = [
+            'packages_fieldset' => [
+                'packages' => [
+                    ['weight' => '3,5', 'quantity' => '1']
                 ]
             ]
         ];

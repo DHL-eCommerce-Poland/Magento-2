@@ -36,7 +36,7 @@ class ShipmentFullDataMapper
                 'height' => $pkg->getHeight(),
                 'length' => $pkg->getLength(),
                 'nonStandard' => $pkg->isNonStandard() || $services->isNonStandard(),
-                'euroReturn' => $services->isEuroReturn(),
+                'euroReturn' => $pkg->hasEuroReturn(),
             ];
         }
 
@@ -46,46 +46,7 @@ class ShipmentFullDataMapper
             ? $deliveryHours
             : $settings->getServiceType();
 
-        $serviceDef = [
-            'product' => $product,
-            'deliveryEvening' => $isEvening,
-            'pickupOnSaturday' => $services->isPickupOnSaturday(),
-            'deliveryOnSaturday' => $services->isDeliveryOnSaturday(),
-        ];
-
-        if ($services->isCollectOnDelivery()) {
-            $serviceDef['collectOnDelivery'] = true;
-            $serviceDef['collectOnDeliveryValue'] = $services->getCollectOnDeliveryValue();
-            $serviceDef['collectOnDeliveryForm'] = $services->getCollectOnDeliveryForm();
-        }
-
-        if ($services->isInsurance()) {
-            $serviceDef['insurance'] = true;
-            $serviceDef['insuranceValue'] = $services->getInsuranceValue();
-        }
-
-        if ($services->isPredeliveryInformation()) {
-            $serviceDef['predeliveryInformation'] = true;
-        }
-
-        if ($services->isReturnOnDelivery()) {
-            $serviceDef['returnOnDelivery'] = true;
-            if ($services->getReturnOnDeliveryReference() !== '') {
-                $serviceDef['returnOnDeliveryReference'] = $services->getReturnOnDeliveryReference();
-            }
-        }
-
-        if ($services->isProofOfDelivery()) {
-            $serviceDef['proofOfDelivery'] = true;
-        }
-
-        if ($services->isAgeVer()) {
-            $serviceDef['ageVer'] = true;
-        }
-
-        if ($services->isSelfCollect()) {
-            $serviceDef['selfCollect'] = true;
-        }
+        $specialServices = $this->mapSpecialServices($services);
 
         $senderCompanyName = trim($sender->getName());
         $senderFullName = trim($sender->getFirstName() . ' ' . $sender->getLastName());
@@ -93,9 +54,10 @@ class ShipmentFullDataMapper
         $senderName = $senderCompanyName !== '' ? $senderCompanyName : $senderFullName;
         $senderContact = $senderFullName;
 
-        $recipientContact = $recipient->getContactPerson() !== ''
-            ? $recipient->getContactPerson()
-            : ($recipient->getFirstName() . ' ' . $recipient->getLastName());
+        $recipientFullName = trim($recipient->getFirstName() . ' ' . $recipient->getLastName());
+        $recipientContact = $recipientFullName !== ''
+            ? $recipientFullName
+            : $recipient->getContactPerson();
 
         $payerType = match ($sender->getPayer()) {
             'RECIPIENT' => 'RECEIVER',
@@ -122,7 +84,7 @@ class ShipmentFullDataMapper
             }
         }
 
-        $servicePointAccountNumber = ($isPointDelivery && !empty($recipient->getPopId()))
+        $servicePointAccountNumber = ($countryCode === 'PL' && $isPointDelivery && !empty($recipient->getPopId()))
             ? $this->sanitizeString($recipient->getPopId())
             : null;
 
@@ -234,7 +196,7 @@ class ShipmentFullDataMapper
                 'paymentType' => SpecialServicesData::PAYMENT_METHOD_BANK_TRANSFER,
                 'costsCenter' => $this->sanitizeString($settings->getMpk()),
             ],
-            'specialServices' => $serviceDef,
+            'specialServices' => $specialServices,
             'shipmentTime' => $shipmentTime,
             'labelType' => $settings->getLabelType(),
         ];
@@ -327,7 +289,7 @@ class ShipmentFullDataMapper
                 'notExceedValue' => $customs->isNotExceedValue(),
                 'notProhibitedGoods' => $customs->isNotProhibitedGoods(),
                 'notRestrictedGoods' => $customs->isNotRestrictedGoods(),
-                'invoiceContent' => ($customsType === 'I') || $customs->isInvoiceContent(),
+                'invoiceContent' => $customsType === 'I' && $customs->isInvoiceContent(),
             ];
 
             $items = [];
@@ -336,9 +298,15 @@ class ShipmentFullDataMapper
                     $items[] = [
                         'namePl' => mb_substr($this->sanitizeString((string)($item['namePl'] ?? '')), 0, 35),
                         'nameEn' => mb_substr($this->sanitizeString((string)($item['nameEn'] ?? '')), 0, 35),
-                        'quantity' => (int)($item['quantity'] ?? 1),
-                        'weight' => (float)($item['weight'] ?? 0.0),
-                        'value' => (float)($item['value'] ?? 0.0),
+                        'quantity' => isset($item['quantity']) && trim((string)$item['quantity']) !== ''
+                            ? (int)str_replace(',', '.', trim((string)$item['quantity']))
+                            : '',
+                        'weight' => isset($item['weight']) && trim((string)$item['weight']) !== ''
+                            ? (float)str_replace(',', '.', trim((string)$item['weight']))
+                            : '',
+                        'value' => isset($item['value']) && trim((string)$item['value']) !== ''
+                            ? (float)str_replace(',', '.', trim((string)$item['value']))
+                            : '',
                         'tariffCode' => mb_substr($this->sanitizeString((string)($item['tariffCode'] ?? '')), 0, 10),
                         'countryOfOrigin' => mb_substr(
                             $this->sanitizeString((string)($item['countryOfOrigin'] ?? '')),
@@ -373,7 +341,7 @@ class ShipmentFullDataMapper
     }
 
     /**
-     * Format postal code: remove hyphen for PL, return unchanged for international countries.
+     * Remove spaces from postal codes and hyphens from Polish postal codes for DHL.
      *
      * @param string $postalCode
      * @param string $countryCode
@@ -382,7 +350,7 @@ class ShipmentFullDataMapper
      */
     public function sanitizePostalCode(string $postalCode, string $countryCode = 'PL'): string
     {
-        $postalCode = trim($postalCode);
+        $postalCode = str_replace(' ', '', trim($postalCode));
         if (strtoupper($countryCode) === 'PL') {
             return str_replace('-', '', $postalCode);
         }
@@ -443,5 +411,58 @@ class ShipmentFullDataMapper
         }
 
         return $result;
+    }
+
+    /**
+     * Map special services to DHL WebAPI2 Service structures.
+     *
+     * @param SpecialServicesData $services
+     *
+     * @return array
+     */
+    private function mapSpecialServices(SpecialServicesData $services): array
+    {
+        $items = [];
+
+        if ($services->isInsurance()) {
+            $items[] = [
+                'serviceType' => 'UBEZP',
+                'serviceValue' => $services->getInsuranceValue(),
+            ];
+        }
+
+        if ($services->isCollectOnDelivery()) {
+            $items[] = [
+                'serviceType' => 'COD',
+                'serviceValue' => $services->getCollectOnDeliveryValue(),
+                'collectOnDeliveryForm' => $services->getCollectOnDeliveryForm()
+                    ?: SpecialServicesData::PAYMENT_METHOD_BANK_TRANSFER,
+            ];
+        }
+
+        if ($services->isReturnOnDelivery()) {
+            $rodItem = ['serviceType' => 'ROD'];
+            if ($services->getReturnOnDeliveryReference() !== '') {
+                $rodItem['textInstruction'] = mb_substr($services->getReturnOnDeliveryReference(), 0, 32);
+            }
+            $items[] = $rodItem;
+        }
+
+        $flagServices = [
+            '1722' => $services->isDeliveryEvening(),
+            'SOBOTA' => $services->isDeliveryOnSaturday(),
+            'NAD_SOBOTA' => $services->isPickupOnSaturday(),
+            'PDI' => $services->isPredeliveryInformation(),
+            'POD' => $services->isProofOfDelivery(),
+            'AGEVER' => $services->isAgeVer(),
+        ];
+
+        foreach ($flagServices as $code => $isEnabled) {
+            if ($isEnabled) {
+                $items[] = ['serviceType' => $code];
+            }
+        }
+
+        return !empty($items) ? ['item' => $items] : [];
     }
 }

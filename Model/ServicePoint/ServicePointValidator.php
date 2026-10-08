@@ -70,9 +70,7 @@ class ServicePointValidator
             if ($postnummer === '') {
                 throw new LocalizedException(__('German Customer Number (Postnummer) is required for delivery to a German Packstation.'));
             }
-        }
 
-        if ($country === 'DE' && $postnummer !== '') {
             if (!preg_match('/^\d{6,10}$/', $postnummer)) {
                 throw new LocalizedException(__('Invalid German Customer Number (Postnummer). It must contain between 6 and 10 digits.'));
             }

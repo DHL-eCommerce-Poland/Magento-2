@@ -35,7 +35,7 @@ class CustomsDataTest extends TestCase
         $this->assertTrue($customs->isNotExceedValue());
         $this->assertTrue($customs->isNotProhibitedGoods());
         $this->assertTrue($customs->isNotRestrictedGoods());
-        $this->assertFalse($customs->isInvoiceContent());
+        $this->assertTrue($customs->isInvoiceContent());
         $this->assertSame([], $customs->getCustomsItems());
     }
 
@@ -109,5 +109,17 @@ class CustomsDataTest extends TestCase
         $this->assertSame(5, $array['selectedCustomsTemplateId']);
         $this->assertSame('I', $array['customsType']);
         $this->assertSame('Koszulka', $array['customsItems'][0]['namePl']);
+    }
+
+    /**
+     * Verify a newly configured individual clearance defaults the agreement to checked.
+     *
+     * @return void
+     */
+    public function testFromArrayDefaultsInvoiceContentAgreementToChecked(): void
+    {
+        $customs = CustomsData::fromArray(['customsType' => 'I']);
+
+        $this->assertTrue($customs->isInvoiceContent());
     }
 }

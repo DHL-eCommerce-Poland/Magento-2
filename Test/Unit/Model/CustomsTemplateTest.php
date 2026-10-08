@@ -96,6 +96,11 @@ class CustomsTemplateTest extends TestCase
         $this->model->setNotRestrictedGoods(true);
         $this->assertTrue($this->model->getNotRestrictedGoods());
 
+        $this->model->setInvoiceContent(false);
+        $this->assertFalse($this->model->getInvoiceContent());
+        $this->model->setInvoiceContent(true);
+        $this->assertTrue($this->model->getInvoiceContent());
+
         $items = [['nameEn' => 'Phone', 'quantity' => 1]];
         $this->model->setCustomsItems($items);
         $this->assertSame(json_encode($items), $this->model->getCustomsItems());

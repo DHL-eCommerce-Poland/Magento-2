@@ -42,6 +42,36 @@ class ShipmentDataPayloadReaderTest extends TestCase
         $this->assertSame([], $this->reader->read(null));
     }
 
+    public function testGetServiceTypeFromEntityReadsNestedServiceType(): void
+    {
+        $shipment = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment->method('getShipmentData')->willReturn(
+            (new Json())->serialize(['shipmentSettings' => ['serviceType' => ' AH ']])
+        );
+
+        $this->assertSame('AH', $this->reader->getServiceTypeFromEntity($shipment));
+    }
+
+    public function testGetServiceTypeFromEntityReturnsNullWhenMissing(): void
+    {
+        $shipment = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment->method('getShipmentData')->willReturn(
+            (new Json())->serialize(['shipmentSettings' => []])
+        );
+
+        $this->assertNull($this->reader->getServiceTypeFromEntity($shipment));
+    }
+
+    public function testGetServiceTypeFromEntityReturnsNullForInvalidServiceType(): void
+    {
+        $shipment = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment->method('getShipmentData')->willReturn(
+            (new Json())->serialize(['shipmentSettings' => ['serviceType' => ['invalid']]])
+        );
+
+        $this->assertNull($this->reader->getServiceTypeFromEntity($shipment));
+    }
+
     public function testGetPackagesPrefersRootPackages(): void
     {
         $rootPackages = [['pieceId' => 'BLP10001']];
@@ -91,5 +121,44 @@ class ShipmentDataPayloadReaderTest extends TestCase
         ]);
 
         $this->assertSame(['90040025505', '90040025516'], $returnIds);
+    }
+
+    public function testGetReturnShipmentIdsFromEntityCombinesAndDeduplicatesDirectAndPayload(): void
+    {
+        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub->method('getReturnShipmentId')->willReturn('90040025505, 90040025506');
+        $entityStub->method('getShipmentData')->willReturn(json_encode([
+            'packages' => [
+                ['returnShipmentId' => '90040025506'],
+                ['returnShipmentId' => '90040025507'],
+            ],
+        ]));
+
+        $result = $this->reader->getReturnShipmentIdsFromEntity($entityStub);
+
+        $this->assertSame(['90040025505', '90040025506', '90040025507'], $result);
+    }
+
+    public function testGetReturnShipmentIdsFromEntityReturnsEmptyArrayWhenNoReturnIds(): void
+    {
+        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub->method('getReturnShipmentId')->willReturn(null);
+        $entityStub->method('getShipmentData')->willReturn(null);
+
+        $result = $this->reader->getReturnShipmentIdsFromEntity($entityStub);
+
+        $this->assertSame([], $result);
+    }
+
+    public function testGetReturnShipmentIdsSplitsCommaSeparatedValuesOnPackageRows(): void
+    {
+        $returnIds = $this->reader->getReturnShipmentIds([
+            'packages' => [
+                ['returnShipmentId' => 'RET001, RET002'],
+                ['returnShipmentId' => 'RET003'],
+            ],
+        ]);
+
+        $this->assertSame(['RET001', 'RET002', 'RET003'], $returnIds);
     }
 }

@@ -72,7 +72,6 @@ class SoapClientAdapterReturnTest extends TestCase
                             (object) [
                                 'shipmentNotificationNumber' => '90040025505',
                                 'shipmentTrackingNumber' => '90040025505',
-                                'packagesTrackingNumbers' => 'JJD000030025688110000000807',
                                 'label' => (object) [
                                     'labelFormat' => 'application/pdf',
                                     'labelContent' => base64_encode('PDF1'),
@@ -81,7 +80,6 @@ class SoapClientAdapterReturnTest extends TestCase
                             (object) [
                                 'shipmentNotificationNumber' => '90040025516',
                                 'shipmentTrackingNumber' => '90040025516',
-                                'packagesTrackingNumbers' => 'JJD000030025688110000000818',
                                 'label' => (object) [
                                     'labelFormat' => 'application/pdf',
                                     'labelContent' => base64_encode('PDF2'),
@@ -90,7 +88,6 @@ class SoapClientAdapterReturnTest extends TestCase
                             (object) [
                                 'shipmentNotificationNumber' => '90040025527',
                                 'shipmentTrackingNumber' => '90040025527',
-                                'packagesTrackingNumbers' => 'JJD000030025688110000000829',
                                 'label' => (object) [
                                     'labelFormat' => 'application/pdf',
                                     'labelContent' => base64_encode('PDF3'),

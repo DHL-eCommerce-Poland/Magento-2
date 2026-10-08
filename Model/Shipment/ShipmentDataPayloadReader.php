@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use InvalidArgumentException;
 use Magento\Framework\Serialize\SerializerInterface;
 
@@ -67,6 +68,31 @@ class ShipmentDataPayloadReader
     }
 
     /**
+     * Retrieve the DHL service type stored with a shipment entity.
+     *
+     * @param ShipmentDataInterface $shipment
+     *
+     * @return string|null
+     */
+    public function getServiceTypeFromEntity(ShipmentDataInterface $shipment): ?string
+    {
+        $data = $this->read($shipment->getShipmentData());
+        $shipmentSettings = $data['shipmentSettings'] ?? null;
+        if (!is_array($shipmentSettings)) {
+            return null;
+        }
+
+        $serviceType = $shipmentSettings['serviceType'] ?? null;
+        if (!is_string($serviceType)) {
+            return null;
+        }
+
+        $serviceType = trim($serviceType);
+
+        return $serviceType !== '' ? $serviceType : null;
+    }
+
+    /**
      * Retrieve unique return shipment identifiers from package data.
      *
      * @param array $data
@@ -88,7 +114,42 @@ class ShipmentDataPayloadReader
 
             $returnId = trim((string) $returnId);
             if ($returnId !== '') {
-                $returnIds[] = $returnId;
+                foreach (explode(',', $returnId) as $part) {
+                    $trimmedPart = trim($part);
+                    if ($trimmedPart !== '') {
+                        $returnIds[] = $trimmedPart;
+                    }
+                }
+            }
+        }
+
+        return array_values(array_unique($returnIds));
+    }
+
+    /**
+     * Retrieve all unique return shipment identifiers for a shipment entity.
+     *
+     * @param ShipmentDataInterface $shipment
+     *
+     * @return string[]
+     */
+    public function getReturnShipmentIdsFromEntity(ShipmentDataInterface $shipment): array
+    {
+        $returnIds = [];
+        $directReturnId = $shipment->getReturnShipmentId();
+        if ($directReturnId !== null && trim($directReturnId) !== '') {
+            foreach (explode(',', $directReturnId) as $id) {
+                $trimmed = trim($id);
+                if ($trimmed !== '') {
+                    $returnIds[] = $trimmed;
+                }
+            }
+        }
+
+        $payload = $this->read($shipment->getShipmentData());
+        foreach ($this->getReturnShipmentIds($payload) as $id) {
+            if ($id !== '') {
+                $returnIds[] = $id;
             }
         }
 

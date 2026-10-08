@@ -7,8 +7,8 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\Shipment;
 
 use Ideo\Dhl\Model\Carrier;
+use Ideo\Dhl\Model\Config\Source\InternationalMapPointType;
 use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\ServicePoint\NearestPointResolver;
 use Ideo\Dhl\Model\Shipment\Data\PackageData;
 use Ideo\Dhl\Model\Shipment\Data\RecipientData;
 use Ideo\Dhl\Model\Shipment\Data\SenderData;
@@ -20,8 +20,6 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Psr\Log\LoggerInterface;
-use Throwable;
 
 class OrderToShipmentDataMapper
 {
@@ -31,9 +29,7 @@ class OrderToShipmentDataMapper
      * @param TemplateVariableResolver $variableResolver
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
-     * @param NearestPointResolver $nearestPointResolver
      * @param MethodCatalog $methodCatalog
-     * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly StreetAddressParser $streetAddressParser,
@@ -41,9 +37,7 @@ class OrderToShipmentDataMapper
         private readonly TemplateVariableResolver $variableResolver,
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
-        private readonly NearestPointResolver $nearestPointResolver,
-        private readonly MethodCatalog $methodCatalog,
-        private readonly LoggerInterface $logger
+        private readonly MethodCatalog $methodCatalog
     ) {
     }
 
@@ -159,31 +153,31 @@ class OrderToShipmentDataMapper
             }
         }
 
-        $isPackstation = false;
-        $isPostfiliale = false;
-        $postnummer = null;
-
-        $cleanMethodCode = strtolower(trim((string)($order->getShippingMethod() ?? '')));
+        $shippingMethod = (string)($order->getShippingMethod() ?? '');
+        $cleanMethodCode = strtolower(trim($shippingMethod));
         if (str_starts_with($cleanMethodCode, Carrier::CODE_PREFIX)) {
             $cleanMethodCode = substr($cleanMethodCode, strlen(Carrier::CODE_PREFIX));
         }
 
-        $isInternationalPointMethod = in_array(
-            $cleanMethodCode,
-            [
-                MethodCatalog::METHOD_CONNECT_PARCELSHOP,
-                MethodCatalog::METHOD_CONNECT_PARCELSHOP_COD,
-                MethodCatalog::METHOD_CONNECT_PACKSTATION,
-                MethodCatalog::METHOD_CONNECT_PACKSTATION_COD,
-            ],
-            true
-        );
-
-        if ($shippingAddress && $isInternationalPointMethod) {
+        $mapPointType = null;
+        $isPackstation = false;
+        $isPostfiliale = false;
+        if (strtoupper($country) !== 'PL') {
+            $mapPointType = $this->methodCatalog->getInternationalMapPointTypeForMethod($shippingMethod);
+            $isPackstation = $mapPointType === InternationalMapPointType::TYPE_PACKSTATION;
+        } elseif ($shippingAddress && (
+            $this->methodCatalog->isPackstationMethod($cleanMethodCode)
+            || $this->methodCatalog->isParcelShopMethod($cleanMethodCode)
+        )) {
             $isPackstation = (bool)($shippingAddress->getData('dhl_is_packstation') ?? false);
             $isPostfiliale = (bool)($shippingAddress->getData('dhl_is_postfiliale') ?? false);
+        }
+        $postnummer = null;
+
+        if ($shippingAddress && $isPackstation) {
+            $countryUpper = strtoupper((string)($shippingAddress->getCountryId() ?? ''));
             $postnummerVal = (string)($shippingAddress->getData('dhl_postnummer') ?? '');
-            $postnummer = $postnummerVal !== '' ? $postnummerVal : null;
+            $postnummer = ($countryUpper === 'DE' && $postnummerVal !== '') ? $postnummerVal : null;
         }
 
         $recipientData = new RecipientData(
@@ -207,7 +201,8 @@ class OrderToShipmentDataMapper
             postnummer: $postnummer,
             popStreet: $popStreet,
             popCity: $popCity,
-            popPostcode: $popPostcode
+            popPostcode: $popPostcode,
+            mapPointType: $mapPointType
         );
 
         // 2. Sender mapping
@@ -267,7 +262,6 @@ class OrderToShipmentDataMapper
         $rodDocumentText = (string)($presetSS['returnOnDeliveryReference'] ?? '');
         $isPod = !empty($presetSS['proofOfDelivery']);
         $isAgever = !empty($presetSS['ageVer']);
-        $isOdb = !empty($presetSS['selfCollect']);
 
         $presetCodAmount = isset($presetSS['collectOnDeliveryValue']) && $presetSS['collectOnDeliveryValue'] !== null && $presetSS['collectOnDeliveryValue'] !== ''
             ? (float)$presetSS['collectOnDeliveryValue']
@@ -288,8 +282,7 @@ class OrderToShipmentDataMapper
             returnOnDelivery: $isRod,
             returnOnDeliveryReference: $rodDocumentText,
             proofOfDelivery: $isPod,
-            ageVer: $isAgever,
-            selfCollect: $isOdb
+            ageVer: $isAgever
         );
 
         // 6. Packages
@@ -333,21 +326,12 @@ class OrderToShipmentDataMapper
         $shippingMethod = (string)($order->getShippingMethod() ?? '');
         $serviceType = $this->methodCatalog->getServiceCodeForMethod($shippingMethod);
 
-        $isSpOrPsOrEk = in_array(
-            strtoupper(trim((string)$serviceType)),
-            [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_EK],
-            true
-        );
-        if ($isSpOrPsOrEk
-            && (empty($popId) || trim((string)$popId) === '')
-            && $this->nearestPointResolver !== null
-        ) {
-            try {
-                $recipientData = $this->nearestPointResolver->resolveForRecipient($recipientData);
-            } catch (Throwable $e) {
-                $this->logger->warning('Could not resolve nearest point during OrderToShipmentDataMapper::map: ' . $e->getMessage());
-            }
-        }
+        $autoCreateReturn = !empty($defaultShipmentDefaults['autoCreateReturnShipment']);
+        $rawExpDays = $defaultShipmentDefaults['returnLabelExpDays'] ?? null;
+        $returnExpDays = ($rawExpDays !== null && $rawExpDays !== '') ? (int)$rawExpDays : null;
+        $returnLabelType = $defaultShipmentDefaults['returnLabelType'] ?? null;
+        $returnQrCodeType = $defaultShipmentDefaults['returnQrCodeType'] ?? null;
+        $returnBookCourier = $defaultShipmentDefaults['returnBookCourier'] ?? null;
 
         $shipmentSettings = new ShipmentSettingsData(
             serviceType: $serviceType,
@@ -367,11 +351,11 @@ class OrderToShipmentDataMapper
             labelType: (string)($defaultShipmentDefaults['labelType'] ?? 'BLP'),
             isNonStandard: !empty($defaultShipmentDefaults['isNonStandard']),
             hasEuroReturn: !empty($defaultShipmentDefaults['hasEuroReturn']),
-            autoCreateReturnShipment: !empty($defaultShipmentDefaults['autoCreateReturnShipment']),
-            returnLabelType: isset($defaultShipmentDefaults['returnLabelType']) && (string)$defaultShipmentDefaults['returnLabelType'] !== '' ? (string)$defaultShipmentDefaults['returnLabelType'] : null,
-            returnQrCodeType: isset($defaultShipmentDefaults['returnQrCodeType']) && (string)$defaultShipmentDefaults['returnQrCodeType'] !== '' ? (string)$defaultShipmentDefaults['returnQrCodeType'] : null,
-            returnLabelExpDays: isset($defaultShipmentDefaults['returnLabelExpDays']) && $defaultShipmentDefaults['returnLabelExpDays'] !== '' && $defaultShipmentDefaults['returnLabelExpDays'] !== null ? (int)$defaultShipmentDefaults['returnLabelExpDays'] : null,
-            returnBookCourier: isset($defaultShipmentDefaults['returnBookCourier']) && $defaultShipmentDefaults['returnBookCourier'] !== '' && $defaultShipmentDefaults['returnBookCourier'] !== null ? (int)$defaultShipmentDefaults['returnBookCourier'] : null,
+            autoCreateReturnShipment: $autoCreateReturn,
+            returnLabelType: $returnLabelType !== null && (string)$returnLabelType !== '' ? (string)$returnLabelType : null,
+            returnQrCodeType: $returnQrCodeType !== null && (string)$returnQrCodeType !== '' ? (string)$returnQrCodeType : null,
+            returnLabelExpDays: $returnExpDays,
+            returnBookCourier: $returnBookCourier !== null && $returnBookCourier !== '' ? (int)$returnBookCourier : null,
             addressType: (string)($defaultShipmentDefaults['addressType'] ?? 'N'),
             packages: $packagesList
         );

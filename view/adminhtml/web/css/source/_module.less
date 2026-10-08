@@ -35,3 +35,61 @@
         display: block !important;
     }
 }
+
+.dhl-prepare-shipment-modal {
+    &.modal-slide {
+        .modal-inner-wrap {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: #fff;
+            border-bottom: 1px solid #e3e3e3;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .modal-content {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    }
+}
+
+.dhl-service-point-selector-wrapper {
+    margin: 6px 0 10px 24px;
+
+    &.dhl-sp-active-info {
+        margin-top: 6px;
+        margin-left: 0;
+    }
+
+    .dhl-sp-label {
+        font-weight: normal;
+    }
+
+    .dhl-sp-display-text {
+        font-weight: bold;
+    }
+
+    .dhl-show-map-btn {
+        margin-top: 8px;
+    }
+}
+
+.dhl-postnummer-wrapper {
+    margin-top: 6px;
+
+    .dhl-postnummer-label {
+        font-weight: bold;
+        margin-right: 6px;
+    }
+
+    .dhl-postnummer-input {
+        width: 160px;
+    }
+}

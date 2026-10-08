@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Ideo\Dhl\Model\Shipment;
 
+use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
+use Ideo\Dhl\Model\Shipment\Data\CustomsData;
+use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
@@ -28,6 +31,7 @@ class DataProvider extends AbstractDataProvider
      * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
      * @param LoggerInterface $logger
+     * @param DeliveryServiceRepositoryInterface $deliveryServiceRepository
      * @param array $meta
      * @param array $data
      */
@@ -40,6 +44,7 @@ class DataProvider extends AbstractDataProvider
         private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
         private readonly LoggerInterface $logger,
+        private readonly DeliveryServiceRepositoryInterface $deliveryServiceRepository,
         array $meta = [],
         array $data = []
     ) {
@@ -104,6 +109,9 @@ class DataProvider extends AbstractDataProvider
                             $createdAt = (string) ($item->getCreatedAt() ?? '');
                             $dispatchNumber = (string) ($item->getDispatchNumber() ?? '');
                             $returnShipmentId = (string) ($item->getReturnShipmentId() ?? '');
+                            $deliveryServiceTemplateId = (string) ($item->getDeliveryServiceTemplateId()
+                                ?? ($payload['deliveryServiceTemplateId']
+                                ?? ($payload['shipmentSettings']['selectedDeliveryServiceId'] ?? '')));
                             $data['shipmentSettings'] = $this->normalizeShipmentSettings(
                                 $payload['shipmentSettings'],
                                 $shipmentId,
@@ -111,17 +119,25 @@ class DataProvider extends AbstractDataProvider
                                 $createdAt,
                                 $payload['sender'] ?? [],
                                 $dispatchNumber,
-                                $returnShipmentId
+                                $returnShipmentId,
+                                $deliveryServiceTemplateId
                             );
                             $hasPackages = isset($payload['shipmentSettings']['packages'])
                                 && is_array($payload['shipmentSettings']['packages']);
                             if ($hasPackages) {
                                 $pkgNumsRaw = $payload['packageNumbers']
                                     ?? ($payload['shipmentSettings']['packageNumbers'] ?? []);
-                                $rootPkgNums = (array) $pkgNumsRaw;
+                                $rootPkgNums = is_array($pkgNumsRaw)
+                                    ? $pkgNumsRaw
+                                    : (is_string($pkgNumsRaw) ? explode(',', $pkgNumsRaw) : []);
+                                $rootReturnIds = array_values(array_filter(
+                                    array_map('trim', explode(',', $returnShipmentId)),
+                                    static fn($val) => $val !== ''
+                                ));
                                 $data['packages'] = $this->normalizePackages(
                                     $payload['shipmentSettings']['packages'],
-                                    $rootPkgNums
+                                    $rootPkgNums,
+                                    $rootReturnIds
                                 );
                                 $data['packages_fieldset'] = ['packages' => $data['packages']];
                             }
@@ -145,6 +161,21 @@ class DataProvider extends AbstractDataProvider
                             ));
                         }
                     }
+                    if (isset($payload['customs']) && is_array($payload['customs'])) {
+                        try {
+                            $customsTemplateId = (string) ($item->getCustomsTemplateId()
+                                ?? ($payload['customs_template_id']
+                                ?? ($payload['customs']['selectedCustomsTemplateId'] ?? '')));
+                            $data['customs'] = $this->normalizeCustoms($payload['customs'], $customsTemplateId);
+                            $data['customs_fieldset'] = $data['customs'];
+                        } catch (Throwable $e) {
+                            $this->logger->error(sprintf(
+                                '[DataProvider] Failed to normalize customs for shipment entity #%s: %s',
+                                $item->getId(),
+                                $e->getMessage()
+                            ));
+                        }
+                    }
                     $hasRootPackages = !isset($data['packages'])
                         && isset($payload['packages'])
                         && is_array($payload['packages']);
@@ -152,8 +183,18 @@ class DataProvider extends AbstractDataProvider
                         try {
                             $pkgNumsRaw = $payload['packageNumbers']
                                 ?? ($payload['shipmentSettings']['packageNumbers'] ?? []);
-                            $rootPkgNums = (array) $pkgNumsRaw;
-                            $data['packages'] = $this->normalizePackages($payload['packages'], $rootPkgNums);
+                            $rootPkgNums = is_array($pkgNumsRaw)
+                                ? $pkgNumsRaw
+                                : (is_string($pkgNumsRaw) ? explode(',', $pkgNumsRaw) : []);
+                            $rootReturnIds = array_values(array_filter(
+                                array_map('trim', explode(',', (string)($item->getReturnShipmentId() ?? ''))),
+                                static fn($val) => $val !== ''
+                            ));
+                            $data['packages'] = $this->normalizePackages(
+                                $payload['packages'],
+                                $rootPkgNums,
+                                $rootReturnIds
+                            );
                             $data['packages_fieldset'] = ['packages' => $data['packages']];
                         } catch (Throwable $e) {
                             $this->logger->error(sprintf(
@@ -198,7 +239,6 @@ class DataProvider extends AbstractDataProvider
             'returnOnDeliveryReference' => $dto->isReturnOnDelivery() ? $dto->getReturnOnDeliveryReference() : '',
             'proofOfDelivery' => $dto->isProofOfDelivery() ? '1' : '0',
             'ageVer' => $dto->isAgeVer() ? '1' : '0',
-            'selfCollect' => $dto->isSelfCollect() ? '1' : '0',
         ];
     }
 
@@ -212,7 +252,7 @@ class DataProvider extends AbstractDataProvider
      * @param array $sender
      * @param string $dispatchNumber
      * @param string $returnShipmentId
-     *
+     * @param string $deliveryServiceTemplateId
      * @return array
      */
     private function normalizeShipmentSettings(
@@ -222,9 +262,36 @@ class DataProvider extends AbstractDataProvider
         string $createdAt = '',
         array $sender = [],
         string $dispatchNumber = '',
-        string $returnShipmentId = ''
+        string $returnShipmentId = '',
+        string $deliveryServiceTemplateId = ''
     ): array {
         $settings['autoCreateReturnShipment'] = !empty($settings['autoCreateReturnShipment']) ? '1' : '0';
+
+        $tpl = null;
+        if (!empty($deliveryServiceTemplateId)) {
+            try {
+                $tpl = $this->deliveryServiceRepository->getById((int)$deliveryServiceTemplateId);
+            } catch (Throwable) {
+                $tpl = null;
+            }
+        }
+
+        if (empty($settings['returnLabelExpDays']) || (int)$settings['returnLabelExpDays'] <= 0) {
+            $settings['returnLabelExpDays'] = $tpl?->getReturnLabelExpDays()
+                ?: ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS;
+        }
+
+        if (empty($settings['returnLabelType'])) {
+            $settings['returnLabelType'] = $tpl?->getReturnLabelType() ?: 'BLP';
+        }
+
+        if (empty($settings['returnQrCodeType'])) {
+            $settings['returnQrCodeType'] = $tpl?->getReturnQrCodeType() ?: 'QR_PDF';
+        }
+
+        if (!isset($settings['returnBookCourier']) || $settings['returnBookCourier'] === '') {
+            $settings['returnBookCourier'] = $tpl?->getReturnBookCourier() ?? 0;
+        }
         if (empty($settings['shipmentId']) && !empty($shipmentId)) {
             $settings['shipmentId'] = $shipmentId;
         }
@@ -272,40 +339,124 @@ class DataProvider extends AbstractDataProvider
             $settings['pickupHourTo'] = null;
         }
 
+        unset($settings['packages']);
+
         return $settings;
     }
 
     /**
-     * Normalize packages array flags to string '1'/'0', record_id, returnShipmentId, and packagesTrackingNumbers.
+     * Normalize packages array flags to string '1'/'0', record_id, packageNumber, and returnShipmentId.
      *
      * @param array $packages
      * @param array $rootPackageNumbers
+     * @param array $rootReturnShipmentIds
      *
      * @return array
      */
-    private function normalizePackages(array $packages, array $rootPackageNumbers = []): array
-    {
+    private function normalizePackages(
+        array $packages,
+        array $rootPackageNumbers = [],
+        array $rootReturnShipmentIds = []
+    ): array {
         $result = [];
-        $rootPackageNumbers = array_values($rootPackageNumbers);
-        foreach ($packages as $index => $pkg) {
-            if (is_array($pkg)) {
-                $pkg['record_id'] = (string)$index;
-                $pkg['isNonStandard'] = !empty($pkg['isNonStandard']) ? '1' : '0';
-                $pkg['hasEuroReturn'] = !empty($pkg['hasEuroReturn']) ? '1' : '0';
-                $pkgNumber = $pkg['packageNumber'] ?? $pkg['pieceId'] ?? null;
-                if (empty($pkgNumber) && isset($rootPackageNumbers[$index])) {
-                    $pkgNumber = $rootPackageNumbers[$index];
-                }
-                $pkg['packageNumber'] = (string)($pkgNumber ?? '');
+        $cleanRootPkgNums = array_values(array_filter(
+            array_map('trim', $rootPackageNumbers),
+            static fn($val) => $val !== ''
+        ));
+        $cleanRootReturnIds = array_values(array_filter(
+            array_map('trim', $rootReturnShipmentIds),
+            static fn($val) => $val !== ''
+        ));
 
-                $trackNum = $pkg['packagesTrackingNumbers'] ?? $pkg['packageTrackingNumber'] ?? null;
-                if (empty($trackNum) && isset($rootPackageNumbers[$index])) {
-                    $trackNum = $rootPackageNumbers[$index];
+        $pkgNumOffset = 0;
+        $retIdOffset = 0;
+
+        foreach ($packages as $index => $pkg) {
+            if (!is_array($pkg)) {
+                continue;
+            }
+            $pkg['record_id'] = (string)$index;
+            $pkg['isNonStandard'] = !empty($pkg['isNonStandard']) ? '1' : '0';
+            $pkg['hasEuroReturn'] = !empty($pkg['hasEuroReturn']) ? '1' : '0';
+
+            $qty = max(1, (int)($pkg['quantity'] ?? 1));
+
+            // Package numbers
+            $pkgNumber = $pkg['packageNumber'] ?? $pkg['pieceId'] ?? null;
+            if (is_array($pkgNumber)) {
+                $pkgNumber = implode(', ', array_filter(array_map('trim', $pkgNumber), static fn($v) => $v !== ''));
+            } elseif ($pkgNumber !== null) {
+                $pkgNumber = trim((string)$pkgNumber);
+            }
+
+            if (empty($pkgNumber) && !empty($cleanRootPkgNums)) {
+                $slice = array_slice($cleanRootPkgNums, $pkgNumOffset, $qty);
+                $pkgNumber = implode(', ', $slice);
+            }
+            $pkgNumOffset += $qty;
+            $pkg['packageNumber'] = (string)($pkgNumber ?? '');
+
+            // Return package numbers
+            $retNumber = $pkg['returnShipmentId'] ?? null;
+            if (is_array($retNumber)) {
+                $retNumber = implode(', ', array_filter(array_map('trim', $retNumber), static fn($v) => $v !== ''));
+            } elseif ($retNumber !== null) {
+                $retNumber = trim((string)$retNumber);
+            }
+
+            if (empty($retNumber) && !empty($cleanRootReturnIds)) {
+                $retSlice = array_slice($cleanRootReturnIds, $retIdOffset, $qty);
+                $retNumber = implode(', ', $retSlice);
+            }
+            $retIdOffset += $qty;
+            $pkg['returnShipmentId'] = (string)($retNumber ?? '');
+
+            $result[$index] = $pkg;
+        }
+        return $result;
+    }
+
+    /**
+     * Normalize customs clearance array flags to string '1'/'0' and assign record_id to dynamic row items.
+     *
+     * @param array $customs
+     * @param string $customsTemplateId
+     *
+     * @return array
+     */
+    private function normalizeCustoms(array $customs, string $customsTemplateId = ''): array
+    {
+        $dto = CustomsData::fromArray($customs);
+        $result = $dto->toArray();
+
+        if (empty($result['selectedCustomsTemplateId']) && !empty($customsTemplateId)) {
+            $result['selectedCustomsTemplateId'] = (int)$customsTemplateId;
+        }
+
+        $result['notExceedValue'] = $dto->isNotExceedValue() ? '1' : '0';
+        $result['notProhibitedGoods'] = $dto->isNotProhibitedGoods() ? '1' : '0';
+        $result['notRestrictedGoods'] = $dto->isNotRestrictedGoods() ? '1' : '0';
+        $result['invoiceContent'] = $dto->isInvoiceContent() ? '1' : '0';
+
+        $rawItems = $result['customsItems'] ?? [];
+        $normalizedItems = [];
+        if (is_array($rawItems)) {
+            foreach ($rawItems as $index => $item) {
+                if (!is_array($item)) {
+                    continue;
                 }
-                $pkg['packagesTrackingNumbers'] = (string)($trackNum ?? '');
-                $result[$index] = $pkg;
+                $itemFields = ['nameEn', 'namePl', 'quantity', 'weight', 'value', 'tariffCode', 'countryOfOrigin'];
+                foreach ($itemFields as $field) {
+                    if (!isset($item[$field])) {
+                        $item[$field] = '';
+                    }
+                }
+                $item['record_id'] = (string)$index;
+                $normalizedItems[$index] = $item;
             }
         }
+        $result['customsItems'] = $normalizedItems;
+
         return $result;
     }
 }

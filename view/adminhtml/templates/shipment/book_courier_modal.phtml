@@ -16,14 +16,14 @@ $viewModel = $block->getViewModel();
 $dateFormat = $viewModel->getDateFormat();
 $todayDate = $viewModel->getFormattedDate();
 
-$hoursUrl = $block->getUrl('dhlpoland/shipment/getPickupHours');
+$infoUrl = $block->getUrl('dhlpoland/shipment/getShipmentPickupInfo');
 $bookUrl = $block->getUrl('dhlpoland/shipment/bookCourier');
 ?>
 <div id="ideo-dhl-book-courier-modal" style="display: none;" data-bind="scope: 'dhlBookCourierModal'">
     <form id="ideo-dhl-book-courier-form" onsubmit="return false;">
         <div class="admin__fieldset" style="margin-bottom: 0;">
 
-            <!-- Warning Notice if Today is Unavailable -->
+            <!-- Warning Notice if Needed -->
             <!-- ko if: warningMessage() -->
             <div class="message message-warning warning" style="margin-bottom: 15px;">
                 <div data-bind="text: warningMessage"></div>
@@ -58,22 +58,34 @@ $bookUrl = $block->getUrl('dhlpoland/shipment/bookCourier');
                 </div>
             </div>
 
-            <!-- Loading Indicator -->
-            <!-- ko if: isLoading() -->
-            <div style="padding: 15px 0; text-align: center; color: #666;">
-                <span><?= $escaper->escapeHtml(__('Fetching available courier pickup hours...')) ?></span>
-            </div>
-            <!-- /ko -->
-
-            <!-- Available Hours Selection -->
-            <!-- ko if: !isLoading() && availableHours().length > 0 -->
+            <!-- Courier Pickup [From - To] -->
             <div class="admin__field required">
-                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Available Courier Pickup Hours')) ?></span></label>
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Courier Pickup [From - To]')) ?></span></label>
                 <div class="admin__field-control">
-                    <select class="admin__control-select" data-bind="options: availableHours, optionsText: 'label', optionsValue: 'value', value: selectedHourSlot" style="width: 260px;" required></select>
+                    <div style="display: flex; gap: 8px; width: 260px;">
+                        <div style="flex: 1;">
+                            <input type="text"
+                                   id="dhlpoland_pickup_time_from"
+                                   class="admin__control-text"
+                                   placeholder="HH:mm"
+                                   data-bind="dhlTimepicker: pickupTimeFrom"
+                                   style="width: 100%; box-sizing: border-box;"
+                                   autocomplete="off"
+                                   required />
+                        </div>
+                        <div style="flex: 1;">
+                            <input type="text"
+                                   id="dhlpoland_pickup_time_to"
+                                   class="admin__control-text"
+                                   placeholder="HH:mm"
+                                   data-bind="dhlTimepicker: pickupTimeTo"
+                                   style="width: 100%; box-sizing: border-box;"
+                                   autocomplete="off"
+                                   required />
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- /ko -->
 
             <!-- Additional Info for Courier -->
             <div class="admin__field">
@@ -94,7 +106,7 @@ $bookUrl = $block->getUrl('dhlpoland/shipment/bookCourier');
             "components": {
                 "dhlBookCourierModal": {
                     "component": "Ideo_Dhl/js/shipment/book-courier-modal",
-                    "hoursUrl": "<?= $escaper->escapeUrl($hoursUrl) ?>",
+                    "infoUrl": "<?= $escaper->escapeUrl($infoUrl) ?>",
                     "bookUrl": "<?= $escaper->escapeUrl($bookUrl) ?>",
                     "dateFormat": "<?= $escaper->escapeJs($dateFormat) ?>"
                 }

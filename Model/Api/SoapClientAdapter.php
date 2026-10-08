@@ -10,6 +10,7 @@ use Magento\Framework\Filesystem\Driver\File as FileDriver;
 use Psr\Log\LoggerInterface;
 use SoapClient;
 use SoapFault;
+use SoapVar;
 use Throwable;
 
 class SoapClientAdapter implements ClientInterface
@@ -18,6 +19,7 @@ class SoapClientAdapter implements ClientInterface
     private const WSDL_URL_SANDBOX = 'https://sandbox.dhl24.com.pl/webapi2';
     private const CONNECTION_TIMEOUT = 10;
     private const API_ORIGIN = 'Ideo_M2';
+    private const MAX_ITEMS_TO_PRINT_PER_REQUEST = 3;
 
     /**
      * @param LoggerInterface $logger
@@ -86,19 +88,26 @@ class SoapClientAdapter implements ClientInterface
     public function getInternationalParams2(Credentials $credentials): array
     {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
-        $client = $this->createSoapClient($wsdlUrl);
+        $client = null;
 
-        $params = [
-            'authData' => [
-                'username' => $this->ensureUtf8($credentials->getUsername()),
-                'password' => $this->ensureUtf8($credentials->getPassword()),
-            ],
-        ];
+        try {
+            $client = $this->createSoapClient($wsdlUrl);
 
-        $response = $client->getInternationalParams2($params);
-        $this->logSoapCommunication($client, 'getInternationalParams2', true);
+            $params = [
+                'authData' => [
+                    'username' => $this->ensureUtf8($credentials->getUsername()),
+                    'password' => $this->ensureUtf8($credentials->getPassword()),
+                ],
+            ];
 
-        return (array) ($response->getInternationalParams2Result ?? []);
+            $response = $client->getInternationalParams2($params);
+            $this->logSoapCommunication($client, 'getInternationalParams2');
+
+            return (array) ($response->getInternationalParams2Result ?? []);
+        } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getInternationalParams2');
+            throw $e;
+        }
     }
 
     /**
@@ -117,6 +126,7 @@ class SoapClientAdapter implements ClientInterface
     ): CreateShipmentResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
         $orderContext = $orderId !== null ? sprintf(' (Order #%d)', $orderId) : '';
+        $client = null;
 
         if (!isset($shipmentData['shipmentInfo']['dropOffType'])) {
             $shipmentData['shipmentInfo']['dropOffType'] = CreateShipmentResult::DROP_OFF_TYPE_REGULAR_PICKUP;
@@ -130,7 +140,7 @@ class SoapClientAdapter implements ClientInterface
                     'username' => $this->ensureUtf8($credentials->getUsername()),
                     'password' => $this->ensureUtf8($credentials->getPassword()),
                 ],
-                'shipment' => $shipmentData,
+                'shipment' => $this->preserveFractionalPackageMeasurements($shipmentData),
             ];
 
             $response = $client->createShipment($params);
@@ -217,21 +227,34 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
-     * Delete shipment via DHL WebAPI2 API.
+     * Delete shipment and optional return shipments via DHL WebAPI2 API.
      *
      * @param Credentials $credentials
      * @param string $shipmentId
+     * @param string[] $returnShipmentIds
      *
      * @return DeleteShipmentResult
      */
     public function deleteShipment(
         Credentials $credentials,
-        string $shipmentId
+        string $shipmentId,
+        array $returnShipmentIds = []
     ): DeleteShipmentResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
+
+            $rawShipmentIds = array_merge([$shipmentId], $returnShipmentIds);
+            $cleanShipmentIds = [];
+            foreach ($rawShipmentIds as $id) {
+                if (is_string($id) && trim($id) !== '') {
+                    $cleanShipmentIds[] = trim($id);
+                }
+            }
+            $cleanShipmentIds = array_values(array_unique($cleanShipmentIds));
+            $formattedShipmentIds = array_map([$this, 'ensureUtf8'], $cleanShipmentIds);
 
             $params = [
                 'authData' => [
@@ -239,7 +262,9 @@ class SoapClientAdapter implements ClientInterface
                     'password' => $this->ensureUtf8($credentials->getPassword()),
                 ],
                 'shipments' => [
-                    'item' => $this->ensureUtf8($shipmentId),
+                    'item' => count($formattedShipmentIds) === 1
+                        ? $formattedShipmentIds[0]
+                        : $formattedShipmentIds,
                 ],
             ];
 
@@ -247,34 +272,41 @@ class SoapClientAdapter implements ClientInterface
             $this->logSoapCommunication($client, 'deleteShipments');
 
             $resultItem = $response->deleteShipmentsResult->item ?? $response->deleteShipmentsResult ?? null;
-            if (is_array($resultItem)) {
-                $resultItem = $resultItem[0] ?? null;
+            $items = is_array($resultItem) ? $resultItem : ($resultItem !== null ? [$resultItem] : []);
+
+            $errors = [];
+            $hasSuccess = false;
+            $allSuccess = !empty($items);
+
+            foreach ($items as $item) {
+                if (is_object($item)) {
+                    if (!empty($item->error)) {
+                        $allSuccess = false;
+                        $ident = $item->shipmentIdentification ?? $item->id ?? null;
+                        $errors[] = $ident ? sprintf('[%s] %s', $ident, $item->error) : (string) $item->error;
+                    } else {
+                        $hasId = !empty($item->id)
+                            || !empty($item->shipmentIdentification)
+                            || (isset($item->result) && (bool) $item->result === true);
+                        if ($hasId) {
+                            $hasSuccess = true;
+                        } else {
+                            $allSuccess = false;
+                        }
+                    }
+                } elseif (is_bool($item) && $item === true) {
+                    $hasSuccess = true;
+                } else {
+                    $allSuccess = false;
+                }
             }
 
-            if (is_object($resultItem)) {
-                if (!empty($resultItem->error)) {
-                    return new DeleteShipmentResult(
-                        false,
-                        $shipmentId,
-                        'DELETE_SHIPMENT_ERROR',
-                        (string) $resultItem->error
-                    );
-                }
-
-                $hasId = !empty($resultItem->id)
-                    || !empty($resultItem->shipmentIdentification)
-                    || (isset($resultItem->result) && (bool) $resultItem->result === true);
-                if ($hasId) {
-                    return new DeleteShipmentResult(true, $shipmentId);
-                }
-            }
-
-            if (is_bool($resultItem) && $resultItem === true) {
+            if ($allSuccess && $hasSuccess) {
                 return new DeleteShipmentResult(true, $shipmentId);
             }
 
-            $errorMsg = is_object($resultItem) && !empty($resultItem->error)
-                ? (string) $resultItem->error
+            $errorMsg = !empty($errors)
+                ? implode('; ', $errors)
                 : 'DHL API returned an error or invalid response during deleteShipments.';
 
             return new DeleteShipmentResult(false, $shipmentId, 'DELETE_SHIPMENT_ERROR', $errorMsg);
@@ -309,124 +341,6 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
-     * Get postal code services and pickup windows via DHL WebAPI2 API.
-     *
-     * @param Credentials $credentials
-     * @param string $postCode
-     * @param string $pickupDate Format YYYY-MM-DD
-     *
-     * @return PostalCodeServicesResult
-     */
-    public function getPostalCodeServices(
-        Credentials $credentials,
-        string $postCode,
-        string $pickupDate
-    ): PostalCodeServicesResult {
-        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
-
-        try {
-            $client = $this->createSoapClient($wsdlUrl);
-
-            $cleanPostCode = (string) preg_replace('/[^0-9]/', '', $postCode);
-            if (empty($cleanPostCode) || $cleanPostCode === '00000') {
-                return new PostalCodeServicesResult(
-                    success: false,
-                    errorCode: 'INVALID_POSTAL_CODE',
-                    errorMessage: 'Sender postal code is invalid or missing.'
-                );
-            }
-            if (strlen($cleanPostCode) < 5) {
-                $cleanPostCode = str_pad($cleanPostCode, 5, '0', STR_PAD_LEFT);
-            }
-
-            $cleanDate = $this->dateSanitizer->sanitize($pickupDate);
-
-            $params = [
-                'authData' => [
-                    'username' => $this->ensureUtf8($credentials->getUsername()),
-                    'password' => $this->ensureUtf8($credentials->getPassword()),
-                ],
-                'postCode' => $this->ensureUtf8($cleanPostCode),
-                'pickupDate' => $this->ensureUtf8($cleanDate),
-            ];
-
-            $response = $client->getPostalCodeServices($params);
-            $this->logSoapCommunication($client, 'getPostalCodeServices');
-
-            $result = $response->getPostalCodeServicesResult ?? null;
-
-            if (is_object($result)) {
-                $hasDrFrom = !empty($result->drPickupFrom) && (string) $result->drPickupFrom !== 'brak';
-                $drFrom = $hasDrFrom ? (string) $result->drPickupFrom : null;
-
-                $hasDrTo = !empty($result->drPickupTo) && (string) $result->drPickupTo !== 'brak';
-                $drTo = $hasDrTo ? (string) $result->drPickupTo : null;
-
-                $hasExFrom = !empty($result->exPickupFrom) && (string) $result->exPickupFrom !== 'brak';
-                $exFrom = $hasExFrom ? (string) $result->exPickupFrom : null;
-
-                $hasExTo = !empty($result->exPickupTo) && (string) $result->exPickupTo !== 'brak';
-                $exTo = $hasExTo ? (string) $result->exPickupTo : null;
-
-                $sat = !empty($result->pickupOnSaturday) && (bool) $result->pickupOnSaturday;
-
-                return new PostalCodeServicesResult(
-                    true,
-                    $drFrom,
-                    $drTo,
-                    $exFrom,
-                    $exTo,
-                    $sat
-                );
-            }
-
-            return new PostalCodeServicesResult(
-                false,
-                null,
-                null,
-                null,
-                null,
-                false,
-                'INVALID_RESPONSE',
-                'DHL WebAPI2 returned invalid response for getPostalCodeServices.'
-            );
-        } catch (SoapFault $fault) {
-            $this->logger->error(sprintf(
-                '[DHL WebAPI2] SoapFault during getPostalCodeServices: [%s] %s',
-                $fault->faultcode ?? 'FAULT',
-                $fault->getMessage()
-            ));
-
-            return new PostalCodeServicesResult(
-                false,
-                null,
-                null,
-                null,
-                null,
-                false,
-                $fault->faultcode ?? 'SOAP_FAULT',
-                'DHL API error: ' . $fault->getMessage()
-            );
-        } catch (Throwable $e) {
-            $this->logger->error(sprintf(
-                '[DHL WebAPI2] Exception during getPostalCodeServices: %s',
-                $e->getMessage()
-            ));
-
-            return new PostalCodeServicesResult(
-                false,
-                null,
-                null,
-                null,
-                null,
-                false,
-                'CONNECTION_ERROR',
-                'An error occurred while connecting to DHL: ' . $e->getMessage()
-            );
-        }
-    }
-
-    /**
      * Book courier for existing generated shipments via DHL WebAPI2 API.
      *
      * @param Credentials $credentials
@@ -447,6 +361,7 @@ class SoapClientAdapter implements ClientInterface
         ?string $additionalInfo = null
     ): CourierBookingResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -476,56 +391,72 @@ class SoapClientAdapter implements ClientInterface
             $this->logSoapCommunication($client, 'bookCourier');
 
             $result = $response->bookCourierResult ?? null;
+            $items = [];
+            $orderStatus = null;
 
             if (is_object($result)) {
                 if (!empty($result->error)) {
                     return new CourierBookingResult(
                         false,
-                        null,
+                        [],
                         'BOOK_COURIER_ERROR',
                         (string) $result->error
                     );
                 }
 
-                $orderId = null;
-                $orderStatus = null;
-
-                if (!empty($result->id)) {
-                    $orderId = (string) $result->id;
-                } elseif (!empty($result->item)) {
-                    $item = is_array($result->item) ? $result->item[0] : $result->item;
-                    if (is_object($item)) {
-                        $orderId = !empty($item->id) ? (string) $item->id : null;
-                        $orderStatus = !empty($item->orderStatus) ? (string) $item->orderStatus : null;
-                    } elseif (is_string($item)) {
-                        $orderId = $item;
-                    }
+                if (isset($result->item)) {
+                    $items = is_array($result->item) ? $result->item : [$result->item];
+                } elseif (!empty($result->id)) {
+                    $items = [$result];
                 }
 
                 if (empty($orderStatus) && !empty($result->orderStatus)) {
                     $orderStatus = (string) $result->orderStatus;
                 }
+            } elseif (is_array($result)) {
+                $items = $result;
+            } else {
+                return new CourierBookingResult(
+                    false,
+                    [],
+                    'INVALID_RESPONSE',
+                    (string) __('DHL returned an invalid courier order ID.')
+                );
+            }
 
-                if (empty($orderStatus)) {
-                    $orderStatus = (string) __('Kurier zamówiony');
+            $orderIds = [];
+            foreach ($items as $item) {
+                if (is_string($item) && trim($item) !== '') {
+                    $orderIds[] = trim($item);
+                } elseif (is_object($item) && !empty($item->id)) {
+                    $orderIds[] = (string) $item->id;
+                    if (empty($orderStatus) && !empty($item->orderStatus)) {
+                        $orderStatus = (string) $item->orderStatus;
+                    }
+                } else {
+                    return new CourierBookingResult(
+                        false,
+                        [],
+                        'INVALID_RESPONSE',
+                        (string) __('DHL returned an invalid courier order ID.')
+                    );
                 }
-
-                return new CourierBookingResult(true, $orderId, null, null, $orderStatus);
             }
 
-            if (is_array($result) && !empty($result)) {
-                $orderId = is_string($result[0]) ? $result[0] : (string) ($result[0]->id ?? '');
-                $orderStatus = (string) __('Kurier zamówiony');
-                return new CourierBookingResult(true, $orderId, null, null, $orderStatus);
+            if (empty($orderIds)) {
+                return new CourierBookingResult(
+                    false,
+                    [],
+                    'INVALID_RESPONSE',
+                    (string) __('DHL returned an invalid courier order ID.')
+                );
             }
 
-            return new CourierBookingResult(
-                false,
-                null,
-                'INVALID_RESPONSE',
-                'DHL WebAPI2 returned invalid response for bookCourier.'
-            );
+            $orderStatus = $orderStatus ?: (string) __('Kurier zamówiony');
+
+            return new CourierBookingResult(true, $orderIds, null, null, $orderStatus);
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'bookCourier');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during bookCourier: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -534,11 +465,12 @@ class SoapClientAdapter implements ClientInterface
 
             return new CourierBookingResult(
                 false,
-                null,
+                [],
                 $fault->faultcode ?? 'SOAP_FAULT',
                 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'bookCourier');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during bookCourier: %s',
                 $e->getMessage()
@@ -546,7 +478,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new CourierBookingResult(
                 false,
-                null,
+                [],
                 'CONNECTION_ERROR',
                 'An error occurred while connecting to DHL: ' . $e->getMessage()
             );
@@ -566,6 +498,7 @@ class SoapClientAdapter implements ClientInterface
         array $dispatchNumbers
     ): CancelCourierBookingResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -620,10 +553,12 @@ class SoapClientAdapter implements ClientInterface
                 'DHL WebAPI2 returned invalid response for cancelCourierBooking.'
             );
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'cancelCourierBooking');
+            $faultMessage = $this->redactCredentials($fault->getMessage(), $credentials);
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during cancelCourierBooking: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
-                $fault->getMessage()
+                $faultMessage
             ));
 
             return new CancelCourierBookingResult(
@@ -633,9 +568,11 @@ class SoapClientAdapter implements ClientInterface
                 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'cancelCourierBooking');
+            $exceptionMessage = $this->redactCredentials($e->getMessage(), $credentials);
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during cancelCourierBooking: %s',
-                $e->getMessage()
+                $exceptionMessage
             ));
 
             return new CancelCourierBookingResult(
@@ -660,6 +597,7 @@ class SoapClientAdapter implements ClientInterface
         string $shipmentId
     ): TrackingResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -721,6 +659,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL WebAPI2 returned invalid response for getTrackAndTraceInfo.'
             );
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'getTrackAndTraceInfo');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during getTrackAndTraceInfo: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -736,6 +675,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL API error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getTrackAndTraceInfo');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getTrackAndTraceInfo: %s',
                 $e->getMessage()
@@ -763,6 +703,8 @@ class SoapClientAdapter implements ClientInterface
     public function getLabels(Credentials $credentials, array $itemsToPrint): GetLabelsResult
     {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
+        $communicationAction = 'getLabels';
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -786,53 +728,60 @@ class SoapClientAdapter implements ClientInterface
                 );
             }
 
-            $params = [
-                'authData' => [
-                    'username' => $this->ensureUtf8($credentials->getUsername()),
-                    'password' => $this->ensureUtf8($credentials->getPassword()),
-                ],
-                'itemsToPrint' => $formattedItems,
-            ];
-
-            $response = $client->getLabels($params);
-            $this->logSoapCommunication($client, 'getLabels');
-
-            $result = $response->getLabelsResult ?? null;
-
-            if ($result === null) {
-                return new GetLabelsResult(
-                    false,
-                    [],
-                    'INVALID_RESPONSE',
-                    'DHL WebAPI2 returned invalid response for getLabels.'
-                );
-            }
-
-            $itemsRaw = [];
-            if (isset($result->item)) {
-                $itemsRaw = is_array($result->item) ? $result->item : [$result->item];
-            }
-
+            $chunks = array_chunk($formattedItems, self::MAX_ITEMS_TO_PRINT_PER_REQUEST);
             $parsedItems = [];
-            foreach ($itemsRaw as $itemObj) {
-                $shipmentId = (string) ($itemObj->shipmentId ?? '');
-                $labelType = (string) ($itemObj->labelType ?? GetLabelsResult::LABEL_TYPE_BLP);
-                $rawBase64 = (string) ($itemObj->labelData ?? '');
-                // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
-                $labelBinary = !empty($rawBase64) ? base64_decode($rawBase64) : '';
 
-                $defaultMime = str_contains($labelType, GetLabelsResult::LABEL_TYPE_ZBLP)
-                    ? 'text/plain'
-                    : (str_contains($labelType, 'IMG') ? 'image/png' : 'application/pdf');
-                $mimeType = (string) ($itemObj->labelMimeType ?? ($itemObj->mimeType ?? $defaultMime));
+            foreach ($chunks as $chunkIndex => $chunk) {
+                $communicationAction = count($chunks) > 1
+                    ? sprintf('getLabels_batch_%d', $chunkIndex + 1)
+                    : 'getLabels';
+                $params = [
+                    'authData' => [
+                        'username' => $this->ensureUtf8($credentials->getUsername()),
+                        'password' => $this->ensureUtf8($credentials->getPassword()),
+                    ],
+                    'itemsToPrint' => $chunk,
+                ];
 
-                if (!empty($labelBinary)) {
-                    $parsedItems[] = [
-                        'shipmentId' => $shipmentId,
-                        'labelType' => $labelType,
-                        'labelData' => $labelBinary,
-                        'mimeType' => $mimeType,
-                    ];
+                $response = $client->getLabels($params);
+                $this->logSoapCommunication($client, $communicationAction);
+
+                $result = $response->getLabelsResult ?? null;
+
+                if ($result === null) {
+                    return new GetLabelsResult(
+                        false,
+                        [],
+                        'INVALID_RESPONSE',
+                        'DHL WebAPI2 returned invalid response for getLabels.'
+                    );
+                }
+
+                $itemsRaw = [];
+                if (isset($result->item)) {
+                    $itemsRaw = is_array($result->item) ? $result->item : [$result->item];
+                }
+
+                foreach ($itemsRaw as $itemObj) {
+                    $shipmentId = (string) ($itemObj->shipmentId ?? '');
+                    $labelType = (string) ($itemObj->labelType ?? GetLabelsResult::LABEL_TYPE_BLP);
+                    $rawBase64 = (string) ($itemObj->labelData ?? '');
+                    // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
+                    $labelBinary = !empty($rawBase64) ? base64_decode($rawBase64) : '';
+
+                    $defaultMime = str_contains($labelType, GetLabelsResult::LABEL_TYPE_ZBLP)
+                        ? 'text/plain'
+                        : (str_contains($labelType, 'IMG') ? 'image/png' : 'application/pdf');
+                    $mimeType = (string) ($itemObj->labelMimeType ?? ($itemObj->mimeType ?? $defaultMime));
+
+                    if (!empty($labelBinary)) {
+                        $parsedItems[] = [
+                            'shipmentId' => $shipmentId,
+                            'labelType' => $labelType,
+                            'labelData' => $labelBinary,
+                            'mimeType' => $mimeType,
+                        ];
+                    }
                 }
             }
 
@@ -842,6 +791,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new GetLabelsResult(true, $parsedItems);
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, $communicationAction);
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during getLabels: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -855,6 +805,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, $communicationAction);
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getLabels: %s',
                 $e->getMessage()
@@ -880,6 +831,7 @@ class SoapClientAdapter implements ClientInterface
     public function getShipmentScan(Credentials $credentials, string $shipmentId): GetScanResult
     {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -924,6 +876,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new GetScanResult(true, $fileData, $mimeType);
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'getShipmentScan');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during getShipmentScan: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -938,6 +891,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getShipmentScan');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getShipmentScan: %s',
                 $e->getMessage()
@@ -964,6 +918,7 @@ class SoapClientAdapter implements ClientInterface
     public function getEpod(Credentials $credentials, string $shipmentId): GetEpodResult
     {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -1008,6 +963,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new GetEpodResult(true, $fileData, $mimeType);
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'getEpod');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during getEpod: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -1022,6 +978,7 @@ class SoapClientAdapter implements ClientInterface
                 'DHL error: ' . $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getEpod');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getEpod: %s',
                 $e->getMessage()
@@ -1052,6 +1009,7 @@ class SoapClientAdapter implements ClientInterface
         string $typePackage
     ): GetPnpResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -1102,6 +1060,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new GetPnpResult(true, $fileData, $fileName, $mimeType);
         } catch (SoapFault $fault) {
+            $this->logSoapCommunication($client, 'getPnp');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] SoapFault during getPnp: [%s] %s',
                 $fault->faultcode ?? 'FAULT',
@@ -1117,6 +1076,7 @@ class SoapClientAdapter implements ClientInterface
                 $fault->getMessage()
             );
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getPnp');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getPnp: %s',
                 $e->getMessage()
@@ -1148,11 +1108,11 @@ class SoapClientAdapter implements ClientInterface
 
         $xml = $this->ensureUtf8($xml);
 
-        $xml = (string) preg_replace(
-            '/(<(?:[a-zA-Z0-9_]+:)?password>)[^<]+(<\/(?:[a-zA-Z0-9_]+:)?password>)/i',
-            '$1***MASKED***$2',
-            $xml
-        );
+        foreach (['username', 'password'] as $credentialTag) {
+            $pattern = '/(<(?:[a-zA-Z0-9_]+:)?' . $credentialTag . '>)[^<]*(<\/(?:[a-zA-Z0-9_]+:)?'
+                . $credentialTag . '>)/i';
+            $xml = (string) preg_replace($pattern, '$1***MASKED***$2', $xml);
+        }
 
         $binPattern = '/(<(?:[a-zA-Z0-9_]+:)?'
             . '(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile|invoice)>)'
@@ -1204,6 +1164,7 @@ class SoapClientAdapter implements ClientInterface
     ): CreateShipmentReturnResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
         $orderContext = $orderId !== null ? sprintf(' (Order #%d)', $orderId) : '';
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -1253,10 +1214,6 @@ class SoapClientAdapter implements ClientInterface
                         ? (string) $itemObj->shipmentTrackingNumber
                         : $shipmentId);
 
-                $packageTrackingNumber = !empty($itemObj->packagesTrackingNumbers)
-                    ? (string) $itemObj->packagesTrackingNumbers
-                    : null;
-
                 $labelData = null;
                 $labelMimeType = null;
 
@@ -1274,7 +1231,6 @@ class SoapClientAdapter implements ClientInterface
                 $parsedItems[] = [
                     'shipmentId' => $shipmentId,
                     'waybill' => $waybill,
-                    'packageTrackingNumber' => $packageTrackingNumber,
                     'labelData' => $labelData,
                     'labelMimeType' => $labelMimeType,
                 ];
@@ -1337,130 +1293,6 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
-     * Get nearest DHL service points for recipient address via DHL WebAPI2 API.
-     *
-     * @param Credentials $credentials
-     * @param string $country
-     * @param string $postCode
-     * @param string $city
-     * @param int $radius
-     *
-     * @return GetNearestServicepointsResult
-     */
-    public function getNearestServicepoints(
-        Credentials $credentials,
-        string $country,
-        string $postCode,
-        string $city = '',
-        int $radius = 15
-    ): GetNearestServicepointsResult {
-        $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
-
-        try {
-            $client = $this->createSoapClient($wsdlUrl);
-
-            $cleanCountry = strtoupper(trim($country)) ?: 'PL';
-            if ($cleanCountry === 'PL') {
-                $cleanPostCode = (string) preg_replace('/[^0-9]/', '', $postCode);
-                if (strlen($cleanPostCode) < 5 && !empty($cleanPostCode)) {
-                    $cleanPostCode = str_pad($cleanPostCode, 5, '0', STR_PAD_LEFT);
-                }
-            } else {
-                $cleanPostCode = trim($postCode);
-            }
-
-            $params = [
-                'authData' => [
-                    'username' => $this->ensureUtf8($credentials->getUsername()),
-                    'password' => $this->ensureUtf8($credentials->getPassword()),
-                ],
-                'structure' => [
-                    'country' => $this->ensureUtf8($cleanCountry),
-                    'postcode' => $this->ensureUtf8($cleanPostCode),
-                    'city' => $this->ensureUtf8($city),
-                    'radius' => $radius,
-                ],
-            ];
-
-            $response = $client->getNearestServicepoints($params);
-            $this->logSoapCommunication($client, 'getNearestServicepoints');
-
-            $result = $response->getNearestServicepointsResult ?? null;
-
-            if (is_object($result) && isset($result->points)) {
-                $rawPoints = $result->points->item ?? $result->points ?? [];
-                if (is_object($rawPoints)) {
-                    $rawPoints = [$rawPoints];
-                }
-
-                $pointsArr = [];
-                if (is_array($rawPoints)) {
-                    foreach ($rawPoints as $pointObj) {
-                        if (is_object($pointObj)) {
-                            $addr = $pointObj->address ?? null;
-                            $pointsArr[] = [
-                                'sap' => (string) ($pointObj->sap ?? ''),
-                                'name' => (string) ($pointObj->name ?? ''),
-                                'type' => (string) ($pointObj->type ?? ''),
-                                'description' => (string) ($pointObj->description ?? ''),
-                                'longitude' => (string) ($pointObj->longitude ?? ''),
-                                'latitude' => (string) ($pointObj->latitude ?? ''),
-                                'street' => is_object($addr) ? (string) ($addr->street ?? '') : '',
-                                'houseNumber' => is_object($addr) ? (string) ($addr->houseNumber ?? '') : '',
-                                'postcode' => is_object($addr) ? (string) ($addr->postcode ?? '') : '',
-                                'city' => is_object($addr) ? (string) ($addr->city ?? '') : '',
-                            ];
-                        }
-                    }
-                }
-
-                if (empty($pointsArr)) {
-                    return new GetNearestServicepointsResult(
-                        false,
-                        [],
-                        'NO_POINTS_FOUND',
-                        'No DHL service points found for given postal code.'
-                    );
-                }
-
-                return new GetNearestServicepointsResult(true, $pointsArr);
-            }
-
-            return new GetNearestServicepointsResult(
-                false,
-                [],
-                'INVALID_RESPONSE',
-                'DHL WebAPI2 returned invalid response for getNearestServicepoints.'
-            );
-        } catch (SoapFault $fault) {
-            $this->logger->error(sprintf(
-                '[DHL WebAPI2] SoapFault during getNearestServicepoints: [%s] %s',
-                $fault->faultcode ?? 'FAULT',
-                $fault->getMessage()
-            ));
-
-            return new GetNearestServicepointsResult(
-                false,
-                [],
-                $fault->faultcode ?? 'SOAP_FAULT',
-                'DHL API error: ' . $fault->getMessage()
-            );
-        } catch (Throwable $e) {
-            $this->logger->error(sprintf(
-                '[DHL WebAPI2] Exception during getNearestServicepoints: %s',
-                $e->getMessage()
-            ));
-
-            return new GetNearestServicepointsResult(
-                false,
-                [],
-                'CONNECTION_ERROR',
-                'An error occurred while connecting to DHL: ' . $e->getMessage()
-            );
-        }
-    }
-
-    /**
      * Get piece IDs / package tracking numbers for a shipment via DHL WebAPI2 getPieceId endpoint.
      *
      * @param Credentials $credentials
@@ -1477,6 +1309,7 @@ class SoapClientAdapter implements ClientInterface
         }
 
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
+        $client = null;
 
         try {
             $client = $this->createSoapClient($wsdlUrl);
@@ -1511,6 +1344,7 @@ class SoapClientAdapter implements ClientInterface
 
             return $this->extractPieceIds($resultItem);
         } catch (Throwable $e) {
+            $this->logSoapCommunication($client, 'getPieceId');
             $this->logger->error(sprintf(
                 '[DHL WebAPI2] Exception during getPieceId for shipment #%s: %s',
                 $shipmentId,
@@ -1580,14 +1414,12 @@ class SoapClientAdapter implements ClientInterface
      *
      * @param SoapClient|null $client
      * @param string $action
-     * @param bool $skipResponseBody Option to skip logging response body (e.g. for connection test endpoints)
      *
      * @return void
      */
     private function logSoapCommunication(
         ?SoapClient $client,
-        string $action,
-        bool $skipResponseBody = false
+        string $action
     ): void {
         if ($client === null) {
             return;
@@ -1622,12 +1454,8 @@ class SoapClientAdapter implements ClientInterface
 
             $lastResponse = (string) $client->__getLastResponse();
             if (!empty($lastResponse)) {
-                if ($skipResponseBody) {
-                    $this->logger->info(sprintf('[DHL SOAP Response - %s] [RESPONSE_BODY_OMITTED]', $action));
-                } else {
-                    $responseXml = $this->sanitizeXml($lastResponse);
-                    $this->logger->info(sprintf('[DHL SOAP Response - %s] %s', $action, $responseXml));
-                }
+                $responseXml = $this->sanitizeXml($lastResponse);
+                $this->logger->info(sprintf('[DHL SOAP Response - %s] %s', $action, $responseXml));
             }
         } catch (Throwable $e) {
             $this->logger->warning('Failed to log SOAP communication: ' . $e->getMessage());
@@ -1716,5 +1544,41 @@ class SoapClientAdapter implements ClientInterface
         }
 
         return $message;
+    }
+
+    /**
+     * Force fractional package measurements to be serialized as XML floats for createShipment.
+     *
+     * DHL's WSDL declares these fields as integers, which makes SoapClient truncate fractional values.
+     *
+     * @param array $shipmentData
+     *
+     * @return array
+     */
+    private function preserveFractionalPackageMeasurements(array $shipmentData): array
+    {
+        $packageItems = $shipmentData['pieceList']['item'] ?? null;
+        if (!is_array($packageItems)) {
+            return $shipmentData;
+        }
+
+        foreach ($packageItems as $packageIndex => $package) {
+            if (!is_array($package)) {
+                continue;
+            }
+
+            foreach (['weight', 'width', 'height', 'length'] as $measurement) {
+                $value = $package[$measurement] ?? null;
+                if ($value !== null && $value !== '' && is_numeric($value)) {
+                    $package[$measurement] = new SoapVar((float) $value, XSD_FLOAT);
+                }
+            }
+
+            $packageItems[$packageIndex] = $package;
+        }
+
+        $shipmentData['pieceList']['item'] = $packageItems;
+
+        return $shipmentData;
     }
 }

@@ -72,16 +72,93 @@ class CourierBookingCancellationServiceTest extends TestCase
     {
         $entityStub = $this->createStub(ShipmentDataInterface::class);
         $entityStub->method('getDispatchNumber')->willReturn(null);
+        $entityStub->method('getStatus')->willReturn('Courier status (STATUS_TOKEN)');
+        $entityStub->method('getShipmentId')->willReturn('DHL_SHIPMENT_10');
 
         $this->shipmentDataRepositoryStub->method('getById')
             ->willReturn($entityStub);
 
-        $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage(
-            'None of the selected shipments have an active courier booking/dispatch number to cancel.'
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->expects($this->never())->method('cancelCourierBooking');
+        $service = new CourierBookingCancellationService(
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->shipmentDataRepositoryStub,
+            $this->collectionFactoryStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
         );
 
-        $this->service->cancelCourierBooking([10]);
+        $this->expectException(LocalizedException::class);
+        $this->expectExceptionMessage(
+            'None of the selected shipments have an active courier dispatch number to cancel.'
+        );
+
+        $service->cancelCourierBooking([10]);
+    }
+
+    /**
+     * Test that only selected records with a courier dispatch number are sent for cancellation.
+     *
+     * @return void
+     */
+    public function testCancelCourierBookingSkipsRecordsWithoutDispatchNumber(): void
+    {
+        $entityWithDispatchNumber = $this->createStub(ShipmentDataInterface::class);
+        $entityWithDispatchNumber->method('getDispatchNumber')->willReturn('COURIER_ORDER_10');
+
+        $entityWithoutDispatchNumber = $this->createStub(ShipmentDataInterface::class);
+        $entityWithoutDispatchNumber->method('getDispatchNumber')->willReturn(null);
+        $entityWithoutDispatchNumber->method('getStatus')->willReturn('Courier status (STATUS_TOKEN)');
+        $entityWithoutDispatchNumber->method('getShipmentId')->willReturn('DHL_SHIPMENT_20');
+
+        $this->shipmentDataRepositoryStub->method('getById')->willReturnMap([
+            [10, $entityWithDispatchNumber],
+            [20, $entityWithoutDispatchNumber],
+        ]);
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->expects($this->once())
+            ->method('cancelCourierBooking')
+            ->with($this->anything(), ['COURIER_ORDER_10'])
+            ->willReturn(new CancelCourierBookingResult(false, null, 'ERR', 'Expected test failure'));
+
+        $service = new CourierBookingCancellationService(
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->shipmentDataRepositoryStub,
+            $this->collectionFactoryStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
+        );
+
+        $result = $service->cancelCourierBooking([10, 20]);
+
+        $this->assertFalse($result->isSuccess());
+    }
+
+    /**
+     * Test that a directly supplied courier order number remains supported.
+     *
+     * @return void
+     */
+    public function testCancelCourierBookingAcceptsExplicitCourierOrderNumber(): void
+    {
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->expects($this->once())
+            ->method('cancelCourierBooking')
+            ->with($this->anything(), ['COURIER_ORDER_10'])
+            ->willReturn(new CancelCourierBookingResult(false, null, 'ERR', 'Expected test failure'));
+
+        $service = new CourierBookingCancellationService(
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->shipmentDataRepositoryStub,
+            $this->collectionFactoryStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
+        );
+
+        $result = $service->cancelCourierBooking([' COURIER_ORDER_10 ']);
+
+        $this->assertFalse($result->isSuccess());
     }
 
     public function testCancelCourierBookingSuccess(): void

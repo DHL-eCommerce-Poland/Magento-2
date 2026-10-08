@@ -124,7 +124,6 @@
             "PRIMARY": true
         }
     },
-
     "dhlpoland_customs_template": {
         "column": {
             "entity_id": true,
@@ -147,6 +146,7 @@
             "not_exceed_value": true,
             "not_prohibited_goods": true,
             "not_restricted_goods": true,
+            "invoice_content": true,
             "customs_items": true,
             "country_id": true,
             "created_at": true,

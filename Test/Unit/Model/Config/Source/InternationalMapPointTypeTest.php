@@ -24,8 +24,8 @@ class InternationalMapPointTypeTest extends TestCase
         $options = $this->source->toOptionArray();
 
         $this->assertCount(3, $options);
-        $this->assertEquals(InternationalMapPointType::TYPE_PACKSTATION, $options[0]['value']);
-        $this->assertEquals(InternationalMapPointType::TYPE_PARCELSHOP, $options[1]['value']);
-        $this->assertEquals(InternationalMapPointType::TYPE_COURIER, $options[2]['value']);
+        $this->assertSame(InternationalMapPointType::TYPE_COURIER, $options[0]['value']);
+        $this->assertSame(InternationalMapPointType::TYPE_PACKSTATION, $options[1]['value']);
+        $this->assertSame(InternationalMapPointType::TYPE_PARCELSHOP, $options[2]['value']);
     }
 }

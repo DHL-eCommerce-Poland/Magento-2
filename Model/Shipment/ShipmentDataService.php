@@ -171,7 +171,11 @@ class ShipmentDataService
             }
         }
 
-        return $this->mapper->map($order, $senderDefaults, $shipmentDefaults);
+        return $this->mapper->map(
+            $order,
+            $senderDefaults,
+            $this->normalizeShipmentDefaults($shipmentDefaults)
+        );
     }
 
     /**
@@ -212,7 +216,7 @@ class ShipmentDataService
             $payloadArr['shipmentId'] = (string)$shipmentId;
         }
         if ($packageNumbers !== null && !empty($packageNumbers)) {
-            $this->mapPackageTrackingNumbers($payloadArr, $packageNumbers);
+            $this->mapPackageNumbers($payloadArr, $packageNumbers);
             $pkgStr = implode(', ', array_values(array_unique(array_filter(array_map('trim', $packageNumbers)))));
             if ($pkgStr !== '') {
                 $entity->setPackageNumbers($pkgStr);
@@ -222,6 +226,8 @@ class ShipmentDataService
             $payloadArr['magentoShipmentId'] = $magentoShipmentId;
         }
 
+        $this->removeInvoiceFileFromPayload($payloadArr);
+
         $entity->setOrderId($orderId);
         $entity->setMagentoShipmentId($magentoShipmentId);
         $entity->setStatus($status);
@@ -230,6 +236,28 @@ class ShipmentDataService
         }
         if ($returnShipmentId !== null && trim($returnShipmentId) !== '') {
             $entity->setReturnShipmentId($returnShipmentId);
+            $retWaybills = array_values(array_filter(
+                array_map('trim', explode(',', $returnShipmentId)),
+                static fn($v) => $v !== ''
+            ));
+            if (!empty($retWaybills)) {
+                if (isset($payloadArr['shipmentSettings']['packages'])
+                    && is_array($payloadArr['shipmentSettings']['packages'])
+                ) {
+                    $payloadArr['shipmentSettings']['packages'] = $this->distributeNumbersToPackages(
+                        $payloadArr['shipmentSettings']['packages'],
+                        $retWaybills,
+                        'returnShipmentId'
+                    );
+                    $payloadArr['packages'] = $payloadArr['shipmentSettings']['packages'];
+                } elseif (isset($payloadArr['packages']) && is_array($payloadArr['packages'])) {
+                    $payloadArr['packages'] = $this->distributeNumbersToPackages(
+                        $payloadArr['packages'],
+                        $retWaybills,
+                        'returnShipmentId'
+                    );
+                }
+            }
         }
         $entity->setDropOffPointTemplateId($dropOffPointTemplateId);
         $entity->setDeliveryServiceTemplateId($deliveryServiceTemplateId);
@@ -280,32 +308,35 @@ class ShipmentDataService
                 $payloadArr = (array) $this->serializer->unserialize($rawPayload);
                 $hasChanged = false;
 
-                if (!empty($returnItems)) {
-                    $packages = $payloadArr['packages']
-                        ?? ($payloadArr['shipmentSettings']['packages'] ?? []);
+                $allWaybills = !empty($returnWaybills)
+                    ? $returnWaybills
+                    : array_values(array_filter(
+                        array_map('trim', explode(',', $returnShipmentId)),
+                        static fn($v) => $v !== ''
+                    ));
 
-                    if (is_array($packages) && !empty($packages)) {
-                        foreach ($packages as $idx => $pkg) {
-                            $item = $returnItems[$idx] ?? null;
-                            if ($item && is_array($item)) {
-                                $retId = (string) ($item['waybill'] ?? ($item['shipmentId'] ?? ''));
-                                $pkgTrackNum = (string) (
-                                    $item['packageTrackingNumber'] ?? ($item['packagesTrackingNumbers'] ?? '')
-                                );
+                if (!empty($allWaybills)) {
+                    if (isset($payloadArr['shipmentSettings']['packages'])
+                        && is_array($payloadArr['shipmentSettings']['packages'])
+                    ) {
+                        $payloadArr['shipmentSettings']['packages'] = $this->distributeNumbersToPackages(
+                            $payloadArr['shipmentSettings']['packages'],
+                            $allWaybills,
+                            'returnShipmentId'
+                        );
+                        $payloadArr['packages'] = $payloadArr['shipmentSettings']['packages'];
+                        $hasChanged = true;
+                    } elseif (isset($payloadArr['packages']) && is_array($payloadArr['packages'])) {
+                        $payloadArr['packages'] = $this->distributeNumbersToPackages(
+                            $payloadArr['packages'],
+                            $allWaybills,
+                            'returnShipmentId'
+                        );
+                        $hasChanged = true;
+                    }
 
-                                $packages[$idx]['returnShipmentId'] = $retId;
-                                $packages[$idx]['packagesTrackingNumbers'] = $pkgTrackNum;
-                                $hasChanged = true;
-                            }
-                        }
-
-                        if ($hasChanged) {
-                            $payloadArr['packages'] = $packages;
-                            if (isset($payloadArr['shipmentSettings']['packages'])) {
-                                $payloadArr['shipmentSettings']['packages'] = $packages;
-                            }
-                            $entity->setShipmentData($this->serializer->serialize($payloadArr));
-                        }
+                    if ($hasChanged) {
+                        $entity->setShipmentData($this->serializer->serialize($payloadArr));
                     }
                 }
             } catch (Throwable $e) {
@@ -351,7 +382,6 @@ class ShipmentDataService
         if (isset($payloadArr['packages']) && is_array($payloadArr['packages'])) {
             foreach ($payloadArr['packages'] as $idx => $pkg) {
                 $payloadArr['packages'][$idx]['returnShipmentId'] = null;
-                $payloadArr['packages'][$idx]['packagesTrackingNumbers'] = null;
             }
         }
         if (isset($payloadArr['shipmentSettings']['packages'])
@@ -359,7 +389,6 @@ class ShipmentDataService
         ) {
             foreach ($payloadArr['shipmentSettings']['packages'] as $idx => $pkg) {
                 $payloadArr['shipmentSettings']['packages'][$idx]['returnShipmentId'] = null;
-                $payloadArr['shipmentSettings']['packages'][$idx]['packagesTrackingNumbers'] = null;
             }
         }
 
@@ -368,7 +397,7 @@ class ShipmentDataService
             $entity->setShipmentId($shipmentId);
         }
         if ($packageNumbers !== null && !empty($packageNumbers)) {
-            $this->mapPackageTrackingNumbers($payloadArr, $packageNumbers);
+            $this->mapPackageNumbers($payloadArr, $packageNumbers);
             $pkgStr = implode(', ', array_values(array_unique(array_filter(array_map('trim', $packageNumbers)))));
             if ($pkgStr !== '') {
                 $entity->setPackageNumbers($pkgStr);
@@ -378,6 +407,8 @@ class ShipmentDataService
             $payloadArr['magentoShipmentId'] = $magentoShipmentId;
             $entity->setMagentoShipmentId($magentoShipmentId);
         }
+
+        $this->removeInvoiceFileFromPayload($payloadArr);
 
         $entity->setStatus($status);
         $entity->setShipmentData($this->serializer->serialize($payloadArr));
@@ -408,7 +439,7 @@ class ShipmentDataService
                 if (isset($payloadArr['packages']) && is_array($payloadArr['packages'])) {
                     foreach ($payloadArr['packages'] as $idx => &$pkg) {
                         if (is_array($pkg)) {
-                            unset($pkg['packageNumber'], $pkg['returnShipmentId'], $pkg['packagesTrackingNumbers']);
+                            unset($pkg['packageNumber'], $pkg['returnShipmentId']);
                         }
                     }
                     unset($pkg);
@@ -418,7 +449,7 @@ class ShipmentDataService
                 ) {
                     foreach ($payloadArr['shipmentSettings']['packages'] as $idx => &$pkg) {
                         if (is_array($pkg)) {
-                            unset($pkg['packageNumber'], $pkg['returnShipmentId'], $pkg['packagesTrackingNumbers']);
+                            unset($pkg['packageNumber'], $pkg['returnShipmentId']);
                         }
                     }
                     unset($pkg);
@@ -510,37 +541,110 @@ class ShipmentDataService
     }
 
     /**
-     * Map package tracking numbers into individual package elements in payload array.
+     * Convert persisted delivery service field names to the mapper's camelCase input format.
+     *
+     * @param array $defaults
+     *
+     * @return array
+     */
+    private function normalizeShipmentDefaults(array $defaults): array
+    {
+        $keyMap = [
+            'label_type' => 'labelType',
+            'address_type' => 'addressType',
+            'auto_create_return_shipment' => 'autoCreateReturnShipment',
+            'return_label_type' => 'returnLabelType',
+            'return_qr_code_type' => 'returnQrCodeType',
+            'return_label_exp_days' => 'returnLabelExpDays',
+            'return_book_courier' => 'returnBookCourier',
+        ];
+
+        foreach ($keyMap as $storedKey => $mapperKey) {
+            if (array_key_exists($storedKey, $defaults)) {
+                $defaults[$mapperKey] = $defaults[$mapperKey] ?? $defaults[$storedKey];
+                unset($defaults[$storedKey]);
+            }
+        }
+
+        return $defaults;
+    }
+
+    /**
+     * Map package numbers into individual package elements in payload array by quantity.
      *
      * @param array $payloadArr
      * @param array $packageNumbers
      *
      * @return void
      */
-    private function mapPackageTrackingNumbers(array &$payloadArr, array $packageNumbers): void
+    private function mapPackageNumbers(array &$payloadArr, array $packageNumbers): void
     {
-        $pkgNums = array_values($packageNumbers);
-        $payloadArr['packageNumbers'] = $pkgNums;
+        $cleanNumbers = array_values(array_filter(
+            array_map('trim', $packageNumbers),
+            static fn($val) => $val !== ''
+        ));
+        $payloadArr['packageNumbers'] = $cleanNumbers;
 
         if (isset($payloadArr['shipmentSettings']['packages'])
             && is_array($payloadArr['shipmentSettings']['packages'])
         ) {
-            foreach ($payloadArr['shipmentSettings']['packages'] as $idx => &$pkg) {
-                if (is_array($pkg) && isset($pkgNums[$idx])) {
-                    $pkg['packageNumber'] = (string)$pkgNums[$idx];
-                }
-            }
-            unset($pkg);
+            $payloadArr['shipmentSettings']['packages'] = $this->distributeNumbersToPackages(
+                $payloadArr['shipmentSettings']['packages'],
+                $cleanNumbers,
+                'packageNumber'
+            );
             $payloadArr['packages'] = $payloadArr['shipmentSettings']['packages'];
+        } elseif (isset($payloadArr['packages']) && is_array($payloadArr['packages'])) {
+            $payloadArr['packages'] = $this->distributeNumbersToPackages(
+                $payloadArr['packages'],
+                $cleanNumbers,
+                'packageNumber'
+            );
         }
+    }
 
-        if (isset($payloadArr['packages']) && is_array($payloadArr['packages'])) {
-            foreach ($payloadArr['packages'] as $idx => &$pkg) {
-                if (is_array($pkg) && isset($pkgNums[$idx])) {
-                    $pkg['packageNumber'] = (string)$pkgNums[$idx];
-                }
+    /**
+     * Distribute tracking numbers sequentially into package rows according to each package's quantity.
+     *
+     * @param array $packages
+     * @param string[] $numbers
+     * @param string $targetField
+     *
+     * @return array
+     */
+    private function distributeNumbersToPackages(array $packages, array $numbers, string $targetField): array
+    {
+        $cleanNumbers = array_values(array_filter(
+            array_map('trim', $numbers),
+            static fn($val) => $val !== ''
+        ));
+
+        $offset = 0;
+        foreach ($packages as &$pkg) {
+            if (!is_array($pkg)) {
+                continue;
             }
-            unset($pkg);
+            $qty = max(1, (int)($pkg['quantity'] ?? 1));
+            $assigned = array_slice($cleanNumbers, $offset, $qty);
+            $offset += $qty;
+            $pkg[$targetField] = implode(', ', $assigned);
+        }
+        unset($pkg);
+
+        return $packages;
+    }
+
+    /**
+     * Keep the uploaded VAT invoice in the DHL request only, not in the persisted shipment payload.
+     *
+     * @param array $payloadArr
+     *
+     * @return void
+     */
+    private function removeInvoiceFileFromPayload(array &$payloadArr): void
+    {
+        if (isset($payloadArr['customs']) && is_array($payloadArr['customs'])) {
+            unset($payloadArr['customs']['invoiceFile']);
         }
     }
 }

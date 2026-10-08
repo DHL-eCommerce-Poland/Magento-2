@@ -129,7 +129,6 @@ class ReturnShipmentCreationServiceTest extends TestCase
                 [
                     'shipmentId' => 'RET3003',
                     'waybill' => 'RET3003',
-                    'packageTrackingNumber' => 'P1',
                     'labelData' => 'pdf',
                     'labelMimeType' => 'application/pdf',
                 ],
@@ -195,21 +194,18 @@ class ReturnShipmentCreationServiceTest extends TestCase
                 [
                     'shipmentId' => '90040025505',
                     'waybill' => '90040025505',
-                    'packageTrackingNumber' => 'P1',
                     'labelData' => 'pdf1',
                     'labelMimeType' => 'application/pdf',
                 ],
                 [
                     'shipmentId' => '90040025516',
                     'waybill' => '90040025516',
-                    'packageTrackingNumber' => 'P2',
                     'labelData' => 'pdf2',
                     'labelMimeType' => 'application/pdf',
                 ],
                 [
                     'shipmentId' => '90040025527',
                     'waybill' => '90040025527',
-                    'packageTrackingNumber' => 'P3',
                     'labelData' => 'pdf3',
                     'labelMimeType' => 'application/pdf',
                 ],

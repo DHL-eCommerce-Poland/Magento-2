@@ -254,10 +254,15 @@
             </formElements>
         </field>
         <field name="return_label_exp_days" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">14</item>
+                </item>
+            </argument>
             <settings>
                 <validation>
                     <rule name="validate-digits" xsi:type="boolean">true</rule>
-                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
                 </validation>
                 <dataType>text</dataType>
                 <label translate="true">Return Label Expiration (7-183 Days)</label>
@@ -504,29 +509,6 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="additional_services[selfCollect]" formElement="checkbox">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="default" xsi:type="number">0</item>
-                </item>
-            </argument>
-            <settings>
-                <dataType>boolean</dataType>
-                <label translate="true">Self Pickup</label>
-                <dataScope>additional_services.selfCollect</dataScope>
-            </settings>
-            <formElements>
-                <checkbox>
-                    <settings>
-                        <valueMap>
-                            <map name="false" xsi:type="number">0</map>
-                            <map name="true" xsi:type="number">1</map>
-                        </valueMap>
-                        <prefer>toggle</prefer>
-                    </settings>
-                </checkbox>
-            </formElements>
-        </field>
     </fieldset>
     <fieldset name="dimensions">
         <settings>
@@ -587,10 +569,14 @@
                                             <callback>enable</callback>
                                         </action>
                                         <action name="3">
+                                            <target>${ $.parentName }.weight</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="4">
                                             <target>${ $.parentName }.has_euro_return</target>
                                             <callback>disable</callback>
                                         </action>
-                                        <action name="4">
+                                        <action name="5">
                                             <target>${ $.parentName }.has_euro_return</target>
                                             <callback>value</callback>
                                             <params>
@@ -636,10 +622,21 @@
                                             </params>
                                         </action>
                                         <action name="6">
-                                            <target>${ $.parentName }.has_euro_return</target>
+                                            <target>${ $.parentName }.weight</target>
                                             <callback>disable</callback>
                                         </action>
                                         <action name="7">
+                                            <target>${ $.parentName }.weight</target>
+                                            <callback>value</callback>
+                                            <params>
+                                                <param name="0" xsi:type="string"></param>
+                                            </params>
+                                        </action>
+                                        <action name="8">
+                                            <target>${ $.parentName }.has_euro_return</target>
+                                            <callback>disable</callback>
+                                        </action>
+                                        <action name="9">
                                             <target>${ $.parentName }.has_euro_return</target>
                                             <callback>value</callback>
                                             <params>
@@ -664,6 +661,10 @@
                                             <callback>enable</callback>
                                         </action>
                                         <action name="3">
+                                            <target>${ $.parentName }.weight</target>
+                                            <callback>enable</callback>
+                                        </action>
+                                        <action name="4">
                                             <target>${ $.parentName }.has_euro_return</target>
                                             <callback>enable</callback>
                                         </action>
@@ -705,7 +706,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Weight (kg)</label>
+                        <label translate="true">Weight [kg]</label>
                         <dataScope>weight</dataScope>
                     </settings>
                 </field>
@@ -718,7 +719,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Width (cm)</label>
+                        <label translate="true">Width [cm]</label>
                         <dataScope>width</dataScope>
                     </settings>
                 </field>
@@ -731,7 +732,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Length (cm)</label>
+                        <label translate="true">Length [cm]</label>
                         <dataScope>length</dataScope>
                     </settings>
                 </field>
@@ -744,7 +745,7 @@
                     </argument>
                     <settings>
                         <dataType>text</dataType>
-                        <label translate="true">Height (cm)</label>
+                        <label translate="true">Height [cm]</label>
                         <dataScope>height</dataScope>
                     </settings>
                 </field>

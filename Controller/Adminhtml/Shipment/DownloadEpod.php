@@ -11,6 +11,7 @@ use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Throwable;
 
@@ -22,11 +23,13 @@ class DownloadEpod extends Action implements HttpGetActionInterface, HttpPostAct
      * @param Context $context
      * @param DocumentDownloadService $documentDownloadService
      * @param FileFactory $fileFactory
+     * @param JsonFactory $resultJsonFactory
      */
     public function __construct(
         Context $context,
         private readonly DocumentDownloadService $documentDownloadService,
-        private readonly FileFactory $fileFactory
+        private readonly FileFactory $fileFactory,
+        private readonly JsonFactory $resultJsonFactory
     ) {
         parent::__construct($context);
     }
@@ -38,11 +41,20 @@ class DownloadEpod extends Action implements HttpGetActionInterface, HttpPostAct
      */
     public function execute(): ResponseInterface|ResultInterface
     {
+        $request = $this->getRequest();
+        $isAjax = $request->isXmlHttpRequest() || (bool) $request->getParam('isAjax');
         $resultRedirect = $this->resultRedirectFactory->create();
-        $entityId = (int) $this->getRequest()->getParam('entity_id');
+        $entityId = (int) $request->getParam('entity_id');
 
         if ($entityId <= 0) {
-            $this->messageManager->addErrorMessage(__('Invalid shipment entity ID.'));
+            $msg = __('Invalid shipment entity ID.');
+            if ($isAjax) {
+                return $this->resultJsonFactory->create()->setData([
+                    'success' => false,
+                    'message' => (string) $msg,
+                ]);
+            }
+            $this->messageManager->addErrorMessage($msg);
             return $resultRedirect->setPath('*/*/index');
         }
 
@@ -60,10 +72,15 @@ class DownloadEpod extends Action implements HttpGetActionInterface, HttpPostAct
                 $epodData['mimeType']
             );
         } catch (Throwable $e) {
-            $this->messageManager->addErrorMessage(
-                __('Could not download ePOD: %1', $e->getMessage())
-            );
-            return $resultRedirect->setPath('*/*/index');
+            $errorMsg = __('Could not download ePOD: %1', $e->getMessage());
+            if ($isAjax) {
+                return $this->resultJsonFactory->create()->setData([
+                    'success' => false,
+                    'message' => (string) $errorMsg,
+                ]);
+            }
+            $this->messageManager->addErrorMessage($errorMsg);
+            return $resultRedirect->setPath('*/*/edit', ['entity_id' => $entityId]);
         }
     }
 }

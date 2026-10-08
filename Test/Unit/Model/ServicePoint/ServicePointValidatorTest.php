@@ -226,6 +226,28 @@ class ServicePointValidatorTest extends TestCase
         $validator->validate(Carrier::CODE, 'connect_parcelshop', $point);
     }
 
+    public function testValidationPassesForConnectParcelshopEvenIfPostnummerIsProvided(): void
+    {
+        $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
+
+        $validator = $this->createValidator($scopeConfigStub);
+        $point = new ServicePointValueObject(
+            'DE123',
+            'ParcelShop Filiale 501',
+            'Keetstr.',
+            '49393',
+            'Lohne',
+            false,
+            true,
+            'invalid_postnummer_for_shop',
+            'DE'
+        );
+
+        $this->expectNotToPerformAssertions();
+        $validator->validate(Carrier::CODE, 'connect_parcelshop', $point);
+        $validator->validate(Carrier::CODE, 'connect_parcelshop_cod', $point);
+    }
+
     public function testValidationPassesForConnectMethodWithoutServicePoint(): void
     {
         $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);

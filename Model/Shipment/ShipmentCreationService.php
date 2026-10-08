@@ -10,7 +10,6 @@ use Ideo\Dhl\Model\Api\CreateShipmentResult;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
 use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\ServicePoint\NearestPointResolver;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Lock\LockManagerInterface;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -33,7 +32,7 @@ class ShipmentCreationService
      * @param ReturnShipmentDataBuilder $returnBuilder
      * @param ReturnShipmentCreationService $returnCreationService
      * @param MagentoShipmentSyncService $magentoShipmentSyncService
-     * @param NearestPointResolver $nearestPointResolver
+     * @param ShipmentDataPayloadReader $payloadReader
      */
     public function __construct(
         private readonly ShipmentDataService $shipmentDataService,
@@ -47,7 +46,7 @@ class ShipmentCreationService
         private readonly ReturnShipmentDataBuilder $returnBuilder,
         private readonly ReturnShipmentCreationService $returnCreationService,
         private readonly MagentoShipmentSyncService $magentoShipmentSyncService,
-        private readonly NearestPointResolver $nearestPointResolver
+        private readonly ShipmentDataPayloadReader $payloadReader
     ) {
     }
 
@@ -72,8 +71,6 @@ class ShipmentCreationService
         ?string $deliveryServiceTemplateId = null,
         ?string $customsTemplateId = null
     ): CreateShipmentResult {
-        $shipmentData = $this->ensureServicePointResolved($shipmentData, $environment);
-
         $orderId = $shipmentData->getOrderId();
         if ($orderId !== null && $this->shipmentDataService->hasShipmentForOrder($orderId)) {
             throw new LocalizedException(
@@ -167,7 +164,7 @@ class ShipmentCreationService
                 ));
                 try {
                     $returnShipmentData = $this->returnBuilder->buildReturnShipmentData($shipmentData);
-                    $expDays = $shipmentData->getShipmentSettings()->getReturnLabelExpDays() ?: 14;
+                    $expDays = (int) $shipmentData->getShipmentSettings()->getReturnLabelExpDays();
                     $savedEntityId = $savedEntity ? (int) $savedEntity->getEntityId() : null;
 
                     $this->returnCreationService->createReturnShipment(
@@ -210,8 +207,6 @@ class ShipmentCreationService
         DhlShipmentData $shipmentData,
         string $environment = 'sandbox'
     ): CreateShipmentResult {
-        $shipmentData = $this->ensureServicePointResolved($shipmentData, $environment);
-
         $lockName = 'dhl_shipment_recreate_' . $entityId;
 
         if (!$this->lockManager->lock($lockName, self::LOCK_TTL)) {
@@ -229,7 +224,8 @@ class ShipmentCreationService
 
             if (!empty($oldShipmentId)) {
                 try {
-                    $deleteResult = $this->client->deleteShipment($credentials, $oldShipmentId);
+                    $returnShipmentIds = $this->payloadReader->getReturnShipmentIdsFromEntity($existingEntity);
+                    $deleteResult = $this->client->deleteShipment($credentials, $oldShipmentId, $returnShipmentIds);
                     if ($deleteResult->isSuccess()) {
                         $this->shipmentDataService->clearShipmentId($entityId);
 
@@ -329,7 +325,7 @@ class ShipmentCreationService
                 ));
                 try {
                     $returnShipmentData = $this->returnBuilder->buildReturnShipmentData($shipmentData);
-                    $expDays = $shipmentData->getShipmentSettings()->getReturnLabelExpDays() ?: 14;
+                    $expDays = (int) $shipmentData->getShipmentSettings()->getReturnLabelExpDays();
 
                     $this->returnCreationService->createReturnShipment(
                         returnShipmentData: $returnShipmentData,
@@ -353,55 +349,5 @@ class ShipmentCreationService
                 $this->logger->warning(sprintf('[ShipmentCreation] Failed to release lock: %s', $lockName));
             }
         }
-    }
-
-    /**
-     * Resolve nearest service point if service is SP / PS / EK and recipient popId is empty.
-     *
-     * @param DhlShipmentData $shipmentData
-     * @param string $environment
-     *
-     * @return DhlShipmentData
-     * @throws LocalizedException
-     */
-    private function ensureServicePointResolved(DhlShipmentData $shipmentData, string $environment): DhlShipmentData
-    {
-        $serviceType = strtoupper(trim((string)$shipmentData->getShipmentSettings()->getServiceType()));
-        $popId = $shipmentData->getRecipient()->getPopId();
-
-        $isPointService = in_array($serviceType, [MethodCatalog::SERVICE_SP, MethodCatalog::SERVICE_EK], true);
-        if ($isPointService && (empty($popId) || trim((string)$popId) === '')) {
-            if ($this->nearestPointResolver !== null) {
-                try {
-                    $updatedRecipient = $this->nearestPointResolver->resolveForRecipient(
-                        $shipmentData->getRecipient(),
-                        $environment
-                    );
-                    $shipmentDataArr = $shipmentData->toArray();
-                    $shipmentDataArr['recipient'] = $updatedRecipient->toArray();
-
-                    return DhlShipmentData::fromArray($shipmentDataArr);
-                } catch (LocalizedException $e) {
-                    $this->logger->warning(sprintf(
-                        '[ShipmentCreation] Could not auto-resolve nearest point for order #%s: %s',
-                        (string) $shipmentData->getOrderId(),
-                        $e->getMessage()
-                    ));
-                    throw $e;
-                } catch (Throwable $e) {
-                    $this->logger->error(sprintf(
-                        '[ShipmentCreation] Error resolving nearest point for order #%s: %s',
-                        (string) $shipmentData->getOrderId(),
-                        $e->getMessage()
-                    ));
-                    throw new LocalizedException(__(
-                        'Could not resolve nearest DHL Service Point: %1',
-                        $e->getMessage()
-                    ));
-                }
-            }
-        }
-
-        return $shipmentData;
     }
 }

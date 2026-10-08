@@ -49,34 +49,18 @@ class RecreateShipment extends Generic implements ButtonProviderInterface
         $safeTitle = $this->escapeJs((string) $title);
         $safeMsg = $this->escapeJs((string) $msg);
 
+        $saveUrl = $this->escapeJs($this->getUrl('dhlpoland/shipment/save', ['entity_id' => $entity->getEntityId()]));
+
         return [
             'label' => __('Save & Resend to DHL'),
             'class' => 'save primary',
             'on_click' => sprintf(
-                "require(['Magento_Ui/js/modal/confirm', 'uiRegistry', 'jquery'], function(confirm, registry, $) {
-                    confirm({
-                        title: '%s',
-                        content: '%s',
-                        actions: {
-                            confirm: function() {
-                                var formComponent = registry.get('dhlpoland_shipment_form.dhlpoland_shipment_form');
-                                if (formComponent && typeof formComponent.save === 'function') {
-                                    formComponent.save();
-                                } else {
-                                    var \$form = $('form').filter(function() {
-                                        var act = $(this).attr('action');
-                                        return act && act.indexOf('dhlpoland/shipment/save') !== -1;
-                                    });
-                                    if (\$form.length) {
-                                        \$form.trigger('submit');
-                                    }
-                                }
-                            }
-                        }
-                    });
+                "require(['Ideo_Dhl/js/shipment/recreate-shipment'], function(recreateShipment) {
+                    recreateShipment('%s', '%s', '%s');
                 });",
                 $safeTitle,
-                $safeMsg
+                $safeMsg,
+                $saveUrl
             ),
             'sort_order' => 70,
         ];

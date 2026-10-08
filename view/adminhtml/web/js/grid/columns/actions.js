@@ -7,6 +7,20 @@ define([
 
     return Actions.extend({
         /**
+         * Checks if specified action requires a handler function.
+         *
+         * @param {String} actionIndex - Actions' identifier.
+         * @param {Number} rowIndex - Index of a row.
+         *
+         * @returns {Boolean}
+         */
+        isHandlerRequired: function (actionIndex, rowIndex) {
+            var action = this.getAction(rowIndex, actionIndex);
+
+            return this._super(actionIndex, rowIndex) || Boolean(action && action.post);
+        },
+
+        /**
          * Callback for single row action 'Order Courier' on shipment grid.
          *
          * @param {String} actionIndex
@@ -16,8 +30,8 @@ define([
             var numbers = [];
             if (this.rows && Array.isArray(this.rows)) {
                 this.rows.forEach(function (row) {
-                    if (row.entity_id == recordId) {
-                        numbers.push(row.shipment_id || row.entity_id);
+                    if (row.entity_id == recordId && row.shipment_id) {
+                        numbers.push(row.shipment_id);
                     }
                 });
             }
@@ -39,7 +53,9 @@ define([
                 if (this.rows && Array.isArray(this.rows)) {
                     this.rows.forEach(function (row) {
                         if (selectedIds.indexOf(row.entity_id) !== -1 || selectedIds.indexOf(String(row.entity_id)) !== -1) {
-                            numbers.push(row.shipment_id || row.entity_id);
+                            if (row.shipment_id) {
+                                numbers.push(row.shipment_id);
+                            }
                         }
                     });
                 }

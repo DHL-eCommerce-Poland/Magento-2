@@ -13,11 +13,13 @@ use Ideo\Dhl\Model\ShipmentData;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Ui\Component\MassAction\Filter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class MassCancelCourierBookingTest extends TestCase
 {
@@ -50,6 +52,10 @@ class MassCancelCourierBookingTest extends TestCase
      */
     private $messageManagerMock;
     /**
+     * @var Stub
+     */
+    private $loggerStub;
+    /**
      * @var MassCancelCourierBooking
      */
     private $controller;
@@ -63,6 +69,7 @@ class MassCancelCourierBookingTest extends TestCase
         $this->redirectFactoryStub = $this->createStub(RedirectFactory::class);
         $this->redirectMock = $this->createMock(Redirect::class);
         $this->messageManagerMock = $this->createMock(ManagerInterface::class);
+        $this->loggerStub = $this->createStub(LoggerInterface::class);
 
         $this->contextStub->method('getResultRedirectFactory')
             ->willReturn($this->redirectFactoryStub);
@@ -83,7 +90,7 @@ class MassCancelCourierBookingTest extends TestCase
             $this->filterMock,
             $this->collectionFactoryMock,
             $this->cancellationServiceMock,
-            $this->createStub(\Psr\Log\LoggerInterface::class)
+            $this->loggerStub
         );
     }
 
@@ -176,6 +183,58 @@ class MassCancelCourierBookingTest extends TestCase
             ->method('addErrorMessage');
 
         $result = $this->controller->execute();
+        $this->assertSame($this->redirectMock, $result);
+    }
+
+    /**
+     * Test that expected localized cancellation failures are shown without exception logging.
+     *
+     * @return void
+     */
+    public function testExecuteLocalizedCancellationFailureIsNotLoggedAsException(): void
+    {
+        $this->collectionFactoryMock->expects($this->never())->method('create');
+        $this->filterMock->expects($this->never())->method('getCollection');
+
+        $itemStub = $this->createStub(ShipmentData::class);
+        $itemStub->method('getEntityId')->willReturn(10);
+
+        $collectionMock = $this->createMock(Collection::class);
+        $collectionMock->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator([$itemStub]));
+        $collectionFactoryMock = $this->createMock(CollectionFactory::class);
+        $collectionFactoryMock->expects($this->once())
+            ->method('create')
+            ->willReturn($collectionMock);
+        $filterMock = $this->createMock(Filter::class);
+        $filterMock->expects($this->once())
+            ->method('getCollection')
+            ->with($collectionMock)
+            ->willReturn($collectionMock);
+
+        $message = 'Żadna z wybranych przesyłek nie posiada aktywnego numeru zlecenia kuriera do anulowania.';
+        $this->cancellationServiceMock->expects($this->once())
+            ->method('cancelCourierBooking')
+            ->with([10])
+            ->willThrowException(new LocalizedException(__($message)));
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->never())->method('error');
+        $this->messageManagerMock->expects($this->once())
+            ->method('addErrorMessage')
+            ->with($message);
+
+        $controller = new MassCancelCourierBooking(
+            $this->contextStub,
+            $filterMock,
+            $collectionFactoryMock,
+            $this->cancellationServiceMock,
+            $loggerMock
+        );
+
+        $result = $controller->execute();
+
         $this->assertSame($this->redirectMock, $result);
     }
 }

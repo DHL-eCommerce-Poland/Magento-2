@@ -156,7 +156,12 @@ class SaveTest extends TestCase
             'sender' => ['name' => 'Jan Kowalski'],
             'recipient' => ['name' => 'Firma ABC'],
             'specialServices' => [],
-            'shipmentSettings' => ['serviceType' => 'AH']
+            'shipmentSettings' => [
+                'serviceType' => 'AH',
+                'labelType' => 'LBLP',
+                'returnLabelType' => 'ZBLP300',
+                'returnQrCodeType' => 'QR6_IMG',
+            ]
         ];
 
         $this->requestStub
@@ -182,7 +187,10 @@ class SaveTest extends TestCase
         $apiResult = new CreateShipmentResult(true, false, '90039521201');
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('createShipment')
-            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'sandbox', '1', '2', null)
+            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData
+                && $arg->getShipmentSettings()->getLabelType() === 'LBLP'
+                && $arg->getShipmentSettings()->getReturnLabelType() === 'ZBLP300'
+                && $arg->getShipmentSettings()->getReturnQrCodeType() === 'QR6_IMG'), 'sandbox', '1', '2', null)
             ->willReturn($apiResult);
 
         $this->jsonResultMock->expects(self::once())
@@ -348,6 +356,138 @@ class SaveTest extends TestCase
             ->willReturn($this->jsonResultMock);
 
         $result = $controllerWithValidator->execute();
+        $this->assertSame($this->jsonResultMock, $result);
+    }
+
+    /**
+     * Test execute calls recreateShipment when entity_id is provided and preserves packages from packages_fieldset.
+     *
+     * @return void
+     */
+    public function testExecuteRecreateShipmentWithPackagesFieldset(): void
+    {
+        $payloadData = [
+            'entity_id' => 42,
+            'orderId' => 123,
+            'sender' => ['name' => 'Jan Kowalski'],
+            'recipient' => ['name' => 'Firma ABC'],
+            'specialServices' => [],
+            'shipmentSettings' => [
+                'serviceType' => 'AH',
+                'labelType' => 'ZBLP300',
+                'returnLabelType' => 'LBLP',
+                'returnQrCodeType' => 'QR4_IMG',
+                'packages' => [
+                    ['weight' => 10.0, 'quantity' => 1],
+                ],
+            ],
+            'packages_fieldset' => [
+                'packages' => [
+                    ['weight' => 10.0, 'quantity' => 1],
+                    ['weight' => 5.0, 'quantity' => 1],
+                ],
+            ],
+        ];
+
+        $this->requestStub
+            ->method('getParam')
+            ->willReturnCallback(function (string $param) use ($payloadData) {
+                if ($param === 'shipment_data') {
+                    return json_encode($payloadData);
+                }
+                if ($param === 'entity_id') {
+                    return 42;
+                }
+                return null;
+            });
+
+        $this->scopeConfigMock->expects(self::once())
+            ->method('getValue')
+            ->with('carriers/dhlpoland/sandbox')
+            ->willReturn('1');
+
+        $apiResult = new CreateShipmentResult(true, false, '90039521202');
+        $this->shipmentCreationServiceMock->expects(self::once())
+            ->method('recreateShipment')
+            ->with(
+                42,
+                Assert::callback(function ($arg) {
+                    return $arg instanceof DhlShipmentData
+                        && $arg->getShipmentSettings()->getLabelType() === 'ZBLP300'
+                        && $arg->getShipmentSettings()->getReturnLabelType() === 'LBLP'
+                        && $arg->getShipmentSettings()->getReturnQrCodeType() === 'QR4_IMG'
+                        && count($arg->getShipmentSettings()->getPackages()) === 2
+                        && $arg->getShipmentSettings()->getPackageQuantity() === 2;
+                }),
+                'sandbox'
+            )
+            ->willReturn($apiResult);
+
+        $this->jsonResultMock->expects(self::once())
+            ->method('setData')
+            ->with(Assert::callback(function (array $data) {
+                return $data['success'] === true
+                    && $data['shipmentId'] === '90039521202';
+            }))
+            ->willReturn($this->jsonResultMock);
+
+        $result = $this->controller->execute();
+        $this->assertSame($this->jsonResultMock, $result);
+    }
+
+    public function testExecuteSanitizesCustomsInvoiceDate(): void
+    {
+        $payloadData = [
+            'entity_id' => 42,
+            'shipmentSettings' => [
+                'shipmentDate' => '2026-09-10',
+                'serviceType' => 'AH',
+            ],
+            'customs' => [
+                'invoiceDate' => '10.08.2025',
+                'customsType' => 'C',
+            ],
+        ];
+
+        $this->requestStub
+            ->method('getParam')
+            ->willReturnCallback(function (string $param) use ($payloadData) {
+                if ($param === 'shipment_data') {
+                    return json_encode($payloadData);
+                }
+                if ($param === 'entity_id') {
+                    return 42;
+                }
+                return null;
+            });
+
+        $this->scopeConfigMock
+            ->method('getValue')
+            ->with('carriers/dhlpoland/sandbox')
+            ->willReturn('1');
+
+        $apiResult = new CreateShipmentResult(true, false, '90039521202');
+        $this->shipmentCreationServiceMock->expects(self::once())
+            ->method('recreateShipment')
+            ->with(
+                42,
+                Assert::callback(function ($arg) {
+                    return $arg instanceof DhlShipmentData
+                        && $arg->getCustoms() !== null
+                        && $arg->getCustoms()->getInvoiceDate() === '2025-08-10';
+                }),
+                'sandbox'
+            )
+            ->willReturn($apiResult);
+
+        $this->jsonResultMock->expects(self::once())
+            ->method('setData')
+            ->with(Assert::callback(function (array $data) {
+                return $data['success'] === true;
+            }))
+            ->willReturn($this->jsonResultMock);
+
+        $result = $this->controller->execute();
         $this->assertSame($this->jsonResultMock, $result);
     }
 }

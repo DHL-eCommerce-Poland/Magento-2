@@ -11,6 +11,7 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Ui\Component\MassAction\Filter;
 use Psr\Log\LoggerInterface;
 
@@ -48,6 +49,7 @@ class MassDelete extends Action implements HttpPostActionInterface
             $collection = $this->filter->getCollection($this->collectionFactory->create());
             $deletedCount = 0;
             $errorCount = 0;
+            $errorMessages = [];
 
             foreach ($collection as $item) {
                 $entityId = (int)$item->getEntityId();
@@ -56,10 +58,31 @@ class MassDelete extends Action implements HttpPostActionInterface
                 }
 
                 try {
-                    $this->shipmentDeletionService->deleteShipment($entityId);
-                    $deletedCount++;
+                    $deletionResult = $this->shipmentDeletionService->deleteShipment($entityId);
+                    if ($deletionResult->isSuccess()) {
+                        $deletedCount++;
+                    } else {
+                        $errorCount++;
+                        $errorMessages[] = (string) __(
+                            'Shipment #%1: %2',
+                            $entityId,
+                            $deletionResult->getErrorMessage() ?: (string) __('Shipment could not be deleted.')
+                        );
+                    }
+                } catch (LocalizedException $e) {
+                    $errorCount++;
+                    $errorMessages[] = (string) __('Shipment #%1: %2', $entityId, $e->getMessage());
+                    $this->logger->error(
+                        sprintf('Error deleting shipment #%d during mass delete: %s', $entityId, $e->getMessage()),
+                        ['exception' => $e]
+                    );
                 } catch (Exception $e) {
                     $errorCount++;
+                    $errorMessages[] = (string) __(
+                        'Shipment #%1: %2',
+                        $entityId,
+                        (string) __('An unexpected error occurred.')
+                    );
                     $this->logger->error(
                         sprintf('Error deleting shipment #%d during mass delete: %s', $entityId, $e->getMessage()),
                         ['exception' => $e]
@@ -75,7 +98,11 @@ class MassDelete extends Action implements HttpPostActionInterface
 
             if ($errorCount > 0) {
                 $this->messageManager->addErrorMessage(
-                    __('Failed to delete %1 shipment(s). Please check system logs.', $errorCount)
+                    __(
+                        'Failed to delete shipments (%1). Details: %2',
+                        $errorCount,
+                        implode('; ', $errorMessages)
+                    )
                 );
             }
         } catch (Exception $e) {

@@ -129,12 +129,12 @@ class ShipmentSettingsDataTest extends TestCase
             'height' => 10.0,
             'length' => 20.0,
             'packageQuantity' => 3,
-            'labelType' => 'BLP',
+            'labelType' => 'ZBLP300',
             'isNonStandard' => false,
             'hasEuroReturn' => false,
             'autoCreateReturnShipment' => false,
-            'returnLabelType' => null,
-            'returnQrCodeType' => null,
+            'returnLabelType' => 'LBLP',
+            'returnQrCodeType' => 'QR4_IMG',
             'returnLabelExpDays' => null,
             'returnBookCourier' => null,
             'dropOffPointId' => null,
@@ -206,5 +206,42 @@ class ShipmentSettingsDataTest extends TestCase
         $this->assertCount(1, $settings->getPackages());
         $this->assertEquals(2, $settings->getPackageQuantity());
         $this->assertEquals(3.0, $settings->getWeight());
+    }
+
+    public function testReturnLabelExpDaysDefaultsTo14WhenAutoCreateReturnShipmentIsTrue(): void
+    {
+        $settings = new ShipmentSettingsData(
+            autoCreateReturnShipment: true,
+            returnLabelExpDays: null
+        );
+        $this->assertSame(14, $settings->getReturnLabelExpDays());
+        $arr = $settings->toArray();
+        $this->assertSame(14, $arr['returnLabelExpDays']);
+
+        $settingsWithZero = new ShipmentSettingsData(
+            autoCreateReturnShipment: true,
+            returnLabelExpDays: 0
+        );
+        $this->assertSame(14, $settingsWithZero->getReturnLabelExpDays());
+        $arrZero = $settingsWithZero->toArray();
+        $this->assertSame(14, $arrZero['returnLabelExpDays']);
+
+        $settingsWithCustom = new ShipmentSettingsData(
+            autoCreateReturnShipment: true,
+            returnLabelExpDays: 21
+        );
+        $this->assertSame(21, $settingsWithCustom->getReturnLabelExpDays());
+
+        $fromArray = ShipmentSettingsData::fromArray([
+            'autoCreateReturnShipment' => true,
+            'returnLabelExpDays' => '0'
+        ]);
+        $this->assertSame(14, $fromArray->getReturnLabelExpDays());
+
+        $fromArrayDisabled = ShipmentSettingsData::fromArray([
+            'autoCreateReturnShipment' => false,
+            'returnLabelExpDays' => ''
+        ]);
+        $this->assertNull($fromArrayDisabled->getReturnLabelExpDays());
     }
 }

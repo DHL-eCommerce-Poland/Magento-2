@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
 use Ideo\Dhl\Controller\Adminhtml\Shipment\Delete;
+use Ideo\Dhl\Model\Shipment\ShipmentDeletionResult;
 use Ideo\Dhl\Model\Shipment\ShipmentDeletionService;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
@@ -12,39 +13,41 @@ use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Message\ManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class DeleteTest extends TestCase
 {
     /**
-     * @var MockObject
+     * @var Stub
      */
-    private $contextMock;
+    private $contextStub;
     /**
-     * @var MockObject
+     * @var Stub
      */
-    private $requestMock;
+    private $requestStub;
     /**
      * @var MockObject
      */
     private $messageManagerMock;
     /**
-     * @var MockObject
+     * @var Stub
      */
-    private $redirectFactoryMock;
+    private $redirectFactoryStub;
     /**
-     * @var MockObject
+     * @var Stub
      */
-    private $redirectMock;
+    private $redirectStub;
     /**
-     * @var MockObject
+     * @var Stub
      */
-    private $deletionServiceMock;
+    private $deletionServiceStub;
     /**
-     * @var MockObject
+     * @var Stub
      */
-    private $loggerMock;
+    private $loggerStub;
     /**
      * @var Delete
      */
@@ -52,112 +55,120 @@ class DeleteTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->contextMock = $this->createMock(Context::class);
-        $this->requestMock = $this->createMock(RequestInterface::class);
+        $this->contextStub = $this->createStub(Context::class);
+        $this->requestStub = $this->createStub(RequestInterface::class);
         $this->messageManagerMock = $this->createMock(ManagerInterface::class);
-        $this->redirectFactoryMock = $this->createMock(RedirectFactory::class);
-        $this->redirectMock = $this->createMock(Redirect::class);
-        $this->deletionServiceMock = $this->createMock(ShipmentDeletionService::class);
-        $this->loggerMock = $this->createStub(LoggerInterface::class);
+        $this->redirectFactoryStub = $this->createStub(RedirectFactory::class);
+        $this->redirectStub = $this->createStub(Redirect::class);
+        $this->redirectStub->method('setPath')->willReturnSelf();
+        $this->deletionServiceStub = $this->createStub(ShipmentDeletionService::class);
+        $this->loggerStub = $this->createStub(LoggerInterface::class);
 
-        $this->contextMock->expects($this->once())->method('getRequest')->willReturn($this->requestMock);
-        $this->contextMock->expects($this->once())->method('getMessageManager')->willReturn($this->messageManagerMock);
-        $this->contextMock->expects($this->once())
-            ->method('getResultRedirectFactory')
-            ->willReturn($this->redirectFactoryMock);
-
-        $this->redirectFactoryMock->expects($this->once())
-            ->method('create')
-            ->willReturn($this->redirectMock);
-
-        $this->redirectMock->expects($this->once())
-            ->method('setPath')
-            ->with('*/*/index')
-            ->willReturnSelf();
+        $this->contextStub->method('getRequest')->willReturn($this->requestStub);
+        $this->contextStub->method('getMessageManager')->willReturn($this->messageManagerMock);
+        $this->contextStub->method('getResultRedirectFactory')->willReturn($this->redirectFactoryStub);
+        $this->redirectFactoryStub->method('create')->willReturn($this->redirectStub);
 
         $this->controller = new Delete(
-            $this->contextMock,
-            $this->deletionServiceMock,
-            $this->loggerMock
+            $this->contextStub,
+            $this->deletionServiceStub,
+            $this->loggerStub
         );
     }
 
     public function testExecuteSuccess(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('getParam')
-            ->with('entity_id')
-            ->willReturn('42');
+        $this->requestStub->method('getParam')
+            ->willReturnCallback(static fn (string $param): ?string => $param === 'entity_id' ? '42' : null);
 
-        $this->deletionServiceMock->expects($this->once())
-            ->method('deleteShipment')
-            ->with(42)
-            ->willReturn(true);
+        $this->deletionServiceStub->method('deleteShipment')
+            ->willReturn(new ShipmentDeletionResult(true));
 
+        $calledPath = null;
+        $this->redirectStub->method('setPath')->willReturnCallback(function (string $path) use (&$calledPath) {
+            $calledPath = $path;
+            return $this->redirectStub;
+        });
         $this->messageManagerMock->expects($this->once())
             ->method('addSuccessMessage');
 
         $result = $this->controller->execute();
-        $this->assertSame($this->redirectMock, $result);
+        $this->assertSame($this->redirectStub, $result);
+        $this->assertEquals('*/*/index', $calledPath);
     }
 
     public function testExecuteInvalidId(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('getParam')
-            ->with('entity_id')
-            ->willReturn('0');
+        $this->requestStub->method('getParam')
+            ->willReturnCallback(static fn (string $param): ?string => $param === 'entity_id' ? '0' : null);
 
-        $this->deletionServiceMock->expects($this->never())
-            ->method('deleteShipment');
-
+        $calledPath = null;
+        $this->redirectStub->method('setPath')->willReturnCallback(function (string $path) use (&$calledPath) {
+            $calledPath = $path;
+            return $this->redirectStub;
+        });
         $this->messageManagerMock->expects($this->once())
             ->method('addErrorMessage');
 
         $result = $this->controller->execute();
-        $this->assertSame($this->redirectMock, $result);
+        $this->assertSame($this->redirectStub, $result);
+        $this->assertEquals('*/*/index', $calledPath);
     }
 
-    public function testExecuteLocalizedExceptionAddsDirectMessageWithoutDuplicatePrefix(): void
+    public function testExecuteFailureResultAddsContextToErrorReason(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('getParam')
-            ->with('entity_id')
-            ->willReturn('42');
+        $this->requestStub->method('getParam')
+            ->willReturnCallback(static fn (string $param): ?string => $param === 'entity_id' ? '42' : null);
 
-        $errorMessage = 'Nie udało się usunąć przesyłki w DHL: Nie znaleziono przesyłki o zadanym identyfikatorze';
-        $this->deletionServiceMock->expects($this->once())
-            ->method('deleteShipment')
-            ->with(42)
-            ->willThrowException(new \Magento\Framework\Exception\LocalizedException(__($errorMessage)));
+        $errorMessage = '[90040166450] Nie znaleziono przesyłki o zadanym identyfikatorze';
+        $this->deletionServiceStub->method('deleteShipment')
+            ->willReturn(new ShipmentDeletionResult(false, $errorMessage));
 
+        $calledPath = null;
+        $calledParams = null;
+        $this->redirectStub->method('setPath')->willReturnCallback(
+            function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
+                $calledPath = $path;
+                $calledParams = $params;
+                return $this->redirectStub;
+            }
+        );
         $this->messageManagerMock->expects($this->once())
             ->method('addErrorMessage')
-            ->with($errorMessage);
+            ->with('Failed to delete shipment: ' . $errorMessage);
 
         $result = $this->controller->execute();
-        $this->assertSame($this->redirectMock, $result);
+        $this->assertSame($this->redirectStub, $result);
+        $this->assertEquals('*/*/edit', $calledPath);
+        $this->assertEquals(['entity_id' => 42], $calledParams);
     }
 
     public function testExecuteGenericExceptionAddsPrefixedMessage(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('getParam')
-            ->with('entity_id')
-            ->willReturn('42');
+        $this->requestStub->method('getParam')
+            ->willReturnCallback(static fn (string $param): ?string => $param === 'entity_id' ? '42' : null);
 
-        $this->deletionServiceMock->expects($this->once())
-            ->method('deleteShipment')
-            ->with(42)
-            ->willThrowException(new \RuntimeException('Connection reset'));
+        $this->deletionServiceStub->method('deleteShipment')
+            ->willThrowException(new RuntimeException('Connection reset'));
 
+        $calledPath = null;
+        $calledParams = null;
+        $this->redirectStub->method('setPath')->willReturnCallback(
+            function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
+                $calledPath = $path;
+                $calledParams = $params;
+                return $this->redirectStub;
+            }
+        );
         $this->messageManagerMock->expects($this->once())
             ->method('addErrorMessage')
             ->with($this->callback(function ($phrase) {
-                return (string)$phrase === 'Failed to delete shipment: Connection reset';
+                return (string) $phrase === 'Failed to delete shipment: Connection reset';
             }));
 
         $result = $this->controller->execute();
-        $this->assertSame($this->redirectMock, $result);
+        $this->assertSame($this->redirectStub, $result);
+        $this->assertEquals('*/*/edit', $calledPath);
+        $this->assertEquals(['entity_id' => 42], $calledParams);
     }
 }

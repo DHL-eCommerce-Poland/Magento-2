@@ -10,6 +10,8 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class ShipmentDataValidator
 {
+    private const MAX_INVOICE_FILE_SIZE = 3 * 1024 * 1024;
+
     /**
      * @param TimezoneInterface $timezone
      */
@@ -77,10 +79,6 @@ class ShipmentDataValidator
         $serviceType = $settings->getServiceType();
         $popId = $recipient->getPopId();
 
-        if (empty(trim($settings->getContent()))) {
-            $errors[] = __('Package Contents Description is required.')->render();
-        }
-
         // ServicePoint / POP point requirement
         if (in_array(strtoupper(trim((string)$serviceType)), [MethodCatalog::SERVICE_SP], true) && empty($popId)) {
             $errors[] = __('Service Point ID is required for ServicePoint shipments.')->render();
@@ -92,10 +90,6 @@ class ShipmentDataValidator
         } else {
             foreach ($packages as $index => $pkg) {
                 $rowNum = $index + 1;
-                if ($pkg->getWeight() <= 0) {
-                    $errors[] = __('Package #%1 weight must be greater than zero.', $rowNum)->render();
-                }
-
                 if ($pkg->getPackageType() !== 'ENVELOPE') {
                     if ($pkg->getWidth() !== null && $pkg->getWidth() <= 0) {
                         $errors[] = __('Package #%1 width must be greater than zero.', $rowNum)->render();
@@ -137,6 +131,11 @@ class ShipmentDataValidator
         if (!empty($errors)) {
             throw new LocalizedException(__(implode("\n", array_unique($errors))));
         }
+
+        $invoiceFile = $shipmentData->getCustoms()?->getInvoiceFile();
+        if ($invoiceFile !== null && $invoiceFile !== '' && $this->invoiceFileExceedsSizeLimit($invoiceFile)) {
+            throw new LocalizedException(__('File size exceeds the 3MB limit.'));
+        }
     }
 
     /**
@@ -152,7 +151,9 @@ class ShipmentDataValidator
         $errors = [];
 
         // 1. Packages
-        $packages = $payload['shipmentSettings']['packages'] ?? ($payload['packages'] ?? []);
+        $packages = $payload['packages']
+            ?? ($payload['packages_fieldset']['packages']
+            ?? ($payload['shipmentSettings']['packages'] ?? []));
         if (is_array($packages)) {
             foreach ($packages as $index => $pkg) {
                 if (!is_array($pkg)) {
@@ -252,5 +253,26 @@ class ShipmentDataValidator
         if (!empty($errors)) {
             throw new LocalizedException(__(implode("\n", array_unique($errors))));
         }
+    }
+
+    /**
+     * Check the decoded size of a Base64 VAT invoice without decoding oversized input.
+     *
+     * @param string $invoiceFile
+     *
+     * @return bool
+     */
+    private function invoiceFileExceedsSizeLimit(string $invoiceFile): bool
+    {
+        $base64 = (string) preg_replace('/^data:[^;]+;base64,/', '', $invoiceFile);
+        $maximumEncodedSize = 4 * (int) ceil(self::MAX_INVOICE_FILE_SIZE / 3);
+        if (strlen($base64) > $maximumEncodedSize) {
+            return true;
+        }
+
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
+        $decoded = base64_decode($base64, true);
+
+        return $decoded !== false && strlen($decoded) > self::MAX_INVOICE_FILE_SIZE;
     }
 }

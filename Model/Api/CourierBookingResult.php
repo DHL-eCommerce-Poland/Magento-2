@@ -8,14 +8,14 @@ class CourierBookingResult
 {
     /**
      * @param bool $success
-     * @param string|null $courierOrderId
+     * @param string[] $courierOrderIds
      * @param string|null $errorCode
      * @param string|null $errorMessage
      * @param string|null $orderStatus Status returned by DHL API or formatted with DHL Order ID
      */
     public function __construct(
         private readonly bool $success,
-        private readonly ?string $courierOrderId = null,
+        private readonly array $courierOrderIds = [],
         private readonly ?string $errorCode = null,
         private readonly ?string $errorMessage = null,
         private readonly ?string $orderStatus = null
@@ -33,13 +33,13 @@ class CourierBookingResult
     }
 
     /**
-     * Get courier order ID / confirmation number returned by DHL WebAPI2.
+     * Get courier order IDs returned by DHL WebAPI2, in request order.
      *
-     * @return string|null
+     * @return string[]
      */
-    public function getCourierOrderId(): ?string
+    public function getCourierOrderIds(): array
     {
-        return $this->courierOrderId;
+        return $this->courierOrderIds;
     }
 
     /**
