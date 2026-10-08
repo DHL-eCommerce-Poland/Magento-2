@@ -19,13 +19,13 @@ $todayDate = $viewModel->getFormattedDate();
 $infoUrl = $block->getUrl('dhlpoland/shipment/getShipmentPickupInfo');
 $bookUrl = $block->getUrl('dhlpoland/shipment/bookCourier');
 ?>
-<div id="ideo-dhl-book-courier-modal" style="display: none;" data-bind="scope: 'dhlBookCourierModal'">
+<div id="ideo-dhl-book-courier-modal" class="dhl-modal-hidden" data-bind="scope: 'dhlBookCourierModal'">
     <form id="ideo-dhl-book-courier-form" onsubmit="return false;">
-        <div class="admin__fieldset" style="margin-bottom: 0;">
+        <div class="admin__fieldset dhl-fieldset-no-margin">
 
             <!-- Warning Notice if Needed -->
             <!-- ko if: warningMessage() -->
-            <div class="message message-warning warning" style="margin-bottom: 15px;">
+            <div class="message message-warning warning dhl-margin-bottom-15">
                 <div data-bind="text: warningMessage"></div>
             </div>
             <!-- /ko -->
@@ -33,10 +33,10 @@ $bookUrl = $block->getUrl('dhlpoland/shipment/bookCourier');
             <!-- Selected Shipments Info -->
             <div class="admin__field">
                 <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Selected Shipments')) ?></span></label>
-                <div class="admin__field-control" style="padding-top: 6px;">
+                <div class="admin__field-control dhl-field-control-pt">
                     <div><strong><span data-bind="text: selectedShipmentIds().length"></span> <?= $escaper->escapeHtml(__('shipment(s) selected')) ?></strong></div>
                     <!-- ko if: typeof selectedShipmentNumbers !== 'undefined' && selectedShipmentNumbers().length > 0 -->
-                    <div style="margin-top: 4px; color: #555; font-size: 1.2rem;">
+                    <div class="dhl-shipment-ids-note">
                         <span><?= $escaper->escapeHtml(__('Shipment IDs:')) ?></span>
                         <span data-bind="text: selectedShipmentNumbers().join(', ')"></span>
                     </div>
@@ -50,10 +50,9 @@ $bookUrl = $block->getUrl('dhlpoland/shipment/bookCourier');
                 <div class="admin__field-control">
                     <input type="text"
                            id="dhlpoland_pickup_date"
-                           class="admin__control-text"
+                           class="admin__control-text dhl-input-w200"
                            value="<?= $escaper->escapeHtmlAttr($todayDate) ?>"
                            data-bind="dhlDatepicker: pickupDate, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', minDate: 0 }"
-                           style="width: 200px; box-sizing: border-box;"
                            required />
                 </div>
             </div>
@@ -62,24 +61,22 @@ $bookUrl = $block->getUrl('dhlpoland/shipment/bookCourier');
             <div class="admin__field required">
                 <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Courier Pickup [From - To]')) ?></span></label>
                 <div class="admin__field-control">
-                    <div style="display: flex; gap: 8px; width: 260px;">
-                        <div style="flex: 1;">
+                    <div class="dhl-flex-row dhl-flex-row-260">
+                        <div class="dhl-flex-1">
                             <input type="text"
                                    id="dhlpoland_pickup_time_from"
-                                   class="admin__control-text"
+                                   class="admin__control-text dhl-input-full"
                                    placeholder="HH:mm"
                                    data-bind="dhlTimepicker: pickupTimeFrom"
-                                   style="width: 100%; box-sizing: border-box;"
                                    autocomplete="off"
                                    required />
                         </div>
-                        <div style="flex: 1;">
+                        <div class="dhl-flex-1">
                             <input type="text"
                                    id="dhlpoland_pickup_time_to"
-                                   class="admin__control-text"
+                                   class="admin__control-text dhl-input-full"
                                    placeholder="HH:mm"
                                    data-bind="dhlTimepicker: pickupTimeTo"
-                                   style="width: 100%; box-sizing: border-box;"
                                    autocomplete="off"
                                    required />
                         </div>

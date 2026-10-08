@@ -16,16 +16,16 @@ $viewModel = $block->getViewModel();
 $dateFormat = $viewModel->getDateFormat();
 $todayIsoDate = $viewModel->getIsoDate();
 ?>
-<div id="ideo-dhl-prepare-modal" style="display: none;" data-bind="scope: 'dhlShipmentForm'">
+<div id="ideo-dhl-prepare-modal" class="dhl-modal-hidden" data-bind="scope: 'dhlShipmentForm'">
     <form id="ideo-dhl-prepare-modal-form" data-mage-init='{"validation":{}}' onsubmit="return false;">
-        <div class="dhl-shipment-prepare-form" style="padding: 0 30px 30px 30px; box-sizing: border-box;">
+        <div class="dhl-shipment-prepare-form">
 
             <!-- Two-Column Container for Sender & Recipient Addresses -->
-            <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 15px;">
+            <div class="dhl-layout-two-columns">
 
                 <!-- 1. Sender Address (Left Column) -->
                 <!-- ko if: shipmentData() && shipmentData().sender -->
-                <div style="flex: 1; min-width: 0;">
+                <div class="dhl-layout-column">
                     <fieldset class="admin__fieldset" data-bind="with: shipmentData().sender">
                         <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Sender Address')) ?></span></legend>
                         <div class="admin__field">
@@ -48,41 +48,41 @@ $todayIsoDate = $viewModel->getIsoDate();
                         </div>
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('First & Last Name')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('First Name')) ?>" data-bind="value: firstName" style="flex: 1;" />
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Last Name')) ?>" data-bind="value: lastName" style="flex: 1;" />
+                            <div class="admin__field-control dhl-flex-row">
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('First Name')) ?>" data-bind="value: firstName" />
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Last Name')) ?>" data-bind="value: lastName" />
                             </div>
                         </div>
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Street & House No.')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Street')) ?>" data-bind="value: street" style="flex: 2;" required />
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('House No.')) ?>" data-bind="value: houseNumber" style="flex: 1;" required />
+                            <div class="admin__field-control dhl-flex-row">
+                                <input type="text" class="admin__control-text dhl-flex-2" placeholder="<?= $escaper->escapeHtmlAttr(__('Street')) ?>" data-bind="value: street" required />
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('House No.')) ?>" data-bind="value: houseNumber" required />
                             </div>
                         </div>
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Postal Code & City')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Postal Code')) ?>" data-bind="value: postalCode" style="flex: 1;" required />
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('City')) ?>" data-bind="value: city" style="flex: 1.5;" required />
+                            <div class="admin__field-control dhl-flex-row">
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Postal Code')) ?>" data-bind="value: postalCode" required />
+                                <input type="text" class="admin__control-text dhl-flex-1-5" placeholder="<?= $escaper->escapeHtmlAttr(__('City')) ?>" data-bind="value: city" required />
                             </div>
                         </div>
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Phone & Email')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Phone')) ?>" data-bind="value: phone" style="flex: 1;" required />
-                                <input type="email" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Email')) ?>" data-bind="value: email" style="flex: 1;" required />
+                            <div class="admin__field-control dhl-flex-row">
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Phone')) ?>" data-bind="value: phone" required />
+                                <input type="email" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Email')) ?>" data-bind="value: email" required />
                             </div>
                         </div>
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Courier Pickup [From - To]')) ?></span></label>
                             <div class="admin__field-control">
-                                <div style="display: flex; gap: 8px;">
-                                    <div style="flex: 1;">
-                                        <input type="text" class="admin__control-text" placeholder="HH:mm" data-bind="dhlTimepicker: pickupHourFrom" style="width: 100%; box-sizing: border-box;" autocomplete="off" />
+                                <div class="dhl-flex-row">
+                                    <div class="dhl-flex-1">
+                                        <input type="text" class="admin__control-text dhl-input-full" placeholder="HH:mm" data-bind="dhlTimepicker: pickupHourFrom" autocomplete="off" />
                                     </div>
-                                    <div style="flex: 1;">
-                                        <input type="text" class="admin__control-text" placeholder="HH:mm" data-bind="dhlTimepicker: pickupHourTo" style="width: 100%; box-sizing: border-box;" autocomplete="off" />
+                                    <div class="dhl-flex-1">
+                                        <input type="text" class="admin__control-text dhl-input-full" placeholder="HH:mm" data-bind="dhlTimepicker: pickupHourTo" autocomplete="off" />
                                     </div>
                                 </div>
                             </div>
@@ -93,7 +93,7 @@ $todayIsoDate = $viewModel->getIsoDate();
 
                 <!-- 2. Recipient Address (Right Column) -->
                 <!-- ko if: shipmentData() && shipmentData().recipient -->
-                <div style="flex: 1; min-width: 0;">
+                <div class="dhl-layout-column">
                     <fieldset class="admin__fieldset" data-bind="with: shipmentData().recipient">
                         <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Recipient Address')) ?></span></legend>
                         <div class="admin__field required">
@@ -110,31 +110,31 @@ $todayIsoDate = $viewModel->getIsoDate();
                         </div>
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('First & Last Name')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('First Name')) ?>" data-bind="value: firstName" style="flex: 1;" required />
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Last Name')) ?>" data-bind="value: lastName" style="flex: 1;" required />
+                            <div class="admin__field-control dhl-flex-row">
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('First Name')) ?>" data-bind="value: firstName" required />
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Last Name')) ?>" data-bind="value: lastName" required />
                             </div>
                         </div>
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Street & House No.')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Street')) ?>" data-bind="value: street" style="flex: 2;" required />
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('House No.')) ?>" data-bind="value: houseNumber" style="flex: 1;" required />
+                            <div class="admin__field-control dhl-flex-row">
+                                <input type="text" class="admin__control-text dhl-flex-2" placeholder="<?= $escaper->escapeHtmlAttr(__('Street')) ?>" data-bind="value: street" required />
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('House No.')) ?>" data-bind="value: houseNumber" required />
                             </div>
                         </div>
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Postal Code, City & Country')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Postal Code')) ?>" data-bind="value: postalCode" style="flex: 1;" required />
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('City')) ?>" data-bind="value: city" style="flex: 1.5;" required />
-                                <select class="admin__control-select" data-bind="options: $parent.countryOptions, optionsText: 'label', optionsValue: 'value', value: country" style="flex: 1.5;" required></select>
+                            <div class="admin__field-control dhl-flex-row">
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Postal Code')) ?>" data-bind="value: postalCode" required />
+                                <input type="text" class="admin__control-text dhl-flex-1-5" placeholder="<?= $escaper->escapeHtmlAttr(__('City')) ?>" data-bind="value: city" required />
+                                <select class="admin__control-select dhl-flex-1-5" data-bind="options: $parent.countryOptions, optionsText: 'label', optionsValue: 'value', value: country" required></select>
                             </div>
                         </div>
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Phone & Email')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Phone')) ?>" data-bind="value: phone" style="flex: 1;" required />
-                                <input type="email" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Email')) ?>" data-bind="value: email" style="flex: 1;" required />
+                            <div class="admin__field-control dhl-flex-row">
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Phone')) ?>" data-bind="value: phone" required />
+                                <input type="email" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Email')) ?>" data-bind="value: email" required />
                             </div>
                         </div>
                         <!-- Delivery Point Fields (Visible for SP or EK service) -->
@@ -187,10 +187,10 @@ $todayIsoDate = $viewModel->getIsoDate();
             </div>
 
             <!-- Two-Column Container for Shipment Settings, Services, Packages (Left) & Customs Clearance (Right) -->
-            <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
+            <div class="dhl-layout-two-columns dhl-margin-top">
 
                 <!-- Left Column: Shipment Settings, Additional Services, Packages -->
-                <div style="flex: 1; max-width: calc(50% - 10px); min-width: 0; display: flex; flex-direction: column; gap: 15px;">
+                <div class="dhl-layout-column dhl-layout-column-half dhl-layout-column-stack">
 
                     <!-- 3. Shipment Settings (Left Column) -->
                     <!-- ko if: shipmentData() && shipmentData().shipmentSettings -->
@@ -208,14 +208,14 @@ $todayIsoDate = $viewModel->getIsoDate();
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipment Date')) ?></span></label>
                             <div class="admin__field-control">
-                                <input type="text" class="admin__control-text" data-bind="dhlDatepicker: shipmentDate, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', minDate: new Date() }" style="width: 100%; box-sizing: border-box;" required />
+                                <input type="text" class="admin__control-text dhl-input-full" data-bind="dhlDatepicker: shipmentDate, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', minDate: new Date() }" required />
                             </div>
                         </div>
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Service & Shipment Label Format')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <select class="admin__control-select" data-bind="options: $parent.serviceCodeOptions, optionsText: 'label', optionsValue: 'value', value: serviceType, optionsCaption: '<?= $escaper->escapeHtmlAttr(__('Select Service...')) ?>'" style="flex: 1;" required></select>
-                                <select class="admin__control-select" data-bind="options: $parent.labelTypeOptions, optionsText: 'label', optionsValue: 'value', value: labelType" style="flex: 1;" required></select>
+                            <div class="admin__field-control dhl-flex-row">
+                                <select class="admin__control-select dhl-flex-1" data-bind="options: $parent.serviceCodeOptions, optionsText: 'label', optionsValue: 'value', value: serviceType, optionsCaption: '<?= $escaper->escapeHtmlAttr(__('Select Service...')) ?>'" required></select>
+                                <select class="admin__control-select dhl-flex-1" data-bind="options: $parent.labelTypeOptions, optionsText: 'label', optionsValue: 'value', value: labelType" required></select>
                             </div>
                         </div>
                         <div class="admin__field required">
@@ -233,15 +233,15 @@ $todayIsoDate = $viewModel->getIsoDate();
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipment Reference Number & MPK')) ?></span></label>
                             <div class="admin__field-control">
-                                <div style="display: flex; gap: 8px;">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipment Reference Number')) ?>" data-bind="value: reference" style="flex: 1;" />
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('MPK')) ?>" data-bind="value: mpk" style="flex: 1;" />
+                                <div class="dhl-flex-row">
+                                    <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipment Reference Number')) ?>" data-bind="value: reference" />
+                                    <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('MPK')) ?>" data-bind="value: mpk" />
                                 </div>
                             </div>
                         </div>
                         <div class="admin__field">
                             <label class="admin__field-label"></label>
-                            <div class="admin__field-control" style="margin-top: 8px;">
+                            <div class="admin__field-control dhl-margin-top-8">
                                 <div class="admin__field admin__field-option">
                                     <input type="checkbox" class="admin__control-checkbox" id="auto_create_return_shipment" data-bind="checked: autoCreateReturnShipment" />
                                     <label class="admin__field-label" for="auto_create_return_shipment">
@@ -251,25 +251,25 @@ $todayIsoDate = $viewModel->getIsoDate();
                             </div>
                         </div>
                         <!-- ko if: autoCreateReturnShipment -->
-                        <div class="admin__field" style="margin-top: 8px; padding-left: 20px;">
+                        <div class="admin__field dhl-nested-field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Return Label Format')) ?></span></label>
                             <div class="admin__field-control">
                                 <select class="admin__control-select" data-bind="options: $parent.labelTypeOptions, optionsText: 'label', optionsValue: 'value', value: returnLabelType"></select>
                             </div>
                         </div>
-                        <div class="admin__field" style="margin-top: 8px; padding-left: 20px;">
+                        <div class="admin__field dhl-nested-field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Return QR Code Type')) ?></span></label>
                             <div class="admin__field-control">
                                 <select class="admin__control-select" data-bind="options: $parent.returnQrCodeTypeOptions, optionsText: 'label', optionsValue: 'value', value: returnQrCodeType"></select>
                             </div>
                         </div>
-                        <div class="admin__field" style="margin-top: 8px; padding-left: 20px;">
+                        <div class="admin__field dhl-nested-field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Return Label Expiration (7-183 Days)')) ?></span></label>
                             <div class="admin__field-control">
-                                <input type="number" class="admin__control-text" min="1" data-bind="value: returnLabelExpDays" style="width: 100px;" data-validate="{'validate-no-comma': true}" />
+                                <input type="number" class="admin__control-text dhl-input-w100" min="1" data-bind="value: returnLabelExpDays" data-validate="{'validate-no-comma': true}" />
                             </div>
                         </div>
-                        <div class="admin__field" style="margin-top: 8px; padding-left: 20px;">
+                        <div class="admin__field dhl-nested-field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Return Dispatch Method')) ?></span></label>
                             <div class="admin__field-control">
                                 <select class="admin__control-select" data-bind="options: $parent.returnBookCourierOptions, optionsText: 'label', optionsValue: 'value', value: returnBookCourier"></select>
@@ -288,14 +288,14 @@ $todayIsoDate = $viewModel->getIsoDate();
                         <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Additional Services')) ?></span></legend>
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Services')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; flex-direction: column; gap: 8px; padding-top: 6px;">
+                            <div class="admin__field-control dhl-services-list">
                                 <div class="admin__field admin__field-option">
                                     <input type="checkbox" class="admin__control-checkbox" id="service_insurance" data-bind="checked: insurance" />
                                     <label class="admin__field-label" for="service_insurance">
                                         <span><?= $escaper->escapeHtml(__('Insurance')) ?></span>
                                     </label>
                                 </div>
-                                <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: insurance">
+                                <div class="dhl-service-subfield" data-bind="visible: insurance">
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Insurance Value')) ?>" data-bind="value: insuranceValue" data-validate="{'validate-no-comma': true}" />
                                     <div class="admin__field-note">
                                         <span><?= $escaper->escapeHtml(__('Amount in PLN')) ?></span>
@@ -307,7 +307,7 @@ $todayIsoDate = $viewModel->getIsoDate();
                                         <span><?= $escaper->escapeHtml(__('Cash On Delivery')) ?></span>
                                     </label>
                                 </div>
-                                <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: collectOnDelivery">
+                                <div class="dhl-service-subfield" data-bind="visible: collectOnDelivery">
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('COD Amount')) ?>" data-bind="value: collectOnDeliveryValue" data-validate="{'validate-no-comma': true}" />
                                     <div class="admin__field-note">
                                         <span><?= $escaper->escapeHtml(__('Amount in destination country\'s currency')) ?></span>
@@ -343,7 +343,7 @@ $todayIsoDate = $viewModel->getIsoDate();
                                         <span><?= $escaper->escapeHtml(__('Return Confirmed Documents')) ?></span>
                                     </label>
                                 </div>
-                                <div style="margin-left: 24px; margin-top: 2px; margin-bottom: 6px; max-width: 250px;" data-bind="visible: returnOnDelivery">
+                                <div class="dhl-service-subfield" data-bind="visible: returnOnDelivery">
                                     <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('ROD Document Name')) ?>" data-bind="value: returnOnDeliveryReference" />
                                 </div>
                                 <div class="admin__field admin__field-option">
@@ -369,55 +369,55 @@ $todayIsoDate = $viewModel->getIsoDate();
 
                         <!-- Dynamic Packages Table -->
                         <div class="admin__field required">
-                            <label class="admin__field-label" style="width: 100%; max-width: 100%; float: none; margin-bottom: 6px;"><span><?= $escaper->escapeHtml(__('Shipment Packages')) ?></span></label>
-                            <div class="admin__field-control" style="width: 100%; max-width: 100%; float: none; overflow-x: auto; padding-right: 30px; box-sizing: border-box;">
-                                <table class="admin__control-table" id="packagesDhlTable" style="width: 100%; border-collapse: collapse;">
+                            <label class="admin__field-label dhl-table-label"><span><?= $escaper->escapeHtml(__('Shipment Packages')) ?></span></label>
+                            <div class="admin__field-control dhl-table-container">
+                                <table class="admin__control-table dhl-admin-table" id="packagesDhlTable">
                                     <thead>
                                         <tr>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 140px;"><?= $escaper->escapeHtml(__('Package Type')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 65px;"><?= $escaper->escapeHtml(__('Qty')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 85px;"><?= $escaper->escapeHtml(__('Weight [kg]')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 80px;"><?= $escaper->escapeHtml(__('Width [cm]')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 80px;"><?= $escaper->escapeHtml(__('Length [cm]')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 80px;"><?= $escaper->escapeHtml(__('Height [cm]')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 60px;"><?= $escaper->escapeHtml(__('NST')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 70px;"><?= $escaper->escapeHtml(__('Euro Return')) ?></th>
-                                             <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 60px;"><?= $escaper->escapeHtml(__('Actions')) ?></th>
+                                            <th scope="col" class="dhl-col-w140"><?= $escaper->escapeHtml(__('Package Type')) ?></th>
+                                            <th scope="col" class="dhl-col-w65"><?= $escaper->escapeHtml(__('Qty')) ?></th>
+                                            <th scope="col" class="dhl-col-w85"><?= $escaper->escapeHtml(__('Weight [kg]')) ?></th>
+                                            <th scope="col" class="dhl-col-w80"><?= $escaper->escapeHtml(__('Width [cm]')) ?></th>
+                                            <th scope="col" class="dhl-col-w80"><?= $escaper->escapeHtml(__('Length [cm]')) ?></th>
+                                            <th scope="col" class="dhl-col-w80"><?= $escaper->escapeHtml(__('Height [cm]')) ?></th>
+                                            <th scope="col" class="dhl-th-center dhl-col-w60"><?= $escaper->escapeHtml(__('NST')) ?></th>
+                                            <th scope="col" class="dhl-th-center dhl-col-w70"><?= $escaper->escapeHtml(__('Euro Return')) ?></th>
+                                            <th scope="col" class="dhl-th-center dhl-col-w60"><?= $escaper->escapeHtml(__('Actions')) ?></th>
                                         </tr>
                                     </thead>
                                     <tbody data-bind="foreach: $data.packages">
                                         <tr>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <select class="admin__control-select" data-bind="options: $parents[1].packageTypeOptions, optionsText: 'label', optionsValue: 'value', value: packageType" style="width: 100%; box-sizing: border-box;" required></select>
+                                            <td>
+                                                <select class="admin__control-select dhl-input-full" data-bind="options: $parents[1].packageTypeOptions, optionsText: 'label', optionsValue: 'value', value: packageType" required></select>
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" class="admin__control-text" data-bind="value: quantity" style="width: 100%; box-sizing: border-box;" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true, 'validate-no-comma':true}" required />
+                                            <td>
+                                                <input type="text" class="admin__control-text dhl-input-full" data-bind="value: quantity" data-validate="{'required-entry':true, 'validate-greater-than-zero':true, 'validate-number':true, 'validate-no-comma':true}" required />
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" class="admin__control-text" data-bind="value: weight, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" style="width: 100%; box-sizing: border-box;" />
+                                            <td>
+                                                <input type="text" class="admin__control-text dhl-input-full" data-bind="value: weight, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" />
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" class="admin__control-text" data-bind="value: width, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" style="width: 100%; box-sizing: border-box;" />
+                                            <td>
+                                                <input type="text" class="admin__control-text dhl-input-full" data-bind="value: width, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" />
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" class="admin__control-text" data-bind="value: length, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" style="width: 100%; box-sizing: border-box;" />
+                                            <td>
+                                                <input type="text" class="admin__control-text dhl-input-full" data-bind="value: length, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" />
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" class="admin__control-text" data-bind="value: height, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" style="width: 100%; box-sizing: border-box;" />
+                                            <td>
+                                                <input type="text" class="admin__control-text dhl-input-full" data-bind="value: height, disable: packageType() === 'ENVELOPE', attr: { 'data-validate': packageType() !== 'ENVELOPE' ? '{\x22required-entry\x22:true, \x22validate-greater-than-zero\x22:true, \x22validate-number\x22:true, \x22validate-no-comma\x22:true}' : null }" />
                                             </td>
-                                            <td class="_fit" style="padding: 6px 4px; vertical-align: middle; text-align: center;">
-                                                <div class="admin__field admin__field-option" style="margin: 0; display: inline-block; vertical-align: middle;">
+                                            <td class="_fit dhl-td-center">
+                                                <div class="admin__field admin__field-option dhl-table-checkbox-field">
                                                     <input type="checkbox" class="admin__control-checkbox" data-bind="checked: isNonStandard, attr: { id: 'pkg_nst_' + $index() }" title="<?= $escaper->escapeHtmlAttr(__('Non-standard package option')) ?>" />
                                                     <label class="admin__field-label" data-bind="attr: { for: 'pkg_nst_' + $index() }"></label>
                                                 </div>
                                             </td>
-                                            <td class="_fit" style="padding: 6px 4px; vertical-align: middle; text-align: center;">
-                                                <div class="admin__field admin__field-option" style="margin: 0; display: inline-block; vertical-align: middle;">
+                                            <td class="_fit dhl-td-center">
+                                                <div class="admin__field admin__field-option dhl-table-checkbox-field">
                                                     <input type="checkbox" class="admin__control-checkbox" data-bind="checked: hasEuroReturn, enable: packageType() === 'PALLET', attr: { id: 'pkg_euro_' + $index() }" />
                                                     <label class="admin__field-label" data-bind="attr: { for: 'pkg_euro_' + $index() }"></label>
                                                 </div>
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: middle; text-align: center;">
+                                            <td class="dhl-td-center">
                                                 <button type="button" class="action-delete" data-bind="click: function() { $parent.removePackageRow($index()) }" title="<?= $escaper->escapeHtmlAttr(__('Delete Row')) ?>">
                                                     <span><?= $escaper->escapeHtml(__('Delete')) ?></span>
                                                 </button>
@@ -426,7 +426,7 @@ $todayIsoDate = $viewModel->getIsoDate();
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="9" style="padding-top: 10px;">
+                                            <td colspan="9">
                                                 <button type="button" class="action-secondary" data-bind="click: function() { $data.addPackageRow() }">
                                                     <span><?= $escaper->escapeHtml(__('Add Package')) ?></span>
                                                 </button>
@@ -443,7 +443,7 @@ $todayIsoDate = $viewModel->getIsoDate();
 
                 <!-- Right Column: Customs Clearance -->
                 <!-- ko if: isCustomsClearanceVisible -->
-                <div style="flex: 1; max-width: calc(50% - 10px); min-width: 0;">
+                <div class="dhl-layout-column dhl-layout-column-half">
                     <fieldset class="admin__fieldset" data-bind="with: shipmentData().customs">
                         <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Customs Clearance Templates')) ?></span></legend>
 
@@ -456,27 +456,27 @@ $todayIsoDate = $viewModel->getIsoDate();
 
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Customs Clearance Type, Category of Item & Currency')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <select class="admin__control-select" data-bind="options: $parent.customsTypeOptions, optionsText: 'label', optionsValue: 'value', value: customsType" style="flex: 1;" required></select>
-                                <select class="admin__control-select" data-bind="options: $parent.filteredCategoryOfItemOptions, optionsText: 'label', optionsValue: 'value', value: categoryOfItem" style="flex: 1;" required></select>
-                                <select class="admin__control-select" data-bind="options: $parent.filteredCurrencyOptions, optionsText: 'label', optionsValue: 'value', value: currency" style="flex: 1;" required></select>
+                            <div class="admin__field-control dhl-flex-row">
+                                <select class="admin__control-select dhl-flex-1" data-bind="options: $parent.customsTypeOptions, optionsText: 'label', optionsValue: 'value', value: customsType" required></select>
+                                <select class="admin__control-select dhl-flex-1" data-bind="options: $parent.filteredCategoryOfItemOptions, optionsText: 'label', optionsValue: 'value', value: categoryOfItem" required></select>
+                                <select class="admin__control-select dhl-flex-1" data-bind="options: $parent.filteredCurrencyOptions, optionsText: 'label', optionsValue: 'value', value: currency" required></select>
                             </div>
                         </div>
 
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Origin Country, Costs & Gross Weight')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <select class="admin__control-select" data-bind="options: $parent.countryOptions, optionsText: 'label', optionsValue: 'value', value: countryOfOrigin" style="flex: 1;" required></select>
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Gross Costs of Shipment')) ?>" data-bind="value: costsOfShipment" style="flex: 1;" required data-validate="{'required-entry': true, 'validate-zero-or-greater': true, 'validate-number': true, 'validate-no-comma': true}" />
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Gross Weight (kg)')) ?>" data-bind="value: grossWeight" style="flex: 1;" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true, 'validate-no-comma': true}" />
+                            <div class="admin__field-control dhl-flex-row">
+                                <select class="admin__control-select dhl-flex-1" data-bind="options: $parent.countryOptions, optionsText: 'label', optionsValue: 'value', value: countryOfOrigin" required></select>
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Gross Costs of Shipment')) ?>" data-bind="value: costsOfShipment" required data-validate="{'required-entry': true, 'validate-zero-or-greater': true, 'validate-number': true, 'validate-no-comma': true}" />
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Gross Weight (kg)')) ?>" data-bind="value: grossWeight" required data-validate="{'required-entry': true, 'validate-greater-than-zero': true, 'validate-number': true, 'validate-no-comma': true}" />
                             </div>
                         </div>
 
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Contact Person First & Last Name')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" maxlength="30" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('First Name')) ?>" data-bind="value: firstName" style="flex: 1;" required />
-                                <input type="text" maxlength="30" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Last Name')) ?>" data-bind="value: secondaryName" style="flex: 1;" required />
+                            <div class="admin__field-control dhl-flex-row">
+                                <input type="text" maxlength="30" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('First Name')) ?>" data-bind="value: firstName" required />
+                                <input type="text" maxlength="30" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Last Name')) ?>" data-bind="value: secondaryName" required />
                             </div>
                         </div>
 
@@ -489,28 +489,28 @@ $todayIsoDate = $viewModel->getIsoDate();
 
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipper VAT & Receiver VAT')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" maxlength="15" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper VAT')) ?>" data-bind="value: vatRegistrationNumber" style="flex: 1;" />
-                                <input type="text" maxlength="15" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver VAT')) ?>" data-bind="value: vatRegistrationNumberReceiver" style="flex: 1;" />
+                            <div class="admin__field-control dhl-flex-row">
+                                <input type="text" maxlength="15" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper VAT')) ?>" data-bind="value: vatRegistrationNumber" />
+                                <input type="text" maxlength="15" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver VAT')) ?>" data-bind="value: vatRegistrationNumberReceiver" />
                             </div>
                         </div>
 
                         <!-- ko if: customsType() === 'I' -->
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipper NIP, Shipper EORI & Receiver EORI')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" maxlength="17" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper NIP')) ?>" data-bind="value: nipNr" style="flex: 1;" required />
-                                <input type="text" maxlength="17" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper EORI')) ?>" data-bind="value: eoriNr" style="flex: 1;" required />
-                                <input type="text" maxlength="17" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver EORI')) ?>" data-bind="value: eoriNrReceiver" style="flex: 1;" required />
+                            <div class="admin__field-control dhl-flex-row">
+                                <input type="text" maxlength="17" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper NIP')) ?>" data-bind="value: nipNr" required />
+                                <input type="text" maxlength="17" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper EORI')) ?>" data-bind="value: eoriNr" required />
+                                <input type="text" maxlength="17" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver EORI')) ?>" data-bind="value: eoriNrReceiver" required />
                             </div>
                         </div>
 
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Invoice Number & Date')) ?></span></label>
-                            <div class="admin__field-control" style="display: flex; gap: 8px;">
-                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Invoice Number')) ?>" data-bind="value: invoiceNr" style="flex: 1;" required />
-                                <div style="flex: 1; position: relative;">
-                                    <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Date of Invoice')) ?>" data-bind="dhlDatepicker: invoiceDate, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', maxDate: new Date() }" style="width: 100%; box-sizing: border-box;" required />
+                            <div class="admin__field-control dhl-flex-row">
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Invoice Number')) ?>" data-bind="value: invoiceNr" required />
+                                <div class="dhl-flex-1 dhl-relative">
+                                    <input type="text" class="admin__control-text dhl-input-full" placeholder="<?= $escaper->escapeHtmlAttr(__('Date of Invoice')) ?>" data-bind="dhlDatepicker: invoiceDate, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', maxDate: new Date() }" required />
                                 </div>
                             </div>
                         </div>
@@ -518,13 +518,13 @@ $todayIsoDate = $viewModel->getIsoDate();
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('VAT Invoice')) ?></span></label>
                             <div class="admin__field-control">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <input type="file" id="dhl_invoice_file_input" accept="application/pdf,.pdf" data-bind="event: { change: function(d, e) { $parent.onInvoiceFileSelected(e); } }" style="display: none;" />
+                                <div class="dhl-invoice-upload-container">
+                                    <input type="file" id="dhl_invoice_file_input" accept="application/pdf,.pdf" data-bind="event: { change: function(d, e) { $parent.onInvoiceFileSelected(e); } }" class="dhl-modal-hidden" />
                                     <button type="button" class="action-secondary" onclick="document.getElementById('dhl_invoice_file_input').click();">
                                         <span><?= $escaper->escapeHtml(__('Upload VAT Invoice')) ?></span>
                                     </button>
                                     <!-- ko if: invoiceFile -->
-                                    <span style="font-weight: bold; color: #007bdb;">
+                                    <span class="dhl-invoice-file-name">
                                         📄 <span data-bind="text: invoiceFileName() || invoiceFile()"></span>
                                     </span>
                                     <button type="button" class="action-delete" data-bind="click: function() { invoiceFile(''); invoiceFileName(''); }" title="<?= $escaper->escapeHtmlAttr(__('Remove File')) ?>">
@@ -532,7 +532,7 @@ $todayIsoDate = $viewModel->getIsoDate();
                                     </button>
                                     <!-- /ko -->
                                     <!-- ko ifnot: invoiceFile -->
-                                    <span class="admin__field-note" style="margin: 0; align-self: center;"><?= $escaper->escapeHtml(__('Only .pdf files allowed (max 3MB)')) ?></span>
+                                    <span class="admin__field-note dhl-invoice-note"><?= $escaper->escapeHtml(__('Only .pdf files allowed (max 3MB)')) ?></span>
                                     <!-- /ko -->
                                 </div>
                             </div>
@@ -541,7 +541,7 @@ $todayIsoDate = $viewModel->getIsoDate();
 
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Agreements and Declarations')) ?></span></label>
-                            <div class="admin__field-control" style="margin-top: 8px;">
+                            <div class="admin__field-control dhl-margin-top-8">
                                 <div class="admin__field admin__field-option">
                                     <input type="checkbox" class="admin__control-checkbox" id="customs_not_exceed_value" data-bind="checked: notExceedValue" />
                                     <label class="admin__field-label" for="customs_not_exceed_value">
@@ -577,46 +577,46 @@ $todayIsoDate = $viewModel->getIsoDate();
                         </div>
 
                         <!-- Customs Goods Items -->
-                        <div class="admin__field required" style="margin-top: 15px;">
-                            <label class="admin__field-label" style="width: 100%; max-width: 100%; float: none; margin-bottom: 6px;"><span><?= $escaper->escapeHtml(__('Customs Items (Goods)')) ?></span></label>
-                            <div class="admin__field-control" style="width: 100%; max-width: 100%; float: none; overflow-x: auto; padding-right: 30px; box-sizing: border-box;">
-                                <table class="admin__control-table" style="width: 100%; border-collapse: collapse;">
+                        <div class="admin__field required dhl-margin-top-15">
+                            <label class="admin__field-label dhl-table-label"><span><?= $escaper->escapeHtml(__('Customs Items (Goods)')) ?></span></label>
+                            <div class="admin__field-control dhl-table-container">
+                                <table class="admin__control-table dhl-admin-table">
                                     <thead>
                                         <tr>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left;"><?= $escaper->escapeHtml(__('English Name')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left;"><?= $escaper->escapeHtml(__('Polish Name')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 65px;"><?= $escaper->escapeHtml(__('Qty')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 85px;"><?= $escaper->escapeHtml(__('Weight [kg]')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 85px;"><?= $escaper->escapeHtml(__('Value')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 110px;"><?= $escaper->escapeHtml(__('Tariff Code')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: left; width: 130px;"><?= $escaper->escapeHtml(__('Country of Origin')) ?></th>
-                                            <th scope="col" style="padding: 8px; border-bottom: 2px solid #d6d6d6; text-align: center; width: 60px;"><?= $escaper->escapeHtml(__('Actions')) ?></th>
+                                            <th scope="col"><?= $escaper->escapeHtml(__('English Name')) ?></th>
+                                            <th scope="col"><?= $escaper->escapeHtml(__('Polish Name')) ?></th>
+                                            <th scope="col" class="dhl-col-w65"><?= $escaper->escapeHtml(__('Qty')) ?></th>
+                                            <th scope="col" class="dhl-col-w85"><?= $escaper->escapeHtml(__('Weight [kg]')) ?></th>
+                                            <th scope="col" class="dhl-col-w85"><?= $escaper->escapeHtml(__('Value')) ?></th>
+                                            <th scope="col" class="dhl-col-w110"><?= $escaper->escapeHtml(__('Tariff Code')) ?></th>
+                                            <th scope="col" class="dhl-col-w130"><?= $escaper->escapeHtml(__('Country of Origin')) ?></th>
+                                            <th scope="col" class="dhl-th-center dhl-col-w60"><?= $escaper->escapeHtml(__('Actions')) ?></th>
                                         </tr>
                                     </thead>
                                     <tbody data-bind="foreach: customsItems">
                                         <tr>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" maxlength="35" class="admin__control-text" data-bind="value: nameEn" style="width: 100%; box-sizing: border-box;" />
+                                            <td>
+                                                <input type="text" maxlength="35" class="admin__control-text dhl-input-full" data-bind="value: nameEn" />
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" maxlength="35" class="admin__control-text" data-bind="value: namePl" style="width: 100%; box-sizing: border-box;" />
+                                            <td>
+                                                <input type="text" maxlength="35" class="admin__control-text dhl-input-full" data-bind="value: namePl" />
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" class="admin__control-text" data-bind="value: quantity" style="width: 100%; box-sizing: border-box;" />
+                                            <td>
+                                                <input type="text" class="admin__control-text dhl-input-full" data-bind="value: quantity" />
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" class="admin__control-text" data-bind="value: weight" style="width: 100%; box-sizing: border-box;" />
+                                            <td>
+                                                <input type="text" class="admin__control-text dhl-input-full" data-bind="value: weight" />
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" class="admin__control-text" data-bind="value: value" style="width: 100%; box-sizing: border-box;" />
+                                            <td>
+                                                <input type="text" class="admin__control-text dhl-input-full" data-bind="value: value" />
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <input type="text" maxlength="10" class="admin__control-text" data-bind="value: tariffCode" style="width: 100%; box-sizing: border-box;" />
+                                            <td>
+                                                <input type="text" maxlength="10" class="admin__control-text dhl-input-full" data-bind="value: tariffCode" />
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: top;">
-                                                <select class="admin__control-select" data-bind="options: $parents[1].customsItemCountryOptions, optionsText: 'label', optionsValue: 'value', value: countryOfOrigin" style="width: 100%; box-sizing: border-box;"></select>
+                                            <td>
+                                                <select class="admin__control-select dhl-input-full" data-bind="options: $parents[1].customsItemCountryOptions, optionsText: 'label', optionsValue: 'value', value: countryOfOrigin"></select>
                                             </td>
-                                            <td style="padding: 6px 4px; vertical-align: middle; text-align: center;">
+                                            <td class="dhl-td-center">
                                                 <button type="button" class="action-delete" data-bind="click: function() { $parent.removeCustomsItemRow($index()) }" title="<?= $escaper->escapeHtmlAttr(__('Delete Row')) ?>">
                                                     <span><?= $escaper->escapeHtml(__('Delete')) ?></span>
                                                 </button>
@@ -625,7 +625,7 @@ $todayIsoDate = $viewModel->getIsoDate();
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="8" style="padding-top: 10px;">
+                                            <td colspan="8">
                                                 <button type="button" class="action-secondary" data-bind="click: function() { $data.addCustomsItemRow() }">
                                                     <span><?= $escaper->escapeHtml(__('Add Item')) ?></span>
                                                 </button>
