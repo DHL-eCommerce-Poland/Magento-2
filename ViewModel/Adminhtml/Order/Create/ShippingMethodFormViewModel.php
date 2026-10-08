@@ -198,6 +198,7 @@ class ShippingMethodFormViewModel implements ArgumentInterface
      */
     private function decodeValue(string $value): string
     {
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
         return html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 }

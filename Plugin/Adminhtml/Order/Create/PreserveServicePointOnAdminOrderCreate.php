@@ -35,13 +35,15 @@ class PreserveServicePointOnAdminOrderCreate
     }
 
     /**
-     * Merge top-level order[dhl_service_point_*] POST data into order[shipping_address] if present,
-     * and update existing quote shipping address without wiping standard address fields.
+     * Merge top-level order service point POST data into shipping address.
+     *
+     * Updates existing quote shipping address without wiping standard address fields.
      *
      * @param AdminOrderCreate $subject
      * @param mixed $data
      *
      * @return array
+     * @throws Exception
      */
     public function beforeImportPostData(AdminOrderCreate $subject, mixed $data): array
     {

@@ -54,7 +54,6 @@ interface ClientInterface
         array $returnShipmentIds = []
     ): DeleteShipmentResult;
 
-
     /**
      * Book courier for existing generated shipments via DHL WebAPI2 API.
      *
@@ -170,7 +169,6 @@ interface ClientInterface
         array $returnShipmentFullData,
         ?int $orderId = null
     ): CreateShipmentReturnResult;
-
 
     /**
      * Get piece IDs / package tracking numbers for a shipment via DHL WebAPI2 getPieceId endpoint.

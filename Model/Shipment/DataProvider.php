@@ -272,6 +272,7 @@ class DataProvider extends AbstractDataProvider
             try {
                 $tpl = $this->deliveryServiceRepository->getById((int)$deliveryServiceTemplateId);
             } catch (Throwable) {
+                $tpl = null;
             }
         }
 

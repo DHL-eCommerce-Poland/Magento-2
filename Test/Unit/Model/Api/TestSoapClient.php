@@ -9,7 +9,14 @@ use SoapFault;
 
 class TestSoapClient extends SoapClient
 {
+    /**
+     * @var int
+     */
     public int $getLabelsCallCount = 0;
+
+    /**
+     * @var array
+     */
     public array $getLabelsCalls = [];
 
     /**
@@ -27,7 +34,6 @@ class TestSoapClient extends SoapClient
             'exceptions' => true,
         ]);
     }
-
 
     /**
      * Dummy getInternationalParams2 method for SoapClient mocking.
@@ -50,7 +56,6 @@ class TestSoapClient extends SoapClient
             ],
         ];
     }
-
 
     /**
      * Dummy bookCourier method for SoapClient mocking.
@@ -270,7 +275,6 @@ class TestSoapClient extends SoapClient
             ],
         ];
     }
-
 
     /**
      * Dummy getLabels method for SoapClient mocking.

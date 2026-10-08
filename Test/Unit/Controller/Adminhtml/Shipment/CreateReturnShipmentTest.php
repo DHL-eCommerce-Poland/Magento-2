@@ -172,11 +172,13 @@ class CreateReturnShipmentTest extends TestCase
 
         $calledPath = null;
         $calledParams = null;
-        $this->redirectStub->method('setPath')->willReturnCallback(function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
-            $calledPath = $path;
-            $calledParams = $params;
-            return $this->redirectStub;
-        });
+        $this->redirectStub->method('setPath')->willReturnCallback(
+            function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
+                $calledPath = $path;
+                $calledParams = $params;
+                return $this->redirectStub;
+            }
+        );
 
         $result = $this->controller->execute();
         $this->assertSame($this->redirectStub, $result);
@@ -226,7 +228,8 @@ class CreateReturnShipmentTest extends TestCase
             return $param === 'entity_id' ? 10 : null;
         });
 
-        $this->shipmentDataServiceStub->method('getShipmentEntity')->willThrowException(new Exception('Shipment not found'));
+        $this->shipmentDataServiceStub->method('getShipmentEntity')
+            ->willThrowException(new Exception('Shipment not found'));
 
         $jsonMock = $this->createMock(Json::class);
         $jsonMock->expects($this->once())->method('setData')->with($this->callback(function (array $data): bool {

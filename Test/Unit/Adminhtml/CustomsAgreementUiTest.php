@@ -78,9 +78,11 @@ class CustomsAgreementUiTest extends TestCase
             return null;
         }
 
+        $expectedDeclaration = 'I declare that the information on the attached invoice is consistent '
+            . 'with the customs data entered to generate the shipment';
         try {
             while (($row = fgetcsv($handle, null, ',', '"', '')) !== false) {
-                if (($row[0] ?? null) === 'I declare that the information on the attached invoice is consistent with the customs data entered to generate the shipment') {
+                if (($row[0] ?? null) === $expectedDeclaration) {
                     return $row[1] ?? null;
                 }
             }

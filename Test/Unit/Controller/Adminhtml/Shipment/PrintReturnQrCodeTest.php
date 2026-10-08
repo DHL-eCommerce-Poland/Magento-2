@@ -145,15 +145,18 @@ class PrintReturnQrCodeTest extends TestCase
         $this->requestStub->method('getParam')->willReturnCallback(function (string $param) {
             return $param === 'entity_id' ? 10 : null;
         });
-        $this->labelPrintingServiceStub->method('getReturnQrCodeContent')->willThrowException(new Exception('Print return QR error'));
+        $this->labelPrintingServiceStub->method('getReturnQrCodeContent')
+            ->willThrowException(new Exception('Print return QR error'));
 
         $calledPath = null;
         $calledParams = null;
-        $this->redirectStub->method('setPath')->willReturnCallback(function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
-            $calledPath = $path;
-            $calledParams = $params;
-            return $this->redirectStub;
-        });
+        $this->redirectStub->method('setPath')->willReturnCallback(
+            function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
+                $calledPath = $path;
+                $calledParams = $params;
+                return $this->redirectStub;
+            }
+        );
 
         $result = $this->controller->execute();
         $this->assertSame($this->redirectStub, $result);
@@ -167,7 +170,8 @@ class PrintReturnQrCodeTest extends TestCase
         $this->requestStub->method('getParam')->willReturnCallback(function (string $param) {
             return $param === 'entity_id' ? 10 : null;
         });
-        $this->labelPrintingServiceStub->method('getReturnQrCodeContent')->willThrowException(new Exception('Return QR not found'));
+        $this->labelPrintingServiceStub->method('getReturnQrCodeContent')
+            ->willThrowException(new Exception('Return QR not found'));
 
         $jsonMock = $this->createMock(Json::class);
         $jsonMock->expects($this->once())->method('setData')->with($this->callback(function (array $data): bool {

@@ -435,7 +435,8 @@ class ShipmentFullDataMapper
             $items[] = [
                 'serviceType' => 'COD',
                 'serviceValue' => $services->getCollectOnDeliveryValue(),
-                'collectOnDeliveryForm' => $services->getCollectOnDeliveryForm() ?: SpecialServicesData::PAYMENT_METHOD_BANK_TRANSFER,
+                'collectOnDeliveryForm' => $services->getCollectOnDeliveryForm()
+                    ?: SpecialServicesData::PAYMENT_METHOD_BANK_TRANSFER,
             ];
         }
 
@@ -465,4 +466,3 @@ class ShipmentFullDataMapper
         return !empty($items) ? ['item' => $items] : [];
     }
 }
-

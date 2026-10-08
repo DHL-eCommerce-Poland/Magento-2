@@ -33,7 +33,9 @@ $shippingRateGroups = $block->getShippingRates();
     <div id="order-shipping-method-choose" class="control">
         <dl class="admin__order-shipment-methods">
             <?php foreach ($shippingRateGroups as $code => $rates): ?>
-                <dt class="admin__order-shipment-methods-title"><?= $escaper->escapeHtml($block->getCarrierName($code)) ?></dt>
+                <dt class="admin__order-shipment-methods-title">
+                    <?= $escaper->escapeHtml($block->getCarrierName($code)) ?>
+                </dt>
                 <dd class="admin__order-shipment-methods-options">
                     <ul class="admin__order-shipment-methods-options-list">
                         <?php foreach ($rates as $rate): ?>
@@ -50,40 +52,65 @@ $shippingRateGroups = $block->getShippingRates();
                                         </div>
                                     </div>
                                 <?php else: ?>
-                                    <?php $checked = $block->isMethodActive($rateCode) || $block->isMethodActive($rateMethod) ? 'checked="checked"' : '' ?>
+                                    <?php
+                                    $isActive = $block->isMethodActive($rateCode)
+                                        || $block->isMethodActive($rateMethod);
+                                    $checked = $isActive ? 'checked="checked"' : '';
+                                    ?>
                                     <input <?= /* @noEscape */ $radioProperty ?>
                                         value="<?= $escaper->escapeHtmlAttr($rateCode) ?>"
-                                        id="s_method_<?= $escaper->escapeHtmlAttr($rateCode) ?>" <?= /* @noEscape */ $checked ?>
+                                        id="s_method_<?= $escaper->escapeHtmlAttr($rateCode) ?>"
+                                        <?= /* @noEscape */ $checked ?>
                                         class="admin__control-radio required-entry"/>
-                                    <label class="admin__field-label" for="s_method_<?= $escaper->escapeHtmlAttr($rateCode) ?>">
-                                        <?= $escaper->escapeHtml($rate->getMethodTitle() ? $rate->getMethodTitle() : $rate->getMethodDescription()) ?> -
+                                    <label class="admin__field-label"
+                                           for="s_method_<?= $escaper->escapeHtmlAttr($rateCode) ?>">
+                                        <?= $escaper->escapeHtml(
+                                            $rate->getMethodTitle()
+                                                ?: $rate->getMethodDescription()
+                                        ) ?> -
                                         <strong>
-                                            <?php $excl = $block->getShippingPrice($rate->getPrice(), $taxHelper->displayShippingPriceIncludingTax()); ?>
-                                            <?php $incl = $block->getShippingPrice($rate->getPrice(), true); ?>
+                                            <?php
+                                            $priceInclTax = $taxHelper->displayShippingPriceIncludingTax();
+                                            $excl = $block->getShippingPrice($rate->getPrice(), $priceInclTax);
+                                            $incl = $block->getShippingPrice($rate->getPrice(), true);
+                                            ?>
                                             <?= /* @noEscape */ $excl ?>
                                             <?php if ($taxHelper->displayShippingBothPrices() && $incl != $excl): ?>
-                                                (<?= $escaper->escapeHtml(__('Incl. Tax')) ?> <?= /* @noEscape */ $incl ?>)
+                                                (<?= $escaper->escapeHtml(__('Incl. Tax')) ?>
+                                                <?= /* @noEscape */ $incl ?>)
                                             <?php endif; ?>
                                         </strong>
                                     </label>
 
                                     <?php if ($isSp): ?>
-                                        <div class="dhl-service-point-selector-wrapper" <?= $checked ? '' : 'style="display: none;"' ?>>
-                                            <span class="dhl-sp-label"><?= $escaper->escapeHtml(__('Selected DHL pickup point:')) ?></span>
-                                            <strong class="dhl-sp-display-text"><?= $escaper->escapeHtml($spDisplayText !== '' ? $spDisplayText : __('None')) ?></strong>
+                                        <div class="dhl-service-point-selector-wrapper"
+                                             <?= $checked ? '' : 'style="display: none;"' ?>>
+                                            <span class="dhl-sp-label">
+                                                <?= $escaper->escapeHtml(__('Selected DHL pickup point:')) ?>
+                                            </span>
+                                            <strong class="dhl-sp-display-text">
+                                                <?= $escaper->escapeHtml(
+                                                    $spDisplayText !== '' ? $spDisplayText : __('None')
+                                                ) ?>
+                                            </strong>
                                             &nbsp;
                                             <a href="#" class="action-secondary dhl-show-map-btn">
                                                 <span><?= $escaper->escapeHtml(__('Select DHL pickup point')) ?></span>
                                             </a>
                                             <div class="dhl-postnummer-wrapper" style="display: none;">
-                                                <label for="dhl_postnummer_input" class="admin__field-label dhl-postnummer-label">
-                                                    <?= $escaper->escapeHtml(__('German Customer Number (Postnummer):')) ?>
+                                                <label for="dhl_postnummer_input"
+                                                       class="admin__field-label dhl-postnummer-label">
+                                                    <?= $escaper->escapeHtml(
+                                                        __('German Customer Number (Postnummer):')
+                                                    ) ?>
                                                 </label>
                                                 <input type="text"
                                                        id="dhl_postnummer_input"
                                                        class="admin__control-text dhl-postnummer-input"
                                                        value="<?= $escaper->escapeHtmlAttr($spPostnummer) ?>"
-                                                       placeholder="<?= $escaper->escapeHtmlAttr(__('6-10 digits')) ?>" />
+                                                       placeholder="<?=
+                                                        $escaper->escapeHtmlAttr(__('6-10 digits'))
+                                                        ?>" />
                                             </div>
                                         </div>
                                     <?php endif; ?>
@@ -115,10 +142,15 @@ $shippingRateGroups = $block->getShippingRates();
                     <?= $escaper->escapeHtml($block->getCarrierName($rate->getCarrier())) ?>
                 </dt>
                 <dd class="admin__order-shipment-methods-options">
-                    <?= $escaper->escapeHtml($rate->getMethodTitle() ? $rate->getMethodTitle() : $rate->getMethodDescription()) ?> -
+                    <?= $escaper->escapeHtml(
+                        $rate->getMethodTitle() ?: $rate->getMethodDescription()
+                    ) ?> -
                     <strong>
-                        <?php $excl = $block->getShippingPrice($rate->getPrice(), $taxHelper->displayShippingPriceIncludingTax()); ?>
-                        <?php $incl = $block->getShippingPrice($rate->getPrice(), true); ?>
+                        <?php
+                        $priceInclTax = $taxHelper->displayShippingPriceIncludingTax();
+                        $excl = $block->getShippingPrice($rate->getPrice(), $priceInclTax);
+                        $incl = $block->getShippingPrice($rate->getPrice(), true);
+                        ?>
                         <?= /* @noEscape */ $excl ?>
                         <?php if ($taxHelper->displayShippingBothPrices() && $incl != $excl): ?>
                             (<?= $escaper->escapeHtml(__('Incl. Tax')) ?> <?= /* @noEscape */ $incl ?>)
@@ -127,8 +159,14 @@ $shippingRateGroups = $block->getShippingRates();
 
                     <?php if ($isActiveDhlSpMethod): ?>
                         <div class="dhl-service-point-selector-wrapper dhl-sp-active-info">
-                            <span class="dhl-sp-label"><?= $escaper->escapeHtml(__('Selected DHL pickup point:')) ?></span>
-                            <strong class="dhl-sp-display-text"><?= $escaper->escapeHtml($spDisplayText !== '' ? $spDisplayText : __('None')) ?></strong>
+                            <span class="dhl-sp-label">
+                                <?= $escaper->escapeHtml(__('Selected DHL pickup point:')) ?>
+                            </span>
+                            <strong class="dhl-sp-display-text">
+                                <?= $escaper->escapeHtml(
+                                    $spDisplayText !== '' ? $spDisplayText : __('None')
+                                ) ?>
+                            </strong>
                             &nbsp;
                             <a href="#" class="action-secondary dhl-show-map-btn">
                                 <span><?= $escaper->escapeHtml(__('Select DHL pickup point')) ?></span>
@@ -185,14 +223,22 @@ script;
     ) ?>
 <?php endif; ?>
 
-<input type="hidden" name="order[dhl_service_point_id]" id="dhl_service_point_id" value="<?= $escaper->escapeHtmlAttr($spId) ?>" />
-<input type="hidden" name="order[dhl_service_point_name]" id="dhl_service_point_name" value="<?= $escaper->escapeHtmlAttr($spName) ?>" />
-<input type="hidden" name="order[dhl_service_point_street]" id="dhl_service_point_street" value="<?= $escaper->escapeHtmlAttr($spStreet) ?>" />
-<input type="hidden" name="order[dhl_service_point_postcode]" id="dhl_service_point_postcode" value="<?= $escaper->escapeHtmlAttr($spPostcode) ?>" />
-<input type="hidden" name="order[dhl_service_point_city]" id="dhl_service_point_city" value="<?= $escaper->escapeHtmlAttr($spCity) ?>" />
-<input type="hidden" name="order[dhl_is_packstation]" id="dhl_is_packstation" value="<?= $escaper->escapeHtmlAttr($spIsPackstation) ?>" />
-<input type="hidden" name="order[dhl_is_postfiliale]" id="dhl_is_postfiliale" value="<?= $escaper->escapeHtmlAttr($spIsPostfiliale) ?>" />
-<input type="hidden" name="order[dhl_postnummer]" id="dhl_postnummer" value="<?= $escaper->escapeHtmlAttr($spPostnummer) ?>" />
+<input type="hidden" name="order[dhl_service_point_id]" id="dhl_service_point_id"
+       value="<?= $escaper->escapeHtmlAttr($spId) ?>" />
+<input type="hidden" name="order[dhl_service_point_name]" id="dhl_service_point_name"
+       value="<?= $escaper->escapeHtmlAttr($spName) ?>" />
+<input type="hidden" name="order[dhl_service_point_street]" id="dhl_service_point_street"
+       value="<?= $escaper->escapeHtmlAttr($spStreet) ?>" />
+<input type="hidden" name="order[dhl_service_point_postcode]" id="dhl_service_point_postcode"
+       value="<?= $escaper->escapeHtmlAttr($spPostcode) ?>" />
+<input type="hidden" name="order[dhl_service_point_city]" id="dhl_service_point_city"
+       value="<?= $escaper->escapeHtmlAttr($spCity) ?>" />
+<input type="hidden" name="order[dhl_is_packstation]" id="dhl_is_packstation"
+       value="<?= $escaper->escapeHtmlAttr($spIsPackstation) ?>" />
+<input type="hidden" name="order[dhl_is_postfiliale]" id="dhl_is_postfiliale"
+       value="<?= $escaper->escapeHtmlAttr($spIsPostfiliale) ?>" />
+<input type="hidden" name="order[dhl_postnummer]" id="dhl_postnummer"
+       value="<?= $escaper->escapeHtmlAttr($spPostnummer) ?>" />
 
 <div id="shipping-method-overlay" class="order-methods-overlay">
     <span><?= $escaper->escapeHtml(__('You don\'t need to select a shipping method.')) ?></span>

@@ -350,5 +350,4 @@ class ShipmentCreationService
             }
         }
     }
-
 }

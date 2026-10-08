@@ -162,5 +162,3 @@ class ShipmentDataPayloadReaderTest extends TestCase
         $this->assertSame(['RET001', 'RET002', 'RET003'], $returnIds);
     }
 }
-
-

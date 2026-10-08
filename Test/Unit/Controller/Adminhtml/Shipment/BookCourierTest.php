@@ -21,14 +21,49 @@ use Psr\Log\LoggerInterface;
 #[AllowMockObjectsWithoutExpectations]
 class BookCourierTest extends TestCase
 {
+    /**
+     * @var Context|MockObject
+     */
     private Context|MockObject $context;
+
+    /**
+     * @var RequestInterface|MockObject
+     */
     private RequestInterface|MockObject $request;
+
+    /**
+     * @var ManagerInterface|MockObject
+     */
     private ManagerInterface|MockObject $messageManager;
+
+    /**
+     * @var JsonFactory|MockObject
+     */
     private JsonFactory|MockObject $jsonFactory;
+
+    /**
+     * @var Json|MockObject
+     */
     private Json|MockObject $jsonResult;
+
+    /**
+     * @var CourierBookingService|MockObject
+     */
     private CourierBookingService|MockObject $bookingService;
+
+    /**
+     * @var ScopeConfigInterface|MockObject
+     */
     private ScopeConfigInterface|MockObject $scopeConfig;
+
+    /**
+     * @var LoggerInterface|MockObject
+     */
     private LoggerInterface|MockObject $logger;
+
+    /**
+     * @var BookCourier
+     */
     private BookCourier $controller;
 
     protected function setUp(): void

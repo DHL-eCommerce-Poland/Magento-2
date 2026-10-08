@@ -27,8 +27,12 @@ class ShippingMethodFormViewModelTest extends TestCase
 
         $viewModel = new ShippingMethodFormViewModel($methodCatalogStub);
 
-        $this->assertTrue($viewModel->isDhlServicePointMethod('dhlpoland', 'dhlpoland_economy_pop', 'dhlpoland_economy_pop'));
-        $this->assertFalse($viewModel->isDhlServicePointMethod('dhlpoland', 'parcel_polska', 'dhlpoland_parcel_polska'));
+        $this->assertTrue(
+            $viewModel->isDhlServicePointMethod('dhlpoland', 'dhlpoland_economy_pop', 'dhlpoland_economy_pop')
+        );
+        $this->assertFalse(
+            $viewModel->isDhlServicePointMethod('dhlpoland', 'parcel_polska', 'dhlpoland_parcel_polska')
+        );
     }
 
     public function testGetServicePointDataReadsAndDecodesQuoteAddress(): void

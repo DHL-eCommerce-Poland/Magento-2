@@ -43,7 +43,8 @@ class PrintReturnLabel extends Generic implements ButtonProviderInterface
             'label' => __('Print Return Label'),
             'class' => '',
             'on_click' => sprintf(
-                "require(['Ideo_Dhl/js/shipment/download-document'], function (downloadDocument) { downloadDocument('%s'); });",
+                "require(['Ideo_Dhl/js/shipment/download-document'], "
+                . "function (downloadDocument) { downloadDocument('%s'); });",
                 $this->escapeJs($printUrl)
             ),
             'sort_order' => 52,

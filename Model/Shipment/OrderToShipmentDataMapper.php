@@ -326,7 +326,6 @@ class OrderToShipmentDataMapper
         $shippingMethod = (string)($order->getShippingMethod() ?? '');
         $serviceType = $this->methodCatalog->getServiceCodeForMethod($shippingMethod);
 
-
         $autoCreateReturn = !empty($defaultShipmentDefaults['autoCreateReturnShipment']);
         $rawExpDays = $defaultShipmentDefaults['returnLabelExpDays'] ?? null;
         $returnExpDays = ($rawExpDays !== null && $rawExpDays !== '') ? (int)$rawExpDays : null;

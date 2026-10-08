@@ -16,6 +16,9 @@ use PHPUnit\Framework\TestCase;
 
 class PreserveServicePointOnAdminOrderCreateTest extends TestCase
 {
+    /**
+     * @var MethodCatalog|Stub
+     */
     private MethodCatalog|Stub $methodCatalogStub;
 
     protected function setUp(): void

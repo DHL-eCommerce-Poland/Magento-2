@@ -100,7 +100,9 @@ class ShipmentReturnDataMapper
         if ($serviceType === 'ZC') {
             $bookCourier = false;
         } else {
-            $returnBookCourierVal = (string) ($settings->getReturnBookCourier() ?? ReturnBookCourier::DROP_OFF_OR_COURIER);
+            $returnBookCourierVal = (string) (
+                $settings->getReturnBookCourier() ?? ReturnBookCourier::DROP_OFF_OR_COURIER
+            );
             $bookCourier = $returnBookCourierVal === ReturnBookCourier::DROP_OFF_OR_COURIER;
         }
         $labelType = $settings->getReturnLabelType() ?: 'BLP';

@@ -63,7 +63,8 @@ class MassDelete extends Action implements HttpPostActionInterface
                         $deletedCount++;
                     } else {
                         $errorCount++;
-                        $errorMessages[] = (string) __('Shipment #%1: %2',
+                        $errorMessages[] = (string) __(
+                            'Shipment #%1: %2',
                             $entityId,
                             $deletionResult->getErrorMessage() ?: (string) __('Shipment could not be deleted.')
                         );

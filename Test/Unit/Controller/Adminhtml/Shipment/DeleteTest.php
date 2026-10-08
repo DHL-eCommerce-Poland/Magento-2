@@ -126,11 +126,13 @@ class DeleteTest extends TestCase
 
         $calledPath = null;
         $calledParams = null;
-        $this->redirectStub->method('setPath')->willReturnCallback(function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
-            $calledPath = $path;
-            $calledParams = $params;
-            return $this->redirectStub;
-        });
+        $this->redirectStub->method('setPath')->willReturnCallback(
+            function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
+                $calledPath = $path;
+                $calledParams = $params;
+                return $this->redirectStub;
+            }
+        );
         $this->messageManagerMock->expects($this->once())
             ->method('addErrorMessage')
             ->with('Failed to delete shipment: ' . $errorMessage);
@@ -151,11 +153,13 @@ class DeleteTest extends TestCase
 
         $calledPath = null;
         $calledParams = null;
-        $this->redirectStub->method('setPath')->willReturnCallback(function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
-            $calledPath = $path;
-            $calledParams = $params;
-            return $this->redirectStub;
-        });
+        $this->redirectStub->method('setPath')->willReturnCallback(
+            function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
+                $calledPath = $path;
+                $calledParams = $params;
+                return $this->redirectStub;
+            }
+        );
         $this->messageManagerMock->expects($this->once())
             ->method('addErrorMessage')
             ->with($this->callback(function ($phrase) {

@@ -10,6 +10,7 @@ use Magento\Framework\Filesystem\Driver\File as FileDriver;
 use Psr\Log\LoggerInterface;
 use SoapClient;
 use SoapFault;
+use SoapVar;
 use Throwable;
 
 class SoapClientAdapter implements ClientInterface
@@ -338,8 +339,6 @@ class SoapClientAdapter implements ClientInterface
             );
         }
     }
-
-
 
     /**
      * Book courier for existing generated shipments via DHL WebAPI2 API.
@@ -1293,7 +1292,6 @@ class SoapClientAdapter implements ClientInterface
         }
     }
 
-
     /**
      * Get piece IDs / package tracking numbers for a shipment via DHL WebAPI2 getPieceId endpoint.
      *
@@ -1572,7 +1570,7 @@ class SoapClientAdapter implements ClientInterface
             foreach (['weight', 'width', 'height', 'length'] as $measurement) {
                 $value = $package[$measurement] ?? null;
                 if ($value !== null && $value !== '' && is_numeric($value)) {
-                    $package[$measurement] = new \SoapVar((float) $value, XSD_FLOAT);
+                    $package[$measurement] = new SoapVar((float) $value, XSD_FLOAT);
                 }
             }
 

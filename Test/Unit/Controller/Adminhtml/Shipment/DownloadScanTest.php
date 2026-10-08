@@ -149,11 +149,13 @@ class DownloadScanTest extends TestCase
 
         $calledPath = null;
         $calledParams = null;
-        $this->redirectStub->method('setPath')->willReturnCallback(function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
-            $calledPath = $path;
-            $calledParams = $params;
-            return $this->redirectStub;
-        });
+        $this->redirectStub->method('setPath')->willReturnCallback(
+            function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
+                $calledPath = $path;
+                $calledParams = $params;
+                return $this->redirectStub;
+            }
+        );
 
         $result = $this->controller->execute();
         $this->assertSame($this->redirectStub, $result);
@@ -167,7 +169,8 @@ class DownloadScanTest extends TestCase
         $this->requestStub->method('getParam')->willReturnCallback(function (string $param) {
             return $param === 'entity_id' ? 10 : null;
         });
-        $this->serviceStub->method('getScanContent')->willThrowException(new LocalizedException(__('Brak skanu lp do pobrania')));
+        $this->serviceStub->method('getScanContent')
+            ->willThrowException(new LocalizedException(__('Brak skanu lp do pobrania')));
 
         $jsonMock = $this->createMock(Json::class);
         $jsonMock->expects($this->once())->method('setData')->with($this->callback(function (array $data): bool {

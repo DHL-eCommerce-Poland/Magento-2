@@ -353,4 +353,3 @@ class DataProviderTest extends TestCase
         $this->assertSame('', $customs['customsItems'][1]['countryOfOrigin']);
     }
 }
-

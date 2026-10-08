@@ -240,7 +240,8 @@ class ShipmentReturnDataMapperTest extends TestCase
         $pkg = new PackageData('PACKAGE', 1, 2.0, 30.0, 20.0, 10.0, false);
         $settings = new ShipmentSettingsData(
             serviceType: 'ZK',
-            returnBookCourier: 1, // 1 = DROP_OFF_OR_COURIER (which would normally produce bookCourier = true for domestic)
+            // 1 = DROP_OFF_OR_COURIER (would normally produce bookCourier = true)
+            returnBookCourier: 1,
             packages: [$pkg]
         );
 
@@ -257,7 +258,6 @@ class ShipmentReturnDataMapperTest extends TestCase
         $this->assertSame('ZC', $mapped['shipmentInfo']['serviceType']);
         $this->assertFalse($mapped['shipmentInfo']['bookCourier']);
     }
-
 
     #[DataProvider('postalCodeDataProvider')]
     public function testSanitizePostalCode(string $inputCode, string $countryCode, string $expected): void

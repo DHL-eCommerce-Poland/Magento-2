@@ -125,4 +125,3 @@ class ReturnShipmentDataBuilderTest extends TestCase
         $this->assertEquals('ZC', $returnShipment->getShipmentSettings()->getServiceType());
     }
 }
-

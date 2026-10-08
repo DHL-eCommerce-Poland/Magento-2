@@ -149,11 +149,13 @@ class PrintLabelTest extends TestCase
 
         $calledPath = null;
         $calledParams = null;
-        $this->redirectStub->method('setPath')->willReturnCallback(function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
-            $calledPath = $path;
-            $calledParams = $params;
-            return $this->redirectStub;
-        });
+        $this->redirectStub->method('setPath')->willReturnCallback(
+            function (string $path, array $params = []) use (&$calledPath, &$calledParams) {
+                $calledPath = $path;
+                $calledParams = $params;
+                return $this->redirectStub;
+            }
+        );
 
         $result = $this->controller->execute();
         $this->assertSame($this->redirectStub, $result);
@@ -167,7 +169,8 @@ class PrintLabelTest extends TestCase
         $this->requestStub->method('getParam')->willReturnCallback(function (string $param) {
             return $param === 'entity_id' ? 10 : null;
         });
-        $this->labelPrintingServiceStub->method('getLabelsContent')->willThrowException(new Exception('Label not found'));
+        $this->labelPrintingServiceStub->method('getLabelsContent')
+            ->willThrowException(new Exception('Label not found'));
 
         $jsonMock = $this->createMock(Json::class);
         $jsonMock->expects($this->once())->method('setData')->with($this->callback(function (array $data): bool {

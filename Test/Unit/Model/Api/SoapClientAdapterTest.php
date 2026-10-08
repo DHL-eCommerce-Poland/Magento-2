@@ -579,8 +579,6 @@ class SoapClientAdapterTest extends TestCase
         $this->assertStringContainsString('[90040146098] Przesylka nie istnieje', (string) $result->getErrorMessage());
     }
 
-
-
     /**
      * Test successful bookCourier via mocked SoapClient.
      *
@@ -862,7 +860,8 @@ class SoapClientAdapterTest extends TestCase
             public function __getLastRequest(): string
             {
                 return '<Envelope><authData><username>private-user</username>'
-                    . '<password>private-password</password></authData><orders><item>ORDER_1</item></orders></Envelope>';
+                    . '<password>private-password</password></authData>'
+                    . '<orders><item>ORDER_1</item></orders></Envelope>';
             }
 
             /**

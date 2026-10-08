@@ -21,13 +21,44 @@ use Psr\Log\LoggerInterface;
 #[AllowMockObjectsWithoutExpectations]
 class GetShipmentPickupInfoTest extends TestCase
 {
+    /**
+     * @var Context|MockObject
+     */
     private Context|MockObject $context;
+
+    /**
+     * @var RequestInterface|MockObject
+     */
     private RequestInterface|MockObject $request;
+
+    /**
+     * @var JsonFactory|MockObject
+     */
     private JsonFactory|MockObject $jsonFactory;
+
+    /**
+     * @var Json|MockObject
+     */
     private Json|MockObject $jsonResult;
+
+    /**
+     * @var ShipmentDataRepositoryInterface|MockObject
+     */
     private ShipmentDataRepositoryInterface|MockObject $shipmentDataRepository;
+
+    /**
+     * @var SerializerInterface|MockObject
+     */
     private SerializerInterface|MockObject $serializer;
+
+    /**
+     * @var LoggerInterface|MockObject
+     */
     private LoggerInterface|MockObject $logger;
+
+    /**
+     * @var GetShipmentPickupInfo
+     */
     private GetShipmentPickupInfo $controller;
 
     protected function setUp(): void

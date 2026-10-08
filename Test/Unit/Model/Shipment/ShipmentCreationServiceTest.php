@@ -590,4 +590,3 @@ class ShipmentCreationServiceTest extends TestCase
         $this->assertEquals('999888777', $result->getShipmentId());
     }
 }
-

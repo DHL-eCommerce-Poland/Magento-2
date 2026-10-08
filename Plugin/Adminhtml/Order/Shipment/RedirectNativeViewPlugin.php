@@ -42,6 +42,7 @@ class RedirectNativeViewPlugin
 
     /**
      * Redirect to DHL shipment view if native shipment has linked DHL shipment entity.
+     *
      * If DHL shipment was deleted, display notice message and proceed to default Magento shipment view.
      *
      * @param BackendAction $subject
@@ -133,7 +134,7 @@ class RedirectNativeViewPlugin
                 }
             }
         } catch (Throwable) {
-            // Fallback to adding message directly if getMessages fails
+            $messages = [];
         }
 
         $this->messageManager->addNoticeMessage($message instanceof Phrase ? $message : __($message));

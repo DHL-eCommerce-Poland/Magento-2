@@ -79,7 +79,6 @@ class ShipmentDataValidator
         $serviceType = $settings->getServiceType();
         $popId = $recipient->getPopId();
 
-
         // ServicePoint / POP point requirement
         if (in_array(strtoupper(trim((string)$serviceType)), [MethodCatalog::SERVICE_SP], true) && empty($popId)) {
             $errors[] = __('Service Point ID is required for ServicePoint shipments.')->render();
@@ -271,6 +270,7 @@ class ShipmentDataValidator
             return true;
         }
 
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
         $decoded = base64_decode($base64, true);
 
         return $decoded !== false && strlen($decoded) > self::MAX_INVOICE_FILE_SIZE;
