@@ -2,5 +2,6 @@
 /AGENTS.md export-ignore
 /.github export-ignore
 /.gitignore export-ignore
-/Test export-ignore
 /phpunit.xml.dist export-ignore
+/Test/autoload.php export-ignore
+/Test/bootstrap.php export-ignore

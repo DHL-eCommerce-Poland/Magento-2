@@ -35,14 +35,15 @@ jobs:
           BUILD_DIR="dist/package"
           mkdir -p "${BUILD_DIR}"
 
-          # Copy files excluding dev, git, caches and test files
+          # Copy files excluding dev, git, caches and build artifacts
           rsync -av --exclude='.git*' \
                     --exclude='.phpunit*' \
                     --exclude='.php-cs*' \
                     --exclude='.github' \
                     --exclude='.agents' \
-                    --exclude='Test' \
                     --exclude='phpunit.xml.dist' \
+                    --exclude='Test/autoload.php' \
+                    --exclude='Test/bootstrap.php' \
                     --exclude='AGENTS.md' \
                     --exclude='dist' \
                     --exclude='vendor' \
