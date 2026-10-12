@@ -292,6 +292,15 @@ define([
         var currencyObs = ko.observable(c.currency || 'EUR');
         var categoryOfItemObs = ko.observable(c.categoryOfItem || '11');
 
+        var isInitialIndividual = ((c.customsType || 'U') === 'I');
+        var nipNrObs = ko.observable(isInitialIndividual ? (c.nipNr || '') : '');
+        var eoriNrObs = ko.observable(isInitialIndividual ? (c.eoriNr || '') : '');
+        var eoriNrReceiverObs = ko.observable(isInitialIndividual ? (c.eoriNrReceiver || '') : '');
+        var invoiceNrObs = ko.observable(isInitialIndividual ? (c.invoiceNr || '') : '');
+        var invoiceDateObs = ko.observable(isInitialIndividual ? (c.invoiceDate || '') : '');
+        var invoiceFileObs = ko.observable(isInitialIndividual ? (c.invoiceFile || '') : '');
+        var invoiceFileNameObs = ko.observable(isInitialIndividual ? (c.invoiceFileName || '') : '');
+
         customsTypeObs.subscribe(function (newType) {
             var allowedCurrencies = {
                 'I': ['GBP', 'EUR'],
@@ -313,10 +322,16 @@ define([
                 categoryOfItemObs('11');
             }
 
-            if (newType !== 'I' && customsObj && typeof customsObj.invoiceFile === 'function') {
-                customsObj.invoiceFile('');
-                if (typeof customsObj.invoiceFileName === 'function') {
-                    customsObj.invoiceFileName('');
+            if (newType !== 'I') {
+                nipNrObs('');
+                eoriNrObs('');
+                eoriNrReceiverObs('');
+                invoiceNrObs('');
+                invoiceDateObs('');
+                invoiceFileObs('');
+                invoiceFileNameObs('');
+                if (customsObj && typeof customsObj.invoiceContent === 'function') {
+                    customsObj.invoiceContent(false);
                 }
             }
         });
@@ -332,20 +347,20 @@ define([
             grossWeight: ko.observable(c.grossWeight !== undefined && c.grossWeight !== null ? c.grossWeight : ''),
             firstName: ko.observable(c.firstName || ''),
             secondaryName: ko.observable(c.secondaryName || ''),
-            nipNr: ko.observable(c.nipNr || ''),
-            eoriNr: ko.observable(c.eoriNr || ''),
+            nipNr: nipNrObs,
+            eoriNr: eoriNrObs,
             vatRegistrationNumber: ko.observable(c.vatRegistrationNumber || ''),
-            eoriNrReceiver: ko.observable(c.eoriNrReceiver || ''),
+            eoriNrReceiver: eoriNrReceiverObs,
             vatRegistrationNumberReceiver: ko.observable(c.vatRegistrationNumberReceiver || ''),
-            invoiceNr: ko.observable(c.invoiceNr || ''),
-            invoiceDate: ko.observable(c.invoiceDate || ''),
-            invoiceFile: ko.observable(c.invoiceFile || ''),
-            invoiceFileName: ko.observable(c.invoiceFileName || ''),
+            invoiceNr: invoiceNrObs,
+            invoiceDate: invoiceDateObs,
+            invoiceFile: invoiceFileObs,
+            invoiceFileName: invoiceFileNameObs,
             additionalInfo: ko.observable(c.additionalInfo || ''),
             notExceedValue: ko.observable(c.notExceedValue !== undefined ? isTruthy(c.notExceedValue) : true),
             notProhibitedGoods: ko.observable(c.notProhibitedGoods !== undefined ? isTruthy(c.notProhibitedGoods) : true),
             notRestrictedGoods: ko.observable(c.notRestrictedGoods !== undefined ? isTruthy(c.notRestrictedGoods) : true),
-            invoiceContent: ko.observable(c.invoiceContent !== undefined ? isTruthy(c.invoiceContent) : true),
+            invoiceContent: ko.observable(isInitialIndividual ? (c.invoiceContent !== undefined ? isTruthy(c.invoiceContent) : true) : false),
             customsItems: itemsObsArr
         };
 
@@ -965,23 +980,25 @@ define([
             if (data.grossWeight !== undefined && data.grossWeight !== null) customs.grossWeight(data.grossWeight);
             if (data.firstName !== undefined) customs.firstName(data.firstName);
             if (data.secondaryName !== undefined) customs.secondaryName(data.secondaryName);
-            if (data.nipNr !== undefined) customs.nipNr(data.nipNr);
-            if (data.eoriNr !== undefined) customs.eoriNr(data.eoriNr);
             if (data.vatRegistrationNumber !== undefined) customs.vatRegistrationNumber(data.vatRegistrationNumber);
-            if (data.eoriNrReceiver !== undefined) customs.eoriNrReceiver(data.eoriNrReceiver);
             if (data.vatRegistrationNumberReceiver !== undefined) customs.vatRegistrationNumberReceiver(data.vatRegistrationNumberReceiver);
-            if (data.invoiceNr !== undefined) customs.invoiceNr(data.invoiceNr);
-            if (data.invoiceDate !== undefined) customs.invoiceDate(data.invoiceDate);
-            if (data.invoiceFile !== undefined) customs.invoiceFile(data.invoiceFile);
+
+            var isIndividual = (customs.customsType() === 'I');
+            customs.nipNr(isIndividual && data.nipNr !== undefined ? data.nipNr : '');
+            customs.eoriNr(isIndividual && data.eoriNr !== undefined ? data.eoriNr : '');
+            customs.eoriNrReceiver(isIndividual && data.eoriNrReceiver !== undefined ? data.eoriNrReceiver : '');
+            customs.invoiceNr(isIndividual && data.invoiceNr !== undefined ? data.invoiceNr : '');
+            customs.invoiceDate(isIndividual && data.invoiceDate !== undefined ? data.invoiceDate : '');
+            customs.invoiceFile(isIndividual && data.invoiceFile !== undefined ? data.invoiceFile : '');
+            if (!isIndividual && typeof customs.invoiceFileName === 'function') {
+                customs.invoiceFileName('');
+            }
+            customs.invoiceContent(isIndividual ? (data.invoiceContent !== undefined ? isTruthy(data.invoiceContent) : true) : false);
+
             if (data.additionalInfo !== undefined) customs.additionalInfo(data.additionalInfo);
             if (data.notExceedValue !== undefined) customs.notExceedValue(isTruthy(data.notExceedValue));
             if (data.notProhibitedGoods !== undefined) customs.notProhibitedGoods(isTruthy(data.notProhibitedGoods));
             if (data.notRestrictedGoods !== undefined) customs.notRestrictedGoods(isTruthy(data.notRestrictedGoods));
-            if (data.customsType === 'I') {
-                customs.invoiceContent(data.invoiceContent !== undefined ? isTruthy(data.invoiceContent) : true);
-            } else if (data.customsType !== undefined) {
-                customs.invoiceContent(false);
-            }
 
             if (customs.customsItems) {
                 customs.customsItems.removeAll();
@@ -1534,12 +1551,23 @@ define([
                                     }
 
                                     if (self.isCustomsClearanceVisible() && shipmentDataPayload.customs) {
-                                        if (shipmentDataPayload.customs.customsType === 'I' && (!shipmentDataPayload.customs.invoiceFile || !shipmentDataPayload.customs.invoiceFile.trim())) {
-                                            alert({
-                                                title: $.mage.__('Error'),
-                                                content: $.mage.__('VAT Invoice PDF file is required for individual customs clearance.')
-                                            });
-                                            return false;
+                                        if (shipmentDataPayload.customs.customsType === 'I') {
+                                            if (!shipmentDataPayload.customs.invoiceFile || !shipmentDataPayload.customs.invoiceFile.trim()) {
+                                                alert({
+                                                    title: $.mage.__('Error'),
+                                                    content: $.mage.__('VAT Invoice PDF file is required for individual customs clearance.')
+                                                });
+                                                return false;
+                                            }
+                                        } else {
+                                            shipmentDataPayload.customs.nipNr = '';
+                                            shipmentDataPayload.customs.eoriNr = '';
+                                            shipmentDataPayload.customs.eoriNrReceiver = '';
+                                            shipmentDataPayload.customs.invoiceNr = '';
+                                            shipmentDataPayload.customs.invoiceDate = '';
+                                            shipmentDataPayload.customs.invoiceFile = '';
+                                            shipmentDataPayload.customs.invoiceFileName = '';
+                                            shipmentDataPayload.customs.invoiceContent = false;
                                         }
                                     }
 

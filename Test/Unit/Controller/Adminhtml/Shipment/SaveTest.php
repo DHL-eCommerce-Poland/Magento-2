@@ -459,6 +459,69 @@ class SaveTest extends TestCase
         $this->assertSame($this->jsonResultMock, $result);
     }
 
+    public function testExecuteStripsIndividualCustomsFieldsForSimplifiedClearance(): void
+    {
+        $payloadData = [
+            'entity_id' => 43,
+            'shipmentSettings' => [
+                'shipmentDate' => '2026-09-10',
+                'serviceType' => 'AH',
+            ],
+            'customs' => [
+                'customsType' => 'U',
+                'nipNr' => '5218487281',
+                'eoriNr' => 'PL52184872810000',
+                'eoriNrReceiver' => 'GB123456789000',
+                'invoiceNr' => 'INV-001',
+                'invoiceDate' => '10.08.2025',
+                'invoiceFile' => 'base64file',
+                'invoiceContent' => true,
+            ],
+        ];
+
+        $this->requestStub
+            ->method('getParam')
+            ->willReturnCallback(function (string $param) use ($payloadData) {
+                if ($param === 'shipment_data') {
+                    return json_encode($payloadData);
+                }
+                if ($param === 'entity_id') {
+                    return 43;
+                }
+                return null;
+            });
+
+        $apiResult = new CreateShipmentResult(true, false, '90039521203');
+        $this->shipmentCreationServiceMock->expects(self::once())
+            ->method('recreateShipment')
+            ->with(
+                43,
+                Assert::callback(function ($arg) {
+                    return $arg instanceof DhlShipmentData
+                        && $arg->getCustoms() !== null
+                        && $arg->getCustoms()->getCustomsType() === 'U'
+                        && $arg->getCustoms()->getNipNr() === null
+                        && $arg->getCustoms()->getEoriNr() === null
+                        && $arg->getCustoms()->getEoriNrReceiver() === null
+                        && $arg->getCustoms()->getInvoiceNr() === null
+                        && $arg->getCustoms()->getInvoiceDate() === null
+                        && $arg->getCustoms()->getInvoiceFile() === null
+                        && $arg->getCustoms()->isInvoiceContent() === false;
+                })
+            )
+            ->willReturn($apiResult);
+
+        $this->jsonResultMock->expects(self::once())
+            ->method('setData')
+            ->with(Assert::callback(function (array $data) {
+                return $data['success'] === true;
+            }))
+            ->willReturn($this->jsonResultMock);
+
+        $result = $this->controller->execute();
+        $this->assertSame($this->jsonResultMock, $result);
+    }
+
     /**
      * Test execute non-AJAX redirects to shipment edit page on success.
      *

@@ -150,9 +150,21 @@ class Save extends Action implements HttpPostActionInterface
             }
         }
 
-        // Sanitize customs invoiceDate if present (allowing past dates)
+        // Sanitize customs fields: strip individual clearance fields when not individual ('I')
         if (isset($payload['customs']) && is_array($payload['customs'])) {
-            if (!empty($payload['customs']['invoiceDate'])) {
+            $customsType = (string)($payload['customs']['customsType'] ?? 'U');
+            if ($customsType === 'U' || $customsType === 'S') {
+                $payload['customs']['nipNr'] = null;
+                $payload['customs']['eoriNr'] = null;
+                $payload['customs']['eoriNrReceiver'] = null;
+                $payload['customs']['shipperNip'] = null;
+                $payload['customs']['shipperEori'] = null;
+                $payload['customs']['receiverEori'] = null;
+                $payload['customs']['invoiceNr'] = null;
+                $payload['customs']['invoiceDate'] = null;
+                $payload['customs']['invoiceFile'] = null;
+                $payload['customs']['invoiceContent'] = false;
+            } elseif (!empty($payload['customs']['invoiceDate'])) {
                 $rawInvoiceDate = trim((string)$payload['customs']['invoiceDate']);
                 $payload['customs']['invoiceDate'] = $this->dateSanitizer->sanitize(
                     $rawInvoiceDate,

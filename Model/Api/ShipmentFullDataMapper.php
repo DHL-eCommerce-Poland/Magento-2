@@ -255,15 +255,6 @@ class ShipmentFullDataMapper
                 ),
             ];
 
-            if ($customs->getNipNr()) {
-                $customsDef['nipNr'] = $this->sanitizeString($customs->getNipNr());
-            }
-            if ($customs->getEoriNr()) {
-                $customsDef['eoriNr'] = $this->sanitizeString($customs->getEoriNr());
-            }
-            if ($customs->getEoriNrReceiver()) {
-                $customsDef['eoriNrReceiver'] = $this->sanitizeString($customs->getEoriNrReceiver());
-            }
             if ($customs->getVatRegistrationNumberReceiver()) {
                 $customsDef['vatRegistrationNumberReceiver'] = $this->sanitizeString(
                     $customs->getVatRegistrationNumberReceiver()
@@ -274,6 +265,15 @@ class ShipmentFullDataMapper
             }
 
             if ($customsType === 'I') {
+                if ($customs->getNipNr()) {
+                    $customsDef['nipNr'] = $this->sanitizeString($customs->getNipNr());
+                }
+                if ($customs->getEoriNr()) {
+                    $customsDef['eoriNr'] = $this->sanitizeString($customs->getEoriNr());
+                }
+                if ($customs->getEoriNrReceiver()) {
+                    $customsDef['eoriNrReceiver'] = $this->sanitizeString($customs->getEoriNrReceiver());
+                }
                 if ($customs->getInvoiceNr()) {
                     $customsDef['invoiceNr'] = $this->sanitizeString($customs->getInvoiceNr());
                 }
