@@ -51,7 +51,9 @@ class CreateReturnShipment extends Generic implements ButtonProviderInterface
             'label' => __('Create Return Shipment'),
             'class' => '',
             'on_click' => sprintf(
-                "require(['DhlPoland_Dhl/js/shipment/create-return'], function (createReturn) { createReturn('%s'); });",
+                "require(['DhlPoland_Dhl/js/shipment/create-return'], function (createReturn) {
+                    createReturn('%s');
+                });",
                 $this->escapeJs($url)
             ),
             'sort_order' => 65,

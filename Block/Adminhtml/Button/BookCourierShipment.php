@@ -56,7 +56,9 @@ class BookCourierShipment extends Generic implements ButtonProviderInterface
                     var modal = $('#dhlpoland-book-courier-modal');
                     if (modal.length && typeof modal.data('openBookCourierModal') === 'function') {
                         modal.data('openBookCourierModal')([%d], %s);
-                    } else if (window.DhlPolandBookCourier && typeof window.DhlPolandBookCourier.openModal === 'function') {
+                    } else if (window.DhlPolandBookCourier
+                        && typeof window.DhlPolandBookCourier.openModal === 'function'
+                    ) {
                         window.DhlPolandBookCourier.openModal([%d], %s);
                     } else {
                         alert('%s');
