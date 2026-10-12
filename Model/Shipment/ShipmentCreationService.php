@@ -142,10 +142,7 @@ class ShipmentCreationService
             );
 
             // 7. Auto-create return shipment if requested
-            if (
-                $shipmentData->getShipmentSettings()->autoCreateReturnShipment()
-                && $apiResult->getShipmentId()
-            ) {
+            if ($shipmentData->getShipmentSettings()->autoCreateReturnShipment() && $apiResult->getShipmentId()) {
                 $this->logger->info(sprintf(
                     '[ShipmentCreation] Triggering auto return shipment creation for order #%s, primary waybill #%s',
                     (string) $orderId,
@@ -305,10 +302,7 @@ class ShipmentCreationService
             );
 
             // 7. Auto-create return shipment if requested
-            if (
-                $shipmentData->getShipmentSettings()->autoCreateReturnShipment()
-                && $newShipmentId !== ''
-            ) {
+            if ($shipmentData->getShipmentSettings()->autoCreateReturnShipment() && $newShipmentId !== '') {
                 $this->logger->info(sprintf(
                     '[ShipmentCreation] Triggering auto return shipment creation for order #%s, '
                     . 'primary waybill #%s (recreation)',

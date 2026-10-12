@@ -28,7 +28,11 @@ class ShipmentFormUiTest extends TestCase
         $openedNodes = $xpath->query('//fieldset[@name="customs_fieldset"]/settings/opened');
         self::assertNotNull($openedNodes);
         self::assertSame(1, $openedNodes->length, 'customs_fieldset must have opened setting');
-        self::assertSame('false', trim($openedNodes->item(0)->textContent), 'customs_fieldset must be collapsed by default');
+        self::assertSame(
+            'false',
+            trim($openedNodes->item(0)->textContent),
+            'customs_fieldset must be collapsed by default'
+        );
 
         $collapsibleNodes = $xpath->query('//fieldset[@name="customs_fieldset"]/settings/collapsible');
         self::assertNotNull($collapsibleNodes);

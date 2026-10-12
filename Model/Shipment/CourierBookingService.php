@@ -102,10 +102,9 @@ class CourierBookingService
                 }
 
                 $dhlId = (string) $dhlId;
-                if (
-                    isset($serviceTypeByDhlShipmentId[$dhlId])
-                    && $serviceTypeByDhlShipmentId[$dhlId] !== $serviceType
-                ) {
+                $hasConflict = isset($serviceTypeByDhlShipmentId[$dhlId])
+                    && $serviceTypeByDhlShipmentId[$dhlId] !== $serviceType;
+                if ($hasConflict) {
                     throw new LocalizedException(
                         __('Selected DHL shipment %1 has conflicting service codes.', $dhlId)
                     );
