@@ -134,7 +134,7 @@
 "Failed to save table rates: %1","Nie udało się zapisać stawek tabelarycznych: %1"
 "Failed to save country rates: %1","Nie udało się zapisać międzynarodowych stawek tabelarycznych: %1"
 "Invalid CSV header structure. Expected columns: Method Code, Country, Condition Type, Value From, Value To, Price.","Nieprawidłowa struktura nagłówka pliku CSV. Oczekiwane kolumny: Method Code, Country, Condition Type, Value From, Value To, Price."
-"Upload Table Rates CSV (Method Code, Country, Condition Type, Value From, Value To, Price) or Matrix CSV file (Matryca_Magento.csv).","Wgraj plik CSV ze stawkami tabelarycznymi (Method Code, Country, Condition Type, Value From, Value To, Price) lub plik matrycy (Matryca_Magento.csv)."
+"Upload Table Rates CSV file (Method Code, Country, Condition Type, Value From, Value To, Price). You can export the current rates below to use as a template.","Wgraj plik CSV ze stawkami tabelarycznymi (Method Code, Country, Condition Type, Value From, Value To, Price). Możesz wyeksportować bieżące stawki poniżej, aby użyć ich jako szablonu."
 "When enabled, detailed cart item weight breakdown is logged to browser console.","Gdy włączone, szczegółowy podział wagi produktów w koszyku jest logowany do konsoli przeglądarki."
 "Invalid country code ""%1"" on line %2. Please use 2-letter ISO country codes.","Nieprawidłowy kod kraju ""%1"" w linii %2. Prosimy użyć 2-literowych kodów ISO kraju."
 "Unsupported method code ""%1"" on line %2.","Nieobsługiwany kod metody ""%1"" w linii %2."

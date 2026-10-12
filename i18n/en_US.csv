@@ -134,7 +134,7 @@
 "Failed to save table rates: %1","Failed to save table rates: %1"
 "Failed to save country rates: %1","Failed to save country rates: %1"
 "Invalid CSV header structure. Expected columns: Method Code, Country, Condition Type, Value From, Value To, Price.","Invalid CSV header structure. Expected columns: Method Code, Country, Condition Type, Value From, Value To, Price."
-"Upload Table Rates CSV (Method Code, Country, Condition Type, Value From, Value To, Price) or Matrix CSV file (Matryca_Magento.csv).","Upload Table Rates CSV (Method Code, Country, Condition Type, Value From, Value To, Price) or Matrix CSV file (Matryca_Magento.csv)."
+"Upload Table Rates CSV file (Method Code, Country, Condition Type, Value From, Value To, Price). You can export the current rates below to use as a template.","Upload Table Rates CSV file (Method Code, Country, Condition Type, Value From, Value To, Price). You can export the current rates below to use as a template."
 "When enabled, detailed cart item weight breakdown is logged to browser console.","When enabled, detailed cart item weight breakdown is logged to browser console."
 "Invalid country code ""%1"" on line %2. Please use 2-letter ISO country codes.","Invalid country code ""%1"" on line %2. Please use 2-letter ISO country codes."
 "Unsupported method code ""%1"" on line %2.","Unsupported method code ""%1"" on line %2."
