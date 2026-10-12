@@ -215,7 +215,6 @@
         <field name="costs_of_shipment" formElement="input">
             <settings>
                 <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
                     <rule name="validate-number" xsi:type="boolean">true</rule>
                     <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
                 </validation>
@@ -227,7 +226,6 @@
         <field name="gross_weight" formElement="input">
             <settings>
                 <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
                     <rule name="validate-number" xsi:type="boolean">true</rule>
                     <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
                 </validation>

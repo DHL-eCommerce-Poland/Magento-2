@@ -24,7 +24,7 @@ class ShipmentFullDataMapperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mapper = new ShipmentFullDataMapper();
+        $this->mapper = new ShipmentFullDataMapper(new \Ideo\Dhl\Model\Shipment\PostalCodeSanitizer());
     }
 
     /**
@@ -700,10 +700,10 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertSame(1.5, $c['grossWeight']);
         $this->assertSame('John', $c['firstName']);
         $this->assertSame('Smith', $c['secondaryName']);
-        $this->assertSame('5218487281', $c['nipNr']);
-        $this->assertSame('PL52184872810000', $c['eoriNr']);
+        $this->assertArrayNotHasKey('nipNr', $c);
+        $this->assertArrayNotHasKey('eoriNr', $c);
         $this->assertSame('PL5218487281', $c['vatRegistrationNumber']);
-        $this->assertSame('GB123456789000', $c['eoriNrReceiver']);
+        $this->assertArrayNotHasKey('eoriNrReceiver', $c);
         $this->assertSame('GB123456789', $c['vatRegistrationNumberReceiver']);
         $this->assertSame('Customs note', $c['additionalInfo']);
         $this->assertTrue($c['customAgreements']['notExceedValue']);
@@ -800,6 +800,9 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $customs = new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
             customsType: 'I',
+            nipNr: '5218487281',
+            eoriNr: 'PL52184872810000',
+            eoriNrReceiver: 'GB123456789000',
             invoiceContent: true,
             invoiceNr: 'INV-2026-001',
             invoiceDate: '2026-09-23',
@@ -823,6 +826,9 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertArrayHasKey('customs', $mapped);
         $c = $mapped['customs'];
         $this->assertSame('I', $c['customsType']);
+        $this->assertSame('5218487281', $c['nipNr']);
+        $this->assertSame('PL52184872810000', $c['eoriNr']);
+        $this->assertSame('GB123456789000', $c['eoriNrReceiver']);
         $this->assertSame('INV-2026-001', $c['invoiceNr']);
         $this->assertSame('2026-09-23', $c['invoiceDate']);
         $this->assertSame($base64Content, $c['invoice']);
@@ -887,10 +893,44 @@ class ShipmentFullDataMapperTest extends TestCase
         ];
     }
 
-    #[DataProvider('postalCodeDataProvider')]
-    public function testSanitizePostalCode(string $inputCode, string $countryCode, string $expected): void
+    /**
+     * Verify individual customs fields are omitted when customs type is not individual.
+     *
+     * @param string $customsType
+     *
+     * @return void
+     */
+    #[DataProvider('nonIndividualCustomsTypesDataProvider')]
+    public function testNonIndividualCustomsTypeOmitsIndividualFields(string $customsType): void
     {
-        $this->assertSame($expected, $this->mapper->sanitizePostalCode($inputCode, $countryCode));
+        $customs = new CustomsData(
+            customsType: $customsType,
+            nipNr: '5218487281',
+            eoriNr: 'PL52184872810000',
+            eoriNrReceiver: 'GB123456789000',
+            invoiceNr: 'INV-123',
+            invoiceDate: '2026-09-23',
+            invoiceFile: 'data:application/pdf;base64,ZmFrZQ=='
+        );
+
+        $shipmentData = new DhlShipmentData(
+            orderId: 108,
+            sender: new SenderData(name: 'Sender Corp'),
+            recipient: new RecipientData(name: 'UK Customer Ltd', country: 'GB'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
+            customs: $customs
+        );
+
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertArrayNotHasKey('nipNr', $mapped['customs']);
+        $this->assertArrayNotHasKey('eoriNr', $mapped['customs']);
+        $this->assertArrayNotHasKey('eoriNrReceiver', $mapped['customs']);
+        $this->assertArrayNotHasKey('invoiceNr', $mapped['customs']);
+        $this->assertArrayNotHasKey('invoiceDate', $mapped['customs']);
+        $this->assertArrayNotHasKey('invoice', $mapped['customs']);
+        $this->assertFalse($mapped['customs']['customAgreements']['invoiceContent']);
     }
 
     public function testMapRemovesInternalSpaceFromCzechSenderAndRecipientPostalCodes(): void
@@ -1086,17 +1126,5 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertCount(1, $mapped['pieceList']['item']);
         $this->assertEquals('PALLET', $mapped['pieceList']['item'][0]['type']);
         $this->assertTrue($mapped['pieceList']['item'][0]['euroReturn']);
-    }
-
-    public static function postalCodeDataProvider(): array
-    {
-        return [
-            'PL with hyphen' => ['00-950', 'PL', '00950'],
-            'PL without hyphen' => ['00950', 'PL', '00950'],
-            'CZ with internal space' => ['100 00', 'CZ', '10000'],
-            'GB alphanumeric with space' => ['SW1A 1AA', 'GB', 'SW1A1AA'],
-            'DE with hyphen' => ['D-10115', 'DE', 'D-10115'],
-            'US zip extended' => ['90210-1234', 'US', '90210-1234'],
-        ];
     }
 }

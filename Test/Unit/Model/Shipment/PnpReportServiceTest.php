@@ -11,10 +11,8 @@ use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\GetPnpResult;
 use Ideo\Dhl\Model\Shipment\PnpReportService;
 use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
-
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
@@ -32,10 +30,6 @@ class PnpReportServiceTest extends TestCase
      */
     private $credentialsProviderStub;
     /**
-     * @var Stub
-     */
-    private $scopeConfigStub;
-    /**
      * @var MockObject
      */
     private $timezoneMock;
@@ -48,7 +42,6 @@ class PnpReportServiceTest extends TestCase
     {
         $this->clientStub = $this->createStub(ClientInterface::class);
         $this->credentialsProviderStub = $this->createStub(CredentialsProvider::class);
-        $this->scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $this->timezoneMock = $this->createMock(TimezoneInterface::class);
 
         $this->timezoneMock->method('date')
@@ -59,8 +52,6 @@ class PnpReportServiceTest extends TestCase
         $this->service = new PnpReportService(
             $this->clientStub,
             $this->credentialsProviderStub,
-            $this->scopeConfigStub,
-            $this->timezoneMock,
             $dateSanitizer
         );
     }
@@ -68,10 +59,6 @@ class PnpReportServiceTest extends TestCase
     public function testGenerateReportSuccess(): void
     {
         $credentials = new Credentials('user', 'pass', true);
-
-        $this->scopeConfigStub
-            ->method('getValue')
-            ->willReturn(true);
 
         $this->credentialsProviderStub
             ->method('getCredentials')
@@ -115,7 +102,6 @@ class PnpReportServiceTest extends TestCase
     {
         $credentials = new Credentials('user', 'pass', true);
 
-        $this->scopeConfigStub->method('getValue')->willReturn(false);
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
 
         $result = new GetPnpResult(false, null, null, null, 'SOAP_FAULT', 'DHL WebAPI error');

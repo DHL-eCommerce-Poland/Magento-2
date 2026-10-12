@@ -44,11 +44,6 @@ class SaveTest extends TestCase
     private $shipmentCreationServiceMock;
 
     /**
-     * @var ScopeConfigInterface|MockObject
-     */
-    private $scopeConfigMock;
-
-    /**
      * @var JsonFactory|MockObject
      */
     private $jsonFactoryStub;
@@ -75,7 +70,6 @@ class SaveTest extends TestCase
         $this->requestStub->method('isXmlHttpRequest')->willReturn(true);
         $this->shipmentDataServiceMock = $this->createStub(ShipmentDataService::class);
         $this->shipmentCreationServiceMock = $this->createMock(ShipmentCreationService::class);
-        $this->scopeConfigMock = $this->createMock(ScopeConfigInterface::class);
         $this->jsonFactoryStub = $this->createStub(JsonFactory::class);
         $this->jsonResultMock = $this->createMock(Json::class);
         $this->loggerStub = $this->createStub(LoggerInterface::class);
@@ -113,7 +107,6 @@ class SaveTest extends TestCase
         $this->controller = new Save(
             $this->contextStub,
             $this->shipmentCreationServiceMock,
-            $this->scopeConfigMock,
             $this->jsonFactoryStub,
             $serializerStub,
             $timezoneStub,
@@ -138,7 +131,6 @@ class SaveTest extends TestCase
                 ['shipment_data', null, null],
             ]);
 
-        $this->scopeConfigMock->expects(self::never())->method('getValue');
         $this->shipmentCreationServiceMock->expects(self::never())->method('createShipment');
 
         $this->jsonResultMock->expects(self::once())
@@ -181,18 +173,13 @@ class SaveTest extends TestCase
                 return null;
             });
 
-        $this->scopeConfigMock->expects(self::once())
-            ->method('getValue')
-            ->with('carriers/dhlpoland/sandbox')
-            ->willReturn('1');
-
         $apiResult = (new CreateShipmentResult(true, false, '90039521201'))->withEntityId(101);
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('createShipment')
             ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData
                 && $arg->getShipmentSettings()->getLabelType() === 'LBLP'
                 && $arg->getShipmentSettings()->getReturnLabelType() === 'ZBLP300'
-                && $arg->getShipmentSettings()->getReturnQrCodeType() === 'QR6_IMG'), 'sandbox')
+                && $arg->getShipmentSettings()->getReturnQrCodeType() === 'QR6_IMG'))
             ->willReturn($apiResult);
 
         $this->jsonResultMock->expects(self::once())
@@ -234,15 +221,10 @@ class SaveTest extends TestCase
                 return null;
             });
 
-        $this->scopeConfigMock->expects(self::once())
-            ->method('getValue')
-            ->with('carriers/dhlpoland/sandbox')
-            ->willReturn('0');
-
         $apiResult = new CreateShipmentResult(false, false, null, null, [], 'ERR_01', 'Nieprawidłowy kod pocztowy');
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('createShipment')
-            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'production')
+            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData))
             ->willReturn($apiResult);
 
         $this->jsonResultMock->expects(self::once())
@@ -281,14 +263,9 @@ class SaveTest extends TestCase
                 return null;
             });
 
-        $this->scopeConfigMock->expects(self::once())
-            ->method('getValue')
-            ->with('carriers/dhlpoland/sandbox')
-            ->willReturn('1');
-
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('createShipment')
-            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData), 'sandbox')
+            ->with(Assert::callback(fn ($arg) => $arg instanceof DhlShipmentData))
             ->willReturn(new CreateShipmentResult(true, false, '90039521201'));
 
         $this->jsonResultMock->expects(self::once())
@@ -319,7 +296,6 @@ class SaveTest extends TestCase
         $controllerWithValidator = new Save(
             $this->contextStub,
             $this->shipmentCreationServiceMock,
-            $this->scopeConfigMock,
             $this->jsonFactoryStub,
             $serializerStub,
             $timezoneMock,
@@ -405,11 +381,6 @@ class SaveTest extends TestCase
                 return null;
             });
 
-        $this->scopeConfigMock->expects(self::once())
-            ->method('getValue')
-            ->with('carriers/dhlpoland/sandbox')
-            ->willReturn('1');
-
         $apiResult = new CreateShipmentResult(true, false, '90039521202');
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('recreateShipment')
@@ -422,8 +393,7 @@ class SaveTest extends TestCase
                         && $arg->getShipmentSettings()->getReturnQrCodeType() === 'QR4_IMG'
                         && count($arg->getShipmentSettings()->getPackages()) === 2
                         && $arg->getShipmentSettings()->getPackageQuantity() === 2;
-                }),
-                'sandbox'
+                })
             )
             ->willReturn($apiResult);
 
@@ -465,11 +435,6 @@ class SaveTest extends TestCase
                 return null;
             });
 
-        $this->scopeConfigMock
-            ->method('getValue')
-            ->with('carriers/dhlpoland/sandbox')
-            ->willReturn('1');
-
         $apiResult = new CreateShipmentResult(true, false, '90039521202');
         $this->shipmentCreationServiceMock->expects(self::once())
             ->method('recreateShipment')
@@ -479,8 +444,70 @@ class SaveTest extends TestCase
                     return $arg instanceof DhlShipmentData
                         && $arg->getCustoms() !== null
                         && $arg->getCustoms()->getInvoiceDate() === '2025-08-10';
-                }),
-                'sandbox'
+                })
+            )
+            ->willReturn($apiResult);
+
+        $this->jsonResultMock->expects(self::once())
+            ->method('setData')
+            ->with(Assert::callback(function (array $data) {
+                return $data['success'] === true;
+            }))
+            ->willReturn($this->jsonResultMock);
+
+        $result = $this->controller->execute();
+        $this->assertSame($this->jsonResultMock, $result);
+    }
+
+    public function testExecuteStripsIndividualCustomsFieldsForSimplifiedClearance(): void
+    {
+        $payloadData = [
+            'entity_id' => 43,
+            'shipmentSettings' => [
+                'shipmentDate' => '2026-09-10',
+                'serviceType' => 'AH',
+            ],
+            'customs' => [
+                'customsType' => 'U',
+                'nipNr' => '5218487281',
+                'eoriNr' => 'PL52184872810000',
+                'eoriNrReceiver' => 'GB123456789000',
+                'invoiceNr' => 'INV-001',
+                'invoiceDate' => '10.08.2025',
+                'invoiceFile' => 'base64file',
+                'invoiceContent' => true,
+            ],
+        ];
+
+        $this->requestStub
+            ->method('getParam')
+            ->willReturnCallback(function (string $param) use ($payloadData) {
+                if ($param === 'shipment_data') {
+                    return json_encode($payloadData);
+                }
+                if ($param === 'entity_id') {
+                    return 43;
+                }
+                return null;
+            });
+
+        $apiResult = new CreateShipmentResult(true, false, '90039521203');
+        $this->shipmentCreationServiceMock->expects(self::once())
+            ->method('recreateShipment')
+            ->with(
+                43,
+                Assert::callback(function ($arg) {
+                    return $arg instanceof DhlShipmentData
+                        && $arg->getCustoms() !== null
+                        && $arg->getCustoms()->getCustomsType() === 'U'
+                        && $arg->getCustoms()->getNipNr() === null
+                        && $arg->getCustoms()->getEoriNr() === null
+                        && $arg->getCustoms()->getEoriNrReceiver() === null
+                        && $arg->getCustoms()->getInvoiceNr() === null
+                        && $arg->getCustoms()->getInvoiceDate() === null
+                        && $arg->getCustoms()->getInvoiceFile() === null
+                        && $arg->getCustoms()->isInvoiceContent() === false;
+                })
             )
             ->willReturn($apiResult);
 
@@ -550,7 +577,6 @@ class SaveTest extends TestCase
         $controller = new Save(
             $contextStub,
             $this->shipmentCreationServiceMock,
-            $this->scopeConfigMock,
             $this->jsonFactoryStub,
             $serializerStub,
             $timezoneStub,
@@ -558,11 +584,6 @@ class SaveTest extends TestCase
             $shipmentDataValidator,
             $this->loggerStub
         );
-
-        $this->scopeConfigMock->expects(self::once())
-            ->method('getValue')
-            ->with('carriers/dhlpoland/sandbox')
-            ->willReturn('1');
 
         $apiResult = (new CreateShipmentResult(true, false, '90039521201'))->withEntityId(77);
         $this->shipmentCreationServiceMock->expects(self::once())

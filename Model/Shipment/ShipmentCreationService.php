@@ -9,7 +9,6 @@ use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CreateShipmentResult;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
-use Ideo\Dhl\Model\MethodCatalog;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Lock\LockManagerInterface;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -56,14 +55,12 @@ class ShipmentCreationService
      * Saves to DB only upon API success (status CREATED or DHL order status).
      *
      * @param DhlShipmentData $shipmentData
-     * @param string $environment ('sandbox' or 'production')
      *
      * @return CreateShipmentResult
      * @throws LocalizedException
      */
     public function createShipment(
-        DhlShipmentData $shipmentData,
-        string $environment = 'sandbox'
+        DhlShipmentData $shipmentData
     ): CreateShipmentResult {
         $orderId = $shipmentData->getOrderId();
         if ($orderId !== null && $this->shipmentDataService->hasShipmentForOrder($orderId)) {
@@ -86,7 +83,7 @@ class ShipmentCreationService
             $this->validator->validate($shipmentData);
 
             // 2. Prepare DHL API call credentials and data mapping
-            $credentials = $this->credentialsProvider->getCredentials($environment);
+            $credentials = $this->credentialsProvider->getCredentials();
             $mappedData = $this->mapper->map($shipmentData);
 
             // 3. Dispatch directly to DHL WebAPI2 (createShipment)
@@ -145,9 +142,7 @@ class ShipmentCreationService
             );
 
             // 7. Auto-create return shipment if requested
-            if ($shipmentData->getShipmentSettings()->autoCreateReturnShipment()
-                && $apiResult->getShipmentId()
-            ) {
+            if ($shipmentData->getShipmentSettings()->autoCreateReturnShipment() && $apiResult->getShipmentId()) {
                 $this->logger->info(sprintf(
                     '[ShipmentCreation] Triggering auto return shipment creation for order #%s, primary waybill #%s',
                     (string) $orderId,
@@ -160,7 +155,6 @@ class ShipmentCreationService
 
                     $this->returnCreationService->createReturnShipment(
                         returnShipmentData: $returnShipmentData,
-                        environment: $environment,
                         expirationDays: $expDays,
                         primaryWaybillNumber: (string) $apiResult->getShipmentId(),
                         originalEntityId: $savedEntityId
@@ -192,7 +186,6 @@ class ShipmentCreationService
      *
      * @param int $entityId
      * @param DhlShipmentData $shipmentData
-     * @param string $environment ('sandbox' or 'production')
      *
      * @return CreateShipmentResult
      * @throws LocalizedException
@@ -200,8 +193,7 @@ class ShipmentCreationService
     // phpcs:ignore Generic.Metrics.NestingLevel.TooHigh
     public function recreateShipment(
         int $entityId,
-        DhlShipmentData $shipmentData,
-        string $environment = 'sandbox'
+        DhlShipmentData $shipmentData
     ): CreateShipmentResult {
         $lockName = 'dhl_shipment_recreate_' . $entityId;
 
@@ -213,7 +205,7 @@ class ShipmentCreationService
 
         try {
             $this->validator->validate($shipmentData);
-            $credentials = $this->credentialsProvider->getCredentials($environment);
+            $credentials = $this->credentialsProvider->getCredentials();
 
             $existingEntity = $this->shipmentDataService->getShipmentEntity($entityId);
             $oldShipmentId = $existingEntity->getShipmentId();
@@ -310,9 +302,7 @@ class ShipmentCreationService
             );
 
             // 7. Auto-create return shipment if requested
-            if ($shipmentData->getShipmentSettings()->autoCreateReturnShipment()
-                && $newShipmentId !== ''
-            ) {
+            if ($shipmentData->getShipmentSettings()->autoCreateReturnShipment() && $newShipmentId !== '') {
                 $this->logger->info(sprintf(
                     '[ShipmentCreation] Triggering auto return shipment creation for order #%s, '
                     . 'primary waybill #%s (recreation)',
@@ -325,7 +315,6 @@ class ShipmentCreationService
 
                     $this->returnCreationService->createReturnShipment(
                         returnShipmentData: $returnShipmentData,
-                        environment: $environment,
                         expirationDays: $expDays,
                         primaryWaybillNumber: $newShipmentId,
                         originalEntityId: $entityId

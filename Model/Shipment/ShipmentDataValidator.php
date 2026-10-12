@@ -132,9 +132,11 @@ class ShipmentDataValidator
             throw new LocalizedException(__(implode("\n", array_unique($errors))));
         }
 
-        $invoiceFile = $shipmentData->getCustoms()?->getInvoiceFile();
-        if ($invoiceFile !== null && $invoiceFile !== '' && $this->invoiceFileExceedsSizeLimit($invoiceFile)) {
-            throw new LocalizedException(__('File size exceeds the 3MB limit.'));
+        if ($shipmentData->getCustoms()?->getCustomsType() === 'I') {
+            $invoiceFile = $shipmentData->getCustoms()?->getInvoiceFile();
+            if ($invoiceFile !== null && $invoiceFile !== '' && $this->invoiceFileExceedsSizeLimit($invoiceFile)) {
+                throw new LocalizedException(__('File size exceeds the 3MB limit.'));
+            }
         }
     }
 

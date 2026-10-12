@@ -146,4 +146,47 @@ class MethodCatalogTest extends TestCase
         self::assertSame('courier', $catalog->getInternationalMapPointTypeForMethod('unknown_method'));
         self::assertSame('courier', $catalog->getInternationalMapPointTypeForMethod(null));
     }
+
+    /**
+     * Verify getMethods returns the expected localized titles for all shipping methods.
+     */
+    public function testGetMethodsReturnsExpectedTitles(): void
+    {
+        $catalog = new MethodCatalog();
+        $titles = [];
+        foreach ($catalog->getMethods() as $method) {
+            $titles[$method['code']] = (string)$method['title'];
+        }
+
+        $expected = [
+            'parcel_polska' => 'Kurier DHL',
+            'parcel_polska_cod' => 'Kurier DHL - płatność przy odbiorze',
+            'premium' => 'Kurier DHL Premium',
+            'premium_cod' => 'Kurier DHL Premium - płatność przy odbiorze',
+            'parcel_9' => 'Kurier DHL – gwarancja dostawy do godziny 9:00',
+            'parcel_9_cod' => 'Kurier DHL – gwarancja dostawy do godziny 9:00 - płatność przy odbiorze',
+            'parcel_12' => 'Kurier DHL – gwarancja dostawy do godziny 12:00',
+            'parcel_12_cod' => 'Kurier DHL – gwarancja dostawy do godziny 12:00 - płatność przy odbiorze',
+            'economy_all' => 'Automaty DHL BOX i punkty POP (Dostawa także w soboty)',
+            'economy_all_cod' => 'Automaty DHL BOX i punkty POP (Dostawa także w soboty) - płatność przy odbiorze',
+            'economy_pop' => 'DHL POP (Dostawa także w soboty)',
+            'economy_pop_cod' => 'DHL POP (Dostawa także w soboty) - płatność przy odbiorze',
+            'economy_box' => 'Automaty DHL BOX (Dostawa także w soboty)',
+            'economy_box_cod' => 'Automaty DHL BOX (Dostawa także w soboty) - płatność przy odbiorze',
+            'max_paleta' => 'Kurier DHL - przesyłka paletowa',
+            'max_paleta_cod' => 'Kurier DHL - przesyłka paletowa - płatność przy odbiorze',
+            'connect' => 'DHL Connect',
+            'connect_cod' => 'DHL Connect - Cash on Delivery',
+            'connect_parcelshop' => 'DHL Connect Parcelshop',
+            'connect_parcelshop_cod' => 'DHL Connect Parcelshop - Cash on Delivery',
+            'connect_packstation' => 'DHL Connect Packstation',
+            'connect_packstation_cod' => 'DHL Connect Packstation - Cash on Delivery',
+            'connect_plus' => 'DHL Connect Plus',
+            'connect_plus_cod' => 'DHL Connect Plus - Cash on Delivery',
+            'connect_pallet' => 'DHL Connect Pallet',
+            'connect_pallet_cod' => 'DHL Connect Pallet - Cash on Delivery',
+        ];
+
+        self::assertSame($expected, $titles);
+    }
 }

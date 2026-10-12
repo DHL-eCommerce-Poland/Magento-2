@@ -10,6 +10,7 @@ use Throwable;
 
 class CredentialsProvider
 {
+    private const XML_PATH_SANDBOX = 'carriers/dhlpoland/sandbox';
     private const XML_PATH_API_LOGIN = 'carriers/dhlpoland/api_login';
     private const XML_PATH_API_PASSWORD = 'carriers/dhlpoland/api_password';
     private const XML_PATH_API_LOGIN_SANDBOX = 'carriers/dhlpoland/api_login_sandbox';
@@ -28,26 +29,29 @@ class CredentialsProvider
     /**
      * Get API credentials for environment with optional form overrides.
      *
-     * @param string $environment ('sandbox' or 'production' / '1' or '0')
+     * @param string|null $environment ('sandbox', 'production', '1', '0', or null to read from config)
      * @param string|null $overrideUsername
      * @param string|null $overridePassword
      *
      * @return Credentials
      */
     public function getCredentials(
-        string $environment,
+        ?string $environment = null,
         ?string $overrideUsername = null,
         ?string $overridePassword = null
     ): Credentials {
-        $isSandbox = ($environment === 'sandbox' || $environment === '1');
+        if ($environment === null) {
+            $isSandbox = (bool) $this->scopeConfig->getValue(self::XML_PATH_SANDBOX);
+        } else {
+            $isSandbox = ($environment === 'sandbox' || $environment === '1');
+        }
 
         $loginPath = $isSandbox ? self::XML_PATH_API_LOGIN_SANDBOX : self::XML_PATH_API_LOGIN;
         $passwordPath = $isSandbox ? self::XML_PATH_API_PASSWORD_SANDBOX : self::XML_PATH_API_PASSWORD;
 
         $username = $this->filterValue($overrideUsername);
         if ($username === null) {
-            $rawUsername = (string) $this->scopeConfig->getValue($loginPath);
-            $username = $this->decryptValue($rawUsername);
+            $username = (string) $this->scopeConfig->getValue($loginPath);
         }
 
         $password = $this->filterValue($overridePassword);

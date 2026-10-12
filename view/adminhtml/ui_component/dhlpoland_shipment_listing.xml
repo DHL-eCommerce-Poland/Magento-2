@@ -121,6 +121,13 @@
                 <label translate="true">Order #</label>
             </settings>
         </column>
+        <column name="recipient_address" class="Ideo\Dhl\Ui\Component\Listing\Column\RecipientAddress">
+            <settings>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <label translate="true">Recipient Address</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
         <column name="shipment_id">
             <settings>
                 <filter>text</filter>

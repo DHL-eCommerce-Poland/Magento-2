@@ -9,7 +9,10 @@ use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
 use Ideo\Dhl\Model\Shipment\DataProvider;
 use Ideo\Dhl\Model\ShipmentData;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class DataProviderTest extends TestCase
 {
@@ -66,7 +69,8 @@ class DataProviderTest extends TestCase
             $serializer,
             $timezoneStub,
             $dateSanitizer,
-            $this->createStub(\Psr\Log\LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(OrderRepositoryInterface::class)
         );
 
         $data = $dataProvider->getData();
@@ -123,7 +127,8 @@ class DataProviderTest extends TestCase
             $serializer,
             $timezoneStub,
             $dateSanitizer,
-            $this->createStub(\Psr\Log\LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(OrderRepositoryInterface::class)
         );
 
         $data = $dataProvider->getData();
@@ -168,7 +173,8 @@ class DataProviderTest extends TestCase
             $serializer,
             $timezoneStub,
             $dateSanitizer,
-            $this->createStub(\Psr\Log\LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(OrderRepositoryInterface::class)
         );
 
         $data = $dataProvider->getData();
@@ -220,7 +226,8 @@ class DataProviderTest extends TestCase
             $serializer,
             $timezoneStub,
             $dateSanitizer,
-            $this->createStub(\Psr\Log\LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(OrderRepositoryInterface::class)
         );
 
         $data = $dataProvider->getData();
@@ -297,7 +304,8 @@ class DataProviderTest extends TestCase
             $serializer,
             $timezoneStub,
             $dateSanitizer,
-            $this->createStub(\Psr\Log\LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(OrderRepositoryInterface::class)
         );
 
         $data = $dataProvider->getData();
@@ -334,5 +342,150 @@ class DataProviderTest extends TestCase
         $this->assertSame('', $customs['customsItems'][1]['value']);
         $this->assertSame('', $customs['customsItems'][1]['tariffCode']);
         $this->assertSame('', $customs['customsItems'][1]['countryOfOrigin']);
+    }
+
+    public function testGetDataLoadsOrderGrandTotalFromPayload(): void
+    {
+        $collectionFactory = $this->createStub(CollectionFactory::class);
+        $collection = $this->createStub(Collection::class);
+        $serializer = $this->createStub(SerializerInterface::class);
+
+        $shipmentDataModel = $this->createStub(ShipmentData::class);
+        $shipmentDataModel->method('getId')->willReturn(50);
+        $shipmentDataModel->method('getData')->willReturn(['entity_id' => 50, 'order_id' => 101]);
+        $shipmentDataModel->method('getStatus')->willReturn('CREATED');
+        $shipmentDataModel->method('getShipmentData')->willReturn('{"test":true}');
+
+        $collection->method('getItems')->willReturn([$shipmentDataModel]);
+        $collectionFactory->method('create')->willReturn($collection);
+
+        $payloadArray = [
+            'orderGrandTotal' => 199.99,
+            'specialServices' => ['insurance' => true],
+        ];
+        $serializer->method('unserialize')->willReturn($payloadArray);
+
+        $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+
+        $dataProvider = new DataProvider(
+            'dhlpoland_shipment_form_data_source',
+            'entity_id',
+            'entity_id',
+            $collectionFactory,
+            $serializer,
+            $timezoneStub,
+            $dateSanitizer,
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(OrderRepositoryInterface::class)
+        );
+
+        $data = $dataProvider->getData();
+
+        $this->assertArrayHasKey(50, $data);
+        $this->assertSame('199.99', $data[50]['orderGrandTotal']);
+        $this->assertSame('199.99', $data[50]['specialServices']['orderGrandTotal']);
+        $this->assertSame('199.99', $data[50]['special_services']['specialServices']['orderGrandTotal']);
+    }
+
+    public function testGetDataLoadsOrderGrandTotalFromOrderRepositoryFallback(): void
+    {
+        $collectionFactory = $this->createStub(CollectionFactory::class);
+        $collection = $this->createStub(Collection::class);
+        $serializer = $this->createStub(SerializerInterface::class);
+
+        $shipmentDataModel = $this->createStub(ShipmentData::class);
+        $shipmentDataModel->method('getId')->willReturn(60);
+        $shipmentDataModel->method('getOrderId')->willReturn(102);
+        $shipmentDataModel->method('getData')->willReturn(['entity_id' => 60, 'order_id' => 102]);
+        $shipmentDataModel->method('getStatus')->willReturn('CREATED');
+        $shipmentDataModel->method('getShipmentData')->willReturn('{"test":true}');
+
+        $collection->method('getItems')->willReturn([$shipmentDataModel]);
+        $collectionFactory->method('create')->willReturn($collection);
+
+        $payloadArray = [
+            'shipmentSettings' => ['serviceType' => 'AH'],
+        ];
+        $serializer->method('unserialize')->willReturn($payloadArray);
+
+        $orderStub = $this->createStub(OrderInterface::class);
+        $orderStub->method('getGrandTotal')->willReturn(349.5);
+
+        $orderRepositoryMock = $this->createMock(OrderRepositoryInterface::class);
+        $orderRepositoryMock->expects($this->once())
+            ->method('get')
+            ->with(102)
+            ->willReturn($orderStub);
+
+        $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+
+        $dataProvider = new DataProvider(
+            'dhlpoland_shipment_form_data_source',
+            'entity_id',
+            'entity_id',
+            $collectionFactory,
+            $serializer,
+            $timezoneStub,
+            $dateSanitizer,
+            $this->createStub(LoggerInterface::class),
+            $orderRepositoryMock
+        );
+
+        $data = $dataProvider->getData();
+
+        $this->assertArrayHasKey(60, $data);
+        $this->assertSame('349.50', $data[60]['orderGrandTotal']);
+        $this->assertSame('349.50', $data[60]['specialServices']['orderGrandTotal']);
+        $this->assertSame('349.50', $data[60]['special_services']['specialServices']['orderGrandTotal']);
+    }
+
+    public function testGetDataHandlesOrderRepositoryExceptionGracefully(): void
+    {
+        $collectionFactory = $this->createStub(CollectionFactory::class);
+        $collection = $this->createStub(Collection::class);
+        $serializer = $this->createStub(SerializerInterface::class);
+
+        $shipmentDataModel = $this->createStub(ShipmentData::class);
+        $shipmentDataModel->method('getId')->willReturn(70);
+        $shipmentDataModel->method('getOrderId')->willReturn(999);
+        $shipmentDataModel->method('getData')->willReturn(['entity_id' => 70, 'order_id' => 999]);
+        $shipmentDataModel->method('getStatus')->willReturn('CREATED');
+        $shipmentDataModel->method('getShipmentData')->willReturn('{"test":true}');
+
+        $collection->method('getItems')->willReturn([$shipmentDataModel]);
+        $collectionFactory->method('create')->willReturn($collection);
+
+        $serializer->method('unserialize')->willReturn([]);
+
+        $orderRepositoryStub = $this->createStub(OrderRepositoryInterface::class);
+        $orderRepositoryStub->method('get')
+            ->willThrowException(new \Exception('Order does not exist'));
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->once())
+            ->method('error')
+            ->with($this->stringContains('Failed to load order #999 for grand total'));
+
+        $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+
+        $dataProvider = new DataProvider(
+            'dhlpoland_shipment_form_data_source',
+            'entity_id',
+            'entity_id',
+            $collectionFactory,
+            $serializer,
+            $timezoneStub,
+            $dateSanitizer,
+            $loggerMock,
+            $orderRepositoryStub
+        );
+
+        $data = $dataProvider->getData();
+
+        $this->assertArrayHasKey(70, $data);
+        $this->assertArrayNotHasKey('orderGrandTotal', $data[70]);
     }
 }

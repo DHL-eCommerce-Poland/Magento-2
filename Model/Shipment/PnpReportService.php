@@ -5,16 +5,12 @@ declare(strict_types=1);
 namespace Ideo\Dhl\Model\Shipment;
 
 use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Config\Source\PnpPackageType;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class PnpReportService
 {
-    private const XML_PATH_SANDBOX = 'carriers/dhlpoland/sandbox';
     private const ALLOWED_PACKAGE_TYPES = [
         PnpPackageType::TYPE_EX,
         PnpPackageType::TYPE_DR,
@@ -26,15 +22,11 @@ class PnpReportService
     /**
      * @param ClientInterface $client
      * @param CredentialsProvider $credentialsProvider
-     * @param ScopeConfigInterface $scopeConfig
-     * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
      */
     public function __construct(
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
-        private readonly ScopeConfigInterface $scopeConfig,
-        private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer
     ) {
     }
@@ -43,9 +35,9 @@ class PnpReportService
      * Generate courier confirmation report (PnP) for a given date and package type.
      *
      * @param string $date Pickup date in YYYY-MM-DD format
-     * @param string $typePackage Package type code (EX, DR, ALL, 2EUROPE, PR)
+     * @param string $typePackage
      *
-     * @return array Array containing content, mimeType, and filename
+     * @return array
      * @throws LocalizedException
      */
     public function generateReport(string $date, string $typePackage): array
@@ -66,7 +58,7 @@ class PnpReportService
             throw new LocalizedException(__('Invalid package type specified for courier report.'));
         }
 
-        $credentials = $this->getCredentials();
+        $credentials = $this->credentialsProvider->getCredentials();
         $result = $this->client->getPnp($credentials, $date, $typePackage);
 
         if (!$result->isSuccess()) {
@@ -88,18 +80,5 @@ class PnpReportService
             'filename' => $filename,
             'mimeType' => $mimeType,
         ];
-    }
-
-    /**
-     * Get API credentials based on carrier scope config.
-     *
-     * @return Credentials
-     */
-    private function getCredentials(): Credentials
-    {
-        $isSandbox = (bool) $this->scopeConfig->getValue(self::XML_PATH_SANDBOX);
-        $environment = $isSandbox ? 'sandbox' : 'production';
-
-        return $this->credentialsProvider->getCredentials($environment);
     }
 }

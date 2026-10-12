@@ -14,6 +14,7 @@ use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\ResourceModel\ShipmentData\Collection as ShipmentDataCollection;
 use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory as ShipmentDataCollectionFactory;
 use Ideo\Dhl\Model\Shipment\CourierBookingCancellationService;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -226,6 +227,36 @@ class CourierBookingCancellationServiceTest extends TestCase
 
         $result = $serviceWithCollection->cancelCourierBooking([10]);
 
+        $this->assertTrue($result->isSuccess());
+    }
+
+    /**
+     * Test that cancelCourierBooking calls credentialsProvider getCredentials.
+     *
+     * @return void
+     */
+    public function testCancelCourierBookingCallsCredentialsProvider(): void
+    {
+        $credentialsProviderMock = $this->createMock(CredentialsProvider::class);
+        $credentialsProviderMock->expects($this->once())
+            ->method('getCredentials')
+            ->willReturn(new Credentials('prod_user', 'prod_pass', false));
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->expects($this->once())
+            ->method('cancelCourierBooking')
+            ->with($this->callback(fn (Credentials $c) => !$c->isSandbox()), ['COURIER_PROD_1'])
+            ->willReturn(new CancelCourierBookingResult(true, 'COURIER_PROD_1'));
+
+        $service = new CourierBookingCancellationService(
+            $clientMock,
+            $credentialsProviderMock,
+            $this->shipmentDataRepositoryStub,
+            $this->collectionFactoryStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
+        );
+
+        $result = $service->cancelCourierBooking(['COURIER_PROD_1']);
         $this->assertTrue($result->isSuccess());
     }
 }

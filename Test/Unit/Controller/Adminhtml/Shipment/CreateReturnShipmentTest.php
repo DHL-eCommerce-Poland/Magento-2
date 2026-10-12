@@ -61,10 +61,6 @@ class CreateReturnShipmentTest extends TestCase
     /**
      * @var Stub
      */
-    private $scopeConfigStub;
-    /**
-     * @var Stub
-     */
     private $loggerStub;
     /**
      * @var Stub
@@ -86,7 +82,6 @@ class CreateReturnShipmentTest extends TestCase
         $this->shipmentDataServiceStub = $this->createStub(ShipmentDataService::class);
         $this->returnBuilderStub = $this->createStub(ReturnShipmentDataBuilder::class);
         $this->returnCreationServiceStub = $this->createStub(ReturnShipmentCreationService::class);
-        $this->scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $this->loggerStub = $this->createStub(LoggerInterface::class);
         $this->jsonFactoryStub = $this->createStub(JsonFactory::class);
 
@@ -100,7 +95,6 @@ class CreateReturnShipmentTest extends TestCase
             $this->shipmentDataServiceStub,
             $this->returnBuilderStub,
             $this->returnCreationServiceStub,
-            $this->scopeConfigStub,
             $this->loggerStub,
             $this->jsonFactoryStub
         );
@@ -160,8 +154,6 @@ class CreateReturnShipmentTest extends TestCase
         $returnShipmentData = new DhlShipmentData(orderId: 100);
         $this->returnBuilderStub->method('buildReturnShipmentData')->willReturn($returnShipmentData);
 
-        $this->scopeConfigStub->method('getValue')->willReturn('1');
-
         $apiResult = new CreateShipmentReturnResult(
             success: true,
             timeout: false,
@@ -202,7 +194,6 @@ class CreateReturnShipmentTest extends TestCase
 
         $returnShipmentData = new DhlShipmentData(orderId: 100);
         $this->returnBuilderStub->method('buildReturnShipmentData')->willReturn($returnShipmentData);
-        $this->scopeConfigStub->method('getValue')->willReturn('0');
 
         $apiResult = new CreateShipmentReturnResult(
             success: true,

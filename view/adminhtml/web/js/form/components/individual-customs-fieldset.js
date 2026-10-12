@@ -51,8 +51,16 @@ define([
                     if (elem && _.isFunction(elem.disabled)) {
                         elem.disabled(!visible);
                     }
-                    if (!visible && elem && _.isFunction(elem.error)) {
-                        elem.error('');
+                    if (!visible) {
+                        if (elem && _.isFunction(elem.error)) {
+                            elem.error('');
+                        }
+                        if (elem && _.isFunction(elem.value)) {
+                            elem.value('');
+                        }
+                        if (elem && _.isFunction(elem.checked)) {
+                            elem.checked(false);
+                        }
                     }
                 });
             }

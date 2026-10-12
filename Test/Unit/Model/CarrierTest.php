@@ -43,7 +43,7 @@ class CarrierTest extends TestCase
             'method_parcel_polska_active' => '1',
             'method_parcel_polska_pricing_type' => 'fixed',
             'method_parcel_polska_price' => '25.50',
-            'method_parcel_polska_title' => 'DHL Parcel Polska',
+            'method_parcel_polska_title' => 'Kurier DHL',
             'method_parcel_polska_method_name' => 'Przesyłka kurierska',
             'method_premium_active' => '0',
         ];
@@ -61,8 +61,34 @@ class CarrierTest extends TestCase
         $this->assertCount(1, $rates);
         $this->assertSame('parcel_polska', $rates[0]['method']);
         $this->assertSame(25.50, $rates[0]['price']);
-        $this->assertSame('DHL Parcel Polska', $rates[0]['carrier_title']);
+        $this->assertSame('Kurier DHL', $rates[0]['carrier_title']);
         $this->assertSame('Przesyłka kurierska', $rates[0]['title']);
+    }
+
+    /**
+     * Verify method with empty title returns empty carrier title without default fallback.
+     */
+    public function testMethodWithEmptyTitleReturnsEmptyCarrierTitleWithoutDefaultFallback(): void
+    {
+        $config = [
+            'active' => '1',
+            'title' => 'DHL eCommerce Poland',
+            'method_parcel_polska_active' => '1',
+            'method_parcel_polska_pricing_type' => 'fixed',
+            'method_parcel_polska_price' => '25.50',
+            'method_parcel_polska_title' => '',
+            'method_parcel_polska_method_name' => 'Kurier DHL',
+        ];
+
+        $rates = [];
+        $carrier = $this->createCarrier($config, $rates);
+
+        $request = new RateRequest();
+        $carrier->collectRates($request);
+
+        $this->assertCount(1, $rates);
+        $this->assertSame('', $rates[0]['carrier_title']);
+        $this->assertSame('Kurier DHL', $rates[0]['title']);
     }
 
     /**
@@ -204,7 +230,7 @@ class CarrierTest extends TestCase
             'active' => '1',
             'method_parcel_polska_active' => '1',
             'method_parcel_polska_title' => 'DHL eCommerce Poland',
-            'method_parcel_polska_method_name' => 'DHL Parcel Polska',
+            'method_parcel_polska_method_name' => 'Kurier DHL',
             'method_parcel_polska_pricing_type' => 'weight',
             'method_parcel_polska_showmethod' => '1',
             'method_parcel_polska_specificerrmsg' => 'Waga poza zakresem dostawy.',
@@ -225,8 +251,8 @@ class CarrierTest extends TestCase
 
         $this->assertCount(1, $rates);
         $this->assertSame('parcel_polska', $rates[0]['method']);
-        $this->assertSame('DHL Parcel Polska', $rates[0]['carrier_title']);
-        $this->assertSame('DHL Parcel Polska', $rates[0]['title']);
+        $this->assertSame('Kurier DHL', $rates[0]['carrier_title']);
+        $this->assertSame('Kurier DHL', $rates[0]['title']);
         $this->assertSame('Waga poza zakresem dostawy.', $rates[0]['error_message']);
     }
 
@@ -328,7 +354,7 @@ class CarrierTest extends TestCase
         $config = [
             'active' => '1',
             'method_connect_active' => '1',
-            'method_connect_title' => 'DHL Parcel Connect',
+            'method_connect_title' => 'DHL Connect',
             'method_connect_pricing_type' => 'country',
         ];
 
@@ -357,7 +383,7 @@ class CarrierTest extends TestCase
         $config = [
             'active' => '1',
             'method_connect_active' => '1',
-            'method_connect_title' => 'DHL Parcel Connect',
+            'method_connect_title' => 'DHL Connect',
             'method_connect_pricing_type' => 'country',
         ];
 

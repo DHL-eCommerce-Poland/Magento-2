@@ -13,7 +13,6 @@ use InvalidArgumentException;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
@@ -32,7 +31,6 @@ class Save extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param ShipmentCreationService $shipmentCreationService
-     * @param ScopeConfigInterface $scopeConfig
      * @param JsonFactory $jsonFactory
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
@@ -43,7 +41,6 @@ class Save extends Action implements HttpPostActionInterface
     public function __construct(
         Context $context,
         private readonly ShipmentCreationService $shipmentCreationService,
-        private readonly ScopeConfigInterface $scopeConfig,
         private readonly JsonFactory $jsonFactory,
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
@@ -153,9 +150,21 @@ class Save extends Action implements HttpPostActionInterface
             }
         }
 
-        // Sanitize customs invoiceDate if present (allowing past dates)
+        // Sanitize customs fields: strip individual clearance fields when not individual ('I')
         if (isset($payload['customs']) && is_array($payload['customs'])) {
-            if (!empty($payload['customs']['invoiceDate'])) {
+            $customsType = (string)($payload['customs']['customsType'] ?? 'U');
+            if ($customsType === 'U' || $customsType === 'S') {
+                $payload['customs']['nipNr'] = null;
+                $payload['customs']['eoriNr'] = null;
+                $payload['customs']['eoriNrReceiver'] = null;
+                $payload['customs']['shipperNip'] = null;
+                $payload['customs']['shipperEori'] = null;
+                $payload['customs']['receiverEori'] = null;
+                $payload['customs']['invoiceNr'] = null;
+                $payload['customs']['invoiceDate'] = null;
+                $payload['customs']['invoiceFile'] = null;
+                $payload['customs']['invoiceContent'] = false;
+            } elseif (!empty($payload['customs']['invoiceDate'])) {
                 $rawInvoiceDate = trim((string)$payload['customs']['invoiceDate']);
                 $payload['customs']['invoiceDate'] = $this->dateSanitizer->sanitize(
                     $rawInvoiceDate,
@@ -168,20 +177,14 @@ class Save extends Action implements HttpPostActionInterface
         try {
             $shipmentData = DhlShipmentData::fromArray($payload);
 
-            // 1. Resolve environment configuration (sandbox vs production)
-            $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlpoland/sandbox');
-            $environment = $isSandbox ? 'sandbox' : 'production';
-
             if ($entityId > 0) {
                 $dispatchResult = $this->shipmentCreationService->recreateShipment(
                     $entityId,
-                    $shipmentData,
-                    $environment
+                    $shipmentData
                 );
             } else {
                 $dispatchResult = $this->shipmentCreationService->createShipment(
-                    $shipmentData,
-                    $environment
+                    $shipmentData
                 );
             }
 

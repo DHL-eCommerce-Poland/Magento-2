@@ -32,10 +32,6 @@ class ShipmentTrackingServiceTest extends TestCase
      */
     private $credentialsProviderStub;
     /**
-     * @var Stub
-     */
-    private $scopeConfigMock;
-    /**
      * @var ShipmentTrackingService
      */
     private $service;
@@ -45,13 +41,11 @@ class ShipmentTrackingServiceTest extends TestCase
         $this->shipmentDataRepositoryMock = $this->createMock(ShipmentDataRepositoryInterface::class);
         $this->clientStub = $this->createStub(ClientInterface::class);
         $this->credentialsProviderStub = $this->createStub(CredentialsProvider::class);
-        $this->scopeConfigMock = $this->createStub(ScopeConfigInterface::class);
 
         $this->service = new ShipmentTrackingService(
             $this->shipmentDataRepositoryMock,
             $this->clientStub,
             $this->credentialsProviderStub,
-            $this->scopeConfigMock,
             $this->createStub(\Psr\Log\LoggerInterface::class)
         );
     }
@@ -77,9 +71,6 @@ class ShipmentTrackingServiceTest extends TestCase
             ->with($shipmentMock);
 
         $credentials = new Credentials('user', 'pass', true);
-        $this->scopeConfigMock
-            ->method('getValue')
-            ->willReturn('1');
 
         $this->credentialsProviderStub
             ->method('getCredentials')

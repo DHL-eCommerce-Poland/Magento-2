@@ -7,20 +7,16 @@ namespace Ideo\Dhl\Model\Shipment;
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
 class ShipmentDeletionService
 {
-    private const XML_PATH_SANDBOX = 'carriers/dhlpoland/sandbox';
-
     /**
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param ClientInterface $client
      * @param CredentialsProvider $credentialsProvider
-     * @param ScopeConfigInterface $scopeConfig
      * @param MagentoShipmentSyncService $magentoShipmentSyncService
      * @param LoggerInterface $logger
      * @param ShipmentDataPayloadReader $payloadReader
@@ -29,7 +25,6 @@ class ShipmentDeletionService
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
-        private readonly ScopeConfigInterface $scopeConfig,
         private readonly MagentoShipmentSyncService $magentoShipmentSyncService,
         private readonly LoggerInterface $logger,
         private readonly ShipmentDataPayloadReader $payloadReader
@@ -50,9 +45,7 @@ class ShipmentDeletionService
         $shipmentId = $shipment->getShipmentId();
 
         if (!empty($shipmentId)) {
-            $isSandbox = (bool)$this->scopeConfig->getValue(self::XML_PATH_SANDBOX);
-            $environment = $isSandbox ? 'sandbox' : 'production';
-            $credentials = $this->credentialsProvider->getCredentials($environment);
+            $credentials = $this->credentialsProvider->getCredentials();
 
             $returnShipmentIds = $this->payloadReader->getReturnShipmentIdsFromEntity($shipment);
             $result = $this->client->deleteShipment($credentials, $shipmentId, $returnShipmentIds);

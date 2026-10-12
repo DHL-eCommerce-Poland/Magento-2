@@ -8,9 +8,18 @@ use Ideo\Dhl\Model\Config\Source\AddressType;
 use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
+use Ideo\Dhl\Model\Shipment\PostalCodeSanitizer;
 
 class ShipmentFullDataMapper
 {
+    /**
+     * @param PostalCodeSanitizer $postalCodeSanitizer
+     */
+    public function __construct(
+        private readonly PostalCodeSanitizer $postalCodeSanitizer
+    ) {
+    }
+
     /**
      * Map DhlShipmentData to DHL WebAPI2 ShipmentFullData array format.
      *
@@ -99,7 +108,7 @@ class ShipmentFullDataMapper
 
         $senderAddress = [
             'name' => $this->sanitizeString($senderName),
-            'postalCode' => $this->sanitizePostalCode($sender->getPostalCode(), $senderCountryCode),
+            'postalCode' => $this->postalCodeSanitizer->sanitize($sender->getPostalCode(), $senderCountryCode),
             'city' => $this->sanitizeString($sender->getCity()),
             'street' => $this->sanitizeString($sender->getStreet()),
             'houseNumber' => $this->sanitizeString($sender->getHouseNumber()),
@@ -142,7 +151,7 @@ class ShipmentFullDataMapper
                 'addressType' => AddressType::TYPE_CONSUMER,
                 'country' => $countryCode,
                 'name' => $this->sanitizeString($recipientName),
-                'postalCode' => $this->sanitizePostalCode($pointPostcode, $countryCode),
+                'postalCode' => $this->postalCodeSanitizer->sanitize($pointPostcode, $countryCode),
                 'city' => $this->sanitizeString($pointCity),
                 'street' => $this->sanitizeString($pointStreet),
                 'houseNumber' => $this->sanitizeString($pointHouseNumber),
@@ -163,7 +172,7 @@ class ShipmentFullDataMapper
                 'addressType' => $receiverAddressType,
                 'country' => $countryCode,
                 'name' => $this->sanitizeString($recipientName),
-                'postalCode' => $this->sanitizePostalCode($recipient->getPostalCode(), $countryCode),
+                'postalCode' => $this->postalCodeSanitizer->sanitize($recipient->getPostalCode(), $countryCode),
                 'city' => $this->sanitizeString($recipient->getCity()),
                 'street' => $this->sanitizeString($recipient->getStreet()),
                 'houseNumber' => $this->sanitizeString($recipient->getHouseNumber()),
@@ -239,42 +248,34 @@ class ShipmentFullDataMapper
                 'categoryOfItem' => $customs->getCategoryOfItem() ?: '11',
                 'countryOfOrigin' => $customs->getCountryOfOrigin() ?: 'PL',
                 'grossWeight' => (float)($customs->getGrossWeight() ?? 0.0),
-                'firstName' => mb_substr($this->sanitizeString($customs->getFirstName() ?? ''), 0, 30),
-                'secondaryName' => mb_substr($this->sanitizeString($customs->getSecondaryName() ?? ''), 0, 30),
-                'vatRegistrationNumber' => mb_substr(
-                    $this->sanitizeString($customs->getVatRegistrationNumber() ?? ''),
-                    0,
-                    15
+                'firstName' => $this->sanitizeString($customs->getFirstName() ?? ''),
+                'secondaryName' => $this->sanitizeString($customs->getSecondaryName() ?? ''),
+                'vatRegistrationNumber' => $this->sanitizeString(
+                    $customs->getVatRegistrationNumber() ?? ''
                 ),
             ];
 
-            if ($customs->getNipNr()) {
-                $customsDef['nipNr'] = mb_substr($this->sanitizeString($customs->getNipNr()), 0, 17);
-            }
-            if ($customs->getEoriNr()) {
-                $customsDef['eoriNr'] = mb_substr($this->sanitizeString($customs->getEoriNr()), 0, 17);
-            }
-            if ($customs->getEoriNrReceiver()) {
-                $customsDef['eoriNrReceiver'] = mb_substr($this->sanitizeString($customs->getEoriNrReceiver()), 0, 17);
-            }
             if ($customs->getVatRegistrationNumberReceiver()) {
-                $customsDef['vatRegistrationNumberReceiver'] = mb_substr(
-                    $this->sanitizeString($customs->getVatRegistrationNumberReceiver()),
-                    0,
-                    15
+                $customsDef['vatRegistrationNumberReceiver'] = $this->sanitizeString(
+                    $customs->getVatRegistrationNumberReceiver()
                 );
             }
             if ($customs->getAdditionalInfo()) {
-                $customsDef['additionalInfo'] = mb_substr(
-                    $this->sanitizeString($customs->getAdditionalInfo()),
-                    0,
-                    100
-                );
+                $customsDef['additionalInfo'] = $this->sanitizeString($customs->getAdditionalInfo());
             }
 
             if ($customsType === 'I') {
+                if ($customs->getNipNr()) {
+                    $customsDef['nipNr'] = $this->sanitizeString($customs->getNipNr());
+                }
+                if ($customs->getEoriNr()) {
+                    $customsDef['eoriNr'] = $this->sanitizeString($customs->getEoriNr());
+                }
+                if ($customs->getEoriNrReceiver()) {
+                    $customsDef['eoriNrReceiver'] = $this->sanitizeString($customs->getEoriNrReceiver());
+                }
                 if ($customs->getInvoiceNr()) {
-                    $customsDef['invoiceNr'] = mb_substr($this->sanitizeString($customs->getInvoiceNr()), 0, 35);
+                    $customsDef['invoiceNr'] = $this->sanitizeString($customs->getInvoiceNr());
                 }
                 if ($customs->getInvoiceDate()) {
                     $customsDef['invoiceDate'] = $customs->getInvoiceDate();
@@ -296,8 +297,8 @@ class ShipmentFullDataMapper
             foreach ($customs->getCustomsItems() as $item) {
                 if (is_array($item)) {
                     $items[] = [
-                        'namePl' => mb_substr($this->sanitizeString((string)($item['namePl'] ?? '')), 0, 35),
-                        'nameEn' => mb_substr($this->sanitizeString((string)($item['nameEn'] ?? '')), 0, 35),
+                        'namePl' => $this->sanitizeString((string)($item['namePl'] ?? '')),
+                        'nameEn' => $this->sanitizeString((string)($item['nameEn'] ?? '')),
                         'quantity' => isset($item['quantity']) && trim((string)$item['quantity']) !== ''
                             ? (int)str_replace(',', '.', trim((string)$item['quantity']))
                             : '',
@@ -307,11 +308,9 @@ class ShipmentFullDataMapper
                         'value' => isset($item['value']) && trim((string)$item['value']) !== ''
                             ? (float)str_replace(',', '.', trim((string)$item['value']))
                             : '',
-                        'tariffCode' => mb_substr($this->sanitizeString((string)($item['tariffCode'] ?? '')), 0, 10),
-                        'countryOfOrigin' => mb_substr(
-                            $this->sanitizeString((string)($item['countryOfOrigin'] ?? '')),
-                            0,
-                            35
+                        'tariffCode' => $this->sanitizeString((string)($item['tariffCode'] ?? '')),
+                        'countryOfOrigin' => $this->sanitizeString(
+                            (string)($item['countryOfOrigin'] ?? '')
                         ),
                     ];
                 }
@@ -338,24 +337,6 @@ class ShipmentFullDataMapper
         }
 
         return (string) preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', trim($string));
-    }
-
-    /**
-     * Remove spaces from postal codes and hyphens from Polish postal codes for DHL.
-     *
-     * @param string $postalCode
-     * @param string $countryCode
-     *
-     * @return string
-     */
-    public function sanitizePostalCode(string $postalCode, string $countryCode = 'PL'): string
-    {
-        $postalCode = str_replace(' ', '', trim($postalCode));
-        if (strtoupper($countryCode) === 'PL') {
-            return str_replace('-', '', $postalCode);
-        }
-
-        return $postalCode;
     }
 
     /**
@@ -443,7 +424,7 @@ class ShipmentFullDataMapper
         if ($services->isReturnOnDelivery()) {
             $rodItem = ['serviceType' => 'ROD'];
             if ($services->getReturnOnDeliveryReference() !== '') {
-                $rodItem['textInstruction'] = mb_substr($services->getReturnOnDeliveryReference(), 0, 32);
+                $rodItem['textInstruction'] = $this->sanitizeString($services->getReturnOnDeliveryReference());
             }
             $items[] = $rodItem;
         }

@@ -10,6 +10,11 @@ use Magento\Framework\View\Element\Template;
 /** @var Template $block */
 /** @var Escaper $escaper */
 ?>
+<style>
+    .dhl-help-container .fieldset-wrapper-title {
+        border-bottom: none;
+    }
+</style>
 <div class="dhl-help-container">
     <div class="entry-edit form-inline">
         <div class="fieldset-wrapper fieldset-wrapper-opened">
@@ -20,6 +25,10 @@ use Magento\Framework\View\Element\Template;
             </div>
             <div class="fieldset">
                 <p>
+                    <strong><?= $escaper->escapeHtml(__('Welcome to the DHL eCommerce (Poland) Help Center')) ?></strong><br/>
+                    <?= $escaper->escapeHtml(__('Here you will find a complete set of materials supporting your work with the DHL application for Magento 2. Whether you are configuring the module for the first time or want to explore advanced shipment management capabilities, the prepared documentation will help you take full advantage of the integration.')) ?>
+                </p>
+                <p>
                     <?= $escaper->escapeHtml(__('To configure the plugin, it is necessary to have API keys for either the production or sandbox environment. The module supports all DHL eCommerce Poland products and services via WebAPI v2.')) ?>
                 </p>
                 <p>
@@ -27,9 +36,6 @@ use Magento\Framework\View\Element\Template;
                     <a href="https://www.dhl24.com.pl" target="_blank" rel="noopener">www.dhl24.com.pl</a>
                     <?= $escaper->escapeHtml(__('with an active customer number, or for a test account registered at')) ?>
                     <a href="https://sandbox.dhl24.com.pl" target="_blank" rel="noopener">sandbox.dhl24.com.pl</a>.
-                </p>
-                <p>
-                    <?= $escaper->escapeHtml(__('Information on how to obtain API keys can be found in the user manual on page 10 or in the instructional video.')) ?>
                 </p>
             </div>
         </div>
@@ -42,8 +48,19 @@ use Magento\Framework\View\Element\Template;
             </div>
             <div class="fieldset">
                 <p>
-                    <?= $escaper->escapeHtml(__('In case of questions or technical issues with the DHL module, please contact our support team at email:')) ?>
-                    <a href="mailto:plcim@dhl.com"><strong>plcim@dhl.com</strong></a>
+                    <?= $escaper->escapeHtml(__('In case of questions or technical issues with the DHL module, please contact our support team:')) ?>
+                </p>
+                <p>
+                    <strong><?= $escaper->escapeHtml(__('Contact form:')) ?></strong>
+                    <a href="https://dhl24.com.pl/pomoc-techniczna/bledy.html#contact" target="_blank" rel="noopener">https://dhl24.com.pl/pomoc-techniczna/bledy.html#contact</a>
+                </p>
+                <p>
+                    <strong><?= $escaper->escapeHtml(__('Email address:')) ?></strong>
+                    <a href="mailto:pl.cim@dhl.com">pl.cim@dhl.com</a>
+                </p>
+                <p>
+                    <strong><?= $escaper->escapeHtml(__('Phone:')) ?></strong>
+                    <a href="tel:+48426626262">+48 42 662 62 62</a>
                 </p>
             </div>
         </div>
@@ -56,15 +73,8 @@ use Magento\Framework\View\Element\Template;
             </div>
             <div class="fieldset">
                 <p>
-                    <?= $escaper->escapeHtml(__('A detailed user manual for the module is available at:')) ?>
-                </p>
-                <p>
-                    <a href="https://narzedzia.dhl.pl/pl/cms/content/view?content=integracje-dhl-prestashop"
-                       target="_blank"
-                       rel="noopener"
-                       class="action-secondary">
-                        <?= $escaper->escapeHtml(__('Open Detailed Module User Manual')) ?> &rarr;
-                    </a>
+                    <?= $escaper->escapeHtml(__('Take advantage of the materials available on the website:')) ?>
+                    <a href="https://narzedzia.dhl.pl/integracje/magento/" target="_blank" rel="noopener">https://narzedzia.dhl.pl/integracje/magento/</a>
                 </p>
             </div>
         </div>
