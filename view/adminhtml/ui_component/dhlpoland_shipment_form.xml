@@ -1263,7 +1263,7 @@
         <settings>
             <label translate="true">Customs Clearance</label>
             <collapsible>true</collapsible>
-            <opened>true</opened>
+            <opened>false</opened>
         </settings>
         <field name="customs[customsType]" formElement="select">
             <argument name="data" xsi:type="array">
