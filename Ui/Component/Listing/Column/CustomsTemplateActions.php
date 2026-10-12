@@ -1,7 +1,5 @@
 <?php
-/**
- * Copyright © Ideo. All rights reserved.
- */
+
 declare(strict_types=1);
 
 namespace Ideo\Dhl\Ui\Component\Listing\Column;
