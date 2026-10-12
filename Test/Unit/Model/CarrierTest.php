@@ -66,6 +66,32 @@ class CarrierTest extends TestCase
     }
 
     /**
+     * Verify method with empty title returns empty carrier title without default fallback.
+     */
+    public function testMethodWithEmptyTitleReturnsEmptyCarrierTitleWithoutDefaultFallback(): void
+    {
+        $config = [
+            'active' => '1',
+            'title' => 'DHL eCommerce Poland',
+            'method_parcel_polska_active' => '1',
+            'method_parcel_polska_pricing_type' => 'fixed',
+            'method_parcel_polska_price' => '25.50',
+            'method_parcel_polska_title' => '',
+            'method_parcel_polska_method_name' => 'DHL Parcel Polska',
+        ];
+
+        $rates = [];
+        $carrier = $this->createCarrier($config, $rates);
+
+        $request = new RateRequest();
+        $carrier->collectRates($request);
+
+        $this->assertCount(1, $rates);
+        $this->assertSame('', $rates[0]['carrier_title']);
+        $this->assertSame('DHL Parcel Polska', $rates[0]['title']);
+    }
+
+    /**
      * Verify each catalog method can be enabled independently.
      */
     public function testEveryCatalogMethodCanBeEnabledIndependently(): void

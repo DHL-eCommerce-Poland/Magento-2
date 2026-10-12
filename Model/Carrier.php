@@ -131,9 +131,8 @@ class Carrier extends AbstractCarrier implements CarrierInterface
 
             $rate = $this->rateMethodFactory->create();
             $rate->setCarrier(self::CODE);
-            $carrierTitle = $this->getConfigData('method_' . $code . '_title')
-                ?: ($this->getConfigData('title') ?: 'DHL eCommerce Poland');
-            $rate->setCarrierTitle((string)$carrierTitle);
+            $carrierTitle = (string)$this->getConfigData('method_' . $code . '_title');
+            $rate->setCarrierTitle($carrierTitle);
             $rate->setMethod($code);
             $methodTitle = $this->getConfigData('method_' . $code . '_method_name')
                 ?: ($this->getConfigData('method_' . $code . '_title') ?: $method['title']);
