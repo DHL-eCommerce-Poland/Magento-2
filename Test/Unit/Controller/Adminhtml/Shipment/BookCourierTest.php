@@ -52,11 +52,6 @@ class BookCourierTest extends TestCase
     private CourierBookingService|MockObject $bookingService;
 
     /**
-     * @var ScopeConfigInterface|MockObject
-     */
-    private ScopeConfigInterface|MockObject $scopeConfig;
-
-    /**
      * @var LoggerInterface|MockObject
      */
     private LoggerInterface|MockObject $logger;
@@ -80,14 +75,12 @@ class BookCourierTest extends TestCase
         $this->jsonFactory->method('create')->willReturn($this->jsonResult);
 
         $this->bookingService = $this->createMock(CourierBookingService::class);
-        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->controller = new BookCourier(
             $this->context,
             $this->jsonFactory,
             $this->bookingService,
-            $this->scopeConfig,
             $this->logger
         );
     }
@@ -105,15 +98,13 @@ class BookCourierTest extends TestCase
             };
         });
 
-        $this->scopeConfig->method('getValue')->willReturn('sandbox');
-
         $bookingResult = $this->createMock(CourierBookingResult::class);
         $bookingResult->method('isSuccess')->willReturn(true);
         $bookingResult->method('getCourierOrderIds')->willReturn(['ORDER999']);
 
         $this->bookingService->expects($this->once())
             ->method('bookCourier')
-            ->with([123], '2026-10-05', '10:00', '14:00', 'Test info', 'sandbox')
+            ->with([123], '2026-10-05', '10:00', '14:00', 'Test info')
             ->willReturn($bookingResult);
 
         $this->messageManager->expects($this->once())
@@ -149,14 +140,13 @@ class BookCourierTest extends TestCase
             };
         });
 
-        $this->scopeConfig->method('getValue')->willReturn('sandbox');
-
         $bookingResult = $this->createMock(CourierBookingResult::class);
         $bookingResult->method('isSuccess')->willReturn(true);
         $bookingResult->method('getCourierOrderIds')->willReturn(['ORDER_1', 'ORDER_2']);
 
         $this->bookingService->expects($this->once())
             ->method('bookCourier')
+            ->with([123, 456], '2026-10-05', '10:00', '14:00', '')
             ->willReturn($bookingResult);
 
         $this->messageManager->expects($this->once())

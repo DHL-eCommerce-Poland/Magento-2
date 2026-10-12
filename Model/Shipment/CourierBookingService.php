@@ -38,12 +38,11 @@ class CourierBookingService
     /**
      * Book courier for selected Magento shipment entities.
      *
-     * @param array $ids Shipment entity IDs
+     * @param array $ids
      * @param string $pickupDate YYYY-MM-DD format
      * @param string $pickupTimeFrom HH:MM format
      * @param string $pickupTimeTo HH:MM format
      * @param string|null $additionalInfo
-     * @param string $environment ('sandbox' or 'production')
      *
      * @return CourierBookingResult
      * @throws LocalizedException
@@ -53,8 +52,7 @@ class CourierBookingService
         string $pickupDate,
         string $pickupTimeFrom,
         string $pickupTimeTo,
-        ?string $additionalInfo = null,
-        string $environment = 'sandbox'
+        ?string $additionalInfo = null
     ): CourierBookingResult {
         if (empty($ids)) {
             throw new LocalizedException(__('No shipments selected for courier booking.'));
@@ -104,7 +102,8 @@ class CourierBookingService
                 }
 
                 $dhlId = (string) $dhlId;
-                if (isset($serviceTypeByDhlShipmentId[$dhlId])
+                if (
+                    isset($serviceTypeByDhlShipmentId[$dhlId])
                     && $serviceTypeByDhlShipmentId[$dhlId] !== $serviceType
                 ) {
                     throw new LocalizedException(
@@ -132,7 +131,7 @@ class CourierBookingService
             );
         }
 
-        $credentials = $this->credentialsProvider->getCredentials($environment);
+        $credentials = $this->credentialsProvider->getCredentials();
 
         $result = $this->client->bookCourier(
             $credentials,

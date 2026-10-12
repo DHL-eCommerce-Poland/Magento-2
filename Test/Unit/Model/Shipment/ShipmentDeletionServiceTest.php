@@ -37,10 +37,6 @@ class ShipmentDeletionServiceTest extends TestCase
     /**
      * @var MockObject
      */
-    private $scopeConfigMock;
-    /**
-     * @var MockObject
-     */
     private $loggerMock;
     /**
      * @var ShipmentDataPayloadReader
@@ -56,7 +52,6 @@ class ShipmentDeletionServiceTest extends TestCase
         $this->repositoryMock = $this->createMock(ShipmentDataRepositoryInterface::class);
         $this->clientMock = $this->createMock(ClientInterface::class);
         $this->credentialsProviderMock = $this->createMock(CredentialsProvider::class);
-        $this->scopeConfigMock = $this->createMock(ScopeConfigInterface::class);
         $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->payloadReaderStub = new ShipmentDataPayloadReader(new Json());
         $syncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
@@ -65,7 +60,6 @@ class ShipmentDeletionServiceTest extends TestCase
             $this->repositoryMock,
             $this->clientMock,
             $this->credentialsProviderMock,
-            $this->scopeConfigMock,
             $syncServiceMock,
             $this->loggerMock,
             $this->payloadReaderStub
@@ -88,14 +82,8 @@ class ShipmentDeletionServiceTest extends TestCase
             ->with($entityId)
             ->willReturn($shipmentMock);
 
-        $this->scopeConfigMock->expects($this->once())
-            ->method('getValue')
-            ->with('carriers/dhlpoland/sandbox')
-            ->willReturn(1);
-
         $this->credentialsProviderMock->expects($this->once())
             ->method('getCredentials')
-            ->with('sandbox')
             ->willReturn($credentials);
 
         $deleteResult = new DeleteShipmentResult(true, $shipmentId);
@@ -131,14 +119,8 @@ class ShipmentDeletionServiceTest extends TestCase
             ->with($entityId)
             ->willReturn($shipmentMock);
 
-        $this->scopeConfigMock->expects($this->once())
-            ->method('getValue')
-            ->with('carriers/dhlpoland/sandbox')
-            ->willReturn(1);
-
         $this->credentialsProviderMock->expects($this->once())
             ->method('getCredentials')
-            ->with('sandbox')
             ->willReturn($credentials);
 
         $deleteResult = new DeleteShipmentResult(true, $shipmentId);
@@ -172,14 +154,8 @@ class ShipmentDeletionServiceTest extends TestCase
             ->with($entityId)
             ->willReturn($shipmentMock);
 
-        $this->scopeConfigMock->expects($this->once())
-            ->method('getValue')
-            ->with('carriers/dhlpoland/sandbox')
-            ->willReturn(0);
-
         $this->credentialsProviderMock->expects($this->once())
             ->method('getCredentials')
-            ->with('production')
             ->willReturn($credentials);
 
         $deleteResult = new DeleteShipmentResult(false, $shipmentId, 'ERR', 'Shipment cannot be deleted');
@@ -207,14 +183,12 @@ class ShipmentDeletionServiceTest extends TestCase
         $repositoryStub = $this->createStub(ShipmentDataRepositoryInterface::class);
         $clientStub = $this->createStub(ClientInterface::class);
         $credentialsProviderStub = $this->createStub(CredentialsProvider::class);
-        $scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $syncServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
 
         $service = new ShipmentDeletionService(
             $repositoryStub,
             $clientStub,
             $credentialsProviderStub,
-            $scopeConfigStub,
             $syncServiceMock,
             $this->loggerMock,
             $this->payloadReaderStub
@@ -225,7 +199,6 @@ class ShipmentDeletionServiceTest extends TestCase
         $shipmentStub->method('getMagentoShipmentId')->willReturn($magentoShipmentId);
 
         $repositoryStub->method('getById')->willReturn($shipmentStub);
-        $scopeConfigStub->method('getValue')->willReturn(1);
         $credentialsProviderStub->method('getCredentials')->willReturn($credentials);
         $clientStub->method('deleteShipment')->willReturn(new DeleteShipmentResult(true, $shipmentId));
 

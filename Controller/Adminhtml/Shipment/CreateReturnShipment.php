@@ -13,7 +13,6 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Action\HttpPostActionInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Psr\Log\LoggerInterface;
@@ -27,7 +26,6 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
      * @param ShipmentDataService $shipmentDataService
      * @param ReturnShipmentDataBuilder $returnBuilder
      * @param ReturnShipmentCreationService $returnCreationService
-     * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
      * @param JsonFactory $resultJsonFactory
      */
@@ -36,7 +34,6 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
         private readonly ShipmentDataService $shipmentDataService,
         private readonly ReturnShipmentDataBuilder $returnBuilder,
         private readonly ReturnShipmentCreationService $returnCreationService,
-        private readonly ScopeConfigInterface $scopeConfig,
         private readonly LoggerInterface $logger,
         private readonly JsonFactory $resultJsonFactory
     ) {
@@ -86,12 +83,8 @@ class CreateReturnShipment extends Action implements HttpGetActionInterface, Htt
             $returnShipmentData = $this->returnBuilder->buildReturnShipmentData($shipmentData);
             $primaryWaybill = $existingEntity->getShipmentId();
 
-            $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlpoland/sandbox');
-            $environment = $isSandbox ? 'sandbox' : 'production';
-
             $result = $this->returnCreationService->createReturnShipment(
                 returnShipmentData: $returnShipmentData,
-                environment: $environment,
                 expirationDays: ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS,
                 primaryWaybillNumber: $primaryWaybill,
                 originalEntityId: $entityId

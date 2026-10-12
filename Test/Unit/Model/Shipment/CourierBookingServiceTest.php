@@ -14,6 +14,7 @@ use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Shipment\CourierBookingService;
 use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
 use Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
@@ -423,5 +424,51 @@ class CourierBookingServiceTest extends TestCase
         $timezone->method('scopeDate')->willReturn(new DateTime($date));
 
         return $timezone;
+    }
+
+    /**
+     * Test that bookCourier calls credentialsProvider getCredentials.
+     *
+     * @return void
+     */
+    public function testBookCourierCallsCredentialsProvider(): void
+    {
+        $entityStub = $this->createStub(ShipmentDataInterface::class);
+        $entityStub->method('getShipmentId')->willReturn('DHL_PROD_100');
+        $entityStub->method('getShipmentData')->willReturn($this->shipmentPayload('AH'));
+
+        $this->shipmentDataRepositoryStub->method('getById')
+            ->willReturn($entityStub);
+
+        $credentialsProviderMock = $this->createMock(CredentialsProvider::class);
+        $credentialsProviderMock->expects($this->once())
+            ->method('getCredentials')
+            ->willReturn(new Credentials('prod_user', 'prod_pass', false));
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->expects($this->once())
+            ->method('bookCourier')
+            ->with(
+                $this->callback(fn (Credentials $c) => !$c->isSandbox()),
+                ['DHL_PROD_100'],
+                '2026-10-15',
+                '10:00',
+                '14:00',
+                null
+            )
+            ->willReturn(new CourierBookingResult(true, ['ORDER_PROD_1']));
+
+        $service = new CourierBookingService(
+            $clientMock,
+            $credentialsProviderMock,
+            $this->shipmentDataRepositoryStub,
+            $this->timezoneMock,
+            new ShipmentDateSanitizer($this->timezoneMock),
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            new ShipmentDataPayloadReader(new Json())
+        );
+
+        $result = $service->bookCourier([10], '2026-10-15', '10:00', '14:00');
+        $this->assertTrue($result->isSuccess());
     }
 }

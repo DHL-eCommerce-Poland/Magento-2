@@ -23,7 +23,6 @@ use ZipArchive;
 
 class LabelPrintingService
 {
-    private const XML_PATH_SANDBOX = 'carriers/dhlpoland/sandbox';
     private const XML_PATH_DEFAULT_LABEL_TYPE = 'carriers/dhlpoland/label_type';
 
     /**
@@ -54,7 +53,7 @@ class LabelPrintingService
      * @param int[] $entityIds Array of Magento DHL shipment entity IDs
      * @param string|null $overrideLabelType Optional explicit label type override
      *
-     * @return array{content: string, mimeType: string, filename: string}
+     * @return array
      * @throws LocalizedException
      */
     public function getLabelsContent(array $entityIds, ?string $overrideLabelType = null): array
@@ -102,9 +101,7 @@ class LabelPrintingService
             );
         }
 
-        $isSandbox = (bool) $this->scopeConfig->getValue(self::XML_PATH_SANDBOX);
-        $environment = $isSandbox ? 'sandbox' : 'production';
-        $credentials = $this->credentialsProvider->getCredentials($environment);
+        $credentials = $this->credentialsProvider->getCredentials();
 
         $result = $this->client->getLabels($credentials, $itemsToPrint);
 
@@ -138,7 +135,7 @@ class LabelPrintingService
      * @param int[] $entityIds Array of Magento DHL shipment entity IDs
      * @param string|null $overrideLabelType Optional explicit label type override
      *
-     * @return array{content: string, mimeType: string, filename: string}
+     * @return array
      * @throws LocalizedException
      */
     public function getReturnLabelContent(array $entityIds, ?string $overrideLabelType = null): array
@@ -193,9 +190,7 @@ class LabelPrintingService
             );
         }
 
-        $isSandbox = (bool) $this->scopeConfig->getValue(self::XML_PATH_SANDBOX);
-        $environment = $isSandbox ? 'sandbox' : 'production';
-        $credentials = $this->credentialsProvider->getCredentials($environment);
+        $credentials = $this->credentialsProvider->getCredentials();
 
         $result = $this->client->getLabels($credentials, $itemsToPrint);
 
@@ -279,9 +274,7 @@ class LabelPrintingService
             );
         }
 
-        $isSandbox = (bool) $this->scopeConfig->getValue(self::XML_PATH_SANDBOX);
-        $environment = $isSandbox ? 'sandbox' : 'production';
-        $credentials = $this->credentialsProvider->getCredentials($environment);
+        $credentials = $this->credentialsProvider->getCredentials();
 
         $result = $this->client->getLabels($credentials, $itemsToPrint);
 

@@ -36,14 +36,12 @@ class CourierBookingCancellationService
      * Cancel courier booking for selected shipment entity IDs or dispatch numbers.
      *
      * @param array $ids Array of entity IDs (int) or dispatch numbers (string)
-     * @param string $environment ('sandbox' or 'production')
      *
      * @return CancelCourierBookingResult
      * @throws LocalizedException
      */
     public function cancelCourierBooking(
-        array $ids,
-        string $environment = 'sandbox'
+        array $ids
     ): CancelCourierBookingResult {
         if (empty($ids)) {
             throw new LocalizedException(__('No shipments or courier orders selected for cancellation.'));
@@ -81,7 +79,7 @@ class CourierBookingCancellationService
             );
         }
 
-        $credentials = $this->credentialsProvider->getCredentials($environment);
+        $credentials = $this->credentialsProvider->getCredentials();
 
         $result = $this->client->cancelCourierBooking($credentials, $dispatchNumbers);
 

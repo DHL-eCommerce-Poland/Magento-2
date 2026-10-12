@@ -7,9 +7,7 @@ namespace Ideo\Dhl\Model\Shipment;
 use Ideo\Dhl\Api\Data\ShipmentDataInterface;
 use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\Credentials;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem;
@@ -21,13 +19,10 @@ use ZipArchive;
 
 class DocumentDownloadService
 {
-    private const XML_PATH_SANDBOX = 'carriers/dhlpoland/sandbox';
-
     /**
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param ClientInterface $client
      * @param CredentialsProvider $credentialsProvider
-     * @param ScopeConfigInterface $scopeConfig
      * @param Filesystem $filesystem
      * @param LabelGenerator $labelGenerator
      * @param LoggerInterface $logger
@@ -36,7 +31,6 @@ class DocumentDownloadService
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
-        private readonly ScopeConfigInterface $scopeConfig,
         private readonly Filesystem $filesystem,
         private readonly LabelGenerator $labelGenerator,
         private readonly LoggerInterface $logger
@@ -60,7 +54,7 @@ class DocumentDownloadService
             throw new LocalizedException(__('Shipment entity #%1 does not have a DHL shipment ID.', $entityId));
         }
 
-        $credentials = $this->getCredentials();
+        $credentials = $this->credentialsProvider->getCredentials();
         $result = $this->client->getShipmentScan($credentials, (string) $dhlShipmentId);
 
         if (!$result->isSuccess()) {
@@ -102,7 +96,7 @@ class DocumentDownloadService
             throw new LocalizedException(__('Shipment entity #%1 does not have a DHL shipment ID.', $entityId));
         }
 
-        $credentials = $this->getCredentials();
+        $credentials = $this->credentialsProvider->getCredentials();
         $result = $this->client->getEpod($credentials, (string) $dhlShipmentId);
 
         if (!$result->isSuccess()) {
@@ -386,18 +380,5 @@ class DocumentDownloadService
         } catch (Throwable $e) {
             throw new LocalizedException(__('Shipment entity #%1 could not be loaded.', $entityId), $e);
         }
-    }
-
-    /**
-     * Get API credentials based on carrier scope config.
-     *
-     * @return Credentials
-     */
-    private function getCredentials(): Credentials
-    {
-        $isSandbox = (bool) $this->scopeConfig->getValue(self::XML_PATH_SANDBOX);
-        $environment = $isSandbox ? 'sandbox' : 'production';
-
-        return $this->credentialsProvider->getCredentials($environment);
     }
 }

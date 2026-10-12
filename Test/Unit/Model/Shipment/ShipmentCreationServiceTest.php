@@ -148,7 +148,7 @@ class ShipmentCreationServiceTest extends TestCase
             ->with($shipmentData, 'Nowa', '90039521201', null, [])
             ->willReturn($savedEntityStub);
 
-        $result = $this->service->createShipment($shipmentData, 'sandbox');
+        $result = $this->service->createShipment($shipmentData);
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('90039521201', $result->getShipmentId());
         $this->assertEquals(55, $result->getEntityId());
@@ -180,7 +180,7 @@ class ShipmentCreationServiceTest extends TestCase
         $this->shipmentDataServiceMock->expects($this->never())
             ->method('saveShipmentDataWithStatus');
 
-        $result = $this->service->createShipment($shipmentData, 'sandbox');
+        $result = $this->service->createShipment($shipmentData);
         $this->assertFalse($result->isSuccess());
         $this->assertEquals('Błędny kod pocztowy', $result->getErrorMessage());
     }
@@ -227,7 +227,7 @@ class ShipmentCreationServiceTest extends TestCase
         $apiResult = new CreateShipmentResult(true, false, '999888777');
         $this->clientStub->method('createShipment')->willReturn($apiResult);
 
-        $result = $this->service->recreateShipment($entityId, $shipmentData, 'sandbox');
+        $result = $this->service->recreateShipment($entityId, $shipmentData);
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('999888777', $result->getShipmentId());
@@ -274,7 +274,7 @@ class ShipmentCreationServiceTest extends TestCase
         );
         $this->clientStub->method('createShipment')->willReturn($failedCreateResult);
 
-        $result = $this->service->recreateShipment($entityId, $shipmentData, 'sandbox');
+        $result = $this->service->recreateShipment($entityId, $shipmentData);
 
         $this->assertFalse($result->isSuccess());
         $this->assertEquals('Nie odnaleziono wybranego punktu Parelstation', $result->getErrorMessage());
@@ -309,7 +309,7 @@ class ShipmentCreationServiceTest extends TestCase
         $apiResult = new CreateShipmentResult(true, false, 'NEW_999');
         $this->clientStub->method('createShipment')->willReturn($apiResult);
 
-        $result = $this->service->recreateShipment($entityId, $shipmentData, 'sandbox');
+        $result = $this->service->recreateShipment($entityId, $shipmentData);
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('NEW_999', $result->getShipmentId());
@@ -360,7 +360,6 @@ class ShipmentCreationServiceTest extends TestCase
             ->method('createReturnShipment')
             ->with(
                 returnShipmentData: $returnShipmentDataStub,
-                environment: 'sandbox',
                 expirationDays: 14,
                 primaryWaybillNumber: '90039521201',
                 originalEntityId: 42
@@ -383,7 +382,7 @@ class ShipmentCreationServiceTest extends TestCase
             $this->payloadReaderStub
         );
 
-        $result = $serviceWithReturn->createShipment($shipmentData, 'sandbox');
+        $result = $serviceWithReturn->createShipment($shipmentData);
         $this->assertTrue($result->isSuccess());
     }
 
@@ -430,7 +429,6 @@ class ShipmentCreationServiceTest extends TestCase
             ->method('createReturnShipment')
             ->with(
                 $returnShipmentDataStub,
-                'sandbox',
                 14,
                 '90039521202',
                 10
@@ -453,7 +451,7 @@ class ShipmentCreationServiceTest extends TestCase
             $this->payloadReaderStub
         );
 
-        $result = $serviceWithReturn->recreateShipment(10, $shipmentData, 'sandbox');
+        $result = $serviceWithReturn->recreateShipment(10, $shipmentData);
         $this->assertTrue($result->isSuccess());
     }
 
@@ -475,7 +473,7 @@ class ShipmentCreationServiceTest extends TestCase
         $this->expectException(\Magento\Framework\Exception\LocalizedException::class);
         $this->expectExceptionMessage('A DHL shipment has already been created for order #100.');
 
-        $this->service->createShipment($shipmentData, 'sandbox');
+        $this->service->createShipment($shipmentData);
     }
 
     /**
@@ -537,7 +535,7 @@ class ShipmentCreationServiceTest extends TestCase
             $this->payloadReaderStub
         );
 
-        $result = $serviceWithMockClient->createShipment($shipmentData, 'sandbox');
+        $result = $serviceWithMockClient->createShipment($shipmentData);
         $this->assertTrue($result->isSuccess());
     }
 
@@ -588,7 +586,7 @@ class ShipmentCreationServiceTest extends TestCase
             new \Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader($serializer)
         );
 
-        $result = $service->recreateShipment($entityId, $shipmentData, 'sandbox');
+        $result = $service->recreateShipment($entityId, $shipmentData);
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('999888777', $result->getShipmentId());

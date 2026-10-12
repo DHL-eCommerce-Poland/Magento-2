@@ -13,7 +13,6 @@ use InvalidArgumentException;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
@@ -32,7 +31,6 @@ class Save extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param ShipmentCreationService $shipmentCreationService
-     * @param ScopeConfigInterface $scopeConfig
      * @param JsonFactory $jsonFactory
      * @param SerializerInterface $serializer
      * @param TimezoneInterface $timezone
@@ -43,7 +41,6 @@ class Save extends Action implements HttpPostActionInterface
     public function __construct(
         Context $context,
         private readonly ShipmentCreationService $shipmentCreationService,
-        private readonly ScopeConfigInterface $scopeConfig,
         private readonly JsonFactory $jsonFactory,
         private readonly SerializerInterface $serializer,
         private readonly TimezoneInterface $timezone,
@@ -168,20 +165,14 @@ class Save extends Action implements HttpPostActionInterface
         try {
             $shipmentData = DhlShipmentData::fromArray($payload);
 
-            // 1. Resolve environment configuration (sandbox vs production)
-            $isSandbox = (bool) $this->scopeConfig->getValue('carriers/dhlpoland/sandbox');
-            $environment = $isSandbox ? 'sandbox' : 'production';
-
             if ($entityId > 0) {
                 $dispatchResult = $this->shipmentCreationService->recreateShipment(
                     $entityId,
-                    $shipmentData,
-                    $environment
+                    $shipmentData
                 );
             } else {
                 $dispatchResult = $this->shipmentCreationService->createShipment(
-                    $shipmentData,
-                    $environment
+                    $shipmentData
                 );
             }
 

@@ -12,11 +12,9 @@ use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\GetEpodResult;
 use Ideo\Dhl\Model\Api\GetScanResult;
 use Ideo\Dhl\Model\Shipment\DocumentDownloadService;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem;
 use Magento\Shipping\Model\Shipping\LabelGenerator;
-
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -35,10 +33,6 @@ class DocumentDownloadServiceTest extends TestCase
      * @var Stub
      */
     private $credentialsProviderStub;
-    /**
-     * @var Stub
-     */
-    private $scopeConfigStub;
     /**
      * @var Stub
      */
@@ -61,7 +55,6 @@ class DocumentDownloadServiceTest extends TestCase
         $this->repositoryStub = $this->createStub(ShipmentDataRepositoryInterface::class);
         $this->clientStub = $this->createStub(ClientInterface::class);
         $this->credentialsProviderStub = $this->createStub(CredentialsProvider::class);
-        $this->scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $this->filesystemStub = $this->createStub(Filesystem::class);
         $this->labelGeneratorStub = $this->createStub(LabelGenerator::class);
         $this->loggerStub = $this->createStub(LoggerInterface::class);
@@ -73,7 +66,6 @@ class DocumentDownloadServiceTest extends TestCase
             $this->repositoryStub,
             $this->clientStub,
             $this->credentialsProviderStub,
-            $this->scopeConfigStub,
             $this->filesystemStub,
             $this->labelGeneratorStub,
             $this->loggerStub

@@ -150,4 +150,52 @@ class CredentialsProviderTest extends TestCase
         $this->assertEquals('decrypted_pass', $credentials->getPassword());
         $this->assertFalse($credentials->isSandbox());
     }
+
+    /**
+     * Test that getCredentials resolves configured sandbox when environment is null.
+     *
+     * @return void
+     */
+    public function testGetCredentialsResolvesConfiguredSandboxWhenEnvironmentIsNull(): void
+    {
+        $this->scopeConfigMock->expects(self::exactly(3))
+            ->method('getValue')
+            ->willReturnCallback(fn(string $path) => match ($path) {
+                'carriers/dhlpoland/sandbox' => '1',
+                'carriers/dhlpoland/api_login_sandbox' => 'sb_user',
+                'carriers/dhlpoland/api_password_sandbox' => 'sb_pass',
+                default => null,
+            });
+        $this->encryptorMock->expects(self::never())->method('decrypt');
+
+        $credentials = $this->credentialsProvider->getCredentials();
+
+        $this->assertEquals('sb_user', $credentials->getUsername());
+        $this->assertEquals('sb_pass', $credentials->getPassword());
+        $this->assertTrue($credentials->isSandbox());
+    }
+
+    /**
+     * Test that getCredentials resolves configured production when environment is null.
+     *
+     * @return void
+     */
+    public function testGetCredentialsResolvesConfiguredProductionWhenEnvironmentIsNull(): void
+    {
+        $this->scopeConfigMock->expects(self::exactly(3))
+            ->method('getValue')
+            ->willReturnCallback(fn(string $path) => match ($path) {
+                'carriers/dhlpoland/sandbox' => '0',
+                'carriers/dhlpoland/api_login' => 'prod_user',
+                'carriers/dhlpoland/api_password' => 'prod_pass',
+                default => null,
+            });
+        $this->encryptorMock->expects(self::never())->method('decrypt');
+
+        $credentials = $this->credentialsProvider->getCredentials();
+
+        $this->assertEquals('prod_user', $credentials->getUsername());
+        $this->assertEquals('prod_pass', $credentials->getPassword());
+        $this->assertFalse($credentials->isSandbox());
+    }
 }

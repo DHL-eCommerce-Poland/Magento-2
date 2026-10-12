@@ -9,7 +9,6 @@ use Ideo\Dhl\Model\Shipment\CourierBookingService;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Psr\Log\LoggerInterface;
@@ -22,14 +21,12 @@ class BookCourier extends Action implements HttpPostActionInterface
      * @param Context $context
      * @param JsonFactory $jsonFactory
      * @param CourierBookingService $courierBookingService
-     * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         private readonly JsonFactory $jsonFactory,
         private readonly CourierBookingService $courierBookingService,
-        private readonly ScopeConfigInterface $scopeConfig,
         private readonly LoggerInterface $logger
     ) {
         parent::__construct($context);
@@ -65,15 +62,12 @@ class BookCourier extends Action implements HttpPostActionInterface
                 ]);
             }
 
-            $environment = (string) $this->scopeConfig->getValue('carriers/dhlpoland/environment') ?: 'sandbox';
-
             $bookingResult = $this->courierBookingService->bookCourier(
                 $shipmentIds,
                 $pickupDate,
                 $pickupTimeFrom,
                 $pickupTimeTo,
-                $additionalInfo,
-                $environment
+                $additionalInfo
             );
 
             if ($bookingResult->isSuccess()) {

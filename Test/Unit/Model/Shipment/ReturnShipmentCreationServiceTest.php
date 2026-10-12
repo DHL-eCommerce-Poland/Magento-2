@@ -114,7 +114,6 @@ class ReturnShipmentCreationServiceTest extends TestCase
         $credentials = new Credentials('user', 'pass', true);
         $this->credentialsProviderMock->expects($this->once())
             ->method('getCredentials')
-            ->with('sandbox')
             ->willReturn($credentials);
 
         $this->returnMapperMock->expects($this->once())
@@ -146,7 +145,6 @@ class ReturnShipmentCreationServiceTest extends TestCase
 
         $result = $this->service->createReturnShipment(
             returnShipmentData: $shipmentData,
-            environment: 'sandbox',
             expirationDays: 14,
             primaryWaybillNumber: 'WAYBILL_ORIG',
             originalEntityId: 505
@@ -222,7 +220,6 @@ class ReturnShipmentCreationServiceTest extends TestCase
 
         $result = $this->service->createReturnShipment(
             returnShipmentData: $shipmentData,
-            environment: 'sandbox',
             expirationDays: 14,
             primaryWaybillNumber: 'ORIG_WAYBILL',
             originalEntityId: 707

@@ -8,27 +8,22 @@ use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
 use Ideo\Dhl\Model\Api\ClientInterface;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\TrackingResult;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
 class ShipmentTrackingService
 {
-    private const XML_PATH_SANDBOX = 'carriers/dhlpoland/sandbox';
-
     /**
      * @param ShipmentDataRepositoryInterface $shipmentDataRepository
      * @param ClientInterface $client
      * @param CredentialsProvider $credentialsProvider
-     * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
         private readonly ClientInterface $client,
         private readonly CredentialsProvider $credentialsProvider,
-        private readonly ScopeConfigInterface $scopeConfig,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -52,9 +47,7 @@ class ShipmentTrackingService
             );
         }
 
-        $isSandbox = (bool) $this->scopeConfig->getValue(self::XML_PATH_SANDBOX);
-        $environment = $isSandbox ? 'sandbox' : 'production';
-        $credentials = $this->credentialsProvider->getCredentials($environment);
+        $credentials = $this->credentialsProvider->getCredentials();
 
         $result = $this->client->getTrackAndTraceInfo($credentials, $shipmentId);
 

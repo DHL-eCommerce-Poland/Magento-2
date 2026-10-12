@@ -6,7 +6,6 @@ namespace Ideo\Dhl\Model\Shipment;
 
 use Exception;
 use Ideo\Dhl\Model\Api\ClientInterface;
-
 use Ideo\Dhl\Model\Api\CreateShipmentReturnResult;
 use Ideo\Dhl\Model\Api\CredentialsProvider;
 use Ideo\Dhl\Model\Api\ShipmentReturnDataMapper;
@@ -48,17 +47,15 @@ class ReturnShipmentCreationService
      * Saves return shipment entity to DB only upon API success.
      *
      * @param DhlShipmentData $returnShipmentData
-     * @param string $environment ('sandbox' or 'production')
-     * @param int $expirationDays Days until return label expires (default 14)
-     * @param string|null $primaryWaybillNumber Waybill of outgoing shipment if linking
-     * @param int|null $originalEntityId DB entity ID of original outgoing shipment
+     * @param int $expirationDays
+     * @param string|null $primaryWaybillNumber
+     * @param int|null $originalEntityId
      *
      * @return CreateShipmentReturnResult
      * @throws LocalizedException
      */
     public function createReturnShipment(
         DhlShipmentData $returnShipmentData,
-        string $environment = 'sandbox',
         int $expirationDays = ShipmentSettingsData::DEFAULT_RETURN_LABEL_EXP_DAYS,
         ?string $primaryWaybillNumber = null,
         ?int $originalEntityId = null
@@ -78,7 +75,7 @@ class ReturnShipmentCreationService
             $this->validator->validate($returnShipmentData);
 
             // 2. Prepare credentials and map payload for createShipmentReturn
-            $credentials = $this->credentialsProvider->getCredentials($environment);
+            $credentials = $this->credentialsProvider->getCredentials();
             $mappedData = $this->returnMapper->map($returnShipmentData, $expirationDays, $primaryWaybillNumber);
 
             // 3. Dispatch to DHL WebAPI2 (createShipmentReturn)
