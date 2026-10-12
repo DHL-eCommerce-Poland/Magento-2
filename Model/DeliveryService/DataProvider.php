@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\DeliveryService;
+namespace DhlPoland\Dhl\Model\DeliveryService;
 
-use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory;
-use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
+use DhlPoland\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory;
+use DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use InvalidArgumentException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\DeliveryService;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\DeliveryService;
 
-use Ideo\Dhl\Api\Data\DeliveryServiceInterfaceFactory;
-use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
-use Ideo\Dhl\Controller\Adminhtml\DeliveryService\Save;
-use Ideo\Dhl\Model\DeliveryService;
+use DhlPoland\Dhl\Api\Data\DeliveryServiceInterfaceFactory;
+use DhlPoland\Dhl\Api\DeliveryServiceRepositoryInterface;
+use DhlPoland\Dhl\Controller\Adminhtml\DeliveryService\Save;
+use DhlPoland\Dhl\Model\DeliveryService;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\Controller\Result\Redirect;

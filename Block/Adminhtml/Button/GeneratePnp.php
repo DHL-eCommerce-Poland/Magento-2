@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Block\Adminhtml\Button;
+namespace DhlPoland\Dhl\Block\Adminhtml\Button;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
@@ -21,11 +21,11 @@ class GeneratePnp extends Generic implements ButtonProviderInterface
             'label' => __('Generate PNP Report'),
             'class' => 'action-secondary',
             'on_click' => "require(['jquery'], function($) {
-                var modal = $('#ideo-dhl-pnp-modal');
+                var modal = $('#dhlpoland-pnp-modal');
                 if (modal.length && modal.data('mageModal')) {
                     modal.modal('openModal');
-                } else if (window.IdeoDhlPnp && typeof window.IdeoDhlPnp.openModal === 'function') {
-                    window.IdeoDhlPnp.openModal();
+                } else if (window.DhlPolandPnp && typeof window.DhlPolandPnp.openModal === 'function') {
+                    window.DhlPolandPnp.openModal();
                 } else {
                     alert('" . $loadingMsg . "');
                 }

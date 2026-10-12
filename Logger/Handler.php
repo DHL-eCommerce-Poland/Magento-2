@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Logger;
+namespace DhlPoland\Dhl\Logger;
 
 use Magento\Framework\Logger\Handler\Base;
 use Monolog\Level;

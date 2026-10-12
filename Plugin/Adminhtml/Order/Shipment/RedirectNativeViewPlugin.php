@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Plugin\Adminhtml\Order\Shipment;
+namespace DhlPoland\Dhl\Plugin\Adminhtml\Order\Shipment;
 
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
+use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
 use Magento\Backend\App\Action as BackendAction;
 use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\App\RequestInterface;

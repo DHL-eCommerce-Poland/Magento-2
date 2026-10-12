@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\ViewModel\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\ViewModel\Adminhtml\Shipment;
 
 use DateTime;
-use Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig;
+use DhlPoland\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig;
 use IntlDateFormatter;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\MockObject\MockObject;

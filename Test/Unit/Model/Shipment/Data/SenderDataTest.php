@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment\Data;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment\Data;
 
-use Ideo\Dhl\Model\Shipment\Data\SenderData;
+use DhlPoland\Dhl\Model\Shipment\Data\SenderData;
 use PHPUnit\Framework\TestCase;
 
 class SenderDataTest extends TestCase

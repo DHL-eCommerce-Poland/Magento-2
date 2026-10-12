@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Block\Adminhtml\Button;
+namespace DhlPoland\Dhl\Test\Unit\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Block\Adminhtml\Button\Delete;
+use DhlPoland\Dhl\Block\Adminhtml\Button\Delete;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Escaper;

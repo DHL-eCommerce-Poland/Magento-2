@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 // phpcs:disable Generic.Files.LineLength.TooLong
 
-namespace Ideo\Dhl\Model\Shipment;
+namespace DhlPoland\Dhl\Model\Shipment;
 
-use Ideo\Dhl\Model\Carrier;
-use Ideo\Dhl\Model\Config\Source\InternationalMapPointType;
-use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\Shipment\Data\PackageData;
-use Ideo\Dhl\Model\Shipment\Data\RecipientData;
-use Ideo\Dhl\Model\Shipment\Data\SenderData;
-use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
-use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
-use Ideo\Dhl\Model\Template\TemplateVariableResolver;
+use DhlPoland\Dhl\Model\Carrier;
+use DhlPoland\Dhl\Model\Config\Source\InternationalMapPointType;
+use DhlPoland\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\Shipment\Data\PackageData;
+use DhlPoland\Dhl\Model\Shipment\Data\RecipientData;
+use DhlPoland\Dhl\Model\Shipment\Data\SenderData;
+use DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData;
+use DhlPoland\Dhl\Model\Shipment\Data\SpecialServicesData;
+use DhlPoland\Dhl\Model\Template\TemplateVariableResolver;
 use InvalidArgumentException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\SerializerInterface;

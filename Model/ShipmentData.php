@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model;
+namespace DhlPoland\Dhl\Model;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
 use Throwable;
@@ -19,7 +19,7 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
      */
     protected function _construct(): void
     {
-        $this->_init(\Ideo\Dhl\Model\ResourceModel\ShipmentData::class);
+        $this->_init(\DhlPoland\Dhl\Model\ResourceModel\ShipmentData::class);
     }
 
     /**

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Api;
+namespace DhlPoland\Dhl\Test\Unit\Model\Api;
 
-use Ideo\Dhl\Model\Api\ShipmentReturnDataMapper;
-use Ideo\Dhl\Model\Shipment\Data\PackageData;
-use Ideo\Dhl\Model\Shipment\Data\RecipientData;
-use Ideo\Dhl\Model\Shipment\Data\SenderData;
-use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
-use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
-use Ideo\Dhl\Model\Shipment\DhlShipmentData;
+use DhlPoland\Dhl\Model\Api\ShipmentReturnDataMapper;
+use DhlPoland\Dhl\Model\Shipment\Data\PackageData;
+use DhlPoland\Dhl\Model\Shipment\Data\RecipientData;
+use DhlPoland\Dhl\Model\Shipment\Data\SenderData;
+use DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData;
+use DhlPoland\Dhl\Model\Shipment\Data\SpecialServicesData;
+use DhlPoland\Dhl\Model\Shipment\DhlShipmentData;
 use PHPUnit\Framework\TestCase;
 
 class ShipmentReturnDataMapperTest extends TestCase
@@ -27,7 +27,7 @@ class ShipmentReturnDataMapperTest extends TestCase
 
         $this->mapper = new ShipmentReturnDataMapper(
             $timezoneStub,
-            new \Ideo\Dhl\Model\Shipment\PostalCodeSanitizer()
+            new \DhlPoland\Dhl\Model\Shipment\PostalCodeSanitizer()
         );
     }
 

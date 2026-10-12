@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Config\Source;
+namespace DhlPoland\Dhl\Test\Unit\Model\Config\Source;
 
-use Ideo\Dhl\Model\Config\Source\DropOffPoint;
-use Ideo\Dhl\Model\DropOffPoint as DropOffPointModel;
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint\Collection;
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory;
+use DhlPoland\Dhl\Model\Config\Source\DropOffPoint;
+use DhlPoland\Dhl\Model\DropOffPoint as DropOffPointModel;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory;
 use PHPUnit\Framework\TestCase;
 
 class DropOffPointTest extends TestCase
@@ -20,15 +20,15 @@ class DropOffPointTest extends TestCase
         $item1 = $this->createStub(DropOffPointModel::class);
         $item1->method('getTemplateName')->willReturn('Main Warehouse');
         $item1->method('getCity')->willReturn('Warszawa');
-        $item1->method('getStreet')->willReturn('Nad Przyrwą 13');
+        $item1->method('getStreet')->willReturn('Osmańska 2');
         $item1->method('getIsDefault')->willReturn(true);
         $item1->method('getEntityId')->willReturn(1);
 
         $item2 = $this->createStub(DropOffPointModel::class);
         $item2->method('getTemplateName')->willReturn('');
-        $item2->method('getSenderName')->willReturn('Ideo Sp. z o.o.');
-        $item2->method('getCity')->willReturn('Rzeszów');
-        $item2->method('getStreet')->willReturn('Rejtana 1');
+        $item2->method('getSenderName')->willReturn('DHL eCommerce Poland');
+        $item2->method('getCity')->willReturn('Poznań');
+        $item2->method('getStreet')->willReturn('Magazynowa 1');
         $item2->method('getIsDefault')->willReturn(false);
         $item2->method('getEntityId')->willReturn(2);
 
@@ -41,8 +41,8 @@ class DropOffPointTest extends TestCase
 
         $this->assertCount(2, $options);
         $this->assertEquals('1', $options[0]['value']);
-        $this->assertEquals('Main Warehouse (Warszawa, Nad Przyrwą 13) *', $options[0]['label']);
+        $this->assertEquals('Main Warehouse (Warszawa, Osmańska 2) *', $options[0]['label']);
         $this->assertEquals('2', $options[1]['value']);
-        $this->assertEquals('Ideo Sp. z o.o. (Rzeszów, Rejtana 1)', $options[1]['label']);
+        $this->assertEquals('DHL eCommerce Poland (Poznań, Magazynowa 1)', $options[1]['label']);
     }
 }

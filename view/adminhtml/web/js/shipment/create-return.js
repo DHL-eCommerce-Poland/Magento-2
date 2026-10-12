@@ -2,7 +2,7 @@ define([
     'jquery',
     'Magento_Ui/js/modal/confirm',
     'Magento_Ui/js/modal/alert',
-    'Ideo_Dhl/js/utils/safe-message-content',
+    'DhlPoland_Dhl/js/utils/safe-message-content',
     'mage/translate',
     'mage/loader'
 ], function ($, confirm, alert, createSafeMessageContent, $t) {

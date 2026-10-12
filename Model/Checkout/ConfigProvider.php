@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 // phpcs:disable Generic.Files.LineLength.TooLong
 
-namespace Ideo\Dhl\Model\Checkout;
+namespace DhlPoland\Dhl\Model\Checkout;
 
-use Ideo\Dhl\Model\Carrier;
-use Ideo\Dhl\Model\Config\Source\MapPointType;
-use Ideo\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\Carrier;
+use DhlPoland\Dhl\Model\Config\Source\MapPointType;
+use DhlPoland\Dhl\Model\MethodCatalog;
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -113,17 +113,17 @@ class ConfigProvider implements ConfigProviderInterface
                     'debug' => $debug,
                     'selectedPoint' => $this->getQuoteSelectedPoint(),
                     'logos' => [
-                        $economyAllPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box_pop.png'),
-                        $economyAllCodPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box_pop.png'),
-                        $economyPopPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_pop.png'),
-                        $economyPopCodPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_pop.png'),
-                        $economyBoxPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box.png'),
-                        $economyBoxCodPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl_box.png'),
-                        $connectParcelshopPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
-                        $connectParcelshopCodPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
-                        $connectPackstationPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
-                        $connectPackstationCodPrefixed => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
-                        'default' => $this->assetRepository->getUrl('Ideo_Dhl::images/logo_dhl.png'),
+                        $economyAllPrefixed => $this->assetRepository->getUrl('DhlPoland_Dhl::images/logo_dhl_box_pop.png'),
+                        $economyAllCodPrefixed => $this->assetRepository->getUrl('DhlPoland_Dhl::images/logo_dhl_box_pop.png'),
+                        $economyPopPrefixed => $this->assetRepository->getUrl('DhlPoland_Dhl::images/logo_dhl_pop.png'),
+                        $economyPopCodPrefixed => $this->assetRepository->getUrl('DhlPoland_Dhl::images/logo_dhl_pop.png'),
+                        $economyBoxPrefixed => $this->assetRepository->getUrl('DhlPoland_Dhl::images/logo_dhl_box.png'),
+                        $economyBoxCodPrefixed => $this->assetRepository->getUrl('DhlPoland_Dhl::images/logo_dhl_box.png'),
+                        $connectParcelshopPrefixed => $this->assetRepository->getUrl('DhlPoland_Dhl::images/logo_dhl.png'),
+                        $connectParcelshopCodPrefixed => $this->assetRepository->getUrl('DhlPoland_Dhl::images/logo_dhl.png'),
+                        $connectPackstationPrefixed => $this->assetRepository->getUrl('DhlPoland_Dhl::images/logo_dhl.png'),
+                        $connectPackstationCodPrefixed => $this->assetRepository->getUrl('DhlPoland_Dhl::images/logo_dhl.png'),
+                        'default' => $this->assetRepository->getUrl('DhlPoland_Dhl::images/logo_dhl.png'),
                     ],
                     'pointMethods' => [
                         $economyAllPrefixed,

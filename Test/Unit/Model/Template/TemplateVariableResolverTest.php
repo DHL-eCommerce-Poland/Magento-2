@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Template;
+namespace DhlPoland\Dhl\Test\Unit\Model\Template;
 
-use Ideo\Dhl\Model\Template\TemplateVariableResolver;
+use DhlPoland\Dhl\Model\Template\TemplateVariableResolver;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use PHPUnit\Framework\TestCase;

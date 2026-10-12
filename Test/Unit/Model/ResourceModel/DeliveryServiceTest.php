@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\ResourceModel;
+namespace DhlPoland\Dhl\Test\Unit\Model\ResourceModel;
 
-use Ideo\Dhl\Model\ResourceModel\DeliveryService;
+use DhlPoland\Dhl\Model\ResourceModel\DeliveryService;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Model\ResourceModel\Db\Context;

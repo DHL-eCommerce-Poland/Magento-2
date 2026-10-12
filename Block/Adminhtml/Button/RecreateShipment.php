@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Block\Adminhtml\Button;
+namespace DhlPoland\Dhl\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
+use DhlPoland\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
@@ -55,7 +55,7 @@ class RecreateShipment extends Generic implements ButtonProviderInterface
             'label' => __('Save & Resend to DHL'),
             'class' => 'save primary',
             'on_click' => sprintf(
-                "require(['Ideo_Dhl/js/shipment/recreate-shipment'], function(recreateShipment) {
+                "require(['DhlPoland_Dhl/js/shipment/recreate-shipment'], function(recreateShipment) {
                     recreateShipment('%s', '%s', '%s');
                 });",
                 $safeTitle,

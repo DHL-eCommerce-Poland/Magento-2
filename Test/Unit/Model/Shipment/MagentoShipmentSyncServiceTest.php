@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment;
 
-use Ideo\Dhl\Model\Carrier;
-use Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService;
+use DhlPoland\Dhl\Model\Carrier;
+use DhlPoland\Dhl\Model\Shipment\MagentoShipmentSyncService;
 use Magento\Framework\DB\Transaction;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;

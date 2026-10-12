@@ -5,7 +5,7 @@
         <referenceContainer name="content">
             <block class="Magento\Framework\View\Element\Template"
                    name="dhl.clear.service.point"
-                   template="Ideo_Dhl::clear_service_point.phtml"/>
+                   template="DhlPoland_Dhl::clear_service_point.phtml"/>
         </referenceContainer>
     </body>
 </page>

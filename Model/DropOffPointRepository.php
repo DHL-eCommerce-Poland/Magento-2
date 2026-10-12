@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model;
+namespace DhlPoland\Dhl\Model;
 
 use Exception;
-use Ideo\Dhl\Api\Data\DropOffPointInterface;
-use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint as DropOffPointResource;
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory;
+use DhlPoland\Dhl\Api\Data\DropOffPointInterface;
+use DhlPoland\Dhl\Api\DropOffPointRepositoryInterface;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint as DropOffPointResource;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResultsInterface;

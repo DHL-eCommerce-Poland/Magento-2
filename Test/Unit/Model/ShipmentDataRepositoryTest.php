@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model;
+namespace DhlPoland\Dhl\Test\Unit\Model;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Model\ResourceModel\ShipmentData as ShipmentDataResource;
-use Ideo\Dhl\Model\ResourceModel\ShipmentData\Collection;
-use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
-use Ideo\Dhl\Model\ShipmentDataFactory;
-use Ideo\Dhl\Model\ShipmentDataRepository;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData as ShipmentDataResource;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
+use DhlPoland\Dhl\Model\ShipmentDataFactory;
+use DhlPoland\Dhl\Model\ShipmentDataRepository;
 use Magento\Framework\Api\CriteriaInterface;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchResultsInterfaceFactory;

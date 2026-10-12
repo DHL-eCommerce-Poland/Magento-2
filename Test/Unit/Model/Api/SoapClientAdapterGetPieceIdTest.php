@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Api;
+namespace DhlPoland\Dhl\Test\Unit\Model\Api;
 
-use Ideo\Dhl\Model\Api\Credentials;
-use Ideo\Dhl\Model\Api\SoapClientAdapter;
-use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
+use DhlPoland\Dhl\Model\Api\Credentials;
+use DhlPoland\Dhl\Model\Api\SoapClientAdapter;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\TestCase;

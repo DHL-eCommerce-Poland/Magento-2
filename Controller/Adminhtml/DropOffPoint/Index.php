@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\DropOffPoint;
+namespace DhlPoland\Dhl\Controller\Adminhtml\DropOffPoint;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -12,7 +12,7 @@ use Magento\Framework\View\Result\PageFactory;
 
 class Index extends Action implements HttpGetActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::drop_off_point';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::drop_off_point';
 
     /**
      * @param Context $context
@@ -33,7 +33,7 @@ class Index extends Action implements HttpGetActionInterface
     public function execute(): Page
     {
         $resultPage = $this->resultPageFactory->create();
-        $resultPage->setActiveMenu('Ideo_Dhl::drop_off_point');
+        $resultPage->setActiveMenu('DhlPoland_Dhl::drop_off_point');
         $resultPage->getConfig()->getTitle()->prepend(__('Drop-Off Point Templates'));
         return $resultPage;
     }

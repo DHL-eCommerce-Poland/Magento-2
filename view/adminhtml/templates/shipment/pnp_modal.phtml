@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 // phpcs:disable Generic.Files.LineLength.TooLong
 
-use Ideo\Dhl\Model\Config\Source\PnpPackageType;
-use Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig;
+use DhlPoland\Dhl\Model\Config\Source\PnpPackageType;
+use DhlPoland\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\Template;
 
@@ -22,8 +22,8 @@ $generateUrl = $block->getUrl('dhlpoland/shipment/generatePnpReport');
 $pnpPackageTypeSource = $block->getData('pnp_package_type_source') ?? new PnpPackageType();
 $packageTypeOptions = $pnpPackageTypeSource->toOptionArray();
 ?>
-<div id="ideo-dhl-pnp-modal" class="dhl-modal-hidden" data-bind="scope: 'dhlPnpModal'">
-    <form id="ideo-dhl-pnp-form" action="<?= $escaper->escapeUrl($generateUrl) ?>" method="post">
+<div id="dhlpoland-pnp-modal" class="dhl-modal-hidden" data-bind="scope: 'dhlPnpModal'">
+    <form id="dhlpoland-pnp-form" action="<?= $escaper->escapeUrl($generateUrl) ?>" method="post">
         <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>" />
         <div class="admin__fieldset dhl-fieldset-no-margin">
 
@@ -53,11 +53,11 @@ $packageTypeOptions = $pnpPackageTypeSource->toOptionArray();
 
 <script type="text/x-magento-init">
 {
-    "#ideo-dhl-pnp-modal": {
+    "#dhlpoland-pnp-modal": {
         "Magento_Ui/js/core/app": {
             "components": {
                 "dhlPnpModal": {
-                    "component": "Ideo_Dhl/js/shipment/pnp-modal",
+                    "component": "DhlPoland_Dhl/js/shipment/pnp-modal",
                     "generateUrl": "<?= $escaper->escapeUrl($generateUrl) ?>",
                     "dateFormat": "<?= $escaper->escapeJs($dateFormat) ?>"
                 }

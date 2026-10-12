@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model;
+namespace DhlPoland\Dhl\Test\Unit\Model;
 
 use Exception;
-use Ideo\Dhl\Model\CustomsTemplate;
-use Ideo\Dhl\Model\CustomsTemplateFactory;
-use Ideo\Dhl\Model\CustomsTemplateRepository;
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate as CustomsTemplateResource;
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Collection;
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory;
+use DhlPoland\Dhl\Model\CustomsTemplate;
+use DhlPoland\Dhl\Model\CustomsTemplateFactory;
+use DhlPoland\Dhl\Model\CustomsTemplateRepository;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate as CustomsTemplateResource;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;

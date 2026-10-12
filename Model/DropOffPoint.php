@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model;
+namespace DhlPoland\Dhl\Model;
 
-use Ideo\Dhl\Api\Data\DropOffPointInterface;
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint as DropOffPointResource;
+use DhlPoland\Dhl\Api\Data\DropOffPointInterface;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint as DropOffPointResource;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
 

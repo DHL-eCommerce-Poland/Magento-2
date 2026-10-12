@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Shipment\Data;
+namespace DhlPoland\Dhl\Model\Shipment\Data;
 
 class SenderData
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Plugin\Adminhtml\Order\View;
+namespace DhlPoland\Dhl\Test\Unit\Plugin\Adminhtml\Order\View;
 
-use Ideo\Dhl\Plugin\Adminhtml\Order\View\AddDhlPrepareButtonPlugin;
+use DhlPoland\Dhl\Plugin\Adminhtml\Order\View\AddDhlPrepareButtonPlugin;
 use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\Serialize\Serializer\JsonHexTag;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -32,7 +32,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
     private $orderRepository;
 
     /**
-     * @var \Ideo\Dhl\Api\ShipmentDataRepositoryInterface
+     * @var \DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface
      */
     private $shipmentDataRepository;
 
@@ -46,7 +46,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
         $this->urlBuilder = $this->createStub(UrlInterface::class);
         $this->serializer = new JsonHexTag();
         $this->orderRepository = $this->createStub(OrderRepositoryInterface::class);
-        $this->shipmentDataRepository = $this->createStub(\Ideo\Dhl\Api\ShipmentDataRepositoryInterface::class);
+        $this->shipmentDataRepository = $this->createStub(\DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface::class);
         $this->plugin = new AddDhlPrepareButtonPlugin(
             $this->urlBuilder,
             $this->serializer,
@@ -88,7 +88,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
         $order->method('getState')->willReturn(Order::STATE_PROCESSING);
 
         $this->orderRepository->method('get')->willReturn($order);
-        $existingEntity = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $existingEntity = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $this->shipmentDataRepository->method('getByOrderId')->willReturn($existingEntity);
 
         $block = $this->createMock(OrderViewBlock::class);
@@ -173,7 +173,7 @@ class AddDhlPrepareButtonPluginTest extends TestCase
                 'dhlpoland_prepare_shipment',
                 $this->callback(static function (array $button) use ($safeUrl): bool {
                     return $button['onclick'] === sprintf(
-                        'window.ideoDhlOpenPrepareModal && window.ideoDhlOpenPrepareModal(10, %s)',
+                        'window.dhlPolandOpenPrepareModal && window.dhlPolandOpenPrepareModal(10, %s)',
                         $safeUrl
                     );
                 }),

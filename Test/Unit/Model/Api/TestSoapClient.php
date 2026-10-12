@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Api;
+namespace DhlPoland\Dhl\Test\Unit\Model\Api;
 
 use SoapClient;
 use SoapFault;

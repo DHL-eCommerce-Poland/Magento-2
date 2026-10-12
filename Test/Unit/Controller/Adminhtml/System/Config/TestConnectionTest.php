@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\System\Config;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\System\Config;
 
-use Ideo\Dhl\Controller\Adminhtml\System\Config\TestConnection;
-use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\Credentials;
-use Ideo\Dhl\Model\Api\CredentialsProvider;
-use Ideo\Dhl\Model\Api\TestConnectionResult;
+use DhlPoland\Dhl\Controller\Adminhtml\System\Config\TestConnection;
+use DhlPoland\Dhl\Model\Api\ClientInterface;
+use DhlPoland\Dhl\Model\Api\Credentials;
+use DhlPoland\Dhl\Model\Api\CredentialsProvider;
+use DhlPoland\Dhl\Model\Api\TestConnectionResult;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\Controller\Result\Json;

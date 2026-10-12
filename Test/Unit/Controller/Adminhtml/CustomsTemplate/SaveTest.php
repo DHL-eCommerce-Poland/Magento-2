@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\CustomsTemplate;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\CustomsTemplate;
 
-use Ideo\Dhl\Controller\Adminhtml\CustomsTemplate\Save;
-use Ideo\Dhl\Model\CustomsTemplate;
-use Ideo\Dhl\Model\CustomsTemplateFactory;
-use Ideo\Dhl\Model\CustomsTemplateRepository;
-use Ideo\Dhl\Model\Source\CategoryOfItem;
-use Ideo\Dhl\Model\Source\CustomsCurrency;
-use Ideo\Dhl\Model\Source\CustomsType;
+use DhlPoland\Dhl\Controller\Adminhtml\CustomsTemplate\Save;
+use DhlPoland\Dhl\Model\CustomsTemplate;
+use DhlPoland\Dhl\Model\CustomsTemplateFactory;
+use DhlPoland\Dhl\Model\CustomsTemplateRepository;
+use DhlPoland\Dhl\Model\Source\CategoryOfItem;
+use DhlPoland\Dhl\Model\Source\CustomsCurrency;
+use DhlPoland\Dhl\Model\Source\CustomsType;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\Controller\Result\Redirect;

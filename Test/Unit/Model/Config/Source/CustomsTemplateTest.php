@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Config\Source;
+namespace DhlPoland\Dhl\Test\Unit\Model\Config\Source;
 
 use ArrayIterator;
-use Ideo\Dhl\Model\Config\Source\CustomsTemplate;
-use Ideo\Dhl\Model\CustomsTemplate as CustomsTemplateModel;
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Collection;
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory;
+use DhlPoland\Dhl\Model\Config\Source\CustomsTemplate;
+use DhlPoland\Dhl\Model\CustomsTemplate as CustomsTemplateModel;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory;
 use PHPUnit\Framework\TestCase;
 
 class CustomsTemplateTest extends TestCase

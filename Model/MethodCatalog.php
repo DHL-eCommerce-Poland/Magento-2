@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model;
+namespace DhlPoland\Dhl\Model;
 
-use Ideo\Dhl\Model\Config\Source\InternationalMapPointType;
+use DhlPoland\Dhl\Model\Config\Source\InternationalMapPointType;
 
 class MethodCatalog
 {

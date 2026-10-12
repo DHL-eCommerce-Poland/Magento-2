@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Shipment;
+namespace DhlPoland\Dhl\Model\Shipment;
 
-use Ideo\Dhl\Model\Shipment\Data\RecipientData;
-use Ideo\Dhl\Model\Shipment\Data\SenderData;
-use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
-use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
+use DhlPoland\Dhl\Model\Shipment\Data\RecipientData;
+use DhlPoland\Dhl\Model\Shipment\Data\SenderData;
+use DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData;
+use DhlPoland\Dhl\Model\Shipment\Data\SpecialServicesData;
 
 class ReturnShipmentDataBuilder
 {

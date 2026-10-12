@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model;
+namespace DhlPoland\Dhl\Test\Unit\Model;
 
-use Ideo\Dhl\Model\DeliveryService;
-use Ideo\Dhl\Model\ResourceModel\DeliveryService as DeliveryServiceResource;
+use DhlPoland\Dhl\Model\DeliveryService;
+use DhlPoland\Dhl\Model\ResourceModel\DeliveryService as DeliveryServiceResource;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Model\Context;
 use PHPUnit\Framework\TestCase;
@@ -154,7 +154,7 @@ class DeliveryServiceTest extends TestCase
         $this->model->setReturnLabelExpDays(null);
         $this->assertSame(14, $this->model->getReturnLabelExpDays());
 
-        $this->model->setData(\Ideo\Dhl\Api\Data\DeliveryServiceInterface::RETURN_LABEL_EXP_DAYS, 0);
+        $this->model->setData(\DhlPoland\Dhl\Api\Data\DeliveryServiceInterface::RETURN_LABEL_EXP_DAYS, 0);
         $this->assertSame(14, $this->model->getReturnLabelExpDays());
 
         $this->model->setReturnLabelExpDays(30);
@@ -171,10 +171,10 @@ class DeliveryServiceTest extends TestCase
     public function testBeforeSaveDefaultsReturnLabelExpDaysWhenAutoCreateReturnShipmentIsTrue(): void
     {
         $this->model->setAutoCreateReturnShipment(true);
-        $this->model->setData(\Ideo\Dhl\Api\Data\DeliveryServiceInterface::RETURN_LABEL_EXP_DAYS, 0);
+        $this->model->setData(\DhlPoland\Dhl\Api\Data\DeliveryServiceInterface::RETURN_LABEL_EXP_DAYS, 0);
         $this->model->beforeSave();
 
-        $field = \Ideo\Dhl\Api\Data\DeliveryServiceInterface::RETURN_LABEL_EXP_DAYS;
+        $field = \DhlPoland\Dhl\Api\Data\DeliveryServiceInterface::RETURN_LABEL_EXP_DAYS;
         $this->assertSame(14, $this->model->getData($field));
     }
 }

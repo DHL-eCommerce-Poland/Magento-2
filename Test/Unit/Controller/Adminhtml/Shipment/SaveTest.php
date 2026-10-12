@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
-use Ideo\Dhl\Controller\Adminhtml\Shipment\Save;
-use Ideo\Dhl\Model\Api\CreateShipmentResult;
-use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Ideo\Dhl\Model\Shipment\ShipmentCreationService;
-use Ideo\Dhl\Model\Shipment\ShipmentDataService;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\Save;
+use DhlPoland\Dhl\Model\Api\CreateShipmentResult;
+use DhlPoland\Dhl\Model\Shipment\DhlShipmentData;
+use DhlPoland\Dhl\Model\Shipment\ShipmentCreationService;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataService;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Request\Http;
@@ -101,8 +101,8 @@ class SaveTest extends TestCase
         $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
         $timezoneStub->method('date')->willReturnCallback(fn ($d) => new \DateTime((string)$d));
 
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
-        $shipmentDataValidator = new \Ideo\Dhl\Model\Shipment\ShipmentDataValidator($timezoneStub);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $shipmentDataValidator = new \DhlPoland\Dhl\Model\Shipment\ShipmentDataValidator($timezoneStub);
 
         $this->controller = new Save(
             $this->contextStub,
@@ -284,14 +284,14 @@ class SaveTest extends TestCase
     public function testExecuteReturnsErrorWhenNumericFieldContainsComma(): void
     {
         $timezoneMock = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
-        $validator = new \Ideo\Dhl\Model\Shipment\ShipmentDataValidator($timezoneMock);
+        $validator = new \DhlPoland\Dhl\Model\Shipment\ShipmentDataValidator($timezoneMock);
 
         $serializerStub = $this->createStub(\Magento\Framework\Serialize\SerializerInterface::class);
         $serializerStub->method('unserialize')->willReturnCallback(function ($data) {
             return is_string($data) ? json_decode($data, true) : null;
         });
 
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneMock);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneMock);
 
         $controllerWithValidator = new Save(
             $this->contextStub,
@@ -568,8 +568,8 @@ class SaveTest extends TestCase
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
         $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
         $timezoneStub->method('date')->willReturnCallback(fn ($d) => new \DateTime((string)$d));
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
-        $shipmentDataValidator = new \Ideo\Dhl\Model\Shipment\ShipmentDataValidator($timezoneStub);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $shipmentDataValidator = new \DhlPoland\Dhl\Model\Shipment\ShipmentDataValidator($timezoneStub);
         $serializerStub = $this->createStub(\Magento\Framework\Serialize\SerializerInterface::class);
         $serializerStub->method('unserialize')
             ->willReturnCallback(fn ($d) => is_string($d) ? json_decode($d, true) : null);

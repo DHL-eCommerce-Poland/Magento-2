@@ -1,7 +1,7 @@
 define([
     'Magento_Checkout/js/model/quote',
-    'Ideo_Dhl/js/model/point-state',
-    'Ideo_Dhl/js/model/method-codes',
+    'DhlPoland_Dhl/js/model/point-state',
+    'DhlPoland_Dhl/js/model/method-codes',
     'mage/translate'
 ], function (quote, pointState, methodCodes, $t) {
     'use strict';

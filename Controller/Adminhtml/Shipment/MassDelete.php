@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Controller\Adminhtml\Shipment;
 
 use Exception;
-use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
-use Ideo\Dhl\Model\Shipment\ShipmentDeletionService;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDeletionService;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
 
 class MassDelete extends Action implements HttpPostActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::shipment';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::shipment';
 
     /**
      * @param Context $context

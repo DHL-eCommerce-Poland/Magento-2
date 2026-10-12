@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Plugin\Quote;
+namespace DhlPoland\Dhl\Plugin\Quote;
 
-use Ideo\Dhl\Model\ServicePoint\ServicePointDescriptionFormatter;
-use Ideo\Dhl\Model\ServicePoint\ServicePointValidator;
-use Ideo\Dhl\Model\ServicePoint\ServicePointValueObject;
+use DhlPoland\Dhl\Model\ServicePoint\ServicePointDescriptionFormatter;
+use DhlPoland\Dhl\Model\ServicePoint\ServicePointValidator;
+use DhlPoland\Dhl\Model\ServicePoint\ServicePointValueObject;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Address\ToOrder;
 use Magento\Sales\Model\Order;

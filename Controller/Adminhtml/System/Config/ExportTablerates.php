@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\System\Config;
+namespace DhlPoland\Dhl\Controller\Adminhtml\System\Config;
 
 use Exception;
-use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\TableRateResolver;
+use DhlPoland\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\TableRateResolver;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Response\Http\FileFactory;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\CustomsTemplate;
+namespace DhlPoland\Dhl\Controller\Adminhtml\CustomsTemplate;
 
-use Ideo\Dhl\Model\CustomsTemplateRepository;
+use DhlPoland\Dhl\Model\CustomsTemplateRepository;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -15,7 +15,7 @@ use Magento\Framework\View\Result\PageFactory;
 
 class Edit extends Action implements HttpGetActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::customs_template';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::customs_template';
 
     /**
      * @param Context $context
@@ -39,7 +39,7 @@ class Edit extends Action implements HttpGetActionInterface
     {
         $id = (int)$this->getRequest()->getParam('entity_id');
         $resultPage = $this->resultPageFactory->create();
-        $resultPage->setActiveMenu('Ideo_Dhl::customs_template');
+        $resultPage->setActiveMenu('DhlPoland_Dhl::customs_template');
 
         if ($id) {
             try {

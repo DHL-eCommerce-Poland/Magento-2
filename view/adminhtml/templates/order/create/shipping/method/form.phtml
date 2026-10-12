@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Ideo\Dhl\ViewModel\Adminhtml\Order\Create\ShippingMethodFormViewModel;
+use DhlPoland\Dhl\ViewModel\Adminhtml\Order\Create\ShippingMethodFormViewModel;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
 use Magento\Sales\Block\Adminhtml\Order\Create\Shipping\Method\Form;
@@ -248,7 +248,7 @@ script;
 <?php
 $escapedCountryId = $escaper->escapeJs($countryId);
 $mapInitScript = <<<script
-    require(["jquery", "Ideo_Dhl/js/order/create/dhl-map-point"], function($, dhlMapPoint){
+    require(["jquery", "DhlPoland_Dhl/js/order/create/dhl-map-point"], function($, dhlMapPoint){
         dhlMapPoint(
             { country: "{$escapedCountryId}" },
             $("#order-shipping-method-choose, #order-shipping-method-info")

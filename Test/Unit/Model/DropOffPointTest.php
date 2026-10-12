@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model;
+namespace DhlPoland\Dhl\Test\Unit\Model;
 
-use Ideo\Dhl\Model\DropOffPoint;
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint as DropOffPointResource;
+use DhlPoland\Dhl\Model\DropOffPoint;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint as DropOffPointResource;
 use Magento\Framework\Model\Context;
 use PHPUnit\Framework\TestCase;
 

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Controller\Adminhtml\Shipment;
 
 use Exception;
-use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Ideo\Dhl\Model\Shipment\ShipmentCreationService;
-use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
-use Ideo\Dhl\Model\Shipment\ShipmentDataValidator;
+use DhlPoland\Dhl\Model\Shipment\DhlShipmentData;
+use DhlPoland\Dhl\Model\Shipment\ShipmentCreationService;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataValidator;
 use InvalidArgumentException;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -26,7 +26,7 @@ class Save extends Action implements HttpPostActionInterface
     /**
      * Authorization level of a basic admin session
      */
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::shipment';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::shipment';
 
     /**
      * @param Context $context

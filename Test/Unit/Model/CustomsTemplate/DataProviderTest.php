@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\CustomsTemplate;
+namespace DhlPoland\Dhl\Test\Unit\Model\CustomsTemplate;
 
-use Ideo\Dhl\Model\CustomsTemplate;
-use Ideo\Dhl\Model\CustomsTemplate\DataProvider;
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Collection;
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory;
+use DhlPoland\Dhl\Model\CustomsTemplate;
+use DhlPoland\Dhl\Model\CustomsTemplate\DataProvider;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Serialize\SerializerInterface;
 use PHPUnit\Framework\TestCase;

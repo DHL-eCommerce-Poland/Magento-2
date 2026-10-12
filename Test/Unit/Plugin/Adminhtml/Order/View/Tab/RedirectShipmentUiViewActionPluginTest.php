@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Plugin\Adminhtml\Order\View\Tab;
+namespace DhlPoland\Dhl\Test\Unit\Plugin\Adminhtml\Order\View\Tab;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
-use Ideo\Dhl\Plugin\Adminhtml\Order\View\Tab\RedirectShipmentUiViewActionPlugin;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
+use DhlPoland\Dhl\Plugin\Adminhtml\Order\View\Tab\RedirectShipmentUiViewActionPlugin;
 use Magento\Backend\Model\UrlInterface;
 use Magento\Sales\Ui\Component\Listing\Column\ViewAction;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;

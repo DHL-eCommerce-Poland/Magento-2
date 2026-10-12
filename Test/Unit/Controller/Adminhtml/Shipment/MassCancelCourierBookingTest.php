@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
-use Ideo\Dhl\Controller\Adminhtml\Shipment\MassCancelCourierBooking;
-use Ideo\Dhl\Model\Api\CancelCourierBookingResult;
-use Ideo\Dhl\Model\ResourceModel\ShipmentData\Collection;
-use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
-use Ideo\Dhl\Model\Shipment\CourierBookingCancellationService;
-use Ideo\Dhl\Model\ShipmentData;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\MassCancelCourierBooking;
+use DhlPoland\Dhl\Model\Api\CancelCourierBookingResult;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
+use DhlPoland\Dhl\Model\Shipment\CourierBookingCancellationService;
+use DhlPoland\Dhl\Model\ShipmentData;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;

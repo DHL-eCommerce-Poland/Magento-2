@@ -5,7 +5,7 @@ define([
     'Magento_Ui/js/modal/modal',
     'Magento_Ui/js/modal/alert',
     'mage/translate',
-    'Ideo_Dhl/js/utils/safe-message-content',
+    'DhlPoland_Dhl/js/utils/safe-message-content',
     'mage/loader'
 ], function ($, ko, Component, modal, alert, $t, createSafeMessageContent) {
     'use strict';
@@ -221,11 +221,11 @@ define([
                 self.openModal(ids, numbers);
             };
 
-            window.IdeoDhlBookCourier = {
+            window.DhlPolandBookCourier = {
                 openModal: openHandler
             };
 
-            $('#ideo-dhl-book-courier-modal').data('openBookCourierModal', openHandler);
+            $('#dhlpoland-book-courier-modal').data('openBookCourierModal', openHandler);
 
             return this;
         },
@@ -291,7 +291,7 @@ define([
                 });
             }
 
-            var $modal = $('#ideo-dhl-book-courier-modal');
+            var $modal = $('#dhlpoland-book-courier-modal');
             if (!$modal.data('mageModal')) {
                 $modal.modal({
                     title: $t('Order Courier for DHL Shipments'),
@@ -355,7 +355,7 @@ define([
                 success: function (response) {
                     $('body').trigger('processStop');
                     if (response.success) {
-                        $('#ideo-dhl-book-courier-modal').modal('closeModal');
+                        $('#dhlpoland-book-courier-modal').modal('closeModal');
                         window.location.reload();
                     } else {
                         alert({

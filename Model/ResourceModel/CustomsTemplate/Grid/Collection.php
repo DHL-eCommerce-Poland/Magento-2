@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Grid;
+namespace DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\Grid;
 
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate;
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface;
 use Magento\Framework\Data\Collection\EntityFactoryInterface;
 use Magento\Framework\Event\ManagerInterface;

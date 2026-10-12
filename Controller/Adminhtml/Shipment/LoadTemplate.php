@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Controller\Adminhtml\Shipment;
 
 use Exception;
-use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
-use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
-use Ideo\Dhl\Model\CustomsTemplateRepository;
-use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
-use Ideo\Dhl\Model\Source\CustomsType;
-use Ideo\Dhl\Model\Template\TemplateManager;
-use Ideo\Dhl\Model\Template\TemplateVariableResolver;
+use DhlPoland\Dhl\Api\DeliveryServiceRepositoryInterface;
+use DhlPoland\Dhl\Api\DropOffPointRepositoryInterface;
+use DhlPoland\Dhl\Model\CustomsTemplateRepository;
+use DhlPoland\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData;
+use DhlPoland\Dhl\Model\Source\CustomsType;
+use DhlPoland\Dhl\Model\Template\TemplateManager;
+use DhlPoland\Dhl\Model\Template\TemplateVariableResolver;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
@@ -26,7 +26,7 @@ class LoadTemplate extends Action
     /**
      * Authorization level of a basic admin session
      */
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::shipment';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::shipment';
 
     /**
      * @param Context $context

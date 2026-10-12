@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Api;
+namespace DhlPoland\Dhl\Test\Unit\Model\Api;
 
-use Ideo\Dhl\Model\Api\CancelCourierBookingResult;
+use DhlPoland\Dhl\Model\Api\CancelCourierBookingResult;
 use PHPUnit\Framework\TestCase;
 
 class CancelCourierBookingResultTest extends TestCase

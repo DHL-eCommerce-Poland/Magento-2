@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model;
+namespace DhlPoland\Dhl\Test\Unit\Model;
 
-use Ideo\Dhl\Model\TrackingUrlResolver;
+use DhlPoland\Dhl\Model\TrackingUrlResolver;
 use PHPUnit\Framework\TestCase;
 
 class TrackingUrlResolverTest extends TestCase

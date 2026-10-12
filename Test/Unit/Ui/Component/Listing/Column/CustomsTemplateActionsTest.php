@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Ui\Component\Listing\Column;
+namespace DhlPoland\Dhl\Test\Unit\Ui\Component\Listing\Column;
 
-use Ideo\Dhl\Ui\Component\Listing\Column\CustomsTemplateActions;
+use DhlPoland\Dhl\Ui\Component\Listing\Column\CustomsTemplateActions;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;

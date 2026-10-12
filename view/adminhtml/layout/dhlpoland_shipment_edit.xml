@@ -5,9 +5,9 @@
     <body>
         <referenceContainer name="content">
             <uiComponent name="dhlpoland_shipment_form"/>
-            <block name="dhlpoland_book_courier_modal" template="Ideo_Dhl::shipment/book_courier_modal.phtml">
+            <block name="dhlpoland_book_courier_modal" template="DhlPoland_Dhl::shipment/book_courier_modal.phtml">
                 <arguments>
-                    <argument name="view_model" xsi:type="object">Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig</argument>
+                    <argument name="view_model" xsi:type="object">DhlPoland\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig</argument>
                 </arguments>
             </block>
         </referenceContainer>

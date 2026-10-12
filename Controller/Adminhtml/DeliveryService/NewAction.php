@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\DeliveryService;
+namespace DhlPoland\Dhl\Controller\Adminhtml\DeliveryService;
 
 use Magento\Backend\App\Action;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -11,7 +11,7 @@ use Magento\Framework\Controller\Result\ForwardFactory;
 
 class NewAction extends Action implements HttpGetActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::delivery_service';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::delivery_service';
 
     /**
      * @param Action\Context $context

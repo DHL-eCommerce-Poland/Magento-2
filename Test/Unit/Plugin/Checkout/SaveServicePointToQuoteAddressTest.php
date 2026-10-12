@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Plugin\Checkout;
+namespace DhlPoland\Dhl\Test\Unit\Plugin\Checkout;
 
-use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\ServicePoint\ServicePointValidator;
-use Ideo\Dhl\Plugin\Checkout\SaveServicePointToQuoteAddress;
+use DhlPoland\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\ServicePoint\ServicePointValidator;
+use DhlPoland\Dhl\Plugin\Checkout\SaveServicePointToQuoteAddress;
 use Magento\Checkout\Api\Data\ShippingInformationInterface;
 use Magento\Checkout\Api\ShippingInformationManagementInterface;
 use Magento\Framework\DataObject;

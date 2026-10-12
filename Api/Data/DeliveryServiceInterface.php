@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Api\Data;
+namespace DhlPoland\Dhl\Api\Data;
 
 interface DeliveryServiceInterface
 {

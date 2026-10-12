@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Block\Adminhtml\Button;
+namespace DhlPoland\Dhl\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
+use DhlPoland\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
@@ -43,7 +43,7 @@ class PrintReturnQrCode extends Generic implements ButtonProviderInterface
             'label' => __('Print Return QR Code'),
             'class' => '',
             'on_click' => sprintf(
-                "require(['Ideo_Dhl/js/shipment/download-document'], "
+                "require(['DhlPoland_Dhl/js/shipment/download-document'], "
                 . "function (downloadDocument) { downloadDocument('%s'); });",
                 $this->escapeJs($printUrl)
             ),

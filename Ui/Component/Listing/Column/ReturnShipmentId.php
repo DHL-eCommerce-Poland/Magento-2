@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Ui\Component\Listing\Column;
+namespace DhlPoland\Dhl\Ui\Component\Listing\Column;
 
-use Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataPayloadReader;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;

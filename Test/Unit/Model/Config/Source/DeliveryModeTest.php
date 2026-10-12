@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Config\Source;
+namespace DhlPoland\Dhl\Test\Unit\Model\Config\Source;
 
-use Ideo\Dhl\Model\Config\Source\DeliveryMode;
+use DhlPoland\Dhl\Model\Config\Source\DeliveryMode;
 use PHPUnit\Framework\TestCase;
 
 class DeliveryModeTest extends TestCase

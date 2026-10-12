@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Controller\Adminhtml\Shipment;
 
 use Exception;
-use Ideo\Dhl\Model\Shipment\ShipmentDataService;
-use Ideo\Dhl\Model\Template\TemplateManager;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataService;
+use DhlPoland\Dhl\Model\Template\TemplateManager;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
@@ -19,7 +19,7 @@ class Prepare extends Action
     /**
      * Authorization level of a basic admin session
      */
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::shipment';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::shipment';
 
     /**
      * @param Context $context

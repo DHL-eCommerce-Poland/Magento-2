@@ -179,7 +179,7 @@ define([
 
         var initMessageListener = function () {
             window.addEventListener('message', function (event) {
-                var iframe = document.getElementById('ideo-dhl-admin-order-create-map-iframe');
+                var iframe = document.getElementById('dhlpoland-admin-order-create-map-iframe');
                 if (!event || event.origin !== 'https://parcelshop.dhl.pl' || !iframe
                     || event.source !== iframe.contentWindow || !activeModal || !event.data) {
                     return;
@@ -273,9 +273,9 @@ define([
 
             var iframeUrl = params.length ? baseUrl + '?' + params.join('&') : baseUrl;
 
-            var $modalContainer = $('#ideo-dhl-admin-order-create-map-modal');
+            var $modalContainer = $('#dhlpoland-admin-order-create-map-modal');
             if (!$modalContainer.length) {
-                $modalContainer = $('<div id="ideo-dhl-admin-order-create-map-modal" style="display:none;"><iframe id="ideo-dhl-admin-order-create-map-iframe" style="width:100%; height:80vh; min-height:500px; border:none;"></iframe></div>');
+                $modalContainer = $('<div id="dhlpoland-admin-order-create-map-modal" style="display:none;"><iframe id="dhlpoland-admin-order-create-map-iframe" style="width:100%; height:80vh; min-height:500px; border:none;"></iframe></div>');
                 $('body').append($modalContainer);
             }
 

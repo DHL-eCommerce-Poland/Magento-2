@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\ViewModel\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\ViewModel\Adminhtml\Shipment;
 
 use DateTimeInterface;
 use IntlDateFormatter;

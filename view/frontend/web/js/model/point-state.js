@@ -2,7 +2,7 @@ define([
     'jquery',
     'ko',
     'Magento_Checkout/js/model/quote',
-    'Ideo_Dhl/js/model/method-codes',
+    'DhlPoland_Dhl/js/model/method-codes',
     'mage/translate'
 ], function ($, ko, quote, methodCodes, $t) {
     'use strict';

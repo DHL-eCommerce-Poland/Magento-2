@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Block\Adminhtml\Button;
+namespace DhlPoland\Dhl\Test\Unit\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Block\Adminhtml\Button\GeneratePnp;
+use DhlPoland\Dhl\Block\Adminhtml\Button\GeneratePnp;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +25,6 @@ class GeneratePnpTest extends TestCase
         $this->assertArrayHasKey('class', $data);
         $this->assertArrayHasKey('on_click', $data);
         $this->assertEquals('action-secondary', $data['class']);
-        $this->assertStringContainsString('ideo-dhl-pnp-modal', $data['on_click']);
+        $this->assertStringContainsString('dhlpoland-pnp-modal', $data['on_click']);
     }
 }

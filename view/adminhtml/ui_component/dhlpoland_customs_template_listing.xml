@@ -77,7 +77,7 @@
         </column>
         <column name="customs_type" component="Magento_Ui/js/grid/columns/select">
             <settings>
-                <options class="Ideo\Dhl\Model\Source\CustomsType"/>
+                <options class="DhlPoland\Dhl\Model\Source\CustomsType"/>
                 <filter>select</filter>
                 <dataType>select</dataType>
                 <label translate="true">Customs Type</label>
@@ -85,7 +85,7 @@
         </column>
         <column name="category_of_item" component="Magento_Ui/js/grid/columns/select">
             <settings>
-                <options class="Ideo\Dhl\Model\Source\CategoryOfItem"/>
+                <options class="DhlPoland\Dhl\Model\Source\CategoryOfItem"/>
                 <filter>select</filter>
                 <dataType>select</dataType>
                 <label translate="true">Category Of Item</label>
@@ -93,7 +93,7 @@
         </column>
         <column name="currency" component="Magento_Ui/js/grid/columns/select">
             <settings>
-                <options class="Ideo\Dhl\Model\Source\CustomsCurrency"/>
+                <options class="DhlPoland\Dhl\Model\Source\CustomsCurrency"/>
                 <filter>select</filter>
                 <dataType>select</dataType>
                 <label translate="true">Currency</label>
@@ -114,7 +114,7 @@
                 <label translate="true">Associated Countries</label>
             </settings>
         </column>
-        <actionsColumn name="actions" class="Ideo\Dhl\Ui\Component\Listing\Column\CustomsTemplateActions">
+        <actionsColumn name="actions" class="DhlPoland\Dhl\Ui\Component\Listing\Column\CustomsTemplateActions">
             <settings>
                 <indexField>entity_id</indexField>
             </settings>

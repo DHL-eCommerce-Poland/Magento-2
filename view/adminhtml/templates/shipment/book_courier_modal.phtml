@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 // phpcs:disable Generic.Files.LineLength.TooLong
 
-use Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig;
+use DhlPoland\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\Template;
 
@@ -19,8 +19,8 @@ $todayDate = $viewModel->getFormattedDate();
 $infoUrl = $block->getUrl('dhlpoland/shipment/getShipmentPickupInfo');
 $bookUrl = $block->getUrl('dhlpoland/shipment/bookCourier');
 ?>
-<div id="ideo-dhl-book-courier-modal" class="dhl-modal-hidden" data-bind="scope: 'dhlBookCourierModal'">
-    <form id="ideo-dhl-book-courier-form" onsubmit="return false;">
+<div id="dhlpoland-book-courier-modal" class="dhl-modal-hidden" data-bind="scope: 'dhlBookCourierModal'">
+    <form id="dhlpoland-book-courier-form" onsubmit="return false;">
         <div class="admin__fieldset dhl-fieldset-no-margin">
 
             <!-- Warning Notice if Needed -->
@@ -98,11 +98,11 @@ $bookUrl = $block->getUrl('dhlpoland/shipment/bookCourier');
 
 <script type="text/x-magento-init">
 {
-    "#ideo-dhl-book-courier-modal": {
+    "#dhlpoland-book-courier-modal": {
         "Magento_Ui/js/core/app": {
             "components": {
                 "dhlBookCourierModal": {
-                    "component": "Ideo_Dhl/js/shipment/book-courier-modal",
+                    "component": "DhlPoland_Dhl/js/shipment/book-courier-modal",
                     "infoUrl": "<?= $escaper->escapeUrl($infoUrl) ?>",
                     "bookUrl": "<?= $escaper->escapeUrl($bookUrl) ?>",
                     "dateFormat": "<?= $escaper->escapeJs($dateFormat) ?>"

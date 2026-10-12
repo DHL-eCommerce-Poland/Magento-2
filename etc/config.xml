@@ -4,7 +4,7 @@
     <default>
         <carriers>
             <dhlpoland>
-                <model>Ideo\Dhl\Model\Carrier</model>
+                <model>DhlPoland\Dhl\Model\Carrier</model>
                 <title>DHL eCommerce Poland</title>
                 <active>1</active>
                 <sandbox>0</sandbox>

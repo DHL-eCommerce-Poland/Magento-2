@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Shipment\Data;
+namespace DhlPoland\Dhl\Model\Shipment\Data;
 
-use Ideo\Dhl\Model\Config\Source\InternationalMapPointType;
+use DhlPoland\Dhl\Model\Config\Source\InternationalMapPointType;
 
 class RecipientData
 {

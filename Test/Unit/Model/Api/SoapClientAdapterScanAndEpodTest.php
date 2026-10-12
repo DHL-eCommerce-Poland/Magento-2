@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Api;
+namespace DhlPoland\Dhl\Test\Unit\Model\Api;
 
-use Ideo\Dhl\Model\Api\Credentials;
-use Ideo\Dhl\Model\Api\SoapClientAdapter;
+use DhlPoland\Dhl\Model\Api\Credentials;
+use DhlPoland\Dhl\Model\Api\SoapClientAdapter;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\MockObject\Stub;
@@ -27,7 +27,7 @@ class SoapClientAdapterScanAndEpodTest extends TestCase
      */
     private $timezoneStub;
     /**
-     * @var \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer
+     * @var \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer
      */
     private $dateSanitizer;
     /**
@@ -44,7 +44,7 @@ class SoapClientAdapterScanAndEpodTest extends TestCase
         $this->loggerStub = $this->createStub(LoggerInterface::class);
         $this->scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $this->timezoneStub = $this->createStub(TimezoneInterface::class);
-        $this->dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($this->timezoneStub);
+        $this->dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($this->timezoneStub);
         $this->fileDriverStub = $this->createStub(\Magento\Framework\Filesystem\Driver\File::class);
         $this->credentials = new Credentials('user', 'pass', true);
     }

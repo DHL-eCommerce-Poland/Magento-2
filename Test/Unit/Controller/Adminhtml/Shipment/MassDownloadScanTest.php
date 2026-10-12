@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
 use Exception;
-use Ideo\Dhl\Controller\Adminhtml\Shipment\MassDownloadScan;
-use Ideo\Dhl\Model\ResourceModel\ShipmentData\Collection;
-use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
-use Ideo\Dhl\Model\Shipment\DocumentDownloadService;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\MassDownloadScan;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
+use DhlPoland\Dhl\Model\Shipment\DocumentDownloadService;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Response\Http\FileFactory;

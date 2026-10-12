@@ -77,7 +77,7 @@
         </column>
         <column name="method_code" component="Magento_Ui/js/grid/columns/select">
             <settings>
-                <options class="Ideo\Dhl\Model\Config\Source\ShippingMethod"/>
+                <options class="DhlPoland\Dhl\Model\Config\Source\ShippingMethod"/>
                 <filter>select</filter>
                 <dataType>select</dataType>
                 <label translate="true">Associated Shipping Method</label>
@@ -91,7 +91,7 @@
                 <label translate="true">Auto Return</label>
             </settings>
         </column>
-        <actionsColumn name="actions" class="Ideo\Dhl\Ui\Component\Listing\Column\DeliveryServiceActions">
+        <actionsColumn name="actions" class="DhlPoland\Dhl\Ui\Component\Listing\Column\DeliveryServiceActions">
             <settings>
                 <indexField>entity_id</indexField>
             </settings>

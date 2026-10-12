@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model;
+namespace DhlPoland\Dhl\Model;
 
-use Ideo\Dhl\Api\Data\DeliveryServiceInterface;
-use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
+use DhlPoland\Dhl\Api\Data\DeliveryServiceInterface;
+use DhlPoland\Dhl\Api\DeliveryServiceRepositoryInterface;
 
 class DeliveryServiceResolver
 {

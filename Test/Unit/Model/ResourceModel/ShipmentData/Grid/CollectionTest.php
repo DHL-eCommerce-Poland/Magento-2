@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\ResourceModel\ShipmentData\Grid;
+namespace DhlPoland\Dhl\Test\Unit\Model\ResourceModel\ShipmentData\Grid;
 
-use Ideo\Dhl\Model\ResourceModel\ShipmentData\Grid\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\Grid\Collection;
 use PHPUnit\Framework\TestCase;
 
 class CollectionTest extends TestCase

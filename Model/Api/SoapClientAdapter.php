@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Api;
+namespace DhlPoland\Dhl\Model\Api;
 
-use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Filesystem\Driver\File as FileDriver;
 use Psr\Log\LoggerInterface;
@@ -18,7 +18,7 @@ class SoapClientAdapter implements ClientInterface
     private const WSDL_URL_PRODUCTION = 'https://dhl24.com.pl/webapi2';
     private const WSDL_URL_SANDBOX = 'https://sandbox.dhl24.com.pl/webapi2';
     private const CONNECTION_TIMEOUT = 10;
-    private const API_ORIGIN = 'Ideo_M2';
+    private const API_ORIGIN = 'Luma_M2';
     private const MAX_ITEMS_TO_PRINT_PER_REQUEST = 3;
 
     /**
@@ -1377,7 +1377,7 @@ class SoapClientAdapter implements ClientInterface
             $context = stream_context_create([
                 'http' => [
                     'header' => 'DHLApiOrgin: ' . self::API_ORIGIN,
-                    'user_agent' => 'PHP-SOAP/' . PHP_VERSION . ' (Magento 2 Ideo_Dhl)',
+                    'user_agent' => 'PHP-SOAP/' . PHP_VERSION . ' (Magento 2 DhlPoland_Dhl)',
                 ],
                 'ssl' => [
                     'verify_peer' => true,

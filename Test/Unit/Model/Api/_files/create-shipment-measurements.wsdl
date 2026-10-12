@@ -2,10 +2,10 @@
 <definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
              xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
              xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-             xmlns:tns="urn:ideo:dhl:test"
-             targetNamespace="urn:ideo:dhl:test">
+             xmlns:tns="urn:dhlpoland:dhl:test"
+             targetNamespace="urn:dhlpoland:dhl:test">
     <types>
-        <xsd:schema targetNamespace="urn:ideo:dhl:test">
+        <xsd:schema targetNamespace="urn:dhlpoland:dhl:test">
             <xsd:complexType name="AuthData">
                 <xsd:sequence>
                     <xsd:element name="username" type="xsd:string"/>
@@ -64,7 +64,7 @@
     <binding name="DhlTestBinding" type="tns:DhlTestPortType">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <operation name="createShipment">
-            <soap:operation soapAction="urn:ideo:dhl:test#createShipment"/>
+            <soap:operation soapAction="urn:dhlpoland:dhl:test#createShipment"/>
             <input><soap:body use="literal"/></input>
             <output><soap:body use="literal"/></output>
         </operation>

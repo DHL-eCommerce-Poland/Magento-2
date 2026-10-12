@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Block\Adminhtml\System\Config;
+namespace DhlPoland\Dhl\Test\Unit\Block\Adminhtml\System\Config;
 
-use Ideo\Dhl\Block\Adminhtml\System\Config\ReadonlySpecificCountry;
+use DhlPoland\Dhl\Block\Adminhtml\System\Config\ReadonlySpecificCountry;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Data\Form\Element\AbstractElement;

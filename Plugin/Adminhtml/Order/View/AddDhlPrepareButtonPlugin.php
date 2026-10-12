@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Plugin\Adminhtml\Order\View;
+namespace DhlPoland\Dhl\Plugin\Adminhtml\Order\View;
 
 use Exception;
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
+use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
 use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\Serialize\Serializer\JsonHexTag;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -75,7 +75,7 @@ class AddDhlPrepareButtonPlugin
             $prepareUrl = $this->urlBuilder->getUrl('dhlpoland/shipment/prepare', ['order_id' => $orderId]);
             $prepareUrlLiteral = $this->serializer->serialize($prepareUrl);
             $onClickJs = sprintf(
-                'window.ideoDhlOpenPrepareModal && window.ideoDhlOpenPrepareModal(%d, %s)',
+                'window.dhlPolandOpenPrepareModal && window.dhlPolandOpenPrepareModal(%d, %s)',
                 $orderId,
                 $prepareUrlLiteral
             );

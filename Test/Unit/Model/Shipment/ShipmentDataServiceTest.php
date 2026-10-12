@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
-use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
-use Ideo\Dhl\Model\DeliveryService;
-use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
-use Ideo\Dhl\Model\Shipment\ShipmentDataService;
-use Ideo\Dhl\Model\Shipment\ShipmentDataValidator;
-use Ideo\Dhl\Model\ShipmentDataFactory;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Api\DeliveryServiceRepositoryInterface;
+use DhlPoland\Dhl\Api\DropOffPointRepositoryInterface;
+use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
+use DhlPoland\Dhl\Model\DeliveryService;
+use DhlPoland\Dhl\Model\Shipment\DhlShipmentData;
+use DhlPoland\Dhl\Model\Shipment\OrderToShipmentDataMapper;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataService;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataValidator;
+use DhlPoland\Dhl\Model\ShipmentDataFactory;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -348,7 +348,7 @@ class ShipmentDataServiceTest extends TestCase
         $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
         $serializer = new Json();
 
-        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(
+        $shipmentSettings = new \DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData(
             packages: [
                 ['packageType' => 'PACKAGE', 'weight' => 2.5],
                 ['packageType' => 'PACKAGE', 'weight' => 5.0],
@@ -426,7 +426,7 @@ class ShipmentDataServiceTest extends TestCase
         $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
         $serializer = new Json();
 
-        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(
+        $shipmentSettings = new \DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData(
             packages: [
                 [
                     'packageType' => 'PACKAGE',
@@ -490,7 +490,7 @@ class ShipmentDataServiceTest extends TestCase
         $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
         $serializer = new Json();
 
-        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(
+        $shipmentSettings = new \DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData(
             packages: [
                 ['packageType' => 'PACKAGE', 'quantity' => 2, 'weight' => 5.0],
             ]
@@ -558,7 +558,7 @@ class ShipmentDataServiceTest extends TestCase
         $shipmentDataFactory = $this->createStub(ShipmentDataFactory::class);
         $serializer = new Json();
 
-        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(
+        $shipmentSettings = new \DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData(
             packages: [
                 ['packageType' => 'PACKAGE', 'quantity' => 2, 'weight' => 5.0],
                 ['packageType' => 'PACKAGE', 'quantity' => 1, 'weight' => 2.0],

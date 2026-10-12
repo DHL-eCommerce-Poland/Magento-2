@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Api;
+namespace DhlPoland\Dhl\Api;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResultsInterface;
 
@@ -13,9 +13,9 @@ interface ShipmentDataRepositoryInterface
     /**
      * Save DHL shipment data.
      *
-     * @param \Ideo\Dhl\Api\Data\ShipmentDataInterface $shipmentData
+     * @param \DhlPoland\Dhl\Api\Data\ShipmentDataInterface $shipmentData
      *
-     * @return \Ideo\Dhl\Api\Data\ShipmentDataInterface
+     * @return \DhlPoland\Dhl\Api\Data\ShipmentDataInterface
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     public function save(ShipmentDataInterface $shipmentData): ShipmentDataInterface;
@@ -25,7 +25,7 @@ interface ShipmentDataRepositoryInterface
      *
      * @param int $entityId
      *
-     * @return \Ideo\Dhl\Api\Data\ShipmentDataInterface
+     * @return \DhlPoland\Dhl\Api\Data\ShipmentDataInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getById(int $entityId): ShipmentDataInterface;
@@ -35,7 +35,7 @@ interface ShipmentDataRepositoryInterface
      *
      * @param int $orderId
      *
-     * @return \Ideo\Dhl\Api\Data\ShipmentDataInterface|null
+     * @return \DhlPoland\Dhl\Api\Data\ShipmentDataInterface|null
      */
     public function getByOrderId(int $orderId): ?ShipmentDataInterface;
 
@@ -44,7 +44,7 @@ interface ShipmentDataRepositoryInterface
      *
      * @param int $magentoShipmentId
      *
-     * @return \Ideo\Dhl\Api\Data\ShipmentDataInterface|null
+     * @return \DhlPoland\Dhl\Api\Data\ShipmentDataInterface|null
      */
     public function getByMagentoShipmentId(int $magentoShipmentId): ?ShipmentDataInterface;
 
@@ -62,7 +62,7 @@ interface ShipmentDataRepositoryInterface
      *
      * @param int $orderId
      *
-     * @return \Ideo\Dhl\Api\Data\ShipmentDataInterface[]
+     * @return \DhlPoland\Dhl\Api\Data\ShipmentDataInterface[]
      */
     public function getListByOrderId(int $orderId): array;
 
@@ -78,7 +78,7 @@ interface ShipmentDataRepositoryInterface
     /**
      * Delete DHL shipment data entity.
      *
-     * @param \Ideo\Dhl\Api\Data\ShipmentDataInterface $shipmentData
+     * @param \DhlPoland\Dhl\Api\Data\ShipmentDataInterface $shipmentData
      *
      * @return bool
      * @throws \Magento\Framework\Exception\CouldNotDeleteException

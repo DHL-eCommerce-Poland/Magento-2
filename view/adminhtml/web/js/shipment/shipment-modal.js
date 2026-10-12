@@ -4,7 +4,7 @@ define([
     'uiComponent',
     'Magento_Ui/js/modal/modal',
     'Magento_Ui/js/modal/alert',
-    'Ideo_Dhl/js/utils/safe-message-content',
+    'DhlPoland_Dhl/js/utils/safe-message-content',
     'mage/translate',
     'mage/validation',
     'mage/loader'
@@ -732,7 +732,7 @@ define([
                 });
             });
 
-            window.ideoDhlOpenPrepareModal = function (orderId, prepareUrl) {
+            window.dhlPolandOpenPrepareModal = function (orderId, prepareUrl) {
                 self.openModal(orderId, prepareUrl);
             };
 
@@ -745,7 +745,7 @@ define([
                 return;
             }
             this._mapMessageListener = function (event) {
-                var iframe = document.getElementById('ideo-dhl-prepare-map-iframe');
+                var iframe = document.getElementById('dhlpoland-prepare-map-iframe');
                 if (!event || event.origin !== 'https://parcelshop.dhl.pl' || !iframe
                     || event.source !== iframe.contentWindow || !self._activeMapModal || !event.data) {
                     return;
@@ -828,9 +828,9 @@ define([
 
             var iframeUrl = params.length ? baseUrl + '?' + params.join('&') : baseUrl;
 
-            var $modalContainer = $('#ideo-dhl-prepare-map-modal-container');
+            var $modalContainer = $('#dhlpoland-prepare-map-modal-container');
             if (!$modalContainer.length) {
-                $modalContainer = $('<div id="ideo-dhl-prepare-map-modal-container" style="display:none;"><iframe id="ideo-dhl-prepare-map-iframe" style="width:100%; height:80vh; min-height:500px; border:none;"></iframe></div>');
+                $modalContainer = $('<div id="dhlpoland-prepare-map-modal-container" style="display:none;"><iframe id="dhlpoland-prepare-map-iframe" style="width:100%; height:80vh; min-height:500px; border:none;"></iframe></div>');
                 $('body').append($modalContainer);
             }
 
@@ -1470,7 +1470,7 @@ define([
                                 click: function (e) {
                                     var selfModal = this;
                                     var $btn = $(e.target).closest('button');
-                                    var $form = $('#ideo-dhl-prepare-modal-form');
+                                    var $form = $('#dhlpoland-prepare-modal-form');
 
                                     if ($form.length && typeof $form.valid === 'function' && !$form.valid()) {
                                         return false;
@@ -1614,7 +1614,7 @@ define([
                                 }
                             }]
                         };
-                        modal(modalOptions, $('#ideo-dhl-prepare-modal')).openModal();
+                        modal(modalOptions, $('#dhlpoland-prepare-modal')).openModal();
                     } else {
                         alert({
                             title: $.mage.__('Error'),

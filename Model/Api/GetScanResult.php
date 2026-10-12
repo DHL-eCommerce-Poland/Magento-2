@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Api;
+namespace DhlPoland\Dhl\Model\Api;
 
 class GetScanResult
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Config\Backend;
+namespace DhlPoland\Dhl\Model\Config\Backend;
 
 use Magento\Config\Model\Config\Backend\File;
 use Magento\Config\Model\Config\Backend\File\RequestData\RequestDataInterface;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Api;
+namespace DhlPoland\Dhl\Test\Unit\Model\Api;
 
-use Ideo\Dhl\Model\Api\Credentials;
-use Ideo\Dhl\Model\Api\SoapClientAdapter;
+use DhlPoland\Dhl\Model\Api\Credentials;
+use DhlPoland\Dhl\Model\Api\SoapClientAdapter;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -37,7 +37,7 @@ class SoapClientAdapterTest extends TestCase
      */
     private $timezoneMock;
     /**
-     * @var \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer
+     * @var \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer
      */
     private $dateSanitizer;
 
@@ -59,7 +59,7 @@ class SoapClientAdapterTest extends TestCase
         $this->timezoneMock->method('scopeDate')
             ->willReturn(new \DateTime('2026-09-02'));
 
-        $this->dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($this->timezoneMock);
+        $this->dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($this->timezoneMock);
         $this->fileDriverStub = $this->createStub(\Magento\Framework\Filesystem\Driver\File::class);
 
         $this->adapter = new SoapClientAdapter(
@@ -342,7 +342,7 @@ class SoapClientAdapterTest extends TestCase
 
                 return '<?xml version="1.0"?>'
                     . '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">'
-                    . '<SOAP-ENV:Body><createShipmentResponse xmlns="urn:ideo:dhl:test">'
+                    . '<SOAP-ENV:Body><createShipmentResponse xmlns="urn:dhlpoland:dhl:test">'
                     . '<createShipmentResult>OK</createShipmentResult>'
                     . '</createShipmentResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
             }
@@ -1147,15 +1147,15 @@ class SoapClientAdapterTest extends TestCase
     }
 
     /**
-     * Test API origin constant is Ideo_M2 and XML_PATH_API_ORIGIN config constant is removed.
+     * Test API origin constant is Luma_M2 and XML_PATH_API_ORIGIN config constant is removed.
      *
      * @return void
      */
-    public function testApiOriginConstantIsIdeoM2(): void
+    public function testApiOriginConstantIsLumaM2(): void
     {
         $reflection = new \ReflectionClass(SoapClientAdapter::class);
         $this->assertTrue($reflection->hasConstant('API_ORIGIN'));
-        $this->assertEquals('Ideo_M2', $reflection->getConstant('API_ORIGIN'));
+        $this->assertEquals('Luma_M2', $reflection->getConstant('API_ORIGIN'));
         $this->assertFalse($reflection->hasConstant('XML_PATH_API_ORIGIN'));
     }
 }

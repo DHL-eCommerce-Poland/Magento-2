@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Api;
+namespace DhlPoland\Dhl\Test\Unit\Model\Api;
 
-use Ideo\Dhl\Model\Api\TestConnectionResult;
+use DhlPoland\Dhl\Model\Api\TestConnectionResult;
 use PHPUnit\Framework\TestCase;
 
 class TestConnectionResultTest extends TestCase

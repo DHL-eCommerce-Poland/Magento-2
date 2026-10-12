@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\DropOffPoint;
+namespace DhlPoland\Dhl\Controller\Adminhtml\DropOffPoint;
 
-use Ideo\Dhl\Api\Data\DropOffPointInterfaceFactory;
-use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
-use Ideo\Dhl\Model\DropOffPoint;
+use DhlPoland\Dhl\Api\Data\DropOffPointInterfaceFactory;
+use DhlPoland\Dhl\Api\DropOffPointRepositoryInterface;
+use DhlPoland\Dhl\Model\DropOffPoint;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -14,7 +14,7 @@ use Magento\Framework\Controller\Result\Redirect;
 
 class Save extends Action implements HttpPostActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::drop_off_point';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::drop_off_point';
 
     /**
      * @param Context $context

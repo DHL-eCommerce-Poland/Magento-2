@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Api;
+namespace DhlPoland\Dhl\Test\Unit\Model\Api;
 
-use Ideo\Dhl\Model\Api\Credentials;
-use Ideo\Dhl\Model\Api\SoapClientAdapter;
+use DhlPoland\Dhl\Model\Api\Credentials;
+use DhlPoland\Dhl\Model\Api\SoapClientAdapter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -33,7 +33,7 @@ class SoapClientAdapterReturnTest extends TestCase
         $soapClientStub = new TestSoapClient(false);
 
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
         $fileDriverStub = $this->createStub(\Magento\Framework\Filesystem\Driver\File::class);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)
@@ -100,7 +100,7 @@ class SoapClientAdapterReturnTest extends TestCase
         };
 
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
         $fileDriverStub = $this->createStub(\Magento\Framework\Filesystem\Driver\File::class);
 
         $adapter = $this->getMockBuilder(SoapClientAdapter::class)

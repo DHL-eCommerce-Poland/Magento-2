@@ -3,31 +3,31 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Sales\Block\Adminhtml\Order\View">
         <plugin name="dhlpoland_add_prepare_shipment_button"
-                type="Ideo\Dhl\Plugin\Adminhtml\Order\View\AddDhlPrepareButtonPlugin"
+                type="DhlPoland\Dhl\Plugin\Adminhtml\Order\View\AddDhlPrepareButtonPlugin"
                 sortOrder="10" />
     </type>
 
     <type name="Magento\Shipping\Controller\Adminhtml\Order\Shipment\View">
-        <plugin name="ideo_dhl_redirect_shipping_order_shipment_view"
-                type="Ideo\Dhl\Plugin\Adminhtml\Order\Shipment\RedirectNativeViewPlugin"
+        <plugin name="dhlpoland_dhl_redirect_shipping_order_shipment_view"
+                type="DhlPoland\Dhl\Plugin\Adminhtml\Order\Shipment\RedirectNativeViewPlugin"
                 sortOrder="10" />
     </type>
 
     <type name="Magento\Sales\Ui\Component\Listing\Column\ViewAction">
-        <plugin name="ideo_dhl_redirect_shipment_ui_view_action"
-                type="Ideo\Dhl\Plugin\Adminhtml\Order\View\Tab\RedirectShipmentUiViewActionPlugin"
+        <plugin name="dhlpoland_dhl_redirect_shipment_ui_view_action"
+                type="DhlPoland\Dhl\Plugin\Adminhtml\Order\View\Tab\RedirectShipmentUiViewActionPlugin"
                 sortOrder="10" />
     </type>
 
     <type name="Magento\Sales\Model\AdminOrder\Create">
         <plugin name="dhlpoland_preserve_service_point_on_admin_order_create"
-                type="Ideo\Dhl\Plugin\Adminhtml\Order\Create\PreserveServicePointOnAdminOrderCreate"
+                type="DhlPoland\Dhl\Plugin\Adminhtml\Order\Create\PreserveServicePointOnAdminOrderCreate"
                 sortOrder="10" />
     </type>
 
     <type name="Magento\Sales\Block\Adminhtml\Order\Create\Shipping\Method\Form">
-        <plugin name="ideo_dhl_add_service_point_to_shipping_method_form"
-                type="Ideo\Dhl\Plugin\Adminhtml\Order\Create\AddDhlServicePointToShippingMethodFormPlugin"
+        <plugin name="dhlpoland_dhl_add_service_point_to_shipping_method_form"
+                type="DhlPoland\Dhl\Plugin\Adminhtml\Order\Create\AddDhlServicePointToShippingMethodFormPlugin"
                 sortOrder="10" />
     </type>
 </config>

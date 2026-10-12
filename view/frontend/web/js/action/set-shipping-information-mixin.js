@@ -1,7 +1,7 @@
 define([
     'mage/utils/wrapper',
     'Magento_Checkout/js/model/quote',
-    'Ideo_Dhl/js/model/point-state',
+    'DhlPoland_Dhl/js/model/point-state',
     'Magento_Ui/js/model/messageList',
     'jquery'
 ], function (wrapper, quote, pointState, globalMessageList, $) {

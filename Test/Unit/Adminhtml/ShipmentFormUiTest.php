@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Adminhtml;
+namespace DhlPoland\Dhl\Test\Unit\Adminhtml;
 
 use DOMDocument;
 use DOMXPath;

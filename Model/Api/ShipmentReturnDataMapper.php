@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Api;
+namespace DhlPoland\Dhl\Model\Api;
 
-use Ideo\Dhl\Model\Config\Source\ReturnBookCourier;
-use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
-use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
-use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Ideo\Dhl\Model\Shipment\PostalCodeSanitizer;
+use DhlPoland\Dhl\Model\Config\Source\ReturnBookCourier;
+use DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData;
+use DhlPoland\Dhl\Model\Shipment\Data\SpecialServicesData;
+use DhlPoland\Dhl\Model\Shipment\DhlShipmentData;
+use DhlPoland\Dhl\Model\Shipment\PostalCodeSanitizer;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class ShipmentReturnDataMapper

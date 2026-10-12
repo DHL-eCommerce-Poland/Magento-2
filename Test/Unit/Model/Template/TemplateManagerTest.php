@@ -2,30 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Template;
+namespace DhlPoland\Dhl\Test\Unit\Model\Template;
 
-use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
-use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
-use Ideo\Dhl\Model\Config\Source\AddressType as AddressTypeSource;
-use Ideo\Dhl\Model\Config\Source\InternationalMapPointType;
-use Ideo\Dhl\Model\Config\Source\LabelType as LabelTypeSource;
-use Ideo\Dhl\Model\Config\Source\PackageType as PackageTypeSource;
-use Ideo\Dhl\Model\Config\Source\ReturnBookCourier as ReturnBookCourierSource;
-use Ideo\Dhl\Model\Config\Source\ReturnQrCodeType as ReturnQrCodeTypeSource;
-use Ideo\Dhl\Model\Config\Source\ServiceCode as ServiceCodeSource;
-use Ideo\Dhl\Model\Config\Source\ShipmentAddressType as ShipmentAddressTypeSource;
-use Ideo\Dhl\Model\DeliveryService;
-use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory as CustomsTemplateCollectionFactory;
-use Ideo\Dhl\Model\ResourceModel\DeliveryService\Collection as DeliveryServiceCollection;
-use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory as DeliveryServiceCollectionFactory;
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory as DropOffPointCollectionFactory;
-use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
-use Ideo\Dhl\Model\Source\CategoryOfItem;
-use Ideo\Dhl\Model\Source\CustomsCurrency;
-use Ideo\Dhl\Model\Source\CustomsType;
-use Ideo\Dhl\Model\Template\TemplateManager;
-use Ideo\Dhl\Model\Template\TemplateVariableResolver;
+use DhlPoland\Dhl\Api\DeliveryServiceRepositoryInterface;
+use DhlPoland\Dhl\Api\DropOffPointRepositoryInterface;
+use DhlPoland\Dhl\Model\Config\Source\AddressType as AddressTypeSource;
+use DhlPoland\Dhl\Model\Config\Source\InternationalMapPointType;
+use DhlPoland\Dhl\Model\Config\Source\LabelType as LabelTypeSource;
+use DhlPoland\Dhl\Model\Config\Source\PackageType as PackageTypeSource;
+use DhlPoland\Dhl\Model\Config\Source\ReturnBookCourier as ReturnBookCourierSource;
+use DhlPoland\Dhl\Model\Config\Source\ReturnQrCodeType as ReturnQrCodeTypeSource;
+use DhlPoland\Dhl\Model\Config\Source\ServiceCode as ServiceCodeSource;
+use DhlPoland\Dhl\Model\Config\Source\ShipmentAddressType as ShipmentAddressTypeSource;
+use DhlPoland\Dhl\Model\DeliveryService;
+use DhlPoland\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory as CustomsTemplateCollectionFactory;
+use DhlPoland\Dhl\Model\ResourceModel\DeliveryService\Collection as DeliveryServiceCollection;
+use DhlPoland\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory as DeliveryServiceCollectionFactory;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory as DropOffPointCollectionFactory;
+use DhlPoland\Dhl\Model\Shipment\OrderToShipmentDataMapper;
+use DhlPoland\Dhl\Model\Source\CategoryOfItem;
+use DhlPoland\Dhl\Model\Source\CustomsCurrency;
+use DhlPoland\Dhl\Model\Source\CustomsType;
+use DhlPoland\Dhl\Model\Template\TemplateManager;
+use DhlPoland\Dhl\Model\Template\TemplateVariableResolver;
 use Magento\Directory\Model\Config\Source\Country as CountrySource;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
@@ -323,25 +323,25 @@ class TemplateManagerTest extends TestCase
 
     public function testGetCustomsTemplatesOptions(): void
     {
-        $template = $this->createStub(\Ideo\Dhl\Model\CustomsTemplate::class);
+        $template = $this->createStub(\DhlPoland\Dhl\Model\CustomsTemplate::class);
         $template->method('getId')->willReturn(7);
         $template->method('getEntityId')->willReturn(7);
         $template->method('getTemplateName')->willReturn('EU Standard Export');
 
-        $collection = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Collection::class);
+        $collection = $this->createMock(\DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\Collection::class);
         $collection->method('getItems')->willReturn([$template]);
         $collection->method('getIterator')->willReturn(new \ArrayIterator([$template]));
 
-        $factory = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory::class);
+        $factory = $this->createMock(\DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory::class);
         $factory->expects($this->once())->method('create')->willReturn($collection);
 
-        $typeSource = $this->createMock(\Ideo\Dhl\Model\Source\CustomsType::class);
+        $typeSource = $this->createMock(\DhlPoland\Dhl\Model\Source\CustomsType::class);
         $typeSource->method('toOptionArray')->willReturn([['value' => 'U', 'label' => 'Simplified']]);
 
-        $catSource = $this->createMock(\Ideo\Dhl\Model\Source\CategoryOfItem::class);
+        $catSource = $this->createMock(\DhlPoland\Dhl\Model\Source\CategoryOfItem::class);
         $catSource->method('toOptionArray')->willReturn([['value' => '11', 'label' => 'Sales']]);
 
-        $currSource = $this->createMock(\Ideo\Dhl\Model\Source\CustomsCurrency::class);
+        $currSource = $this->createMock(\DhlPoland\Dhl\Model\Source\CustomsCurrency::class);
         $currSource->method('toOptionArray')->willReturn([['value' => 'EUR', 'label' => 'EUR']]);
 
         $manager = new TemplateManager(
@@ -379,18 +379,18 @@ class TemplateManagerTest extends TestCase
 
     public function testGetMatchingCustomsTemplateIdForCountry(): void
     {
-        $template1 = $this->createStub(\Ideo\Dhl\Model\CustomsTemplate::class);
+        $template1 = $this->createStub(\DhlPoland\Dhl\Model\CustomsTemplate::class);
         $template1->method('getEntityId')->willReturn(10);
         $template1->method('getCountryId')->willReturn('GB, US');
 
-        $template2 = $this->createStub(\Ideo\Dhl\Model\CustomsTemplate::class);
+        $template2 = $this->createStub(\DhlPoland\Dhl\Model\CustomsTemplate::class);
         $template2->method('getEntityId')->willReturn(20);
         $template2->method('getCountryId')->willReturn('GB, DE');
 
-        $collection = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Collection::class);
+        $collection = $this->createMock(\DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\Collection::class);
         $collection->method('getIterator')->willReturn(new \ArrayIterator([$template1, $template2]));
 
-        $factory = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory::class);
+        $factory = $this->createMock(\DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory::class);
         $factory->method('create')->willReturn($collection);
 
         $manager = new TemplateManager(
@@ -412,9 +412,9 @@ class TemplateManagerTest extends TestCase
             $this->timezone,
             $this->methodCatalog,
             $factory,
-            $this->createStub(\Ideo\Dhl\Model\Source\CustomsType::class),
-            $this->createStub(\Ideo\Dhl\Model\Source\CategoryOfItem::class),
-            $this->createStub(\Ideo\Dhl\Model\Source\CustomsCurrency::class),
+            $this->createStub(\DhlPoland\Dhl\Model\Source\CustomsType::class),
+            $this->createStub(\DhlPoland\Dhl\Model\Source\CategoryOfItem::class),
+            $this->createStub(\DhlPoland\Dhl\Model\Source\CustomsCurrency::class),
             $this->internationalMapPointTypeSource,
             $this->createStub(\Psr\Log\LoggerInterface::class)
         );
@@ -437,14 +437,14 @@ class TemplateManagerTest extends TestCase
 
     public function testGetMatchingCustomsTemplateIdForOrder(): void
     {
-        $template = $this->createStub(\Ideo\Dhl\Model\CustomsTemplate::class);
+        $template = $this->createStub(\DhlPoland\Dhl\Model\CustomsTemplate::class);
         $template->method('getEntityId')->willReturn(15);
         $template->method('getCountryId')->willReturn('CH, NO');
 
-        $collection = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\Collection::class);
+        $collection = $this->createMock(\DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\Collection::class);
         $collection->method('getIterator')->willReturn(new \ArrayIterator([$template]));
 
-        $factory = $this->createMock(\Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory::class);
+        $factory = $this->createMock(\DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory::class);
         $factory->method('create')->willReturn($collection);
 
         $manager = new TemplateManager(
@@ -466,9 +466,9 @@ class TemplateManagerTest extends TestCase
             $this->timezone,
             $this->methodCatalog,
             $factory,
-            $this->createStub(\Ideo\Dhl\Model\Source\CustomsType::class),
-            $this->createStub(\Ideo\Dhl\Model\Source\CategoryOfItem::class),
-            $this->createStub(\Ideo\Dhl\Model\Source\CustomsCurrency::class),
+            $this->createStub(\DhlPoland\Dhl\Model\Source\CustomsType::class),
+            $this->createStub(\DhlPoland\Dhl\Model\Source\CategoryOfItem::class),
+            $this->createStub(\DhlPoland\Dhl\Model\Source\CustomsCurrency::class),
             $this->internationalMapPointTypeSource,
             $this->createStub(\Psr\Log\LoggerInterface::class)
         );

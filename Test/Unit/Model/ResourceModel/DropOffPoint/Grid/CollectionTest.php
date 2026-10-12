@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\ResourceModel\DropOffPoint\Grid;
+namespace DhlPoland\Dhl\Test\Unit\Model\ResourceModel\DropOffPoint\Grid;
 
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint\Grid\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint\Grid\Collection;
 use PHPUnit\Framework\TestCase;
 
 class CollectionTest extends TestCase

@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
-use Ideo\Dhl\Api\Data\DeliveryServiceInterface;
-use Ideo\Dhl\Api\Data\DropOffPointInterface;
-use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
-use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
-use Ideo\Dhl\Controller\Adminhtml\Shipment\LoadTemplate;
-use Ideo\Dhl\Model\CustomsTemplate;
-use Ideo\Dhl\Model\CustomsTemplateRepository;
-use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\Template\TemplateManager;
-use Ideo\Dhl\Model\Template\TemplateVariableResolver;
+use DhlPoland\Dhl\Api\Data\DeliveryServiceInterface;
+use DhlPoland\Dhl\Api\Data\DropOffPointInterface;
+use DhlPoland\Dhl\Api\DeliveryServiceRepositoryInterface;
+use DhlPoland\Dhl\Api\DropOffPointRepositoryInterface;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\LoadTemplate;
+use DhlPoland\Dhl\Model\CustomsTemplate;
+use DhlPoland\Dhl\Model\CustomsTemplateRepository;
+use DhlPoland\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\Template\TemplateManager;
+use DhlPoland\Dhl\Model\Template\TemplateVariableResolver;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Json;

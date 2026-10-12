@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\DeliveryService;
+namespace DhlPoland\Dhl\Controller\Adminhtml\DeliveryService;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -12,7 +12,7 @@ use Magento\Framework\View\Result\PageFactory;
 
 class Index extends Action implements HttpGetActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::delivery_service';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::delivery_service';
 
     /**
      * @param Context $context
@@ -33,7 +33,7 @@ class Index extends Action implements HttpGetActionInterface
     public function execute(): Page
     {
         $resultPage = $this->resultPageFactory->create();
-        $resultPage->setActiveMenu('Ideo_Dhl::delivery_service');
+        $resultPage->setActiveMenu('DhlPoland_Dhl::delivery_service');
         $resultPage->getConfig()->getTitle()->prepend(__('Delivery Service Templates'));
         return $resultPage;
     }

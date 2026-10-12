@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Api;
+namespace DhlPoland\Dhl\Test\Unit\Model\Api;
 
-use Ideo\Dhl\Model\Api\CourierBookingResult;
+use DhlPoland\Dhl\Model\Api\CourierBookingResult;
 use PHPUnit\Framework\TestCase;
 
 class CourierBookingResultTest extends TestCase

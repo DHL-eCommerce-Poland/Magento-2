@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Controller\Adminhtml\Shipment;
 
 use Exception;
-use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
-use Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService;
-use Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder;
-use Ideo\Dhl\Model\Shipment\ShipmentDataService;
+use DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData;
+use DhlPoland\Dhl\Model\Shipment\ReturnShipmentCreationService;
+use DhlPoland\Dhl\Model\Shipment\ReturnShipmentDataBuilder;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataService;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 
 class CreateReturnShipment extends Action implements HttpGetActionInterface, HttpPostActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::shipment';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::shipment';
 
     /**
      * @param Context $context
