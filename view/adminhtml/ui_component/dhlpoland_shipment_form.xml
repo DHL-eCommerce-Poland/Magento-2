@@ -1510,9 +1510,6 @@
             </field>
             <field name="customs[eoriNrReceiver]" formElement="input">
                 <settings>
-                    <validation>
-                        <rule name="required-entry" xsi:type="boolean">true</rule>
-                    </validation>
                     <dataType>text</dataType>
                     <label translate="true">Receiver EORI</label>
                     <dataScope>customs.eoriNrReceiver</dataScope>

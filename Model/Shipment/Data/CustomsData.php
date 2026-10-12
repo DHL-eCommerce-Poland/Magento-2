@@ -380,9 +380,7 @@ class CustomsData
             isset($data['vatRegistrationNumber'])
                 ? (string)$data['vatRegistrationNumber']
                 : (isset($data['shipperVatNo']) ? (string)$data['shipperVatNo'] : null),
-            isset($data['eoriNrReceiver'])
-                ? (string)$data['eoriNrReceiver']
-                : (isset($data['receiverEori']) ? (string)$data['receiverEori'] : null),
+            trim((string)($data['eoriNrReceiver'] ?? $data['receiverEori'] ?? '')) ?: null,
             isset($data['vatRegistrationNumberReceiver'])
                 ? (string)$data['vatRegistrationNumberReceiver']
                 : (isset($data['receiverVatNo']) ? (string)$data['receiverVatNo'] : null),

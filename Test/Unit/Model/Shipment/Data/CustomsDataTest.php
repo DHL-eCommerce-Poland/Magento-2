@@ -122,4 +122,18 @@ class CustomsDataTest extends TestCase
 
         $this->assertTrue($customs->isInvoiceContent());
     }
+
+    /**
+     * Verify empty or whitespace receiver EORI string is normalized to null.
+     *
+     * @return void
+     */
+    public function testFromArrayNormalizesEmptyReceiverEoriToNull(): void
+    {
+        $customsWithEmptyString = CustomsData::fromArray(['eoriNrReceiver' => '   ']);
+        $this->assertNull($customsWithEmptyString->getEoriNrReceiver());
+
+        $customsWithEmptyReceiverEori = CustomsData::fromArray(['receiverEori' => '']);
+        $this->assertNull($customsWithEmptyReceiverEori->getEoriNrReceiver());
+    }
 }
