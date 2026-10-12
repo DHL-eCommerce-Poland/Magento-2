@@ -11,7 +11,6 @@ use Ideo\Dhl\Model\Shipment\Data\SenderData;
 use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ShipmentReturnDataMapperTest extends TestCase
@@ -26,7 +25,10 @@ class ShipmentReturnDataMapperTest extends TestCase
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
         $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
 
-        $this->mapper = new ShipmentReturnDataMapper($timezoneStub);
+        $this->mapper = new ShipmentReturnDataMapper(
+            $timezoneStub,
+            new \Ideo\Dhl\Model\Shipment\PostalCodeSanitizer()
+        );
     }
 
     public function testMapDomesticReturnShipment(): void
@@ -259,20 +261,19 @@ class ShipmentReturnDataMapperTest extends TestCase
         $this->assertFalse($mapped['shipmentInfo']['bookCourier']);
     }
 
-    #[DataProvider('postalCodeDataProvider')]
-    public function testSanitizePostalCode(string $inputCode, string $countryCode, string $expected): void
+    public function testMapRemovesInternalSpaceFromSenderAndRecipientPostalCodes(): void
     {
-        $this->assertSame($expected, $this->mapper->sanitizePostalCode($inputCode, $countryCode));
-    }
+        $shipmentData = new DhlShipmentData(
+            orderId: 109,
+            sender: new SenderData(postalCode: '100 00', country: 'CZ'),
+            recipient: new RecipientData(postalCode: '110 00', country: 'CZ'),
+            specialServices: new SpecialServicesData(),
+            shipmentSettings: new ShipmentSettingsData(packages: [new PackageData()])
+        );
 
-    public static function postalCodeDataProvider(): array
-    {
-        return [
-            'PL with hyphen' => ['00-950', 'PL', '00950'],
-            'PL without hyphen' => ['00950', 'PL', '00950'],
-            'GB alphanumeric' => ['SW1A 1AA', 'GB', 'SW1A 1AA'],
-            'DE with hyphen' => ['D-10115', 'DE', 'D-10115'],
-            'US zip extended' => ['90210-1234', 'US', '90210-1234'],
-        ];
+        $mapped = $this->mapper->map($shipmentData);
+
+        $this->assertSame('10000', $mapped['ship']['shipper']['address']['postalCode']);
+        $this->assertSame('11000', $mapped['ship']['receiver']['address']['postalCode']);
     }
 }

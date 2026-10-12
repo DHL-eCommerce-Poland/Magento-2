@@ -8,9 +8,18 @@ use Ideo\Dhl\Model\Config\Source\AddressType;
 use Ideo\Dhl\Model\MethodCatalog;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
+use Ideo\Dhl\Model\Shipment\PostalCodeSanitizer;
 
 class ShipmentFullDataMapper
 {
+    /**
+     * @param PostalCodeSanitizer $postalCodeSanitizer
+     */
+    public function __construct(
+        private readonly PostalCodeSanitizer $postalCodeSanitizer
+    ) {
+    }
+
     /**
      * Map DhlShipmentData to DHL WebAPI2 ShipmentFullData array format.
      *
@@ -99,7 +108,7 @@ class ShipmentFullDataMapper
 
         $senderAddress = [
             'name' => $this->sanitizeString($senderName),
-            'postalCode' => $this->sanitizePostalCode($sender->getPostalCode(), $senderCountryCode),
+            'postalCode' => $this->postalCodeSanitizer->sanitize($sender->getPostalCode(), $senderCountryCode),
             'city' => $this->sanitizeString($sender->getCity()),
             'street' => $this->sanitizeString($sender->getStreet()),
             'houseNumber' => $this->sanitizeString($sender->getHouseNumber()),
@@ -142,7 +151,7 @@ class ShipmentFullDataMapper
                 'addressType' => AddressType::TYPE_CONSUMER,
                 'country' => $countryCode,
                 'name' => $this->sanitizeString($recipientName),
-                'postalCode' => $this->sanitizePostalCode($pointPostcode, $countryCode),
+                'postalCode' => $this->postalCodeSanitizer->sanitize($pointPostcode, $countryCode),
                 'city' => $this->sanitizeString($pointCity),
                 'street' => $this->sanitizeString($pointStreet),
                 'houseNumber' => $this->sanitizeString($pointHouseNumber),
@@ -163,7 +172,7 @@ class ShipmentFullDataMapper
                 'addressType' => $receiverAddressType,
                 'country' => $countryCode,
                 'name' => $this->sanitizeString($recipientName),
-                'postalCode' => $this->sanitizePostalCode($recipient->getPostalCode(), $countryCode),
+                'postalCode' => $this->postalCodeSanitizer->sanitize($recipient->getPostalCode(), $countryCode),
                 'city' => $this->sanitizeString($recipient->getCity()),
                 'street' => $this->sanitizeString($recipient->getStreet()),
                 'houseNumber' => $this->sanitizeString($recipient->getHouseNumber()),
@@ -338,24 +347,6 @@ class ShipmentFullDataMapper
         }
 
         return (string) preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', trim($string));
-    }
-
-    /**
-     * Remove spaces from postal codes and hyphens from Polish postal codes for DHL.
-     *
-     * @param string $postalCode
-     * @param string $countryCode
-     *
-     * @return string
-     */
-    public function sanitizePostalCode(string $postalCode, string $countryCode = 'PL'): string
-    {
-        $postalCode = str_replace(' ', '', trim($postalCode));
-        if (strtoupper($countryCode) === 'PL') {
-            return str_replace('-', '', $postalCode);
-        }
-
-        return $postalCode;
     }
 
     /**

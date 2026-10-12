@@ -8,15 +8,18 @@ use Ideo\Dhl\Model\Config\Source\ReturnBookCourier;
 use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Ideo\Dhl\Model\Shipment\DhlShipmentData;
+use Ideo\Dhl\Model\Shipment\PostalCodeSanitizer;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class ShipmentReturnDataMapper
 {
     /**
      * @param TimezoneInterface $timezone
+     * @param PostalCodeSanitizer $postalCodeSanitizer
      */
     public function __construct(
-        private readonly TimezoneInterface $timezone
+        private readonly TimezoneInterface $timezone,
+        private readonly PostalCodeSanitizer $postalCodeSanitizer
     ) {
     }
 
@@ -145,6 +148,15 @@ class ShipmentReturnDataMapper
             'emailAddress' => $this->sanitizeString($merchantRecipient->getEmail()),
         ];
 
+        $customerPostalCode = $this->postalCodeSanitizer->sanitize(
+            $customerSender->getPostalCode(),
+            $customerCountry
+        );
+        $merchantPostalCode = $this->postalCodeSanitizer->sanitize(
+            $merchantRecipient->getPostalCode(),
+            $countryCode
+        );
+
         $result = [
             'shipmentInfo' => $shipmentInfo,
             'content' => $this->sanitizeString($settings->getContent()),
@@ -155,7 +167,7 @@ class ShipmentReturnDataMapper
                     'address' => [
                         'country' => $customerCountry,
                         'name' => $this->sanitizeString($customerName),
-                        'postalCode' => $this->sanitizePostalCode($customerSender->getPostalCode(), $customerCountry),
+                        'postalCode' => $customerPostalCode,
                         'city' => $this->sanitizeString($customerSender->getCity()),
                         'street' => $this->sanitizeString($customerSender->getStreet()),
                         'houseNumber' => $this->sanitizeString($customerSender->getHouseNumber()),
@@ -168,7 +180,7 @@ class ShipmentReturnDataMapper
                     'address' => [
                         'country' => $countryCode,
                         'name' => $this->sanitizeString($merchantName),
-                        'postalCode' => $this->sanitizePostalCode($merchantRecipient->getPostalCode(), $countryCode),
+                        'postalCode' => $merchantPostalCode,
                         'city' => $this->sanitizeString($merchantRecipient->getCity()),
                         'street' => $this->sanitizeString($merchantRecipient->getStreet()),
                         'houseNumber' => $this->sanitizeString($merchantRecipient->getHouseNumber()),
@@ -210,23 +222,5 @@ class ShipmentReturnDataMapper
         }
 
         return (string) preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', trim($string));
-    }
-
-    /**
-     * Format postal code: remove hyphen for PL, return unchanged for international countries.
-     *
-     * @param string $postalCode
-     * @param string $countryCode
-     *
-     * @return string
-     */
-    public function sanitizePostalCode(string $postalCode, string $countryCode = 'PL'): string
-    {
-        $postalCode = trim($postalCode);
-        if (strtoupper($countryCode) === 'PL') {
-            return str_replace('-', '', $postalCode);
-        }
-
-        return $postalCode;
     }
 }

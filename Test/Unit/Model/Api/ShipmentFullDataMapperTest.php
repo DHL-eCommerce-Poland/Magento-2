@@ -24,7 +24,7 @@ class ShipmentFullDataMapperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mapper = new ShipmentFullDataMapper();
+        $this->mapper = new ShipmentFullDataMapper(new \Ideo\Dhl\Model\Shipment\PostalCodeSanitizer());
     }
 
     /**
@@ -887,12 +887,6 @@ class ShipmentFullDataMapperTest extends TestCase
         ];
     }
 
-    #[DataProvider('postalCodeDataProvider')]
-    public function testSanitizePostalCode(string $inputCode, string $countryCode, string $expected): void
-    {
-        $this->assertSame($expected, $this->mapper->sanitizePostalCode($inputCode, $countryCode));
-    }
-
     public function testMapRemovesInternalSpaceFromCzechSenderAndRecipientPostalCodes(): void
     {
         $shipmentData = new DhlShipmentData(
@@ -1086,17 +1080,5 @@ class ShipmentFullDataMapperTest extends TestCase
         $this->assertCount(1, $mapped['pieceList']['item']);
         $this->assertEquals('PALLET', $mapped['pieceList']['item'][0]['type']);
         $this->assertTrue($mapped['pieceList']['item'][0]['euroReturn']);
-    }
-
-    public static function postalCodeDataProvider(): array
-    {
-        return [
-            'PL with hyphen' => ['00-950', 'PL', '00950'],
-            'PL without hyphen' => ['00950', 'PL', '00950'],
-            'CZ with internal space' => ['100 00', 'CZ', '10000'],
-            'GB alphanumeric with space' => ['SW1A 1AA', 'GB', 'SW1A1AA'],
-            'DE with hyphen' => ['D-10115', 'DE', 'D-10115'],
-            'US zip extended' => ['90210-1234', 'US', '90210-1234'],
-        ];
     }
 }
