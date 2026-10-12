@@ -406,13 +406,15 @@ define([
             popCity: ko.observable(r.popCity || ''),
             popPostcode: ko.observable(r.popPostcode || ''),
             postnummer: ko.observable(r.postnummer || ''),
-            mapPointType: ko.observable(r.mapPointType || 'courier'),
+            mapPointType: ko.observable(r.mapPointType || (recipientCountry === 'PL' ? '' : 'courier')),
             phone: ko.observable(r.phone || ''),
             email: ko.observable(r.email || '')
         };
 
         recipientObj.mapPointType.subscribe(function (newType) {
-            if (newType === 'courier') {
+            var currentCountry = recipientObj.country ? (typeof recipientObj.country === 'function' ? recipientObj.country() : recipientObj.country) : '';
+            var isNonPl = currentCountry && String(currentCountry).trim().toUpperCase() !== 'PL';
+            if (isNonPl && newType === 'courier') {
                 recipientObj.popId('');
                 recipientObj.popName('');
                 recipientObj.popStreet('');
@@ -422,7 +424,7 @@ define([
             }
         });
 
-        if (recipientObj.mapPointType() === 'courier') {
+        if (recipientCountry !== 'PL' && recipientObj.mapPointType() === 'courier') {
             recipientObj.popId('');
             recipientObj.popName('');
             recipientObj.popStreet('');
@@ -644,6 +646,18 @@ define([
             });
             this.isSpServiceSelected = this.isPointServiceSelected;
 
+            this.isDeliveryPointButtonDisabled = ko.pureComputed(function () {
+                var draft = self.shipmentData();
+                if (!draft || !draft.recipient) {
+                    return false;
+                }
+                var country = typeof draft.recipient.country === 'function' ? draft.recipient.country() : draft.recipient.country;
+                var countryUpper = country ? String(country).trim().toUpperCase() : '';
+                var isNonPl = countryUpper !== '' && countryUpper !== 'PL';
+                var pType = typeof draft.recipient.mapPointType === 'function' ? draft.recipient.mapPointType() : draft.recipient.mapPointType;
+                return isNonPl && pType === 'courier';
+            });
+
             this.isCustomsClearanceVisible = ko.pureComputed(function () {
                 var draft = self.shipmentData();
                 if (!draft || !draft.recipient || typeof draft.recipient.country !== 'function') {
@@ -777,6 +791,9 @@ define([
         },
 
         openPointMapModal: function () {
+            if (typeof this.isDeliveryPointButtonDisabled === 'function' && this.isDeliveryPointButtonDisabled()) {
+                return;
+            }
             var self = this;
             var draft = this.shipmentData();
             if (!draft || !draft.recipient) {
