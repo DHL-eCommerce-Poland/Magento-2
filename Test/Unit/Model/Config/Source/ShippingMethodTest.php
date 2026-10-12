@@ -15,8 +15,8 @@ class ShippingMethodTest extends TestCase
     {
         $catalogMock = $this->createStub(MethodCatalog::class);
         $catalogMock->method('getMethods')->willReturn([
-            ['code' => 'parcel_polska', 'title' => 'DHL Parcel Polska'],
-            ['code' => 'premium', 'title' => 'DHL Parcel Premium'],
+            ['code' => 'parcel_polska', 'title' => 'Kurier DHL'],
+            ['code' => 'premium', 'title' => 'Kurier DHL Premium'],
         ]);
 
         $scopeConfigMock = $this->createStub(ScopeConfigInterface::class);
@@ -27,14 +27,14 @@ class ShippingMethodTest extends TestCase
 
         self::assertCount(2, $options);
         self::assertSame('parcel_polska', $options[0]['value']);
-        self::assertEquals('DHL Parcel Polska [parcel_polska]', (string)$options[0]['label']);
+        self::assertEquals('Kurier DHL [parcel_polska]', (string)$options[0]['label']);
     }
 
     public function testToOptionArrayUsesConfiguredCustomTitle(): void
     {
         $catalogMock = $this->createStub(MethodCatalog::class);
         $catalogMock->method('getMethods')->willReturn([
-            ['code' => 'parcel_polska', 'title' => 'DHL Parcel Polska'],
+            ['code' => 'parcel_polska', 'title' => 'Kurier DHL'],
         ]);
 
         $scopeConfigMock = $this->createStub(ScopeConfigInterface::class);

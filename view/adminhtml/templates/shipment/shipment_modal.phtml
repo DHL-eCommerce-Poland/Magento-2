@@ -510,7 +510,7 @@ $todayIsoDate = $viewModel->getIsoDate();
                             <div class="admin__field-control dhl-flex-row">
                                 <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Invoice Number')) ?>" data-bind="value: invoiceNr" required />
                                 <div class="dhl-flex-1 dhl-relative">
-                                    <input type="text" class="admin__control-text dhl-input-full" placeholder="<?= $escaper->escapeHtmlAttr(__('Date of Invoice')) ?>" data-bind="dhlDatepicker: invoiceDate, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', maxDate: new Date() }" required />
+                                    <input type="text" class="admin__control-text dhl-input-full" placeholder="<?= $escaper->escapeHtmlAttr(__('Date of invoice')) ?>" data-bind="dhlDatepicker: invoiceDate, datepickerOptions: { dateFormat: '<?= $escaper->escapeJs($dateFormat) ?>', maxDate: new Date() }" required />
                                 </div>
                             </div>
                         </div>
