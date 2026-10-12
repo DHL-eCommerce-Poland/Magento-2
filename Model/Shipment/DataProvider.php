@@ -10,6 +10,7 @@ use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -30,6 +31,7 @@ class DataProvider extends AbstractDataProvider
      * @param TimezoneInterface $timezone
      * @param ShipmentDateSanitizer $dateSanitizer
      * @param LoggerInterface $logger
+     * @param OrderRepositoryInterface $orderRepository
      * @param array $meta
      * @param array $data
      */
@@ -42,6 +44,7 @@ class DataProvider extends AbstractDataProvider
         private readonly TimezoneInterface $timezone,
         private readonly ShipmentDateSanitizer $dateSanitizer,
         private readonly LoggerInterface $logger,
+        private readonly OrderRepositoryInterface $orderRepository,
         array $meta = [],
         array $data = []
     ) {
@@ -65,6 +68,7 @@ class DataProvider extends AbstractDataProvider
         foreach ($items as $item) {
             $data = $item->getData();
             $rawPayload = $item->getShipmentData();
+            $orderGrandTotal = null;
 
             if (!empty($rawPayload) && is_string($rawPayload)) {
                 try {
@@ -79,6 +83,9 @@ class DataProvider extends AbstractDataProvider
                 }
 
                 if (is_array($payload)) {
+                    if (isset($payload['orderGrandTotal']) && is_numeric($payload['orderGrandTotal'])) {
+                        $orderGrandTotal = (float) $payload['orderGrandTotal'];
+                    }
                     if (isset($payload['sender']) && is_array($payload['sender'])) {
                         $data['sender'] = $payload['sender'];
                     }
@@ -186,6 +193,32 @@ class DataProvider extends AbstractDataProvider
                         }
                     }
                 }
+            }
+
+            if ($orderGrandTotal === null && $item->getOrderId()) {
+                try {
+                    $order = $this->orderRepository->get((int)$item->getOrderId());
+                    $orderGrandTotal = (float)$order->getGrandTotal();
+                } catch (Throwable $e) {
+                    $this->logger->error(sprintf(
+                        '[DataProvider] Failed to load order #%s for grand total: %s',
+                        $item->getOrderId(),
+                        $e->getMessage()
+                    ));
+                }
+            }
+
+            if ($orderGrandTotal !== null) {
+                $formattedTotal = number_format($orderGrandTotal, 2, '.', '');
+                $data['orderGrandTotal'] = $formattedTotal;
+                if (!isset($data['specialServices']) || !is_array($data['specialServices'])) {
+                    $data['specialServices'] = [];
+                }
+                $data['specialServices']['orderGrandTotal'] = $formattedTotal;
+                if (!isset($data['special_services']) || !is_array($data['special_services'])) {
+                    $data['special_services'] = [];
+                }
+                $data['special_services']['specialServices'] = $data['specialServices'];
             }
 
             $this->loadedData[$item->getId()] = $data;
