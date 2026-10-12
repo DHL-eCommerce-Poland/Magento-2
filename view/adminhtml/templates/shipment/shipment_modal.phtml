@@ -475,23 +475,23 @@ $todayIsoDate = $viewModel->getIsoDate();
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Contact Person First & Last Name')) ?></span></label>
                             <div class="admin__field-control dhl-flex-row">
-                                <input type="text" maxlength="30" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('First Name')) ?>" data-bind="value: firstName" required />
-                                <input type="text" maxlength="30" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Last Name')) ?>" data-bind="value: secondaryName" required />
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('First Name')) ?>" data-bind="value: firstName" required />
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Last Name')) ?>" data-bind="value: secondaryName" required />
                             </div>
                         </div>
 
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Additional Information')) ?></span></label>
                             <div class="admin__field-control">
-                                <input type="text" maxlength="100" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Additional Information')) ?>" data-bind="value: additionalInfo" />
+                                <input type="text" class="admin__control-text" placeholder="<?= $escaper->escapeHtmlAttr(__('Additional Information')) ?>" data-bind="value: additionalInfo" />
                             </div>
                         </div>
 
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipper VAT & Receiver VAT')) ?></span></label>
                             <div class="admin__field-control dhl-flex-row">
-                                <input type="text" maxlength="15" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper VAT')) ?>" data-bind="value: vatRegistrationNumber" />
-                                <input type="text" maxlength="15" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver VAT')) ?>" data-bind="value: vatRegistrationNumberReceiver" />
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper VAT')) ?>" data-bind="value: vatRegistrationNumber" />
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver VAT')) ?>" data-bind="value: vatRegistrationNumberReceiver" />
                             </div>
                         </div>
 
@@ -499,9 +499,9 @@ $todayIsoDate = $viewModel->getIsoDate();
                         <div class="admin__field required">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Shipper NIP, Shipper EORI & Receiver EORI')) ?></span></label>
                             <div class="admin__field-control dhl-flex-row">
-                                <input type="text" maxlength="17" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper NIP')) ?>" data-bind="value: nipNr" required />
-                                <input type="text" maxlength="17" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper EORI')) ?>" data-bind="value: eoriNr" required />
-                                <input type="text" maxlength="17" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver EORI')) ?>" data-bind="value: eoriNrReceiver" />
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper NIP')) ?>" data-bind="value: nipNr" required />
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Shipper EORI')) ?>" data-bind="value: eoriNr" required />
+                                <input type="text" class="admin__control-text dhl-flex-1" placeholder="<?= $escaper->escapeHtmlAttr(__('Receiver EORI')) ?>" data-bind="value: eoriNrReceiver" />
                             </div>
                         </div>
 
@@ -596,10 +596,10 @@ $todayIsoDate = $viewModel->getIsoDate();
                                     <tbody data-bind="foreach: customsItems">
                                         <tr>
                                             <td>
-                                                <input type="text" maxlength="35" class="admin__control-text dhl-input-full" data-bind="value: nameEn" />
+                                                <input type="text" class="admin__control-text dhl-input-full" data-bind="value: nameEn" />
                                             </td>
                                             <td>
-                                                <input type="text" maxlength="35" class="admin__control-text dhl-input-full" data-bind="value: namePl" />
+                                                <input type="text" class="admin__control-text dhl-input-full" data-bind="value: namePl" />
                                             </td>
                                             <td>
                                                 <input type="text" class="admin__control-text dhl-input-full" data-bind="value: quantity" />
@@ -611,7 +611,7 @@ $todayIsoDate = $viewModel->getIsoDate();
                                                 <input type="text" class="admin__control-text dhl-input-full" data-bind="value: value" />
                                             </td>
                                             <td>
-                                                <input type="text" maxlength="10" class="admin__control-text dhl-input-full" data-bind="value: tariffCode" />
+                                                <input type="text" class="admin__control-text dhl-input-full" data-bind="value: tariffCode" />
                                             </td>
                                             <td>
                                                 <select class="admin__control-select dhl-input-full" data-bind="options: $parents[1].customsItemCountryOptions, optionsText: 'label', optionsValue: 'value', value: countryOfOrigin"></select>
