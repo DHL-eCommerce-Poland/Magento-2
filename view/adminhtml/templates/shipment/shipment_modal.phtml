@@ -152,7 +152,7 @@ $todayIsoDate = $viewModel->getIsoDate();
                         <div class="admin__field">
                             <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Delivery Point')) ?></span></label>
                             <div class="admin__field-control">
-                                <button type="button" class="action-secondary" data-bind="click: function() { if (mapPointType() !== 'courier') { $parent.openPointMapModal(); } }, disable: mapPointType() === 'courier'">
+                                <button type="button" class="action-secondary" data-bind="click: function() { if (!country() || country().toUpperCase() === 'PL' || mapPointType() !== 'courier') { $parent.openPointMapModal(); } }, disable: country() && country().toUpperCase() !== 'PL' && mapPointType() === 'courier'">
                                     <span><?= $escaper->escapeHtml(__('Select delivery point from map')) ?></span>
                                 </button>
                             </div>
