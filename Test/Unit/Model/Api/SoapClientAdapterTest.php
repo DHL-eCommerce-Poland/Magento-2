@@ -75,16 +75,15 @@ class SoapClientAdapterTest extends TestCase
      *
      * @return void
      */
-    public function testSanitizeXmlMasksUsernameAndPassword(): void
+    public function testSanitizeXmlMasksPasswordWhilePreservingUsername(): void
     {
         $rawXml = '<soap:Envelope><AuthData><username>user1</username>'
             . '<password>Secret123!</password></AuthData></soap:Envelope>';
 
         $sanitized = $this->adapter->sanitizeXml($rawXml);
 
-        $this->assertStringNotContainsString('user1', $sanitized);
+        $this->assertStringContainsString('<username>user1</username>', $sanitized);
         $this->assertStringNotContainsString('Secret123!', $sanitized);
-        $this->assertStringContainsString('<username>***MASKED***</username>', $sanitized);
         $this->assertStringContainsString('<password>***MASKED***</password>', $sanitized);
     }
 
@@ -795,9 +794,9 @@ class SoapClientAdapterTest extends TestCase
         $this->assertStringContainsString('[DHL SOAP Response - bookCourier]', $logOutput);
         $this->assertStringContainsString('SHIPMENT_1', $logOutput);
         $this->assertStringContainsString('SHIPMENT_2', $logOutput);
-        $this->assertStringNotContainsString('private-user', $logOutput);
+        $this->assertStringContainsString('private-user', $logOutput);
         $this->assertStringNotContainsString('private-password', $logOutput);
-        $this->assertStringContainsString('<username>***MASKED***</username>', $logOutput);
+        $this->assertStringContainsString('<username>private-user</username>', $logOutput);
         $this->assertStringContainsString('<password>***MASKED***</password>', $logOutput);
     }
 
@@ -910,9 +909,9 @@ class SoapClientAdapterTest extends TestCase
         $this->assertStringContainsString('[DHL SOAP Request - cancelCourierBooking]', $logOutput);
         $this->assertStringContainsString('[DHL SOAP Response - cancelCourierBooking]', $logOutput);
         $this->assertStringContainsString('ORDER_1', $logOutput);
-        $this->assertStringNotContainsString('private-user', $logOutput);
+        $this->assertStringContainsString('private-user', $logOutput);
         $this->assertStringNotContainsString('private-password', $logOutput);
-        $this->assertStringContainsString('<username>***MASKED***</username>', $logOutput);
+        $this->assertStringContainsString('<username>private-user</username>', $logOutput);
         $this->assertStringContainsString('<password>***MASKED***</password>', $logOutput);
     }
 

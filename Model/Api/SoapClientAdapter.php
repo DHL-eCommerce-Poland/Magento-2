@@ -1108,11 +1108,8 @@ class SoapClientAdapter implements ClientInterface
 
         $xml = $this->ensureUtf8($xml);
 
-        foreach (['username', 'password'] as $credentialTag) {
-            $pattern = '/(<(?:[a-zA-Z0-9_]+:)?' . $credentialTag . '>)[^<]*(<\/(?:[a-zA-Z0-9_]+:)?'
-                . $credentialTag . '>)/i';
-            $xml = (string) preg_replace($pattern, '$1***MASKED***$2', $xml);
-        }
+        $passwordPattern = '/(<(?:[a-zA-Z0-9_]+:)?password>)[^<]*(<\/(?:[a-zA-Z0-9_]+:)?password>)/i';
+        $xml = (string) preg_replace($passwordPattern, '$1***MASKED***$2', $xml);
 
         $binPattern = '/(<(?:[a-zA-Z0-9_]+:)?'
             . '(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile|invoice)>)'
