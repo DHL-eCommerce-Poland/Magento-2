@@ -51,8 +51,7 @@ class CredentialsProvider
 
         $username = $this->filterValue($overrideUsername);
         if ($username === null) {
-            $rawUsername = (string) $this->scopeConfig->getValue($loginPath);
-            $username = $this->decryptValue($rawUsername);
+            $username = (string) $this->scopeConfig->getValue($loginPath);
         }
 
         $password = $this->filterValue($overridePassword);

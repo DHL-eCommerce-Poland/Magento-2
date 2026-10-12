@@ -8,10 +8,10 @@
                 <title>DHL eCommerce Poland</title>
                 <active>1</active>
                 <sandbox>0</sandbox>
-                <api_login backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <api_login />
                 <api_password backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <customer_number />
-                <api_login_sandbox backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <api_login_sandbox />
                 <api_password_sandbox backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <customer_number_sandbox />
                 <debug>0</debug>

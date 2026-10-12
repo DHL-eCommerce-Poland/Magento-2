@@ -44,22 +44,36 @@ class SystemXmlTest extends TestCase
             }
         }
 
-        // Test dynamic depends logic for prod vs sandbox fields
+        // Test dynamic depends logic and field types for prod vs sandbox fields
         $apiLoginField = $generalGroups[0]->xpath('./field[@id="api_login"]')[0];
         self::assertSame('0', (string)$apiLoginField->depends->field);
         self::assertSame('sandbox', (string)$apiLoginField->depends->field['id']);
+        self::assertSame('text', (string)$apiLoginField['type']);
+        self::assertEmpty($apiLoginField->xpath('./backend_model'));
 
         $apiPasswordField = $generalGroups[0]->xpath('./field[@id="api_password"]')[0];
         self::assertSame('0', (string)$apiPasswordField->depends->field);
         self::assertSame('sandbox', (string)$apiPasswordField->depends->field['id']);
+        self::assertSame('obscure', (string)$apiPasswordField['type']);
+        self::assertSame(
+            'Magento\Config\Model\Config\Backend\Encrypted',
+            (string)$apiPasswordField->backend_model
+        );
 
         $apiLoginSandboxField = $generalGroups[0]->xpath('./field[@id="api_login_sandbox"]')[0];
         self::assertSame('1', (string)$apiLoginSandboxField->depends->field);
         self::assertSame('sandbox', (string)$apiLoginSandboxField->depends->field['id']);
+        self::assertSame('text', (string)$apiLoginSandboxField['type']);
+        self::assertEmpty($apiLoginSandboxField->xpath('./backend_model'));
 
         $apiPasswordSandboxField = $generalGroups[0]->xpath('./field[@id="api_password_sandbox"]')[0];
         self::assertSame('1', (string)$apiPasswordSandboxField->depends->field);
         self::assertSame('sandbox', (string)$apiPasswordSandboxField->depends->field['id']);
+        self::assertSame('obscure', (string)$apiPasswordSandboxField['type']);
+        self::assertSame(
+            'Magento\Config\Model\Config\Backend\Encrypted',
+            (string)$apiPasswordSandboxField->backend_model
+        );
 
         // Method groups assertions
         $methodCodes = [
@@ -148,5 +162,35 @@ class SystemXmlTest extends TestCase
             '/config/system/section[@id="carriers"]/group[@id="dhlpoland"]//group[@id="connect_packstation"]'
         );
         self::assertCount(1, $connectPackstationGroup);
+    }
+
+    /**
+     * Verify default credentials configuration in config.xml.
+     */
+    public function testConfigXmlCredentialsStructure(): void
+    {
+        $xml = simplexml_load_file(__DIR__ . '/../../../etc/config.xml');
+        self::assertInstanceOf(SimpleXMLElement::class, $xml);
+
+        $dhlNode = $xml->xpath('/config/default/carriers/dhlpoland');
+        self::assertCount(1, $dhlNode);
+
+        $apiLogin = $dhlNode[0]->xpath('./api_login')[0];
+        self::assertNull($apiLogin['backend_model']);
+
+        $apiLoginSandbox = $dhlNode[0]->xpath('./api_login_sandbox')[0];
+        self::assertNull($apiLoginSandbox['backend_model']);
+
+        $apiPassword = $dhlNode[0]->xpath('./api_password')[0];
+        self::assertSame(
+            'Magento\Config\Model\Config\Backend\Encrypted',
+            (string)$apiPassword['backend_model']
+        );
+
+        $apiPasswordSandbox = $dhlNode[0]->xpath('./api_password_sandbox')[0];
+        self::assertSame(
+            'Magento\Config\Model\Config\Backend\Encrypted',
+            (string)$apiPasswordSandbox['backend_model']
+        );
     }
 }
