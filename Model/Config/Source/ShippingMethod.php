@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Config\Source;
+namespace DhlPoland\Dhl\Model\Config\Source;
 
-use Ideo\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\MethodCatalog;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Data\OptionSourceInterface;
 use Magento\Store\Model\ScopeInterface;

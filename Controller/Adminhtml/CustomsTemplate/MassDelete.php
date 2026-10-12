@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\CustomsTemplate;
+namespace DhlPoland\Dhl\Controller\Adminhtml\CustomsTemplate;
 
 use Exception;
-use Ideo\Dhl\Model\CustomsTemplateRepository;
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory;
+use DhlPoland\Dhl\Model\CustomsTemplateRepository;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -15,7 +15,7 @@ use Magento\Ui\Component\MassAction\Filter;
 
 class MassDelete extends Action implements HttpPostActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::customs_template';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::customs_template';
 
     /**
      * @param Context $context

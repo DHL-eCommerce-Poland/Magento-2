@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\CustomsTemplate;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\CustomsTemplate;
 
 use Exception;
-use Ideo\Dhl\Controller\Adminhtml\CustomsTemplate\Delete;
-use Ideo\Dhl\Model\CustomsTemplateRepository;
+use DhlPoland\Dhl\Controller\Adminhtml\CustomsTemplate\Delete;
+use DhlPoland\Dhl\Model\CustomsTemplateRepository;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Redirect;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Template;
+namespace DhlPoland\Dhl\Model\Template;
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;

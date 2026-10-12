@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\CustomsTemplate;
+namespace DhlPoland\Dhl\Controller\Adminhtml\CustomsTemplate;
 
 use Exception;
-use Ideo\Dhl\Model\CustomsTemplateFactory;
-use Ideo\Dhl\Model\CustomsTemplateRepository;
-use Ideo\Dhl\Model\Source\CategoryOfItem;
-use Ideo\Dhl\Model\Source\CustomsCurrency;
+use DhlPoland\Dhl\Model\CustomsTemplateFactory;
+use DhlPoland\Dhl\Model\CustomsTemplateRepository;
+use DhlPoland\Dhl\Model\Source\CategoryOfItem;
+use DhlPoland\Dhl\Model\Source\CustomsCurrency;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -18,7 +18,7 @@ use Magento\Framework\Serialize\SerializerInterface;
 
 class Save extends Action implements HttpPostActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::customs_template';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::customs_template';
 
     /**
      * @param Context $context

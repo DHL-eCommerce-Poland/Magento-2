@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment\Data;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment\Data;
 
-use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
+use DhlPoland\Dhl\Model\Shipment\Data\SpecialServicesData;
 use PHPUnit\Framework\TestCase;
 
 class SpecialServicesDataTest extends TestCase

@@ -8,7 +8,7 @@
     </argument>
     <settings>
         <buttons>
-            <button name="generate_pnp" class="Ideo\Dhl\Block\Adminhtml\Button\GeneratePnp"/>
+            <button name="generate_pnp" class="DhlPoland\Dhl\Block\Adminhtml\Button\GeneratePnp"/>
         </buttons>
         <spinner>dhlpoland_shipment_columns</spinner>
         <deps>
@@ -121,7 +121,7 @@
                 <label translate="true">Order #</label>
             </settings>
         </column>
-        <column name="recipient_address" class="Ideo\Dhl\Ui\Component\Listing\Column\RecipientAddress">
+        <column name="recipient_address" class="DhlPoland\Dhl\Ui\Component\Listing\Column\RecipientAddress">
             <settings>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
                 <label translate="true">Recipient Address</label>
@@ -140,13 +140,13 @@
                 <label translate="true">Courier Dispatch ID</label>
             </settings>
         </column>
-        <column name="package_numbers" class="Ideo\Dhl\Ui\Component\Listing\Column\PackageNumbers">
+        <column name="package_numbers" class="DhlPoland\Dhl\Ui\Component\Listing\Column\PackageNumbers">
             <settings>
                 <filter>text</filter>
                 <label translate="true">Package Number</label>
             </settings>
         </column>
-        <column name="return_shipment_id" class="Ideo\Dhl\Ui\Component\Listing\Column\ReturnShipmentId">
+        <column name="return_shipment_id" class="DhlPoland\Dhl\Ui\Component\Listing\Column\ReturnShipmentId">
             <settings>
                 <filter>text</filter>
                 <label translate="true">Return Package Number</label>
@@ -172,7 +172,7 @@
                 <label translate="true">Updated At</label>
             </settings>
         </column>
-        <actionsColumn name="actions" class="Ideo\Dhl\Ui\Component\Listing\Column\ShipmentActions" component="Ideo_Dhl/js/grid/columns/actions">
+        <actionsColumn name="actions" class="DhlPoland\Dhl\Ui\Component\Listing\Column\ShipmentActions" component="DhlPoland_Dhl/js/grid/columns/actions">
             <settings>
                 <indexField>entity_id</indexField>
             </settings>

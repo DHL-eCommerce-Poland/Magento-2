@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Config\Source;
+namespace DhlPoland\Dhl\Model\Config\Source;
 
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory;
 use Magento\Framework\Data\OptionSourceInterface;
 
 class DropOffPoint implements OptionSourceInterface

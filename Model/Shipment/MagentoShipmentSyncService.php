@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 // phpcs:disable Generic.Files.LineLength.TooLong
 
-namespace Ideo\Dhl\Model\Shipment;
+namespace DhlPoland\Dhl\Model\Shipment;
 
 use Exception;
-use Ideo\Dhl\Model\Carrier;
+use DhlPoland\Dhl\Model\Carrier;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\ShipmentInterface;

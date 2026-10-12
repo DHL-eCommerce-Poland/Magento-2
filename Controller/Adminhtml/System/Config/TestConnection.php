@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\System\Config;
+namespace DhlPoland\Dhl\Controller\Adminhtml\System\Config;
 
-use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\CredentialsProvider;
+use DhlPoland\Dhl\Model\Api\ClientInterface;
+use DhlPoland\Dhl\Model\Api\CredentialsProvider;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -19,7 +19,7 @@ class TestConnection extends Action implements HttpPostActionInterface
     /**
      * Authorization resource ID.
      */
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::config';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::config';
 
     /**
      * @param Context $context

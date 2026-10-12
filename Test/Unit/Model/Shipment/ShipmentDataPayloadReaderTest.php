@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment;
 
-use Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataPayloadReader;
 use Magento\Framework\Serialize\Serializer\Json;
 use PHPUnit\Framework\TestCase;
 
@@ -44,7 +44,7 @@ class ShipmentDataPayloadReaderTest extends TestCase
 
     public function testGetServiceTypeFromEntityReadsNestedServiceType(): void
     {
-        $shipment = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $shipment->method('getShipmentData')->willReturn(
             (new Json())->serialize(['shipmentSettings' => ['serviceType' => ' AH ']])
         );
@@ -54,7 +54,7 @@ class ShipmentDataPayloadReaderTest extends TestCase
 
     public function testGetServiceTypeFromEntityReturnsNullWhenMissing(): void
     {
-        $shipment = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $shipment->method('getShipmentData')->willReturn(
             (new Json())->serialize(['shipmentSettings' => []])
         );
@@ -64,7 +64,7 @@ class ShipmentDataPayloadReaderTest extends TestCase
 
     public function testGetServiceTypeFromEntityReturnsNullForInvalidServiceType(): void
     {
-        $shipment = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $shipment->method('getShipmentData')->willReturn(
             (new Json())->serialize(['shipmentSettings' => ['serviceType' => ['invalid']]])
         );
@@ -125,7 +125,7 @@ class ShipmentDataPayloadReaderTest extends TestCase
 
     public function testGetReturnShipmentIdsFromEntityCombinesAndDeduplicatesDirectAndPayload(): void
     {
-        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $entityStub->method('getReturnShipmentId')->willReturn('90040025505, 90040025506');
         $entityStub->method('getShipmentData')->willReturn(json_encode([
             'packages' => [
@@ -141,7 +141,7 @@ class ShipmentDataPayloadReaderTest extends TestCase
 
     public function testGetReturnShipmentIdsFromEntityReturnsEmptyArrayWhenNoReturnIds(): void
     {
-        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $entityStub->method('getReturnShipmentId')->willReturn(null);
         $entityStub->method('getShipmentData')->willReturn(null);
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Shipment;
+namespace DhlPoland\Dhl\Model\Shipment;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
 use InvalidArgumentException;
 use Magento\Framework\Serialize\SerializerInterface;
 

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
-use Ideo\Dhl\Controller\Adminhtml\Shipment\BookCourier;
-use Ideo\Dhl\Model\Api\CourierBookingResult;
-use Ideo\Dhl\Model\Shipment\CourierBookingService;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\BookCourier;
+use DhlPoland\Dhl\Model\Api\CourierBookingResult;
+use DhlPoland\Dhl\Model\Shipment\CourierBookingService;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;

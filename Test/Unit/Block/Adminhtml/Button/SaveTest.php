@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Block\Adminhtml\Button;
+namespace DhlPoland\Dhl\Test\Unit\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Block\Adminhtml\Button\Save;
+use DhlPoland\Dhl\Block\Adminhtml\Button\Save;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use PHPUnit\Framework\TestCase;

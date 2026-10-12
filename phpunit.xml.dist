@@ -12,7 +12,7 @@
          bootstrap="Test/bootstrap.php"
          cacheDirectory=".phpunit.result.cache">
     <testsuites>
-        <testsuite name="Ideo_Dhl_Unit_Tests">
+        <testsuite name="DhlPoland_Dhl_Unit_Tests">
             <directory>Test/Unit</directory>
         </testsuite>
     </testsuites>

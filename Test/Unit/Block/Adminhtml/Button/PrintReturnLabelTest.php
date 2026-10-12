@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Block\Adminhtml\Button;
+namespace DhlPoland\Dhl\Test\Unit\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Block\Adminhtml\Button\PrintReturnLabel;
-use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Block\Adminhtml\Button\PrintReturnLabel;
+use DhlPoland\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;

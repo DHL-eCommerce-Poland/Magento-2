@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\ServicePoint;
+namespace DhlPoland\Dhl\Test\Unit\Model\ServicePoint;
 
-use Ideo\Dhl\Model\Carrier;
-use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\ServicePoint\ServicePointValidator;
-use Ideo\Dhl\Model\ServicePoint\ServicePointValueObject;
+use DhlPoland\Dhl\Model\Carrier;
+use DhlPoland\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\ServicePoint\ServicePointValidator;
+use DhlPoland\Dhl\Model\ServicePoint\ServicePointValueObject;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use PHPUnit\Framework\TestCase;

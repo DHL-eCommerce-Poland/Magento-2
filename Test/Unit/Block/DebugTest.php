@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Block;
+namespace DhlPoland\Dhl\Test\Unit\Block;
 
-use Ideo\Dhl\Block\Debug;
+use DhlPoland\Dhl\Block\Debug;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Store\Model\ScopeInterface;

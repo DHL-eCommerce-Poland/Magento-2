@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model;
+namespace DhlPoland\Dhl\Test\Unit\Model;
 
-use Ideo\Dhl\Api\Data\DropOffPointInterface;
-use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
-use Ideo\Dhl\Model\DropOffPointResolver;
+use DhlPoland\Dhl\Api\Data\DropOffPointInterface;
+use DhlPoland\Dhl\Api\DropOffPointRepositoryInterface;
+use DhlPoland\Dhl\Model\DropOffPointResolver;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

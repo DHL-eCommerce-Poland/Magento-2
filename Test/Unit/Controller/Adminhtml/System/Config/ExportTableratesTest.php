@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\System\Config;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\System\Config;
 
-use Ideo\Dhl\Controller\Adminhtml\System\Config\ExportTablerates;
-use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\TableRateResolver;
+use DhlPoland\Dhl\Controller\Adminhtml\System\Config\ExportTablerates;
+use DhlPoland\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\TableRateResolver;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Response\Http\FileFactory;
@@ -192,7 +192,7 @@ class ExportTableratesTest extends TestCase
         $resourceConnectionStub->method('getConnection')->willReturn($connectionStub);
         $resourceConnectionStub->method('getTableName')->willReturn('dhlpoland_tablerate');
 
-        $tablerateBackend = new \Ideo\Dhl\Model\Config\Backend\Tablerate(
+        $tablerateBackend = new \DhlPoland\Dhl\Model\Config\Backend\Tablerate(
             $this->createStub(\Magento\Framework\Model\Context::class),
             $this->createStub(\Magento\Framework\Registry::class),
             $this->createStub(\Magento\Framework\App\Config\ScopeConfigInterface::class),

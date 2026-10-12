@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Checkout;
+namespace DhlPoland\Dhl\Test\Unit\Model\Checkout;
 
-use Ideo\Dhl\Model\Checkout\ConfigProvider;
+use DhlPoland\Dhl\Model\Checkout\ConfigProvider;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
@@ -38,10 +38,10 @@ class ConfigProviderTest extends TestCase
             ->method('getUrl')
             ->willReturnCallback(
                 static fn (string $fileId) => match ($fileId) {
-                    'Ideo_Dhl::images/logo_dhl_box_pop.png' => 'https://example.com/logo_dhl_box_pop.png',
-                    'Ideo_Dhl::images/logo_dhl_pop.png' => 'https://example.com/logo_dhl_pop.png',
-                    'Ideo_Dhl::images/logo_dhl_box.png' => 'https://example.com/logo_dhl_box.png',
-                    'Ideo_Dhl::images/logo_dhl.png' => 'https://example.com/logo_dhl.png',
+                    'DhlPoland_Dhl::images/logo_dhl_box_pop.png' => 'https://example.com/logo_dhl_box_pop.png',
+                    'DhlPoland_Dhl::images/logo_dhl_pop.png' => 'https://example.com/logo_dhl_pop.png',
+                    'DhlPoland_Dhl::images/logo_dhl_box.png' => 'https://example.com/logo_dhl_box.png',
+                    'DhlPoland_Dhl::images/logo_dhl.png' => 'https://example.com/logo_dhl.png',
                     default => '',
                 }
             );

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Block\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Block\Adminhtml\Shipment;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
-use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
+use DhlPoland\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use PHPUnit\Framework\TestCase;

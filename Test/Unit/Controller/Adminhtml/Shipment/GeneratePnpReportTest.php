@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
-use Ideo\Dhl\Controller\Adminhtml\Shipment\GeneratePnpReport;
-use Ideo\Dhl\Model\Shipment\PnpReportService;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\GeneratePnpReport;
+use DhlPoland\Dhl\Model\Shipment\PnpReportService;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Response\Http\FileFactory;

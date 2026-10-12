@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\ResourceModel\ShipmentData;
+namespace DhlPoland\Dhl\Model\ResourceModel\ShipmentData;
 
-use Ideo\Dhl\Model\ResourceModel\ShipmentData as ShipmentDataResource;
-use Ideo\Dhl\Model\ShipmentData as ShipmentDataModel;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData as ShipmentDataResource;
+use DhlPoland\Dhl\Model\ShipmentData as ShipmentDataModel;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
 class Collection extends AbstractCollection

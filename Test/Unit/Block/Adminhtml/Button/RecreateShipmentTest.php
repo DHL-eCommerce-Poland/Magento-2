@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Block\Adminhtml\Button;
+namespace DhlPoland\Dhl\Test\Unit\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Block\Adminhtml\Button\RecreateShipment;
-use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Block\Adminhtml\Button\RecreateShipment;
+use DhlPoland\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use PHPUnit\Framework\MockObject\Stub;
@@ -81,6 +81,6 @@ class RecreateShipmentTest extends TestCase
         $this->assertEquals(__('Save & Resend to DHL'), $buttonData['label']);
         $this->assertEquals('save primary', $buttonData['class']);
         $this->assertEquals(70, $buttonData['sort_order']);
-        $this->assertStringContainsString('Ideo_Dhl/js/shipment/recreate-shipment', $buttonData['on_click']);
+        $this->assertStringContainsString('DhlPoland_Dhl/js/shipment/recreate-shipment', $buttonData['on_click']);
     }
 }

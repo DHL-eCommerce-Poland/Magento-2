@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\DeliveryService;
+namespace DhlPoland\Dhl\Test\Unit\Model\DeliveryService;
 
-use Ideo\Dhl\Model\DeliveryService;
-use Ideo\Dhl\Model\DeliveryService\DataProvider;
-use Ideo\Dhl\Model\ResourceModel\DeliveryService\Collection;
-use Ideo\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory;
+use DhlPoland\Dhl\Model\DeliveryService;
+use DhlPoland\Dhl\Model\DeliveryService\DataProvider;
+use DhlPoland\Dhl\Model\ResourceModel\DeliveryService\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\DeliveryService\CollectionFactory;
 use PHPUnit\Framework\TestCase;
 
 class DataProviderTest extends TestCase

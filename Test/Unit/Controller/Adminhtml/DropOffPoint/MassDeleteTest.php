@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\DropOffPoint;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\DropOffPoint;
 
-use Ideo\Dhl\Api\Data\DropOffPointInterface;
-use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
-use Ideo\Dhl\Controller\Adminhtml\DropOffPoint\MassDelete;
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint\Collection;
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory;
+use DhlPoland\Dhl\Api\Data\DropOffPointInterface;
+use DhlPoland\Dhl\Api\DropOffPointRepositoryInterface;
+use DhlPoland\Dhl\Controller\Adminhtml\DropOffPoint\MassDelete;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;

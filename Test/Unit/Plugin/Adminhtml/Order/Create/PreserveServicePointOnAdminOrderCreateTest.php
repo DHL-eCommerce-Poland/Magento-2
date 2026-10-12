@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Plugin\Adminhtml\Order\Create;
+namespace DhlPoland\Dhl\Test\Unit\Plugin\Adminhtml\Order\Create;
 
-use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Plugin\Adminhtml\Order\Create\PreserveServicePointOnAdminOrderCreate;
+use DhlPoland\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Plugin\Adminhtml\Order\Create\PreserveServicePointOnAdminOrderCreate;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Sales\Model\AdminOrder\Create as AdminOrderCreate;

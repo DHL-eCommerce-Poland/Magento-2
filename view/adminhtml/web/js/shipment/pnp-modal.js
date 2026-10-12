@@ -163,11 +163,11 @@ define([
                 self.openModal();
             };
 
-            window.IdeoDhlPnp = {
+            window.DhlPolandPnp = {
                 openModal: openHandler
             };
 
-            $('#ideo-dhl-pnp-modal').data('openPnpModal', openHandler);
+            $('#dhlpoland-pnp-modal').data('openPnpModal', openHandler);
 
             return this;
         },
@@ -185,7 +185,7 @@ define([
                 }
             }
 
-            var $modal = $('#ideo-dhl-pnp-modal');
+            var $modal = $('#dhlpoland-pnp-modal');
             if (!$modal.data('mageModal')) {
                 $modal.modal({
                     title: $t('PNP Report'),
@@ -194,7 +194,7 @@ define([
                         text: $t('Generate Report'),
                         class: 'action-primary action-accept',
                         click: function () {
-                            $('#ideo-dhl-pnp-form').submit();
+                            $('#dhlpoland-pnp-form').submit();
                             $modal.modal('closeModal');
                         }
                     }, {

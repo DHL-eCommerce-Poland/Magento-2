@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
-use Ideo\Dhl\Controller\Adminhtml\Shipment\UpdateStatus;
-use Ideo\Dhl\Model\Api\TrackingResult;
-use Ideo\Dhl\Model\Shipment\ShipmentTrackingService;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\UpdateStatus;
+use DhlPoland\Dhl\Model\Api\TrackingResult;
+use DhlPoland\Dhl\Model\Shipment\ShipmentTrackingService;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Action\HttpPostActionInterface;

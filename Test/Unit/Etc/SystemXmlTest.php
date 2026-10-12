@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Etc;
+namespace DhlPoland\Dhl\Test\Unit\Etc;
 
 use PHPUnit\Framework\TestCase;
 use SimpleXMLElement;

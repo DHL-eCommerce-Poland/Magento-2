@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
 use Exception;
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
-use Ideo\Dhl\Controller\Adminhtml\Shipment\GetShipmentPickupInfo;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\GetShipmentPickupInfo;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Json;

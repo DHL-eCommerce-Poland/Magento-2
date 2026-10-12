@@ -10,19 +10,19 @@
     </argument>
     <settings>
         <buttons>
-            <button name="back" class="Ideo\Dhl\Block\Adminhtml\Button\Back"/>
-            <button name="print_label" class="Ideo\Dhl\Block\Adminhtml\Button\PrintLabel"/>
-            <button name="download_scan" class="Ideo\Dhl\Block\Adminhtml\Button\DownloadScan"/>
-            <button name="download_epod" class="Ideo\Dhl\Block\Adminhtml\Button\DownloadEpod"/>
-            <button name="track_shipment" class="Ideo\Dhl\Block\Adminhtml\Button\TrackShipment"/>
-            <button name="update_status" class="Ideo\Dhl\Block\Adminhtml\Button\UpdateStatusShipment"/>
-            <button name="create_return" class="Ideo\Dhl\Block\Adminhtml\Button\CreateReturnShipment"/>
-            <button name="print_return_label" class="Ideo\Dhl\Block\Adminhtml\Button\PrintReturnLabel"/>
-            <button name="print_return_qr" class="Ideo\Dhl\Block\Adminhtml\Button\PrintReturnQrCode"/>
-            <button name="book_courier" class="Ideo\Dhl\Block\Adminhtml\Button\BookCourierShipment"/>
-            <button name="cancel_courier" class="Ideo\Dhl\Block\Adminhtml\Button\CancelCourierShipment"/>
-            <button name="recreate" class="Ideo\Dhl\Block\Adminhtml\Button\RecreateShipment"/>
-            <button name="delete" class="Ideo\Dhl\Block\Adminhtml\Button\DeleteShipment"/>
+            <button name="back" class="DhlPoland\Dhl\Block\Adminhtml\Button\Back"/>
+            <button name="print_label" class="DhlPoland\Dhl\Block\Adminhtml\Button\PrintLabel"/>
+            <button name="download_scan" class="DhlPoland\Dhl\Block\Adminhtml\Button\DownloadScan"/>
+            <button name="download_epod" class="DhlPoland\Dhl\Block\Adminhtml\Button\DownloadEpod"/>
+            <button name="track_shipment" class="DhlPoland\Dhl\Block\Adminhtml\Button\TrackShipment"/>
+            <button name="update_status" class="DhlPoland\Dhl\Block\Adminhtml\Button\UpdateStatusShipment"/>
+            <button name="create_return" class="DhlPoland\Dhl\Block\Adminhtml\Button\CreateReturnShipment"/>
+            <button name="print_return_label" class="DhlPoland\Dhl\Block\Adminhtml\Button\PrintReturnLabel"/>
+            <button name="print_return_qr" class="DhlPoland\Dhl\Block\Adminhtml\Button\PrintReturnQrCode"/>
+            <button name="book_courier" class="DhlPoland\Dhl\Block\Adminhtml\Button\BookCourierShipment"/>
+            <button name="cancel_courier" class="DhlPoland\Dhl\Block\Adminhtml\Button\CancelCourierShipment"/>
+            <button name="recreate" class="DhlPoland\Dhl\Block\Adminhtml\Button\RecreateShipment"/>
+            <button name="delete" class="DhlPoland\Dhl\Block\Adminhtml\Button\DeleteShipment"/>
         </buttons>
         <namespace>dhlpoland_shipment_form</namespace>
         <dataScope>data</dataScope>
@@ -39,7 +39,7 @@
         <settings>
             <submitUrl path="dhlpoland/shipment/save"/>
         </settings>
-        <dataProvider class="Ideo\Dhl\Model\Shipment\DataProvider" name="dhlpoland_shipment_form_data_source">
+        <dataProvider class="DhlPoland\Dhl\Model\Shipment\DataProvider" name="dhlpoland_shipment_form_data_source">
             <settings>
                 <requestFieldName>entity_id</requestFieldName>
                 <primaryFieldName>entity_id</primaryFieldName>
@@ -217,7 +217,7 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Config\Source\ShipmentAddressType"/>
+                        <options class="DhlPoland\Dhl\Model\Config\Source\ShipmentAddressType"/>
                     </settings>
                 </select>
             </formElements>
@@ -299,7 +299,7 @@
                 <dataScope>recipient.email</dataScope>
             </settings>
         </field>
-        <field name="recipient[mapPointType]" formElement="select" component="Ideo_Dhl/js/form/element/international-map-point-type">
+        <field name="recipient[mapPointType]" formElement="select" component="DhlPoland_Dhl/js/form/element/international-map-point-type">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">International Point Type</label>
@@ -308,17 +308,17 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Config\Source\InternationalMapPointType"/>
+                        <options class="DhlPoland\Dhl\Model\Config\Source\InternationalMapPointType"/>
                     </settings>
                 </select>
             </formElements>
         </field>
-        <button name="select_point_button" component="Ideo_Dhl/js/form/element/map-point-selector">
+        <button name="select_point_button" component="DhlPoland_Dhl/js/form/element/map-point-selector">
             <settings>
                 <title translate="true">Select delivery point from map</title>
             </settings>
         </button>
-        <field name="recipient[popId]" formElement="input" component="Ideo_Dhl/js/form/element/sp-dependent-field">
+        <field name="recipient[popId]" formElement="input" component="DhlPoland_Dhl/js/form/element/sp-dependent-field">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">POP Service Point ID</label>
@@ -326,7 +326,7 @@
                 <disabled>true</disabled>
             </settings>
         </field>
-        <field name="recipient[popName]" formElement="input" component="Ideo_Dhl/js/form/element/sp-dependent-field">
+        <field name="recipient[popName]" formElement="input" component="DhlPoland_Dhl/js/form/element/sp-dependent-field">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">POP Service Point Address</label>
@@ -334,7 +334,7 @@
                 <disabled>true</disabled>
             </settings>
         </field>
-        <field name="recipient[postnummer]" formElement="input" component="Ideo_Dhl/js/form/element/postnummer">
+        <field name="recipient[postnummer]" formElement="input" component="DhlPoland_Dhl/js/form/element/postnummer">
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">German Customer Number (Postnummer)</label>
@@ -407,7 +407,7 @@
                 <select>
                     <settings>
                         <caption translate="true">Select Service...</caption>
-                        <options class="Ideo\Dhl\Model\Config\Source\ServiceCode"/>
+                        <options class="DhlPoland\Dhl\Model\Config\Source\ServiceCode"/>
                     </settings>
                 </select>
             </formElements>
@@ -421,7 +421,7 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Config\Source\LabelType"/>
+                        <options class="DhlPoland\Dhl\Model\Config\Source\LabelType"/>
                     </settings>
                 </select>
             </formElements>
@@ -536,7 +536,7 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Config\Source\LabelType"/>
+                        <options class="DhlPoland\Dhl\Model\Config\Source\LabelType"/>
                     </settings>
                 </select>
             </formElements>
@@ -553,7 +553,7 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Config\Source\ReturnQrCodeType"/>
+                        <options class="DhlPoland\Dhl\Model\Config\Source\ReturnQrCodeType"/>
                     </settings>
                 </select>
             </formElements>
@@ -595,7 +595,7 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Config\Source\ReturnBookCourier"/>
+                        <options class="DhlPoland\Dhl\Model\Config\Source\ReturnBookCourier"/>
                     </settings>
                 </select>
             </formElements>
@@ -608,7 +608,7 @@
             <collapsible>true</collapsible>
             <opened>true</opened>
         </settings>
-        <field name="specialServices[insurance]" formElement="checkbox" component="Ideo_Dhl/js/form/element/auto-amount-checkbox">
+        <field name="specialServices[insurance]" formElement="checkbox" component="DhlPoland_Dhl/js/form/element/auto-amount-checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -670,7 +670,7 @@
                 </imports>
             </settings>
         </field>
-        <field name="specialServices[collectOnDelivery]" formElement="checkbox" component="Ideo_Dhl/js/form/element/auto-amount-checkbox">
+        <field name="specialServices[collectOnDelivery]" formElement="checkbox" component="DhlPoland_Dhl/js/form/element/auto-amount-checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="number">0</item>
@@ -1095,7 +1095,7 @@
                     <formElements>
                         <select>
                             <settings>
-                                <options class="Ideo\Dhl\Model\Config\Source\PackageType"/>
+                                <options class="DhlPoland\Dhl\Model\Config\Source\PackageType"/>
                             </settings>
                         </select>
                     </formElements>
@@ -1346,12 +1346,12 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Source\CustomsType"/>
+                        <options class="DhlPoland\Dhl\Model\Source\CustomsType"/>
                     </settings>
                 </select>
             </formElements>
         </field>
-        <field name="customs[categoryOfItem]" formElement="select" component="Ideo_Dhl/js/form/element/customs-category">
+        <field name="customs[categoryOfItem]" formElement="select" component="DhlPoland_Dhl/js/form/element/customs-category">
             <settings>
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
@@ -1363,12 +1363,12 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Source\CategoryOfItem"/>
+                        <options class="DhlPoland\Dhl\Model\Source\CategoryOfItem"/>
                     </settings>
                 </select>
             </formElements>
         </field>
-        <field name="customs[currency]" formElement="select" component="Ideo_Dhl/js/form/element/customs-currency">
+        <field name="customs[currency]" formElement="select" component="DhlPoland_Dhl/js/form/element/customs-currency">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="string">EUR</item>
@@ -1385,7 +1385,7 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Source\CustomsCurrency"/>
+                        <options class="DhlPoland\Dhl\Model\Source\CustomsCurrency"/>
                     </settings>
                 </select>
             </formElements>
@@ -1480,7 +1480,7 @@
             </settings>
         </field>
 
-        <container name="individual_customs" component="Ideo_Dhl/js/form/components/individual-customs">
+        <container name="individual_customs" component="DhlPoland_Dhl/js/form/components/individual-customs">
             <argument name="data" xsi:type="array">
                 <item name="type" xsi:type="string">group</item>
                 <item name="config" xsi:type="array">
@@ -1544,7 +1544,7 @@
                     </date>
                 </formElements>
             </field>
-            <field name="customs[invoiceFile]" formElement="input" component="Ideo_Dhl/js/form/element/pdf-invoice">
+            <field name="customs[invoiceFile]" formElement="input" component="DhlPoland_Dhl/js/form/element/pdf-invoice">
                 <settings>
                     <validation>
                         <rule name="required-entry" xsi:type="boolean">true</rule>
@@ -1637,7 +1637,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <container name="invoice_content_agreement" component="Ideo_Dhl/js/form/components/individual-customs">
+        <container name="invoice_content_agreement" component="DhlPoland_Dhl/js/form/components/individual-customs">
             <argument name="data" xsi:type="array">
                 <item name="type" xsi:type="string">group</item>
                 <item name="config" xsi:type="array">
@@ -1674,7 +1674,7 @@
             </field>
         </container>
 
-        <dynamicRows name="customsItems" component="Ideo_Dhl/js/dynamic-rows/customs-items">
+        <dynamicRows name="customsItems" component="DhlPoland_Dhl/js/dynamic-rows/customs-items">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="deleteButtonLabel" xsi:type="string" translate="true">Delete</item>
@@ -1822,7 +1822,7 @@
             <opened>true</opened>
         </settings>
         <htmlContent name="tracking_history_content">
-            <block class="Ideo\Dhl\Block\Adminhtml\Shipment\Edit\TrackingHistory" name="tracking_history_block" template="Ideo_Dhl::shipment/tracking_history.phtml"/>
+            <block class="DhlPoland\Dhl\Block\Adminhtml\Shipment\Edit\TrackingHistory" name="tracking_history_block" template="DhlPoland_Dhl::shipment/tracking_history.phtml"/>
         </htmlContent>
     </fieldset>
 </form>

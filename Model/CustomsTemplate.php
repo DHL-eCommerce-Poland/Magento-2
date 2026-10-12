@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model;
+namespace DhlPoland\Dhl\Model;
 
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate as CustomsTemplateResource;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate as CustomsTemplateResource;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;

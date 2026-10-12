@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
     <router id="admin">
         <route id="dhlpoland" frontName="dhlpoland">
-            <module name="Ideo_Dhl" />
+            <module name="DhlPoland_Dhl" />
         </route>
     </router>
 </config>

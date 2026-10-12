@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Block\Adminhtml\Button;
+namespace DhlPoland\Dhl\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
+use DhlPoland\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
@@ -51,7 +51,9 @@ class CreateReturnShipment extends Generic implements ButtonProviderInterface
             'label' => __('Create Return Shipment'),
             'class' => '',
             'on_click' => sprintf(
-                "require(['Ideo_Dhl/js/shipment/create-return'], function (createReturn) { createReturn('%s'); });",
+                "require(['DhlPoland_Dhl/js/shipment/create-return'], function (createReturn) {
+                    createReturn('%s');
+                });",
                 $this->escapeJs($url)
             ),
             'sort_order' => 65,

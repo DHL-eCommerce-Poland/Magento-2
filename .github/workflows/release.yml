@@ -63,7 +63,7 @@ jobs:
 
           # Create ZIP archive with files at archive root (Marketplace requirement)
           mkdir -p dist
-          ZIP_NAME="ideo-module-dhl-${VERSION}.zip"
+          ZIP_NAME="dhl-poland-module-dhl-${VERSION}.zip"
           (cd "${BUILD_DIR}" && zip -r "../../dist/${ZIP_NAME}" .)
           echo "Created archive: dist/${ZIP_NAME}"
 
@@ -75,4 +75,4 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
-          files: dist/ideo-module-dhl-${{ steps.get_version.outputs.VERSION }}.zip
+          files: dist/dhl-poland-module-dhl-${{ steps.get_version.outputs.VERSION }}.zip

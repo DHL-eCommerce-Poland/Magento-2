@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Ui\Component\Listing\Column;
+namespace DhlPoland\Dhl\Test\Unit\Ui\Component\Listing\Column;
 
-use Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader;
-use Ideo\Dhl\Ui\Component\Listing\Column\PackageNumbers;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataPayloadReader;
+use DhlPoland\Dhl\Ui\Component\Listing\Column\PackageNumbers;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;

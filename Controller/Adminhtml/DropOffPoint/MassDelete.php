@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\DropOffPoint;
+namespace DhlPoland\Dhl\Controller\Adminhtml\DropOffPoint;
 
 use Exception;
-use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory;
+use DhlPoland\Dhl\Api\DropOffPointRepositoryInterface;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint\CollectionFactory;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -15,7 +15,7 @@ use Magento\Ui\Component\MassAction\Filter;
 
 class MassDelete extends Action implements HttpPostActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::drop_off_point';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::drop_off_point';
 
     /**
      * @param Context $context

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Plugin\Adminhtml\Order\View\Tab;
+namespace DhlPoland\Dhl\Plugin\Adminhtml\Order\View\Tab;
 
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
+use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
 use Magento\Backend\Model\UrlInterface;
 use Magento\Sales\Ui\Component\Listing\Column\ViewAction;
 use Psr\Log\LoggerInterface;

@@ -76,11 +76,11 @@ define([
                 return;
             }
 
-            var modal = $('#ideo-dhl-book-courier-modal');
+            var modal = $('#dhlpoland-book-courier-modal');
             if (modal.length && typeof modal.data('openBookCourierModal') === 'function') {
                 modal.data('openBookCourierModal')(selectedIds, shipmentNumbers);
-            } else if (window.IdeoDhlBookCourier && typeof window.IdeoDhlBookCourier.openModal === 'function') {
-                window.IdeoDhlBookCourier.openModal(selectedIds, shipmentNumbers);
+            } else if (window.DhlPolandBookCourier && typeof window.DhlPolandBookCourier.openModal === 'function') {
+                window.DhlPolandBookCourier.openModal(selectedIds, shipmentNumbers);
             } else {
                 alert($.mage.__('Courier booking dialog is loading. Please try again.'));
             }

@@ -2,18 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment;
 
-use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\CreateShipmentResult;
-use Ideo\Dhl\Model\Api\Credentials;
-use Ideo\Dhl\Model\Api\CredentialsProvider;
-use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
-use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Ideo\Dhl\Model\Shipment\ShipmentCreationService;
-use Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader;
-use Ideo\Dhl\Model\Shipment\ShipmentDataService;
-use Ideo\Dhl\Model\Shipment\ShipmentDataValidator;
+use DhlPoland\Dhl\Model\Api\ClientInterface;
+use DhlPoland\Dhl\Model\Api\CreateShipmentResult;
+use DhlPoland\Dhl\Model\Api\Credentials;
+use DhlPoland\Dhl\Model\Api\CredentialsProvider;
+use DhlPoland\Dhl\Model\Api\ShipmentFullDataMapper;
+use DhlPoland\Dhl\Model\Shipment\DhlShipmentData;
+use DhlPoland\Dhl\Model\Shipment\ShipmentCreationService;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataPayloadReader;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataService;
+use DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData;
+use DhlPoland\Dhl\Model\Shipment\MagentoShipmentSyncService;
+use DhlPoland\Dhl\Model\Shipment\ReturnShipmentCreationService;
+use DhlPoland\Dhl\Model\Shipment\ReturnShipmentDataBuilder;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataValidator;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Lock\LockManagerInterface;
@@ -95,11 +99,11 @@ class ShipmentCreationServiceTest extends TestCase
         $this->resourceConnectionStub->method('getConnection')->willReturn($this->dbAdapterStub);
 
         $serializer = new \Magento\Framework\Serialize\Serializer\Json();
-        $this->payloadReaderStub = new \Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader($serializer);
+        $this->payloadReaderStub = new \DhlPoland\Dhl\Model\Shipment\ShipmentDataPayloadReader($serializer);
 
-        $returnBuilderMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
-        $returnCreationServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
-        $magentoSyncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+        $returnBuilderMock = $this->createStub(ReturnShipmentDataBuilder::class);
+        $returnCreationServiceMock = $this->createStub(ReturnShipmentCreationService::class);
+        $magentoSyncServiceMock = $this->createStub(MagentoShipmentSyncService::class);
 
         $this->service = new ShipmentCreationService(
             $this->shipmentDataServiceMock,
@@ -140,7 +144,7 @@ class ShipmentCreationServiceTest extends TestCase
         $this->clientStub->method('createShipment')->willReturn($apiResult);
 
         // Expect DB save with status Nowa
-        $savedEntityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $savedEntityStub = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $savedEntityStub->method('getEntityId')->willReturn(55);
 
         $this->shipmentDataServiceMock->expects($this->once())
@@ -205,7 +209,7 @@ class ShipmentCreationServiceTest extends TestCase
             ->with($lockName);
 
         $shipmentData = $this->createStub(DhlShipmentData::class);
-        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $entityStub->method('getShipmentId')->willReturn('OLD_123');
 
         $this->shipmentDataServiceMock->expects($this->once())
@@ -217,7 +221,7 @@ class ShipmentCreationServiceTest extends TestCase
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
         $this->mapperStub->method('map')->willReturn(['content' => 'Test']);
 
-        $deleteResult = new \Ideo\Dhl\Model\Api\DeleteShipmentResult(true, 'OLD_123');
+        $deleteResult = new \DhlPoland\Dhl\Model\Api\DeleteShipmentResult(true, 'OLD_123');
         $this->clientStub->method('deleteShipment')->willReturn($deleteResult);
 
         $this->shipmentDataServiceMock->expects($this->once())
@@ -247,7 +251,7 @@ class ShipmentCreationServiceTest extends TestCase
         $this->lockManagerMock->method('lock')->willReturn(true);
 
         $shipmentData = $this->createStub(DhlShipmentData::class);
-        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $entityStub->method('getShipmentId')->willReturn('OLD_456');
 
         $this->shipmentDataServiceMock->method('getShipmentEntity')->willReturn($entityStub);
@@ -255,7 +259,7 @@ class ShipmentCreationServiceTest extends TestCase
         $credentials = new Credentials('user', 'pass', true);
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
 
-        $deleteResult = new \Ideo\Dhl\Model\Api\DeleteShipmentResult(true, 'OLD_456');
+        $deleteResult = new \DhlPoland\Dhl\Model\Api\DeleteShipmentResult(true, 'OLD_456');
         $this->clientStub->method('deleteShipment')->willReturn($deleteResult);
 
         // Expect clearShipmentId to be called so old ID is removed from DB despite createShipment failing
@@ -291,7 +295,7 @@ class ShipmentCreationServiceTest extends TestCase
         $this->lockManagerMock->method('lock')->willReturn(true);
 
         $shipmentData = $this->createStub(DhlShipmentData::class);
-        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $entityStub->method('getShipmentId')->willReturn('OLD_789');
 
         $this->shipmentDataServiceMock->method('getShipmentEntity')->willReturn($entityStub);
@@ -299,7 +303,7 @@ class ShipmentCreationServiceTest extends TestCase
         $credentials = new Credentials('user', 'pass', true);
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
 
-        $deleteResult = new \Ideo\Dhl\Model\Api\DeleteShipmentResult(false, 'OLD_789', 'ERR', 'Auth error');
+        $deleteResult = new \DhlPoland\Dhl\Model\Api\DeleteShipmentResult(false, 'OLD_789', 'ERR', 'Auth error');
         $this->clientStub->method('deleteShipment')->willReturn($deleteResult);
 
         // Expect clearShipmentId NEVER to be called when delete failed
@@ -322,7 +326,7 @@ class ShipmentCreationServiceTest extends TestCase
      */
     public function testCreateShipmentTriggersAutoReturnCreationWhenEnabled(): void
     {
-        $shipmentSettings = $this->createStub(\Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData::class);
+        $shipmentSettings = $this->createStub(\DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData::class);
         $shipmentSettings->method('autoCreateReturnShipment')->willReturn(true);
         $shipmentSettings->method('getReturnLabelExpDays')->willReturn(14);
 
@@ -340,15 +344,15 @@ class ShipmentCreationServiceTest extends TestCase
         $apiResult = new CreateShipmentResult(true, false, '90039521201', 'Nowa');
         $this->clientStub->method('createShipment')->willReturn($apiResult);
 
-        $savedEntityMock = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $savedEntityMock = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $savedEntityMock->method('getEntityId')->willReturn(42);
 
         $this->shipmentDataServiceMock->expects($this->once())
             ->method('saveShipmentDataWithStatus')
             ->willReturn($savedEntityMock);
 
-        $returnBuilderMock = $this->createMock(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
-        $returnCreationServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
+        $returnBuilderMock = $this->createMock(ReturnShipmentDataBuilder::class);
+        $returnCreationServiceMock = $this->createMock(ReturnShipmentCreationService::class);
 
         $returnShipmentDataStub = $this->createStub(DhlShipmentData::class);
         $returnBuilderMock->expects($this->once())
@@ -366,7 +370,7 @@ class ShipmentCreationServiceTest extends TestCase
             );
 
         $serializer = new \Magento\Framework\Serialize\Serializer\Json();
-        $magentoSyncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+        $magentoSyncServiceMock = $this->createStub(\DhlPoland\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
         $serviceWithReturn = new ShipmentCreationService(
             $this->shipmentDataServiceMock,
             $this->validatorStub,
@@ -393,7 +397,7 @@ class ShipmentCreationServiceTest extends TestCase
      */
     public function testRecreateShipmentTriggersAutoReturnCreationWhenEnabled(): void
     {
-        $shipmentSettings = $this->createStub(\Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData::class);
+        $shipmentSettings = $this->createStub(\DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData::class);
         $shipmentSettings->method('autoCreateReturnShipment')->willReturn(true);
         $shipmentSettings->method('getReturnLabelExpDays')->willReturn(14);
 
@@ -404,7 +408,7 @@ class ShipmentCreationServiceTest extends TestCase
 
         $this->lockManagerMock->method('lock')->willReturn(true);
 
-        $existingEntityMock = $this->createMock(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $existingEntityMock = $this->createMock(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $existingEntityMock->method('getShipmentId')->willReturn('90039521000');
         $existingEntityMock->method('getMagentoShipmentId')->willReturn(null);
         $this->shipmentDataServiceMock->method('getShipmentEntity')->willReturn($existingEntityMock);
@@ -416,8 +420,8 @@ class ShipmentCreationServiceTest extends TestCase
         $apiResult = new CreateShipmentResult(true, false, '90039521202', 'Nowa');
         $this->clientStub->method('createShipment')->willReturn($apiResult);
 
-        $returnBuilderMock = $this->createMock(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
-        $returnCreationServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
+        $returnBuilderMock = $this->createMock(ReturnShipmentDataBuilder::class);
+        $returnCreationServiceMock = $this->createMock(ReturnShipmentCreationService::class);
 
         $returnShipmentDataStub = $this->createStub(DhlShipmentData::class);
         $returnBuilderMock->expects($this->once())
@@ -435,7 +439,7 @@ class ShipmentCreationServiceTest extends TestCase
             );
 
         $serializer = $this->createStub(\Magento\Framework\Serialize\SerializerInterface::class);
-        $magentoSyncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+        $magentoSyncServiceMock = $this->createStub(\DhlPoland\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
         $serviceWithReturn = new ShipmentCreationService(
             $this->shipmentDataServiceMock,
             $this->validatorStub,
@@ -483,7 +487,7 @@ class ShipmentCreationServiceTest extends TestCase
      */
     public function testCreateShipmentCallsGetPieceIdWhenPackageNumbersEmpty(): void
     {
-        $shipmentSettings = new \Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData(autoCreateReturnShipment: false);
+        $shipmentSettings = new ShipmentSettingsData(autoCreateReturnShipment: false);
         $shipmentData = new DhlShipmentData(orderId: 300, shipmentSettings: $shipmentSettings);
 
         $this->shipmentDataServiceMock->method('hasShipmentForOrder')->willReturn(false);
@@ -513,9 +517,9 @@ class ShipmentCreationServiceTest extends TestCase
             );
 
         $serializer = new \Magento\Framework\Serialize\Serializer\Json();
-        $returnBuilderMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class);
-        $returnCreationServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class);
-        $magentoSyncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+        $returnBuilderMock = $this->createStub(ReturnShipmentDataBuilder::class);
+        $returnCreationServiceMock = $this->createStub(ReturnShipmentCreationService::class);
+        $magentoSyncServiceMock = $this->createStub(MagentoShipmentSyncService::class);
         $lockManagerStub = $this->createStub(LockManagerInterface::class);
         $lockManagerStub->method('lock')->willReturn(true);
         $lockManagerStub->method('unlock')->willReturn(true);
@@ -550,7 +554,7 @@ class ShipmentCreationServiceTest extends TestCase
         $this->lockManagerMock->method('lock')->willReturn(true);
 
         $shipmentData = $this->createStub(DhlShipmentData::class);
-        $entityStub = $this->createStub(\Ideo\Dhl\Api\Data\ShipmentDataInterface::class);
+        $entityStub = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
         $entityStub->method('getShipmentId')->willReturn('OLD_123');
         $entityStub->method('getReturnShipmentId')->willReturn('90040146098, 90040146099');
 
@@ -560,7 +564,7 @@ class ShipmentCreationServiceTest extends TestCase
         $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
         $this->mapperStub->method('map')->willReturn(['content' => 'Test']);
 
-        $deleteResult = new \Ideo\Dhl\Model\Api\DeleteShipmentResult(true, 'OLD_123');
+        $deleteResult = new \DhlPoland\Dhl\Model\Api\DeleteShipmentResult(true, 'OLD_123');
         $clientMock = $this->createMock(ClientInterface::class);
         $clientMock->expects($this->once())
             ->method('deleteShipment')
@@ -580,10 +584,10 @@ class ShipmentCreationServiceTest extends TestCase
             $this->lockManagerMock,
             $this->loggerStub,
             $serializer,
-            $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class),
-            $this->createStub(\Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService::class),
-            $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class),
-            new \Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader($serializer)
+            $this->createStub(\DhlPoland\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class),
+            $this->createStub(\DhlPoland\Dhl\Model\Shipment\ReturnShipmentCreationService::class),
+            $this->createStub(\DhlPoland\Dhl\Model\Shipment\MagentoShipmentSyncService::class),
+            new \DhlPoland\Dhl\Model\Shipment\ShipmentDataPayloadReader($serializer)
         );
 
         $result = $service->recreateShipment($entityId, $shipmentData);

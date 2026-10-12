@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Setup\Patch\Data;
+namespace DhlPoland\Dhl\Test\Unit\Setup\Patch\Data;
 
-use Ideo\Dhl\Model\Config\Backend\Tablerate;
-use Ideo\Dhl\Setup\Patch\Data\PopulateDefaultTableRates;
+use DhlPoland\Dhl\Model\Config\Backend\Tablerate;
+use DhlPoland\Dhl\Setup\Patch\Data\PopulateDefaultTableRates;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\DB\Select;
@@ -38,7 +38,7 @@ class PopulateDefaultTableRatesTest extends TestCase
         $moduleDirReaderMock
             ->expects($this->once())
             ->method('getModuleDir')
-            ->with('etc', 'Ideo_Dhl')
+            ->with('etc', 'DhlPoland_Dhl')
             ->willReturn('/path/to/module/etc');
 
         $csvReaderMock

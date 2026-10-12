@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment;
 
 use DateTime;
-use Ideo\Dhl\Model\Shipment\Data\RecipientData;
-use Ideo\Dhl\Model\Shipment\OrderToShipmentDataMapper;
-use Ideo\Dhl\Model\Shipment\OrderWeightAggregator;
-use Ideo\Dhl\Model\Shipment\StreetAddressParser;
-use Ideo\Dhl\Model\Template\TemplateVariableResolver;
+use DhlPoland\Dhl\Model\Shipment\Data\RecipientData;
+use DhlPoland\Dhl\Model\Shipment\OrderToShipmentDataMapper;
+use DhlPoland\Dhl\Model\Shipment\OrderWeightAggregator;
+use DhlPoland\Dhl\Model\Shipment\StreetAddressParser;
+use DhlPoland\Dhl\Model\Template\TemplateVariableResolver;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Sales\Model\Order;
@@ -43,7 +43,7 @@ class OrderToShipmentDataMapperTest extends TestCase
             $variableResolver,
             $serializer,
             $timezoneMock,
-            new \Ideo\Dhl\Model\MethodCatalog()
+            new \DhlPoland\Dhl\Model\MethodCatalog()
         );
     }
 

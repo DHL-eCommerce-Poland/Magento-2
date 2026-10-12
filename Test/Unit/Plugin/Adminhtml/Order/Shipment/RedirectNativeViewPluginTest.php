@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Plugin\Adminhtml\Order\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Plugin\Adminhtml\Order\Shipment;
 
 use Exception;
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
-use Ideo\Dhl\Plugin\Adminhtml\Order\Shipment\RedirectNativeViewPlugin;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
+use DhlPoland\Dhl\Plugin\Adminhtml\Order\Shipment\RedirectNativeViewPlugin;
 use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Response\Http as HttpResponse;

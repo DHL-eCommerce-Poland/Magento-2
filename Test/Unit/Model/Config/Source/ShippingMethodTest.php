@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Config\Source;
+namespace DhlPoland\Dhl\Test\Unit\Model\Config\Source;
 
-use Ideo\Dhl\Model\Config\Source\ShippingMethod;
-use Ideo\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\Config\Source\ShippingMethod;
+use DhlPoland\Dhl\Model\MethodCatalog;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use PHPUnit\Framework\TestCase;
 

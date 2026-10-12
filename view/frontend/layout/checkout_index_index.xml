@@ -19,7 +19,7 @@
                                                             <item name="displayArea" xsi:type="string">shippingAdditional</item>
                                                             <item name="children" xsi:type="array">
                                                                 <item name="dhl-point-selector" xsi:type="array">
-                                                                    <item name="component" xsi:type="string">Ideo_Dhl/js/view/point-selector</item>
+                                                                    <item name="component" xsi:type="string">DhlPoland_Dhl/js/view/point-selector</item>
                                                                 </item>
                                                             </item>
                                                         </item>
@@ -36,7 +36,7 @@
             </arguments>
         </referenceBlock>
         <referenceContainer name="before.body.end">
-            <block class="Ideo\Dhl\Block\Debug" name="dhlpoland_debug" template="Ideo_Dhl::debug.phtml" ifconfig="carriers/dhlpoland/debug" />
+            <block class="DhlPoland\Dhl\Block\Debug" name="dhlpoland_debug" template="DhlPoland_Dhl::debug.phtml" ifconfig="carriers/dhlpoland/debug" />
         </referenceContainer>
     </body>
 </page>

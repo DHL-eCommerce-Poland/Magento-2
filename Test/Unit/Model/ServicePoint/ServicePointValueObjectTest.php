@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\ServicePoint;
+namespace DhlPoland\Dhl\Test\Unit\Model\ServicePoint;
 
-use Ideo\Dhl\Model\ServicePoint\ServicePointValueObject;
+use DhlPoland\Dhl\Model\ServicePoint\ServicePointValueObject;
 use PHPUnit\Framework\TestCase;
 
 class ServicePointValueObjectTest extends TestCase

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\CustomsTemplate;
+namespace DhlPoland\Dhl\Model\CustomsTemplate;
 
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate\CollectionFactory;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;

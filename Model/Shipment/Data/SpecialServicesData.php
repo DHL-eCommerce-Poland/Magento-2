@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 // phpcs:disable Generic.Files.LineLength.TooLong
 
-namespace Ideo\Dhl\Model\Shipment\Data;
+namespace DhlPoland\Dhl\Model\Shipment\Data;
 
 class SpecialServicesData
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\ResourceModel\DeliveryService;
+namespace DhlPoland\Dhl\Model\ResourceModel\DeliveryService;
 
-use Ideo\Dhl\Model\DeliveryService as DeliveryServiceModel;
-use Ideo\Dhl\Model\ResourceModel\DeliveryService as DeliveryServiceResource;
+use DhlPoland\Dhl\Model\DeliveryService as DeliveryServiceModel;
+use DhlPoland\Dhl\Model\ResourceModel\DeliveryService as DeliveryServiceResource;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
 class Collection extends AbstractCollection

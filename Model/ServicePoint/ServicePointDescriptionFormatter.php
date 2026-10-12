@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\ServicePoint;
+namespace DhlPoland\Dhl\Model\ServicePoint;
 
 class ServicePointDescriptionFormatter
 {

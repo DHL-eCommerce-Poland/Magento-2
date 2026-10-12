@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Block\Adminhtml\Button;
+namespace DhlPoland\Dhl\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
+use DhlPoland\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
@@ -53,11 +53,13 @@ class BookCourierShipment extends Generic implements ButtonProviderInterface
             'class' => '',
             'on_click' => sprintf(
                 "require(['jquery'], function($) {
-                    var modal = $('#ideo-dhl-book-courier-modal');
+                    var modal = $('#dhlpoland-book-courier-modal');
                     if (modal.length && typeof modal.data('openBookCourierModal') === 'function') {
                         modal.data('openBookCourierModal')([%d], %s);
-                    } else if (window.IdeoDhlBookCourier && typeof window.IdeoDhlBookCourier.openModal === 'function') {
-                        window.IdeoDhlBookCourier.openModal([%d], %s);
+                    } else if (window.DhlPolandBookCourier
+                        && typeof window.DhlPolandBookCourier.openModal === 'function'
+                    ) {
+                        window.DhlPolandBookCourier.openModal([%d], %s);
                     } else {
                         alert('%s');
                     }

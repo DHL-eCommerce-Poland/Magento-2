@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Config\Source;
+namespace DhlPoland\Dhl\Model\Config\Source;
 
-use Ideo\Dhl\Model\Api\GetLabelsResult;
+use DhlPoland\Dhl\Model\Api\GetLabelsResult;
 use Magento\Framework\Data\OptionSourceInterface;
 
 class LabelType implements OptionSourceInterface

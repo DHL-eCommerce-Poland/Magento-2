@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Setup\Patch\Data;
+namespace DhlPoland\Dhl\Setup\Patch\Data;
 
-use Ideo\Dhl\Model\Config\Backend\Tablerate;
+use DhlPoland\Dhl\Model\Config\Backend\Tablerate;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\File\Csv;
@@ -44,7 +44,7 @@ class PopulateDefaultTableRates implements DataPatchInterface, PatchRevertableIn
             return $this;
         }
 
-        $etcDir = $this->moduleDirReader->getModuleDir('etc', 'Ideo_Dhl');
+        $etcDir = $this->moduleDirReader->getModuleDir('etc', 'DhlPoland_Dhl');
         $filePath = $etcDir . '/dhl_tablerates_default.csv';
 
         $data = $this->csvReader->getData($filePath);

@@ -11,7 +11,7 @@ define([
         defaults: {
             provider: 'dhlpoland_shipment_form.dhlpoland_shipment_form_data_source',
             template: 'ui/form/components/button/container',
-            elementTmpl: 'Ideo_Dhl/form/element/map-point-button',
+            elementTmpl: 'DhlPoland_Dhl/form/element/map-point-button',
             buttonClasses: 'action-secondary',
             additionalClasses: 'dhl-map-point-button-field',
             title: $t('Select delivery point from map'),
@@ -135,7 +135,7 @@ define([
             }
 
             this._messageListener = function (event) {
-                var iframe = document.getElementById('ideo-dhl-admin-form-map-iframe');
+                var iframe = document.getElementById('dhlpoland-admin-form-map-iframe');
                 if (!event || event.origin !== 'https://parcelshop.dhl.pl' || !iframe
                     || event.source !== iframe.contentWindow || !self._activeModal || !event.data) {
                     return;
@@ -247,9 +247,9 @@ define([
 
             var iframeUrl = params.length ? baseUrl + '?' + params.join('&') : baseUrl;
 
-            var $modalContainer = $('#ideo-dhl-admin-form-map-modal');
+            var $modalContainer = $('#dhlpoland-admin-form-map-modal');
             if (!$modalContainer.length) {
-                $modalContainer = $('<div id="ideo-dhl-admin-form-map-modal" style="display:none;"><iframe id="ideo-dhl-admin-form-map-iframe" style="width:100%; height:80vh; min-height:500px; border:none;"></iframe></div>');
+                $modalContainer = $('<div id="dhlpoland-admin-form-map-modal" style="display:none;"><iframe id="dhlpoland-admin-form-map-iframe" style="width:100%; height:80vh; min-height:500px; border:none;"></iframe></div>');
                 $('body').append($modalContainer);
             }
 

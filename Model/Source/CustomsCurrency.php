@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Source;
+namespace DhlPoland\Dhl\Model\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
 use Magento\Framework\Locale\ListsInterface;

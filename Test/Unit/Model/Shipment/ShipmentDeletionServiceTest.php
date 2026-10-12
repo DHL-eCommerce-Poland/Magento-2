@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
-use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\Credentials;
-use Ideo\Dhl\Model\Api\CredentialsProvider;
-use Ideo\Dhl\Model\Api\DeleteShipmentResult;
-use Ideo\Dhl\Model\Shipment\ShipmentDataPayloadReader;
-use Ideo\Dhl\Model\Shipment\ShipmentDeletionService;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
+use DhlPoland\Dhl\Model\Api\ClientInterface;
+use DhlPoland\Dhl\Model\Api\Credentials;
+use DhlPoland\Dhl\Model\Api\CredentialsProvider;
+use DhlPoland\Dhl\Model\Api\DeleteShipmentResult;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataPayloadReader;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDeletionService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -54,7 +54,7 @@ class ShipmentDeletionServiceTest extends TestCase
         $this->credentialsProviderMock = $this->createMock(CredentialsProvider::class);
         $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->payloadReaderStub = new ShipmentDataPayloadReader(new Json());
-        $syncServiceMock = $this->createStub(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+        $syncServiceMock = $this->createStub(\DhlPoland\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
 
         $this->deletionService = new ShipmentDeletionService(
             $this->repositoryMock,
@@ -183,7 +183,7 @@ class ShipmentDeletionServiceTest extends TestCase
         $repositoryStub = $this->createStub(ShipmentDataRepositoryInterface::class);
         $clientStub = $this->createStub(ClientInterface::class);
         $credentialsProviderStub = $this->createStub(CredentialsProvider::class);
-        $syncServiceMock = $this->createMock(\Ideo\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
+        $syncServiceMock = $this->createMock(\DhlPoland\Dhl\Model\Shipment\MagentoShipmentSyncService::class);
 
         $service = new ShipmentDeletionService(
             $repositoryStub,

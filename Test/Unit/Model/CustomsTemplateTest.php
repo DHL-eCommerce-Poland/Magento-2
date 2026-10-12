@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model;
+namespace DhlPoland\Dhl\Test\Unit\Model;
 
-use Ideo\Dhl\Model\CustomsTemplate;
-use Ideo\Dhl\Model\ResourceModel\CustomsTemplate as CustomsTemplateResource;
+use DhlPoland\Dhl\Model\CustomsTemplate;
+use DhlPoland\Dhl\Model\ResourceModel\CustomsTemplate as CustomsTemplateResource;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;

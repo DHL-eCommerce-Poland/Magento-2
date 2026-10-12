@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Plugin\Adminhtml\Order\Create;
+namespace DhlPoland\Dhl\Plugin\Adminhtml\Order\Create;
 
 use Exception;
-use Ideo\Dhl\Model\Carrier;
-use Ideo\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\Carrier;
+use DhlPoland\Dhl\Model\MethodCatalog;
 use Magento\Sales\Model\AdminOrder\Create as AdminOrderCreate;
 use Magento\Sales\Model\Order;
 

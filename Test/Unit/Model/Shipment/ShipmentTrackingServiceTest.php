@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
-use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\Credentials;
-use Ideo\Dhl\Model\Api\CredentialsProvider;
-use Ideo\Dhl\Model\Api\TrackingResult;
-use Ideo\Dhl\Model\Shipment\ShipmentTrackingService;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
+use DhlPoland\Dhl\Model\Api\ClientInterface;
+use DhlPoland\Dhl\Model\Api\Credentials;
+use DhlPoland\Dhl\Model\Api\CredentialsProvider;
+use DhlPoland\Dhl\Model\Api\TrackingResult;
+use DhlPoland\Dhl\Model\Shipment\ShipmentTrackingService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use PHPUnit\Framework\MockObject\MockObject;

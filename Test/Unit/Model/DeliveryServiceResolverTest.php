@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model;
+namespace DhlPoland\Dhl\Test\Unit\Model;
 
-use Ideo\Dhl\Api\Data\DeliveryServiceInterface;
-use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
-use Ideo\Dhl\Model\DeliveryServiceResolver;
+use DhlPoland\Dhl\Api\Data\DeliveryServiceInterface;
+use DhlPoland\Dhl\Api\DeliveryServiceRepositoryInterface;
+use DhlPoland\Dhl\Model\DeliveryServiceResolver;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

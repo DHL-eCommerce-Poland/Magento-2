@@ -9,7 +9,7 @@ define([
 
     return Abstract.extend({
         defaults: {
-            elementTmpl: 'Ideo_Dhl/form/element/pdf-invoice',
+            elementTmpl: 'DhlPoland_Dhl/form/element/pdf-invoice',
             fileName: '',
             fileNote: $t('Only .pdf files allowed (max 3MB)')
         },

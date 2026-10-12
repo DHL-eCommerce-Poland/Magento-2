@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Controller\Adminhtml\Shipment;
 
-use Ideo\Dhl\Model\Shipment\CourierBookingCancellationService;
+use DhlPoland\Dhl\Model\Shipment\CourierBookingCancellationService;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 
 class CancelCourierBooking extends Action implements HttpGetActionInterface, HttpPostActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::shipment';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::shipment';
 
     /**
      * @param Context $context

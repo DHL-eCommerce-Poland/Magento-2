@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
-use Ideo\Dhl\Controller\Adminhtml\Shipment\Prepare;
-use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Ideo\Dhl\Model\Shipment\ShipmentDataService;
-use Ideo\Dhl\Model\Template\TemplateManager;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\Prepare;
+use DhlPoland\Dhl\Model\Shipment\DhlShipmentData;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataService;
+use DhlPoland\Dhl\Model\Template\TemplateManager;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Json;

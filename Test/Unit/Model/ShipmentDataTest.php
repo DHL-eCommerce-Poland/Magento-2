@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model;
+namespace DhlPoland\Dhl\Test\Unit\Model;
 
-use Ideo\Dhl\Model\ResourceModel\ShipmentData as ShipmentDataResource;
-use Ideo\Dhl\Model\ShipmentData;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData as ShipmentDataResource;
+use DhlPoland\Dhl\Model\ShipmentData;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;
 use PHPUnit\Framework\TestCase;

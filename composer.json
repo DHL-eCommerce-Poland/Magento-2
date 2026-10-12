@@ -1,5 +1,5 @@
 {
-    "name": "ideo/module-dhl",
+    "name": "dhl-poland/module-dhl",
     "description": "DHL eCommerce shipping integration module for Magento 2",
     "type": "magento2-module",
     "license": "MIT",
@@ -43,7 +43,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "Ideo\\Dhl\\": ""
+            "DhlPoland\\Dhl\\": ""
         }
     },
     "minimum-stability": "stable",

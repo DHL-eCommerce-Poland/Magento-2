@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\DeliveryService;
+namespace DhlPoland\Dhl\Controller\Adminhtml\DeliveryService;
 
 use Exception;
-use Ideo\Dhl\Api\DeliveryServiceRepositoryInterface;
+use DhlPoland\Dhl\Api\DeliveryServiceRepositoryInterface;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -13,7 +13,7 @@ use Magento\Framework\Controller\Result\Redirect;
 
 class Delete extends Action implements HttpPostActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::delivery_service';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::delivery_service';
 
     /**
      * @param Context $context

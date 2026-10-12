@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Config\Source;
+namespace DhlPoland\Dhl\Test\Unit\Model\Config\Source;
 
-use Ideo\Dhl\Model\Config\Source\PnpPackageType;
+use DhlPoland\Dhl\Model\Config\Source\PnpPackageType;
 use PHPUnit\Framework\TestCase;
 
 class PnpPackageTypeTest extends TestCase

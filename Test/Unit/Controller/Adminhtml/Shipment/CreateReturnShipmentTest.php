@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
 use Exception;
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Controller\Adminhtml\Shipment\CreateReturnShipment;
-use Ideo\Dhl\Model\Api\CreateShipmentReturnResult;
-use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService;
-use Ideo\Dhl\Model\Shipment\ReturnShipmentDataBuilder;
-use Ideo\Dhl\Model\Shipment\ShipmentDataService;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\CreateReturnShipment;
+use DhlPoland\Dhl\Model\Api\CreateShipmentReturnResult;
+use DhlPoland\Dhl\Model\Shipment\DhlShipmentData;
+use DhlPoland\Dhl\Model\Shipment\ReturnShipmentCreationService;
+use DhlPoland\Dhl\Model\Shipment\ReturnShipmentDataBuilder;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataService;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Request\Http as HttpRequest;

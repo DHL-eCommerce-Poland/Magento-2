@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Block\Adminhtml\Button;
+namespace DhlPoland\Dhl\Test\Unit\Block\Adminhtml\Button;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Block\Adminhtml\Button\CreateReturnShipment;
-use Ideo\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Block\Adminhtml\Button\CreateReturnShipment;
+use DhlPoland\Dhl\Block\Adminhtml\Shipment\AdminhtmlShipmentData;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
@@ -32,7 +32,7 @@ class CreateReturnShipmentTest extends TestCase
         $data = $button->getButtonData();
 
         $this->assertEquals('Create Return Shipment', (string) $data['label']);
-        $this->assertStringContainsString('Ideo_Dhl/js/shipment/create-return', $data['on_click']);
+        $this->assertStringContainsString('DhlPoland_Dhl/js/shipment/create-return', $data['on_click']);
         $this->assertStringContainsString('http://example.com/createReturnShipment', $data['on_click']);
         $this->assertEquals(65, $data['sort_order']);
     }

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Shipment;
+namespace DhlPoland\Dhl\Model\Shipment;
 
 use Exception;
-use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\CreateShipmentReturnResult;
-use Ideo\Dhl\Model\Api\CredentialsProvider;
-use Ideo\Dhl\Model\Api\ShipmentReturnDataMapper;
-use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
+use DhlPoland\Dhl\Model\Api\ClientInterface;
+use DhlPoland\Dhl\Model\Api\CreateShipmentReturnResult;
+use DhlPoland\Dhl\Model\Api\CredentialsProvider;
+use DhlPoland\Dhl\Model\Api\ShipmentReturnDataMapper;
+use DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Lock\LockManagerInterface;
 use Magento\Framework\Serialize\SerializerInterface;

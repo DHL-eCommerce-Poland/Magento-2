@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Controller\Adminhtml\Shipment\MassDelete;
-use Ideo\Dhl\Model\ResourceModel\ShipmentData\Collection;
-use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
-use Ideo\Dhl\Model\Shipment\ShipmentDeletionService;
-use Ideo\Dhl\Model\Shipment\ShipmentDeletionResult;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\MassDelete;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDeletionService;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDeletionResult;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;

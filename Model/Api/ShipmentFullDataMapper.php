@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Api;
+namespace DhlPoland\Dhl\Model\Api;
 
-use Ideo\Dhl\Model\Config\Source\AddressType;
-use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
-use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Ideo\Dhl\Model\Shipment\PostalCodeSanitizer;
+use DhlPoland\Dhl\Model\Config\Source\AddressType;
+use DhlPoland\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\Shipment\Data\SpecialServicesData;
+use DhlPoland\Dhl\Model\Shipment\DhlShipmentData;
+use DhlPoland\Dhl\Model\Shipment\PostalCodeSanitizer;
 
 class ShipmentFullDataMapper
 {

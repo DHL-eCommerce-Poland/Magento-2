@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Plugin\Quote;
+namespace DhlPoland\Dhl\Test\Unit\Plugin\Quote;
 
-use Ideo\Dhl\Plugin\Quote\CopyServicePointToOrderAddress;
+use DhlPoland\Dhl\Plugin\Quote\CopyServicePointToOrderAddress;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Address\ToOrderAddress;
 use Magento\Sales\Model\Order\Address as OrderAddress;

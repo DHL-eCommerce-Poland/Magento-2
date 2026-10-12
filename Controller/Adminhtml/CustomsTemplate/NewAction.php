@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\CustomsTemplate;
+namespace DhlPoland\Dhl\Controller\Adminhtml\CustomsTemplate;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -12,7 +12,7 @@ use Magento\Framework\Controller\ResultInterface;
 
 class NewAction extends Action implements HttpGetActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::customs_template';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::customs_template';
 
     /**
      * @param Context $context

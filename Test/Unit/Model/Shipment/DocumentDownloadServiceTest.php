@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
-use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\Credentials;
-use Ideo\Dhl\Model\Api\CredentialsProvider;
-use Ideo\Dhl\Model\Api\GetEpodResult;
-use Ideo\Dhl\Model\Api\GetScanResult;
-use Ideo\Dhl\Model\Shipment\DocumentDownloadService;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
+use DhlPoland\Dhl\Model\Api\ClientInterface;
+use DhlPoland\Dhl\Model\Api\Credentials;
+use DhlPoland\Dhl\Model\Api\CredentialsProvider;
+use DhlPoland\Dhl\Model\Api\GetEpodResult;
+use DhlPoland\Dhl\Model\Api\GetScanResult;
+use DhlPoland\Dhl\Model\Shipment\DocumentDownloadService;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem;
 use Magento\Shipping\Model\Shipping\LabelGenerator;

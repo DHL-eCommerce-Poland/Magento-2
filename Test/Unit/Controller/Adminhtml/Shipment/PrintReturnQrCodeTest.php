@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
 use Exception;
-use Ideo\Dhl\Controller\Adminhtml\Shipment\PrintReturnQrCode;
-use Ideo\Dhl\Model\Shipment\LabelPrintingService;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\PrintReturnQrCode;
+use DhlPoland\Dhl\Model\Shipment\LabelPrintingService;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\App\Response\Http\FileFactory;

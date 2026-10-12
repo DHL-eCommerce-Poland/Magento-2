@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment;
 
-use Ideo\Dhl\Model\Api\ClientInterface;
-use Ideo\Dhl\Model\Api\CreateShipmentReturnResult;
-use Ideo\Dhl\Model\Api\Credentials;
-use Ideo\Dhl\Model\Api\CredentialsProvider;
-use Ideo\Dhl\Model\Api\ShipmentReturnDataMapper;
-use Ideo\Dhl\Model\Shipment\DhlShipmentData;
-use Ideo\Dhl\Model\Shipment\ReturnShipmentCreationService;
-use Ideo\Dhl\Model\Shipment\ShipmentDataService;
-use Ideo\Dhl\Model\Shipment\ShipmentDataValidator;
+use DhlPoland\Dhl\Model\Api\ClientInterface;
+use DhlPoland\Dhl\Model\Api\CreateShipmentReturnResult;
+use DhlPoland\Dhl\Model\Api\Credentials;
+use DhlPoland\Dhl\Model\Api\CredentialsProvider;
+use DhlPoland\Dhl\Model\Api\ShipmentReturnDataMapper;
+use DhlPoland\Dhl\Model\Shipment\DhlShipmentData;
+use DhlPoland\Dhl\Model\Shipment\ReturnShipmentCreationService;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataService;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDataValidator;
 use Magento\Framework\Lock\LockManagerInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use PHPUnit\Framework\MockObject\MockObject;

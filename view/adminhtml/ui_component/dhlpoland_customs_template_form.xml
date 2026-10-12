@@ -10,10 +10,10 @@
     </argument>
     <settings>
         <buttons>
-            <button name="save" class="Ideo\Dhl\Block\Adminhtml\Button\Save"/>
-            <button name="save_and_continue" class="Ideo\Dhl\Block\Adminhtml\Button\SaveAndContinue"/>
-            <button name="delete" class="Ideo\Dhl\Block\Adminhtml\Button\Delete"/>
-            <button name="back" class="Ideo\Dhl\Block\Adminhtml\Button\Back"/>
+            <button name="save" class="DhlPoland\Dhl\Block\Adminhtml\Button\Save"/>
+            <button name="save_and_continue" class="DhlPoland\Dhl\Block\Adminhtml\Button\SaveAndContinue"/>
+            <button name="delete" class="DhlPoland\Dhl\Block\Adminhtml\Button\Delete"/>
+            <button name="back" class="DhlPoland\Dhl\Block\Adminhtml\Button\Back"/>
         </buttons>
         <namespace>dhlpoland_customs_template_form</namespace>
         <dataScope>data</dataScope>
@@ -30,7 +30,7 @@
         <settings>
             <submitUrl path="dhlpoland/customstemplate/save"/>
         </settings>
-        <dataProvider class="Ideo\Dhl\Model\CustomsTemplate\DataProvider" name="dhlpoland_customs_template_form_data_source">
+        <dataProvider class="DhlPoland\Dhl\Model\CustomsTemplate\DataProvider" name="dhlpoland_customs_template_form_data_source">
             <settings>
                 <requestFieldName>entity_id</requestFieldName>
                 <primaryFieldName>entity_id</primaryFieldName>
@@ -154,12 +154,12 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Source\CustomsType"/>
+                        <options class="DhlPoland\Dhl\Model\Source\CustomsType"/>
                     </settings>
                 </select>
             </formElements>
         </field>
-        <field name="category_of_item" formElement="select" component="Ideo_Dhl/js/form/element/customs-category">
+        <field name="category_of_item" formElement="select" component="DhlPoland_Dhl/js/form/element/customs-category">
             <settings>
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
@@ -171,12 +171,12 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Source\CategoryOfItem"/>
+                        <options class="DhlPoland\Dhl\Model\Source\CategoryOfItem"/>
                     </settings>
                 </select>
             </formElements>
         </field>
-        <field name="currency" formElement="select" component="Ideo_Dhl/js/form/element/customs-currency">
+        <field name="currency" formElement="select" component="DhlPoland_Dhl/js/form/element/customs-currency">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="default" xsi:type="string">PLN</item>
@@ -193,7 +193,7 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Ideo\Dhl\Model\Source\CustomsCurrency"/>
+                        <options class="DhlPoland\Dhl\Model\Source\CustomsCurrency"/>
                     </settings>
                 </select>
             </formElements>
@@ -236,7 +236,7 @@
         </field>
     </fieldset>
 
-    <fieldset name="individual_customs" component="Ideo_Dhl/js/form/components/individual-customs-fieldset">
+    <fieldset name="individual_customs" component="DhlPoland_Dhl/js/form/components/individual-customs-fieldset">
         <settings>
             <label translate="true">Data for Individual Clearance</label>
             <collapsible>true</collapsible>
@@ -416,7 +416,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <container name="invoice_content_agreement" component="Ideo_Dhl/js/form/components/individual-customs">
+        <container name="invoice_content_agreement" component="DhlPoland_Dhl/js/form/components/individual-customs">
             <argument name="data" xsi:type="array">
                 <item name="type" xsi:type="string">group</item>
                 <item name="config" xsi:type="array">
@@ -459,7 +459,7 @@
             <collapsible>true</collapsible>
             <opened>true</opened>
         </settings>
-        <dynamicRows name="customs_items" component="Ideo_Dhl/js/dynamic-rows/customs-items">
+        <dynamicRows name="customs_items" component="DhlPoland_Dhl/js/dynamic-rows/customs-items">
             <settings>
                 <addButtonLabel translate="true">Add Goods Item</addButtonLabel>
                 <label translate="true">Goods List</label>

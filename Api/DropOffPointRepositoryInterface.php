@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Api;
+namespace DhlPoland\Dhl\Api;
 
-use Ideo\Dhl\Api\Data\DropOffPointInterface;
+use DhlPoland\Dhl\Api\Data\DropOffPointInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResultsInterface;
 
@@ -13,9 +13,9 @@ interface DropOffPointRepositoryInterface
     /**
      * Save Drop-Off Point.
      *
-     * @param \Ideo\Dhl\Api\Data\DropOffPointInterface $dropOffPoint
+     * @param \DhlPoland\Dhl\Api\Data\DropOffPointInterface $dropOffPoint
      *
-     * @return \Ideo\Dhl\Api\Data\DropOffPointInterface
+     * @return \DhlPoland\Dhl\Api\Data\DropOffPointInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function save(DropOffPointInterface $dropOffPoint): DropOffPointInterface;
@@ -25,7 +25,7 @@ interface DropOffPointRepositoryInterface
      *
      * @param int $entityId
      *
-     * @return \Ideo\Dhl\Api\Data\DropOffPointInterface
+     * @return \DhlPoland\Dhl\Api\Data\DropOffPointInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getById(int $entityId): DropOffPointInterface;
@@ -33,7 +33,7 @@ interface DropOffPointRepositoryInterface
     /**
      * Get default Drop-Off Point.
      *
-     * @return \Ideo\Dhl\Api\Data\DropOffPointInterface|null
+     * @return \DhlPoland\Dhl\Api\Data\DropOffPointInterface|null
      */
     public function getDefault(): ?DropOffPointInterface;
 
@@ -49,7 +49,7 @@ interface DropOffPointRepositoryInterface
     /**
      * Delete Drop-Off Point.
      *
-     * @param \Ideo\Dhl\Api\Data\DropOffPointInterface $dropOffPoint
+     * @param \DhlPoland\Dhl\Api\Data\DropOffPointInterface $dropOffPoint
      *
      * @return bool
      * @throws \Magento\Framework\Exception\LocalizedException

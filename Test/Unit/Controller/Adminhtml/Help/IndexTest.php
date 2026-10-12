@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Help;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Help;
 
-use Ideo\Dhl\Controller\Adminhtml\Help\Index;
+use DhlPoland\Dhl\Controller\Adminhtml\Help\Index;
 use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\Page as BackendPage;
 use Magento\Framework\View\Page\Config;

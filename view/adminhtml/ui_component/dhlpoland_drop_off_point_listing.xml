@@ -101,7 +101,7 @@
                 <label translate="true">Is Default</label>
             </settings>
         </column>
-        <actionsColumn name="actions" class="Ideo\Dhl\Ui\Component\Listing\Column\DropOffPointActions">
+        <actionsColumn name="actions" class="DhlPoland\Dhl\Ui\Component\Listing\Column\DropOffPointActions">
             <settings>
                 <indexField>entity_id</indexField>
             </settings>

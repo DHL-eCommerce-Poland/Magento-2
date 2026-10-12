@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Source;
+namespace DhlPoland\Dhl\Test\Unit\Model\Source;
 
-use Ideo\Dhl\Model\Source\CategoryOfItem;
-use Ideo\Dhl\Model\Source\CustomsType;
+use DhlPoland\Dhl\Model\Source\CategoryOfItem;
+use DhlPoland\Dhl\Model\Source\CustomsType;
 use PHPUnit\Framework\TestCase;
 
 class CategoryOfItemTest extends TestCase

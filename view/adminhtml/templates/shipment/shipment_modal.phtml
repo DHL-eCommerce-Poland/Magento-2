@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 // phpcs:disable Generic.Files.LineLength.TooLong
 
-use Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig;
+use DhlPoland\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig;
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\Template;
 
@@ -16,8 +16,8 @@ $viewModel = $block->getViewModel();
 $dateFormat = $viewModel->getDateFormat();
 $todayIsoDate = $viewModel->getIsoDate();
 ?>
-<div id="ideo-dhl-prepare-modal" class="dhl-modal-hidden" data-bind="scope: 'dhlShipmentForm'">
-    <form id="ideo-dhl-prepare-modal-form" data-mage-init='{"validation":{}}' onsubmit="return false;">
+<div id="dhlpoland-prepare-modal" class="dhl-modal-hidden" data-bind="scope: 'dhlShipmentForm'">
+    <form id="dhlpoland-prepare-modal-form" data-mage-init='{"validation":{}}' onsubmit="return false;">
         <div class="dhl-shipment-prepare-form">
 
             <!-- Two-Column Container for Sender & Recipient Addresses -->
@@ -646,11 +646,11 @@ $todayIsoDate = $viewModel->getIsoDate();
 
 <script type="text/x-magento-init">
 {
-    "#ideo-dhl-prepare-modal": {
+    "#dhlpoland-prepare-modal": {
         "Magento_Ui/js/core/app": {
             "components": {
                 "dhlShipmentForm": {
-                    "component": "Ideo_Dhl/js/shipment/shipment-modal",
+                    "component": "DhlPoland_Dhl/js/shipment/shipment-modal",
                     "saveUrl": "<?= $escaper->escapeUrl($block->getUrl('dhlpoland/shipment/save')) ?>",
                     "loadTemplateUrl": "<?= $escaper->escapeUrl($block->getUrl('dhlpoland/shipment/loadTemplate')) ?>",
                     "dateFormat": "<?= $escaper->escapeJs($dateFormat) ?>",

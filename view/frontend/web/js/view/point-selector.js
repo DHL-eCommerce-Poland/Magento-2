@@ -2,8 +2,8 @@ define([
     'uiComponent',
     'jquery',
     'Magento_Checkout/js/model/quote',
-    'Ideo_Dhl/js/model/point-state',
-    'Ideo_Dhl/js/model/method-codes',
+    'DhlPoland_Dhl/js/model/point-state',
+    'DhlPoland_Dhl/js/model/method-codes',
     'Magento_Ui/js/modal/modal',
     'mage/translate'
 ], function (Component, $, quote, pointState, methodCodes, modal, $t) {
@@ -11,7 +11,7 @@ define([
 
     return Component.extend({
         defaults: {
-            template: 'Ideo_Dhl/point-selector',
+            template: 'DhlPoland_Dhl/point-selector',
             isModalOpen: false
         },
 

@@ -4,10 +4,10 @@
     <body>
         <referenceContainer name="content">
             <block name="dhlpoland_shipment_modal"
-                   template="Ideo_Dhl::shipment/shipment_modal.phtml">
+                   template="DhlPoland_Dhl::shipment/shipment_modal.phtml">
                 <arguments>
                     <argument name="view_model"
-                              xsi:type="object">Ideo\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig</argument>
+                              xsi:type="object">DhlPoland\Dhl\ViewModel\Adminhtml\Shipment\DatePickerConfig</argument>
                 </arguments>
             </block>
         </referenceContainer>

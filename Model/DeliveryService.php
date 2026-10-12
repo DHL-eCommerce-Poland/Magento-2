@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model;
+namespace DhlPoland\Dhl\Model;
 
-use Ideo\Dhl\Api\Data\DeliveryServiceInterface;
-use Ideo\Dhl\Model\Config\Source\LabelType;
-use Ideo\Dhl\Model\ResourceModel\DeliveryService as DeliveryServiceResource;
-use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
+use DhlPoland\Dhl\Api\Data\DeliveryServiceInterface;
+use DhlPoland\Dhl\Model\Config\Source\LabelType;
+use DhlPoland\Dhl\Model\ResourceModel\DeliveryService as DeliveryServiceResource;
+use DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData;
 use InvalidArgumentException;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\LocalizedException;

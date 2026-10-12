@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * PHPUnit Bootstrap for Ideo_Dhl module tests.
+ * PHPUnit Bootstrap for DhlPoland_Dhl module tests.
  *
  * Modeled after Magento core dev/tests/unit/framework/bootstrap.php with adaptive autoloading
  * for standalone CI and full Magento environments.
@@ -12,7 +12,7 @@ declare(strict_types=1);
 // 1. Locate Composer autoloader
 $vendorAutoload = dirname(__DIR__) . '/vendor/autoload.php';
 if (!file_exists($vendorAutoload)) {
-    // Fallback when running inside full Magento (app/code/Ideo/Dhl)
+    // Fallback when running inside full Magento (app/code/DhlPoland/Dhl)
     $parentVendor = dirname(__DIR__, 4) . '/vendor/autoload.php';
     if (file_exists($parentVendor)) {
         $vendorAutoload = $parentVendor;
@@ -22,6 +22,17 @@ if (!file_exists($vendorAutoload)) {
 if (file_exists($vendorAutoload)) {
     require_once $vendorAutoload;
 }
+
+spl_autoload_register(static function (string $class): void {
+    $prefix = 'DhlPoland\\Dhl\\';
+    if (str_starts_with($class, $prefix)) {
+        $relativeClass = substr($class, strlen($prefix));
+        $file = dirname(__DIR__) . '/' . str_replace('\\', '/', $relativeClass) . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+        }
+    }
+});
 
 // 2. Define temp directory for generated test code
 if (!defined('TESTS_TEMP_DIR')) {

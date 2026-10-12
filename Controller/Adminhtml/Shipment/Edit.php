@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Controller\Adminhtml\Shipment;
 
-use Ideo\Dhl\Api\ShipmentDataRepositoryInterface;
+use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -15,7 +15,7 @@ use Magento\Framework\View\Result\PageFactory;
 
 class Edit extends Action implements HttpGetActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::shipment';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::shipment';
 
     /**
      * @param Context $context
@@ -39,7 +39,7 @@ class Edit extends Action implements HttpGetActionInterface
     {
         $id = (int)$this->getRequest()->getParam('entity_id');
         $resultPage = $this->resultPageFactory->create();
-        $resultPage->setActiveMenu('Ideo_Dhl::shipment');
+        $resultPage->setActiveMenu('DhlPoland_Dhl::shipment');
 
         if ($id) {
             try {

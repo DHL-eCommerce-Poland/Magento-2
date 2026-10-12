@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\Help;
+namespace DhlPoland\Dhl\Controller\Adminhtml\Help;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -12,7 +12,7 @@ use Magento\Framework\View\Result\PageFactory;
 
 class Index extends Action implements HttpGetActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::help';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::help';
 
     /**
      * @param Context $context
@@ -33,7 +33,7 @@ class Index extends Action implements HttpGetActionInterface
     public function execute(): Page
     {
         $resultPage = $this->resultPageFactory->create();
-        $resultPage->setActiveMenu('Ideo_Dhl::help');
+        $resultPage->setActiveMenu('DhlPoland_Dhl::help');
         $resultPage->getConfig()->getTitle()->prepend(__('DHL eCommerce Poland - Help & Support'));
 
         return $resultPage;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Config\Source;
+namespace DhlPoland\Dhl\Test\Unit\Model\Config\Source;
 
-use Ideo\Dhl\Model\Config\Source\LabelType;
+use DhlPoland\Dhl\Model\Config\Source\LabelType;
 use PHPUnit\Framework\TestCase;
 
 class LabelTypeTest extends TestCase

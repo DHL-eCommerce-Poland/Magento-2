@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Api;
+namespace DhlPoland\Dhl\Api;
 
-use Ideo\Dhl\Api\Data\DeliveryServiceInterface;
+use DhlPoland\Dhl\Api\Data\DeliveryServiceInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResultsInterface;
 
@@ -13,9 +13,9 @@ interface DeliveryServiceRepositoryInterface
     /**
      * Save Delivery Service.
      *
-     * @param \Ideo\Dhl\Api\Data\DeliveryServiceInterface $deliveryService
+     * @param \DhlPoland\Dhl\Api\Data\DeliveryServiceInterface $deliveryService
      *
-     * @return \Ideo\Dhl\Api\Data\DeliveryServiceInterface
+     * @return \DhlPoland\Dhl\Api\Data\DeliveryServiceInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function save(DeliveryServiceInterface $deliveryService): DeliveryServiceInterface;
@@ -25,7 +25,7 @@ interface DeliveryServiceRepositoryInterface
      *
      * @param int $entityId
      *
-     * @return \Ideo\Dhl\Api\Data\DeliveryServiceInterface
+     * @return \DhlPoland\Dhl\Api\Data\DeliveryServiceInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getById(int $entityId): DeliveryServiceInterface;
@@ -35,7 +35,7 @@ interface DeliveryServiceRepositoryInterface
      *
      * @param string $methodCode
      *
-     * @return \Ideo\Dhl\Api\Data\DeliveryServiceInterface|null
+     * @return \DhlPoland\Dhl\Api\Data\DeliveryServiceInterface|null
      */
     public function getByMethod(string $methodCode): ?DeliveryServiceInterface;
 
@@ -51,7 +51,7 @@ interface DeliveryServiceRepositoryInterface
     /**
      * Delete Delivery Service.
      *
-     * @param \Ideo\Dhl\Api\Data\DeliveryServiceInterface $deliveryService
+     * @param \DhlPoland\Dhl\Api\Data\DeliveryServiceInterface $deliveryService
      *
      * @return bool
      * @throws \Magento\Framework\Exception\LocalizedException

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Api;
+namespace DhlPoland\Dhl\Test\Unit\Model\Api;
 
-use Ideo\Dhl\Model\Api\ShipmentFullDataMapper;
-use Ideo\Dhl\Model\Shipment\Data\CustomsData;
-use Ideo\Dhl\Model\Shipment\Data\PackageData;
-use Ideo\Dhl\Model\Shipment\Data\RecipientData;
-use Ideo\Dhl\Model\Shipment\Data\SenderData;
-use Ideo\Dhl\Model\Shipment\Data\ShipmentSettingsData;
-use Ideo\Dhl\Model\Shipment\Data\SpecialServicesData;
-use Ideo\Dhl\Model\Shipment\DhlShipmentData;
+use DhlPoland\Dhl\Model\Api\ShipmentFullDataMapper;
+use DhlPoland\Dhl\Model\Shipment\Data\CustomsData;
+use DhlPoland\Dhl\Model\Shipment\Data\PackageData;
+use DhlPoland\Dhl\Model\Shipment\Data\RecipientData;
+use DhlPoland\Dhl\Model\Shipment\Data\SenderData;
+use DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData;
+use DhlPoland\Dhl\Model\Shipment\Data\SpecialServicesData;
+use DhlPoland\Dhl\Model\Shipment\DhlShipmentData;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +24,7 @@ class ShipmentFullDataMapperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mapper = new ShipmentFullDataMapper(new \Ideo\Dhl\Model\Shipment\PostalCodeSanitizer());
+        $this->mapper = new ShipmentFullDataMapper(new \DhlPoland\Dhl\Model\Shipment\PostalCodeSanitizer());
     }
 
     /**
@@ -729,7 +729,7 @@ class ShipmentFullDataMapperTest extends TestCase
             recipient: new RecipientData(name: 'DE Customer', country: 'DE'),
             specialServices: new SpecialServicesData(),
             shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
-            customs: new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
+            customs: new \DhlPoland\Dhl\Model\Shipment\Data\CustomsData(
                 customsItems: [
                     [
                         'namePl' => '',
@@ -773,7 +773,7 @@ class ShipmentFullDataMapperTest extends TestCase
             recipient: new RecipientData(name: 'DE Customer', country: 'DE'),
             specialServices: new SpecialServicesData(),
             shipmentSettings: new ShipmentSettingsData(serviceType: 'EK', packages: [new PackageData()]),
-            customs: new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
+            customs: new \DhlPoland\Dhl\Model\Shipment\Data\CustomsData(
                 customsItems: [
                     [
                         'quantity' => '2',
@@ -798,7 +798,7 @@ class ShipmentFullDataMapperTest extends TestCase
 
         $base64Content = base64_encode('%PDF-1.4 Fake PDF Content');
 
-        $customs = new \Ideo\Dhl\Model\Shipment\Data\CustomsData(
+        $customs = new \DhlPoland\Dhl\Model\Shipment\Data\CustomsData(
             customsType: 'I',
             nipNr: '5218487281',
             eoriNr: 'PL52184872810000',

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model;
+namespace DhlPoland\Dhl\Test\Unit\Model;
 
-use Ideo\Dhl\Model\Carrier;
-use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\Model\RateCalculator;
-use Ideo\Dhl\Model\TableRateResolver;
-use Ideo\Dhl\Model\TrackingUrlResolver;
+use DhlPoland\Dhl\Model\Carrier;
+use DhlPoland\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\RateCalculator;
+use DhlPoland\Dhl\Model\TableRateResolver;
+use DhlPoland\Dhl\Model\TrackingUrlResolver;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\DataObject;
 use Magento\Quote\Model\Quote\Address\RateRequest;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Logger;
+namespace DhlPoland\Dhl\Logger;
 
 use Monolog\Logger as MonologLogger;
 

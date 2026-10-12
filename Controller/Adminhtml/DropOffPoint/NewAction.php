@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Controller\Adminhtml\DropOffPoint;
+namespace DhlPoland\Dhl\Controller\Adminhtml\DropOffPoint;
 
 use Magento\Backend\App\Action;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -11,7 +11,7 @@ use Magento\Framework\Controller\Result\ForwardFactory;
 
 class NewAction extends Action implements HttpGetActionInterface
 {
-    public const ADMIN_RESOURCE = 'Ideo_Dhl::drop_off_point';
+    public const ADMIN_RESOURCE = 'DhlPoland_Dhl::drop_off_point';
 
     /**
      * @param Action\Context $context

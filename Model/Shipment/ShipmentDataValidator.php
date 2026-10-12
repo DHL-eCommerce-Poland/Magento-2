@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\Shipment;
+namespace DhlPoland\Dhl\Model\Shipment;
 
-use Ideo\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\Model\MethodCatalog;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 

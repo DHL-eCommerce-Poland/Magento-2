@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment;
 
-use Ideo\Dhl\Model\ResourceModel\ShipmentData\Collection;
-use Ideo\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
-use Ideo\Dhl\Model\Shipment\DataProvider;
-use Ideo\Dhl\Model\ShipmentData;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\Collection;
+use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
+use DhlPoland\Dhl\Model\Shipment\DataProvider;
+use DhlPoland\Dhl\Model\ShipmentData;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -59,7 +59,7 @@ class DataProviderTest extends TestCase
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
         $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
 
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
 
         $dataProvider = new DataProvider(
             'dhlpoland_shipment_form_data_source',
@@ -117,7 +117,7 @@ class DataProviderTest extends TestCase
 
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
         $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
 
         $dataProvider = new DataProvider(
             'dhlpoland_shipment_form_data_source',
@@ -163,7 +163,7 @@ class DataProviderTest extends TestCase
 
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
         $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
 
         $dataProvider = new DataProvider(
             'dhlpoland_shipment_form_data_source',
@@ -216,7 +216,7 @@ class DataProviderTest extends TestCase
 
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
         $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-09-02'));
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
 
         $dataProvider = new DataProvider(
             'dhlpoland_shipment_form_data_source',
@@ -294,7 +294,7 @@ class DataProviderTest extends TestCase
 
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
         $timezoneStub->method('scopeDate')->willReturn(new \DateTime('2026-10-07'));
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
 
         $dataProvider = new DataProvider(
             'dhlpoland_shipment_form_data_source',
@@ -366,7 +366,7 @@ class DataProviderTest extends TestCase
         $serializer->method('unserialize')->willReturn($payloadArray);
 
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
 
         $dataProvider = new DataProvider(
             'dhlpoland_shipment_form_data_source',
@@ -419,7 +419,7 @@ class DataProviderTest extends TestCase
             ->willReturn($orderStub);
 
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
 
         $dataProvider = new DataProvider(
             'dhlpoland_shipment_form_data_source',
@@ -469,7 +469,7 @@ class DataProviderTest extends TestCase
             ->with($this->stringContains('Failed to load order #999 for grand total'));
 
         $timezoneStub = $this->createStub(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
-        $dateSanitizer = new \Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
+        $dateSanitizer = new \DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer($timezoneStub);
 
         $dataProvider = new DataProvider(
             'dhlpoland_shipment_form_data_source',

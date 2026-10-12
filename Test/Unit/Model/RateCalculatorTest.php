@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model;
+namespace DhlPoland\Dhl\Test\Unit\Model;
 
-use Ideo\Dhl\Model\RateCalculator;
-use Ideo\Dhl\Model\TableRateResolver;
+use DhlPoland\Dhl\Model\RateCalculator;
+use DhlPoland\Dhl\Model\TableRateResolver;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

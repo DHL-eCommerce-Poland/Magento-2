@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model;
+namespace DhlPoland\Dhl\Model;
 
-use Ideo\Dhl\Api\Data\DropOffPointInterface;
-use Ideo\Dhl\Api\DropOffPointRepositoryInterface;
+use DhlPoland\Dhl\Api\Data\DropOffPointInterface;
+use DhlPoland\Dhl\Api\DropOffPointRepositoryInterface;
 
 class DropOffPointResolver
 {

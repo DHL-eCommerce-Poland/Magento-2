@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Block\Adminhtml\System\Config;
+namespace DhlPoland\Dhl\Block\Adminhtml\System\Config;
 
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;

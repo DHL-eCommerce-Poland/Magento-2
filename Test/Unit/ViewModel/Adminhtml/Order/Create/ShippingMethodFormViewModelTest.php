@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\ViewModel\Adminhtml\Order\Create;
+namespace DhlPoland\Dhl\Test\Unit\ViewModel\Adminhtml\Order\Create;
 
-use Ideo\Dhl\Model\MethodCatalog;
-use Ideo\Dhl\ViewModel\Adminhtml\Order\Create\ShippingMethodFormViewModel;
+use DhlPoland\Dhl\Model\MethodCatalog;
+use DhlPoland\Dhl\ViewModel\Adminhtml\Order\Create\ShippingMethodFormViewModel;
 use Magento\Quote\Model\Quote\Address;
 use PHPUnit\Framework\TestCase;
 

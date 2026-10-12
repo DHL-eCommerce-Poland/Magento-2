@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Model\Shipment;
 
 use DateTime;
-use Ideo\Dhl\Model\Shipment\ShipmentDateSanitizer;
+use DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;

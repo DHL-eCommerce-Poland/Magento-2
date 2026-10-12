@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model;
+namespace DhlPoland\Dhl\Model;
 
-use Ideo\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
 use Magento\Framework\ObjectManagerInterface;
 
 class ShipmentDataFactory

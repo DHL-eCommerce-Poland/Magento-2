@@ -3,8 +3,8 @@ define([
     'ko',
     'Magento_Checkout/js/model/quote',
     'Magento_Checkout/js/model/shipping-service',
-    'Ideo_Dhl/js/model/point-state',
-    'Ideo_Dhl/js/model/method-codes',
+    'DhlPoland_Dhl/js/model/point-state',
+    'DhlPoland_Dhl/js/model/method-codes',
     'uiRegistry',
     'mage/translate',
     'require'
@@ -88,8 +88,8 @@ define([
                     return false;
                 }
 
-                var defaultLogoUrl = require.toUrl('Ideo_Dhl/images/logo_dhl.png');
-                var boxPopLogoUrl = require.toUrl('Ideo_Dhl/images/logo_dhl_box_pop.png');
+                var defaultLogoUrl = require.toUrl('DhlPoland_Dhl/images/logo_dhl.png');
+                var boxPopLogoUrl = require.toUrl('DhlPoland_Dhl/images/logo_dhl_box_pop.png');
                 var dhlConfig = (window.checkoutConfig && window.checkoutConfig.shipping && window.checkoutConfig.shipping.dhlpoland) || {};
                 var configuredLogos = dhlConfig.logos || {};
 
@@ -159,7 +159,7 @@ define([
                     }
 
                     var rowViewModel = {
-                        name: 'Ideo_Dhl/shipping/method-item-addon',
+                        name: 'DhlPoland_Dhl/shipping/method-item-addon',
                         isDhlPointMethod: function () {
                             return isPointMethod;
                         },
@@ -264,7 +264,7 @@ define([
                         }
                     };
 
-                    wrapperNode.innerHTML = '<div data-bind="template: { name: \'Ideo_Dhl/shipping/method-item-addon\' }"></div>';
+                    wrapperNode.innerHTML = '<div data-bind="template: { name: \'DhlPoland_Dhl/shipping/method-item-addon\' }"></div>';
                     ko.applyBindings(rowViewModel, wrapperNode);
                 });
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Api;
+namespace DhlPoland\Dhl\Test\Unit\Model\Api;
 
-use Ideo\Dhl\Model\Api\GetScanResult;
+use DhlPoland\Dhl\Model\Api\GetScanResult;
 use PHPUnit\Framework\TestCase;
 
 class GetScanResultTest extends TestCase

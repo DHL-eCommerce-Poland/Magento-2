@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Model\Config\Backend;
+namespace DhlPoland\Dhl\Test\Unit\Model\Config\Backend;
 
-use Ideo\Dhl\Model\Config\Backend\Tablerate;
+use DhlPoland\Dhl\Model\Config\Backend\Tablerate;
 use Magento\Config\Model\Config\Backend\File\RequestData\RequestDataInterface;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\ResourceModel\DeliveryService\Grid;
+namespace DhlPoland\Dhl\Model\ResourceModel\DeliveryService\Grid;
 
-use Ideo\Dhl\Model\ResourceModel\DeliveryService;
+use DhlPoland\Dhl\Model\ResourceModel\DeliveryService;
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface;
 use Magento\Framework\Data\Collection\EntityFactoryInterface;
 use Magento\Framework\Event\ManagerInterface;

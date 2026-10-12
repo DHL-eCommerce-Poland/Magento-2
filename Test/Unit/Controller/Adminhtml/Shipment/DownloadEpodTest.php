@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
+namespace DhlPoland\Dhl\Test\Unit\Controller\Adminhtml\Shipment;
 
-use Ideo\Dhl\Controller\Adminhtml\Shipment\DownloadEpod;
-use Ideo\Dhl\Model\Shipment\DocumentDownloadService;
+use DhlPoland\Dhl\Controller\Adminhtml\Shipment\DownloadEpod;
+use DhlPoland\Dhl\Model\Shipment\DocumentDownloadService;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\App\Response\Http\FileFactory;

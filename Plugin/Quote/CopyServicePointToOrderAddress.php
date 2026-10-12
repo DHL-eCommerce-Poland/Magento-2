@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Plugin\Quote;
+namespace DhlPoland\Dhl\Plugin\Quote;
 
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Address\ToOrderAddress;

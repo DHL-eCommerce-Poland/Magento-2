@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ideo\Dhl\Model\ResourceModel\DropOffPoint;
+namespace DhlPoland\Dhl\Model\ResourceModel\DropOffPoint;
 
-use Ideo\Dhl\Model\DropOffPoint as DropOffPointModel;
-use Ideo\Dhl\Model\ResourceModel\DropOffPoint as DropOffPointResource;
+use DhlPoland\Dhl\Model\DropOffPoint as DropOffPointModel;
+use DhlPoland\Dhl\Model\ResourceModel\DropOffPoint as DropOffPointResource;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
 class Collection extends AbstractCollection
