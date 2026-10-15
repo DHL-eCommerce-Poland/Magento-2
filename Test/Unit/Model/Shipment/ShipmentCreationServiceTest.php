@@ -9,6 +9,7 @@ use DhlPoland\Dhl\Model\Api\CreateShipmentResult;
 use DhlPoland\Dhl\Model\Api\Credentials;
 use DhlPoland\Dhl\Model\Api\CredentialsProvider;
 use DhlPoland\Dhl\Model\Api\ShipmentFullDataMapper;
+use DhlPoland\Dhl\Model\Shipment\CustomsDocumentService;
 use DhlPoland\Dhl\Model\Shipment\DhlShipmentData;
 use DhlPoland\Dhl\Model\Shipment\ShipmentCreationService;
 use DhlPoland\Dhl\Model\Shipment\ShipmentDataPayloadReader;
@@ -33,6 +34,11 @@ class ShipmentCreationServiceTest extends TestCase
      * @var ShipmentDataService|MockObject
      */
     private $shipmentDataServiceMock;
+
+    /**
+     * @var CustomsDocumentService|MockObject
+     */
+    private $customsDocumentServiceMock;
 
     /**
      * @var ShipmentDataValidator|MockObject
@@ -104,6 +110,7 @@ class ShipmentCreationServiceTest extends TestCase
         $returnBuilderMock = $this->createStub(ReturnShipmentDataBuilder::class);
         $returnCreationServiceMock = $this->createStub(ReturnShipmentCreationService::class);
         $magentoSyncServiceMock = $this->createStub(MagentoShipmentSyncService::class);
+        $this->customsDocumentServiceMock = $this->createMock(CustomsDocumentService::class);
 
         $this->service = new ShipmentCreationService(
             $this->shipmentDataServiceMock,
@@ -117,7 +124,8 @@ class ShipmentCreationServiceTest extends TestCase
             $returnBuilderMock,
             $returnCreationServiceMock,
             $magentoSyncServiceMock,
-            $this->payloadReaderStub
+            $this->payloadReaderStub,
+            $this->customsDocumentServiceMock
         );
     }
 
@@ -383,7 +391,8 @@ class ShipmentCreationServiceTest extends TestCase
             $returnBuilderMock,
             $returnCreationServiceMock,
             $magentoSyncServiceMock,
-            $this->payloadReaderStub
+            $this->payloadReaderStub,
+            $this->customsDocumentServiceMock
         );
 
         $result = $serviceWithReturn->createShipment($shipmentData);
@@ -452,7 +461,8 @@ class ShipmentCreationServiceTest extends TestCase
             $returnBuilderMock,
             $returnCreationServiceMock,
             $magentoSyncServiceMock,
-            $this->payloadReaderStub
+            $this->payloadReaderStub,
+            $this->customsDocumentServiceMock
         );
 
         $result = $serviceWithReturn->recreateShipment(10, $shipmentData);
@@ -536,7 +546,8 @@ class ShipmentCreationServiceTest extends TestCase
             $returnBuilderMock,
             $returnCreationServiceMock,
             $magentoSyncServiceMock,
-            $this->payloadReaderStub
+            $this->payloadReaderStub,
+            $this->customsDocumentServiceMock
         );
 
         $result = $serviceWithMockClient->createShipment($shipmentData);
@@ -587,12 +598,69 @@ class ShipmentCreationServiceTest extends TestCase
             $this->createStub(\DhlPoland\Dhl\Model\Shipment\ReturnShipmentDataBuilder::class),
             $this->createStub(\DhlPoland\Dhl\Model\Shipment\ReturnShipmentCreationService::class),
             $this->createStub(\DhlPoland\Dhl\Model\Shipment\MagentoShipmentSyncService::class),
-            new \DhlPoland\Dhl\Model\Shipment\ShipmentDataPayloadReader($serializer)
+            new \DhlPoland\Dhl\Model\Shipment\ShipmentDataPayloadReader($serializer),
+            $this->customsDocumentServiceMock
         );
 
         $result = $service->recreateShipment($entityId, $shipmentData);
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('999888777', $result->getShipmentId());
+    }
+
+    /**
+     * Test createAndDispatchShipment calls saveDocuments on CustomsDocumentService when customs docs are present.
+     *
+     * @return void
+     */
+    public function testCreateShipmentSavesCustomsDocumentsWhenPresent(): void
+    {
+        $shipmentSettings = $this->createStub(ShipmentSettingsData::class);
+        $shipmentSettings->method('autoCreateReturnShipment')->willReturn(false);
+
+        $shipmentData = $this->createStub(DhlShipmentData::class);
+        $shipmentData->method('getOrderId')->willReturn(100);
+        $shipmentData->method('toArray')->willReturn(['orderId' => 100]);
+        $shipmentData->method('getShipmentSettings')->willReturn($shipmentSettings);
+
+        $this->lockManagerMock->method('lock')->willReturn(true);
+        $this->lockManagerMock->method('unlock')->willReturn(true);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+        $this->mapperStub->method('map')->willReturn(['mapped' => 'payload']);
+
+        $apiResult = new CreateShipmentResult(
+            success: true,
+            timeout: false,
+            shipmentId: '123456789',
+            orderStatus: 'Nowa',
+            packageNumbers: ['PKG001'],
+            labelContent: 'RAW_LABEL',
+            labelFormat: 'PDF',
+            labelType: 'BLP',
+            cn23Content: 'BASE64_CN23',
+            cn23MimeType: 'application/pdf',
+            fvProformaContent: 'BASE64_PROFORMA',
+            fvProformaMimeType: 'application/pdf',
+            fvProformaNumber: 'FV/2026/001'
+        );
+        $this->clientStub->method('createShipment')->willReturn($apiResult);
+
+        $savedEntityStub = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
+        $savedEntityStub->method('getEntityId')->willReturn(42);
+
+        $this->shipmentDataServiceMock->expects($this->once())
+            ->method('saveShipmentDataWithStatus')
+            ->willReturn($savedEntityStub);
+
+        $this->customsDocumentServiceMock->expects($this->once())
+            ->method('saveDocuments')
+            ->with(42, $apiResult);
+
+        $result = $this->service->createShipment($shipmentData);
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals(42, $result->getEntityId());
     }
 }

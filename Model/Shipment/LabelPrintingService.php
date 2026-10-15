@@ -34,6 +34,7 @@ class LabelPrintingService
      * @param SerializerInterface $serializer
      * @param LabelGenerator $labelGenerator
      * @param FileDriver $fileDriver
+     * @param CustomsDocumentService $customsDocumentService
      */
     public function __construct(
         private readonly ShipmentDataRepositoryInterface $shipmentDataRepository,
@@ -43,7 +44,8 @@ class LabelPrintingService
         private readonly LoggerInterface $logger,
         private readonly SerializerInterface $serializer,
         private readonly LabelGenerator $labelGenerator,
-        private readonly FileDriver $fileDriver
+        private readonly FileDriver $fileDriver,
+        private readonly CustomsDocumentService $customsDocumentService
     ) {
     }
 
@@ -54,7 +56,7 @@ class LabelPrintingService
      * @param string|null $overrideLabelType Optional explicit label type override
      *
      * @return array
-     * @throws LocalizedException
+     * @throws LocalizedException|Zend_Pdf_Exception
      */
     public function getLabelsContent(array $entityIds, ?string $overrideLabelType = null): array
     {
@@ -65,6 +67,7 @@ class LabelPrintingService
 
         $defaultConfigLabelType = (string) $this->scopeConfig->getValue(self::XML_PATH_DEFAULT_LABEL_TYPE) ?: 'BLP';
         $itemsToPrint = [];
+        $entityIdByShipmentId = [];
 
         foreach ($entityIds as $id) {
             try {
@@ -73,6 +76,9 @@ class LabelPrintingService
                 if (empty($dhlShipmentId)) {
                     continue;
                 }
+
+                $shipmentIdStr = (string) $dhlShipmentId;
+                $entityIdByShipmentId[$shipmentIdStr] = (int) $id;
 
                 $labelType = $overrideLabelType;
                 if (empty($labelType)) {
@@ -83,7 +89,7 @@ class LabelPrintingService
                 }
 
                 $itemsToPrint[] = [
-                    'shipmentId' => (string) $dhlShipmentId,
+                    'shipmentId' => $shipmentIdStr,
                     'labelType' => $labelType ?: $defaultConfigLabelType,
                 ];
             } catch (Throwable $e) {
@@ -116,17 +122,72 @@ class LabelPrintingService
             throw new LocalizedException(__('No label data returned by DHL.'));
         }
 
+        $customsDocsByEntityId = $this->customsDocumentService->getDocumentsForShipments($entityIds);
+
         if (count($items) === 1) {
             $single = $items[0];
-            $ext = str_contains($single['mimeType'], 'pdf') ? 'pdf' : 'txt';
-            return [
-                'content' => $single['labelData'],
-                'mimeType' => $single['mimeType'],
-                'filename' => sprintf('dhl_label_%s.%s', $single['shipmentId'], $ext),
+            $shipmentId = (string) $single['shipmentId'];
+            $entityId = $entityIdByShipmentId[$shipmentId] ?? null;
+            $docs = $entityId ? ($customsDocsByEntityId[$entityId] ?? []) : [];
+
+            if (empty($docs)) {
+                $mime = strtolower((string) ($single['mimeType'] ?? ''));
+                $ext = str_contains($mime, 'pdf') ? 'pdf' : (str_contains($mime, 'zpl') ? 'zpl' : 'txt');
+                return [
+                    'content' => $single['labelData'],
+                    'mimeType' => $single['mimeType'],
+                    'filename' => sprintf('dhl_label_%s.%s', $single['shipmentId'], $ext),
+                ];
+            }
+
+            $isPdf = str_contains(strtolower((string) ($single['mimeType'] ?? '')), 'pdf');
+            if ($isPdf) {
+                foreach ($docs as $doc) {
+                    if (!str_contains(strtolower((string) ($doc['mime_type'] ?? '')), 'pdf')) {
+                        $isPdf = false;
+                        break;
+                    }
+                }
+            }
+
+            if ($isPdf) {
+                $pdfStrings = array_merge([$single['labelData']], array_column($docs, 'content'));
+                return [
+                    'content' => $this->mergePdfDocuments($pdfStrings),
+                    'mimeType' => 'application/pdf',
+                    'filename' => sprintf('dhl_label_%s.pdf', $shipmentId),
+                ];
+            }
+
+            $files = [];
+            $mime = strtolower((string) ($single['mimeType'] ?? ''));
+            $ext = str_contains($mime, 'pdf') ? 'pdf' : (str_contains($mime, 'png') ? 'png' : (str_contains($mime, 'zpl') ? 'zpl' : 'txt'));
+            $files[] = [
+                'filename' => sprintf('dhl_label_%s.%s', $shipmentId, $ext),
+                'content' => (string) $single['labelData'],
             ];
+
+            foreach ($docs as $doc) {
+                $docType = (string) ($doc['document_type'] ?? '');
+                $docMime = strtolower((string) ($doc['mime_type'] ?? ''));
+                $docExt = str_contains($docMime, 'pdf') ? 'pdf' : 'bin';
+                if ($docType === CustomsDocumentService::TYPE_CN23) {
+                    $files[] = [
+                        'filename' => sprintf('dhl_cn23_%s.%s', $shipmentId, $docExt),
+                        'content' => (string) $doc['content'],
+                    ];
+                } elseif ($docType === CustomsDocumentService::TYPE_PROFORMA) {
+                    $files[] = [
+                        'filename' => sprintf('dhl_proforma_%s.%s', $shipmentId, $docExt),
+                        'content' => (string) $doc['content'],
+                    ];
+                }
+            }
+
+            return $this->createZipArchive($files, sprintf('dhl_label_%s.zip', $shipmentId));
         }
 
-        return $this->combineLabels($items);
+        return $this->combineLabelsWithCustoms($items, $entityIdByShipmentId, $customsDocsByEntityId);
     }
 
     /**
@@ -303,70 +364,88 @@ class LabelPrintingService
     }
 
     /**
-     * Combine multiple label binary data items into a single document.
+     * Combine multiple shipment labels and their customs documents into a single PDF or ZIP archive.
      *
-     * @param array $items Array of label items [['shipmentId' => string, 'labelData' => string, 'mimeType' => string]]
+     * @param array $items
+     * @param array $entityIdByShipmentId
+     * @param array $customsDocsByEntityId
      *
-     * @return array{content: string, mimeType: string, filename: string}
+     * @return array
+     * @throws Zend_Pdf_Exception
      */
-    private function combineLabels(array $items): array
-    {
+    private function combineLabelsWithCustoms(
+        array $items,
+        array $entityIdByShipmentId,
+        array $customsDocsByEntityId
+    ): array {
         $hasNonPdf = false;
         foreach ($items as $item) {
-            if (!str_contains($item['mimeType'], 'pdf')) {
+            if (!str_contains(strtolower((string) ($item['mimeType'] ?? '')), 'pdf')) {
                 $hasNonPdf = true;
                 break;
             }
         }
 
-        if ($hasNonPdf) {
-            $zip = new ZipArchive();
-            $tempFile = tempnam(sys_get_temp_dir(), 'dhl_zip_'); // phpcs:ignore
-            if ($tempFile !== false && $zip->open($tempFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
-                foreach ($items as $index => $item) {
-                    $mime = strtolower((string) ($item['mimeType'] ?? ''));
-                    $ext = str_contains($mime, 'png') ? 'png' : (str_contains($mime, 'zpl') ? 'zpl' : 'bin');
-                    $filename = sprintf('dhl_label_%s.%s', $item['shipmentId'] ?? ($index + 1), $ext);
-                    $zip->addFromString($filename, (string) $item['labelData']);
-                }
-                $zip->close();
-
-                $zipContent = null;
-                try {
-                    $zipContent = $this->fileDriver->fileGetContents($tempFile);
-                } catch (FileSystemException $e) {
-                    $this->logger->warning(sprintf('Failed to read temporary ZIP label file: %s', $e->getMessage()));
-                }
-
-                try {
-                    if ($this->fileDriver->isExists($tempFile)) {
-                        $this->fileDriver->deleteFile($tempFile);
-                    }
-                } catch (FileSystemException $e) {
-                    $this->logger->warning(sprintf('Failed to clean up temporary ZIP label file: %s', $e->getMessage()));
-                }
-
-                if ($zipContent !== null) {
-                    return [
-                        'content' => $zipContent,
-                        'mimeType' => 'application/zip',
-                        'filename' => sprintf('dhl_labels_%s.zip', date('Ymd_His')),
-                    ];
-                }
-            }
-
-            $combinedText = '';
+        if (!$hasNonPdf) {
             foreach ($items as $item) {
-                $combinedText .= $item['labelData'] . "\n\n";
+                $shipmentId = (string) $item['shipmentId'];
+                $entityId = $entityIdByShipmentId[$shipmentId] ?? null;
+                $docs = $entityId ? ($customsDocsByEntityId[$entityId] ?? []) : [];
+                foreach ($docs as $doc) {
+                    if (!str_contains(strtolower((string) ($doc['mime_type'] ?? '')), 'pdf')) {
+                        $hasNonPdf = true;
+                        break 2;
+                    }
+                }
             }
-            return [
-                'content' => trim($combinedText),
-                'mimeType' => 'text/plain',
-                'filename' => sprintf('dhl_labels_%s.txt', date('Ymd_His')),
-            ];
         }
 
-        $combinedContent = $this->mergePdfDocuments($items);
+        if ($hasNonPdf) {
+            $files = [];
+            foreach ($items as $index => $item) {
+                $shipmentId = (string) ($item['shipmentId'] ?? ($index + 1));
+                $mime = strtolower((string) ($item['mimeType'] ?? ''));
+                $ext = str_contains($mime, 'pdf') ? 'pdf' : (str_contains($mime, 'png') ? 'png' : (str_contains($mime, 'zpl') ? 'zpl' : 'bin'));
+                $files[] = [
+                    'filename' => sprintf('dhl_label_%s.%s', $shipmentId, $ext),
+                    'content' => (string) $item['labelData'],
+                ];
+
+                $entityId = $entityIdByShipmentId[$shipmentId] ?? null;
+                $docs = $entityId ? ($customsDocsByEntityId[$entityId] ?? []) : [];
+                foreach ($docs as $doc) {
+                    $docType = (string) ($doc['document_type'] ?? '');
+                    $docMime = strtolower((string) ($doc['mime_type'] ?? ''));
+                    $docExt = str_contains($docMime, 'pdf') ? 'pdf' : 'bin';
+                    if ($docType === CustomsDocumentService::TYPE_CN23) {
+                        $files[] = [
+                            'filename' => sprintf('dhl_cn23_%s.%s', $shipmentId, $docExt),
+                            'content' => (string) $doc['content'],
+                        ];
+                    } elseif ($docType === CustomsDocumentService::TYPE_PROFORMA) {
+                        $files[] = [
+                            'filename' => sprintf('dhl_proforma_%s.%s', $shipmentId, $docExt),
+                            'content' => (string) $doc['content'],
+                        ];
+                    }
+                }
+            }
+
+            return $this->createZipArchive($files, sprintf('dhl_labels_%s.zip', date('Ymd_His')));
+        }
+
+        $allPdfStrings = [];
+        foreach ($items as $item) {
+            $allPdfStrings[] = $item['labelData'];
+            $shipmentId = (string) $item['shipmentId'];
+            $entityId = $entityIdByShipmentId[$shipmentId] ?? null;
+            $docs = $entityId ? ($customsDocsByEntityId[$entityId] ?? []) : [];
+            foreach ($docs as $doc) {
+                $allPdfStrings[] = $doc['content'];
+            }
+        }
+
+        $combinedContent = $this->mergePdfDocuments($allPdfStrings);
 
         return [
             'content' => $combinedContent,
@@ -376,16 +455,109 @@ class LabelPrintingService
     }
 
     /**
+     * Combine multiple label binary data items into a single document.
+     *
+     * @param array $items Array of label items [['shipmentId' => string, 'labelData' => string, 'mimeType' => string]]
+     *
+     * @return array
+     * @throws Zend_Pdf_Exception
+     */
+    private function combineLabels(array $items): array
+    {
+        $hasNonPdf = false;
+        foreach ($items as $item) {
+            if (!str_contains(strtolower((string) ($item['mimeType'] ?? '')), 'pdf')) {
+                $hasNonPdf = true;
+                break;
+            }
+        }
+
+        if ($hasNonPdf) {
+            $files = [];
+            foreach ($items as $index => $item) {
+                $mime = strtolower((string) ($item['mimeType'] ?? ''));
+                $ext = str_contains($mime, 'png') ? 'png' : (str_contains($mime, 'zpl') ? 'zpl' : 'bin');
+                $files[] = [
+                    'filename' => sprintf('dhl_label_%s.%s', $item['shipmentId'] ?? ($index + 1), $ext),
+                    'content' => (string) $item['labelData'],
+                ];
+            }
+            return $this->createZipArchive($files, sprintf('dhl_labels_%s.zip', date('Ymd_His')));
+        }
+
+        $pdfStrings = array_column($items, 'labelData');
+        $combinedContent = $this->mergePdfDocuments($pdfStrings);
+
+        return [
+            'content' => $combinedContent,
+            'mimeType' => 'application/pdf',
+            'filename' => sprintf('dhl_labels_%s.pdf', date('Ymd_His')),
+        ];
+    }
+
+    /**
+     * Create a ZIP archive from an array of file entries.
+     *
+     * @param array $files Array of ['filename' => string, 'content' => string]
+     * @param string $zipFilename
+     *
+     * @return array
+     */
+    private function createZipArchive(array $files, string $zipFilename): array
+    {
+        $zip = new ZipArchive();
+        $tempFile = tempnam(sys_get_temp_dir(), 'dhl_zip_'); // phpcs:ignore
+        if ($tempFile !== false && $zip->open($tempFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            foreach ($files as $file) {
+                $zip->addFromString($file['filename'], (string) $file['content']);
+            }
+            $zip->close();
+
+            $zipContent = null;
+            try {
+                $zipContent = $this->fileDriver->fileGetContents($tempFile);
+            } catch (FileSystemException $e) {
+                $this->logger->warning(sprintf('Failed to read temporary ZIP label file: %s', $e->getMessage()));
+            }
+
+            try {
+                if ($this->fileDriver->isExists($tempFile)) {
+                    $this->fileDriver->deleteFile($tempFile);
+                }
+            } catch (FileSystemException $e) {
+                $this->logger->warning(sprintf('Failed to clean up temporary ZIP label file: %s', $e->getMessage()));
+            }
+
+            if ($zipContent !== null) {
+                return [
+                    'content' => $zipContent,
+                    'mimeType' => 'application/zip',
+                    'filename' => $zipFilename,
+                ];
+            }
+        }
+
+        $combinedText = '';
+        foreach ($files as $file) {
+            $combinedText .= $file['content'] . "\n\n";
+        }
+        return [
+            'content' => trim($combinedText),
+            'mimeType' => 'text/plain',
+            'filename' => str_replace('.zip', '.txt', $zipFilename),
+        ];
+    }
+
+    /**
      * Merge multiple PDF binary strings with Magento's label generator.
      *
-     * @param array $items
+     * @param array $pdfStrings
      *
      * @return string
      * @throws Zend_Pdf_Exception
      */
-    private function mergePdfDocuments(array $items): string
+    private function mergePdfDocuments(array $pdfStrings): string
     {
-        $pdfStrings = array_column($items, 'labelData');
         $combinedPdf = $this->labelGenerator->combineLabelsPdf($pdfStrings);
 
         return $combinedPdf->render();

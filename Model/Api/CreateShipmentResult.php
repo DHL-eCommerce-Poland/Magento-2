@@ -19,6 +19,11 @@ class CreateShipmentResult
      * @param string|null $labelFormat Label MIME format (e.g., application/pdf)
      * @param string|null $labelType Label type (e.g., BLP)
      * @param int|null $entityId Database entity ID of the shipment
+     * @param string|null $cn23Content Base64 encoded CN23 customs declaration content
+     * @param string|null $cn23MimeType CN23 document MIME format
+     * @param string|null $fvProformaContent Base64 encoded proforma invoice content
+     * @param string|null $fvProformaMimeType Proforma invoice MIME format
+     * @param string|null $fvProformaNumber Proforma invoice number
      */
     public function __construct(
         private readonly bool $success,
@@ -31,7 +36,12 @@ class CreateShipmentResult
         private readonly ?string $labelContent = null,
         private readonly ?string $labelFormat = null,
         private readonly ?string $labelType = null,
-        private readonly ?int $entityId = null
+        private readonly ?int $entityId = null,
+        private readonly ?string $cn23Content = null,
+        private readonly ?string $cn23MimeType = null,
+        private readonly ?string $fvProformaContent = null,
+        private readonly ?string $fvProformaMimeType = null,
+        private readonly ?string $fvProformaNumber = null
     ) {
     }
 
@@ -146,6 +156,66 @@ class CreateShipmentResult
     }
 
     /**
+     * Get base64 encoded CN23 customs declaration content if returned by API.
+     *
+     * @return string|null
+     */
+    public function getCn23Content(): ?string
+    {
+        return $this->cn23Content;
+    }
+
+    /**
+     * Get CN23 document MIME format.
+     *
+     * @return string|null
+     */
+    public function getCn23MimeType(): ?string
+    {
+        return $this->cn23MimeType;
+    }
+
+    /**
+     * Get base64 encoded proforma invoice content if returned by API.
+     *
+     * @return string|null
+     */
+    public function getFvProformaContent(): ?string
+    {
+        return $this->fvProformaContent;
+    }
+
+    /**
+     * Get pro forma invoice MIME format.
+     *
+     * @return string|null
+     */
+    public function getFvProformaMimeType(): ?string
+    {
+        return $this->fvProformaMimeType;
+    }
+
+    /**
+     * Get proforma invoice number.
+     *
+     * @return string|null
+     */
+    public function getFvProformaNumber(): ?string
+    {
+        return $this->fvProformaNumber;
+    }
+
+    /**
+     * Whether customs documents (CN23 or proforma invoice) are present.
+     *
+     * @return bool
+     */
+    public function hasCustomsDocuments(): bool
+    {
+        return !empty($this->cn23Content) || !empty($this->fvProformaContent);
+    }
+
+    /**
      * Return a new instance with the specified database entity ID.
      *
      * @param int $entityId
@@ -165,7 +235,12 @@ class CreateShipmentResult
             $this->labelContent,
             $this->labelFormat,
             $this->labelType,
-            $entityId
+            $entityId,
+            $this->cn23Content,
+            $this->cn23MimeType,
+            $this->fvProformaContent,
+            $this->fvProformaMimeType,
+            $this->fvProformaNumber
         );
     }
 }

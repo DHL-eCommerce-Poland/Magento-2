@@ -152,5 +152,23 @@
         "constraint": {
             "PRIMARY": true
         }
+    },
+    "dhlpoland_shipment_customs_document": {
+        "column": {
+            "document_id": true,
+            "shipment_entity_id": true,
+            "document_type": true,
+            "document_number": true,
+            "mime_type": true,
+            "content": true,
+            "created_at": true
+        },
+        "index": {
+            "IDX_DHLPOLAND_CUSTOMS_DOC_SHIPMENT_ENTITY": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_DHLPOLAND_CUSTOMS_DOC_SHIPMENT": true
+        }
     }
 }
