@@ -32,6 +32,7 @@ class ShipmentCreationService
      * @param ReturnShipmentCreationService $returnCreationService
      * @param MagentoShipmentSyncService $magentoShipmentSyncService
      * @param ShipmentDataPayloadReader $payloadReader
+     * @param CustomsDocumentService $customsDocumentService
      */
     public function __construct(
         private readonly ShipmentDataService $shipmentDataService,
@@ -45,7 +46,8 @@ class ShipmentCreationService
         private readonly ReturnShipmentDataBuilder $returnBuilder,
         private readonly ReturnShipmentCreationService $returnCreationService,
         private readonly MagentoShipmentSyncService $magentoShipmentSyncService,
-        private readonly ShipmentDataPayloadReader $payloadReader
+        private readonly ShipmentDataPayloadReader $payloadReader,
+        private readonly CustomsDocumentService $customsDocumentService
     ) {
     }
 
@@ -170,6 +172,9 @@ class ShipmentCreationService
 
             $savedEntityId = $savedEntity ? (int) $savedEntity->getEntityId() : null;
             if ($savedEntityId) {
+                if ($apiResult->hasCustomsDocuments()) {
+                    $this->customsDocumentService->saveDocuments($savedEntityId, $apiResult);
+                }
                 $apiResult = $apiResult->withEntityId($savedEntityId);
             }
 
@@ -300,6 +305,10 @@ class ShipmentCreationService
                 $packageNumbers,
                 $magentoShipmentId
             );
+
+            if ($apiResult->hasCustomsDocuments()) {
+                $this->customsDocumentService->saveDocuments($entityId, $apiResult);
+            }
 
             // 7. Auto-create return shipment if requested
             if ($shipmentData->getShipmentSettings()->autoCreateReturnShipment() && $newShipmentId !== '') {

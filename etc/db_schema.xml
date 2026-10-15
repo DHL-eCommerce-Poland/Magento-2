@@ -151,4 +151,23 @@
             <column name="status"/>
         </index>
     </table>
+    <table name="dhlpoland_shipment_customs_document" resource="default" engine="innodb" comment="DHL Customs Documents (CN23, Proforma)">
+        <column xsi:type="int" name="document_id" unsigned="true" nullable="false" identity="true" comment="Document ID"/>
+        <column xsi:type="int" name="shipment_entity_id" unsigned="true" nullable="false" comment="DHL Shipment Entity ID"/>
+        <column xsi:type="varchar" name="document_type" length="32" nullable="false" comment="Document Type (cn23, fv_proforma)"/>
+        <column xsi:type="varchar" name="document_number" length="64" nullable="true" comment="Document Number (e.g. Proforma Number)"/>
+        <column xsi:type="varchar" name="mime_type" length="64" nullable="false" default="application/pdf" comment="MIME Type"/>
+        <column xsi:type="mediumblob" name="content" nullable="false" comment="Decoded Binary Document Content"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="document_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_DHLPOLAND_CUSTOMS_DOC_SHIPMENT"
+                    table="dhlpoland_shipment_customs_document" column="shipment_entity_id"
+                    referenceTable="dhlpoland_shipment" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="IDX_DHLPOLAND_CUSTOMS_DOC_SHIPMENT_ENTITY" indexType="btree">
+            <column name="shipment_entity_id"/>
+        </index>
+    </table>
 </schema>

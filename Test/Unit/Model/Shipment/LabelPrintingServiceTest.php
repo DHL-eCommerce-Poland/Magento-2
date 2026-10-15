@@ -10,12 +10,15 @@ use DhlPoland\Dhl\Model\Api\ClientInterface;
 use DhlPoland\Dhl\Model\Api\Credentials;
 use DhlPoland\Dhl\Model\Api\CredentialsProvider;
 use DhlPoland\Dhl\Model\Api\GetLabelsResult;
+use DhlPoland\Dhl\Model\Shipment\CustomsDocumentService;
 use DhlPoland\Dhl\Model\Shipment\LabelPrintingService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class LabelPrintingServiceTest extends TestCase
 {
     /**
@@ -43,6 +46,10 @@ class LabelPrintingServiceTest extends TestCase
      */
     private $fileDriverStub;
     /**
+     * @var CustomsDocumentService|Stub
+     */
+    private $customsDocumentServiceStub;
+    /**
      * @var LabelPrintingService
      */
     private $service;
@@ -55,6 +62,7 @@ class LabelPrintingServiceTest extends TestCase
         $this->scopeConfigStub = $this->createStub(ScopeConfigInterface::class);
         $this->labelGeneratorStub = $this->createStub(\Magento\Shipping\Model\Shipping\LabelGenerator::class);
         $this->fileDriverStub = $this->createStub(\Magento\Framework\Filesystem\Driver\File::class);
+        $this->customsDocumentServiceStub = $this->createStub(CustomsDocumentService::class);
 
         $this->service = new LabelPrintingService(
             $this->repositoryStub,
@@ -64,7 +72,8 @@ class LabelPrintingServiceTest extends TestCase
             $this->createStub(\Psr\Log\LoggerInterface::class),
             new \Magento\Framework\Serialize\Serializer\Json(),
             $this->labelGeneratorStub,
-            $this->fileDriverStub
+            $this->fileDriverStub,
+            $this->customsDocumentServiceStub
         );
     }
 
@@ -178,7 +187,8 @@ class LabelPrintingServiceTest extends TestCase
             $this->createStub(\Psr\Log\LoggerInterface::class),
             new \Magento\Framework\Serialize\Serializer\Json(),
             $labelGeneratorStub,
-            $this->fileDriverStub
+            $this->fileDriverStub,
+            $this->customsDocumentServiceStub
         );
 
         $result = $service->getLabelsContent([1, 2]);
@@ -324,7 +334,8 @@ class LabelPrintingServiceTest extends TestCase
             $this->createStub(\Psr\Log\LoggerInterface::class),
             new \Magento\Framework\Serialize\Serializer\Json(),
             $labelGeneratorStub,
-            $this->fileDriverStub
+            $this->fileDriverStub,
+            $this->customsDocumentServiceStub
         );
 
         $result = $service->getReturnLabelContent([1]);
@@ -404,7 +415,8 @@ class LabelPrintingServiceTest extends TestCase
             $this->createStub(\Psr\Log\LoggerInterface::class),
             new \Magento\Framework\Serialize\Serializer\Json(),
             $labelGeneratorMock,
-            $this->fileDriverStub
+            $this->fileDriverStub,
+            $this->customsDocumentServiceStub
         );
 
         $result = $service->getReturnLabelContent([1]);
@@ -450,7 +462,8 @@ class LabelPrintingServiceTest extends TestCase
             $this->createStub(\Psr\Log\LoggerInterface::class),
             new \Magento\Framework\Serialize\Serializer\Json(),
             $this->labelGeneratorStub,
-            new \Magento\Framework\Filesystem\Driver\File()
+            new \Magento\Framework\Filesystem\Driver\File(),
+            $this->customsDocumentServiceStub
         );
 
         $result = $service->getReturnLabelContent([1]);
@@ -506,13 +519,305 @@ class LabelPrintingServiceTest extends TestCase
             $this->createStub(\Psr\Log\LoggerInterface::class),
             new \Magento\Framework\Serialize\Serializer\Json(),
             $this->labelGeneratorStub,
-            $fileDriverMock
+            $fileDriverMock,
+            $this->customsDocumentServiceStub
         );
 
         $result = $service->getReturnLabelContent([1]);
 
         $this->assertEquals('application/zip', $result['mimeType']);
         $this->assertEquals('MOCK_ZIP_CONTENT', $result['content']);
+    }
+
+    public function testGetLabelsContentSinglePdfWithCustomsDocumentsCombinesPdf(): void
+    {
+        $shipmentStub = $this->createStub(ShipmentDataInterface::class);
+        $shipmentStub->method('getShipmentId')->willReturn('1234567890');
+        $shipmentStub->method('getShipmentData')->willReturn('{"shipmentSettings":{"labelType":"BLP"}}');
+
+        $this->repositoryStub->method('getById')->willReturn($shipmentStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+
+        $labelsResult = new GetLabelsResult(true, [
+            [
+                'shipmentId' => '1234567890',
+                'labelType' => 'BLP',
+                'labelData' => '%PDF-LABEL-RAW',
+                'mimeType' => 'application/pdf',
+            ],
+        ]);
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->method('getLabels')->willReturn($labelsResult);
+
+        $this->customsDocumentServiceStub->method('getDocumentsForShipments')
+            ->willReturn([
+                1 => [
+                    [
+                        'document_type' => CustomsDocumentService::TYPE_CN23,
+                        'mime_type' => 'application/pdf',
+                        'content' => '%PDF-CN23-RAW',
+                    ],
+                    [
+                        'document_type' => CustomsDocumentService::TYPE_PROFORMA,
+                        'mime_type' => 'application/pdf',
+                        'content' => '%PDF-PROFORMA-RAW',
+                    ],
+                ],
+            ]);
+
+        $labelGeneratorMock = $this->createMock(\Magento\Shipping\Model\Shipping\LabelGenerator::class);
+        $zendPdfMock = new \Zend_Pdf();
+        $labelGeneratorMock->expects($this->once())
+            ->method('combineLabelsPdf')
+            ->with(['%PDF-LABEL-RAW', '%PDF-CN23-RAW', '%PDF-PROFORMA-RAW'])
+            ->willReturn($zendPdfMock);
+
+        $service = new LabelPrintingService(
+            $this->repositoryStub,
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->scopeConfigStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            new \Magento\Framework\Serialize\Serializer\Json(),
+            $labelGeneratorMock,
+            $this->fileDriverStub,
+            $this->customsDocumentServiceStub
+        );
+
+        $result = $service->getLabelsContent([1]);
+
+        $this->assertEquals('application/pdf', $result['mimeType']);
+        $this->assertEquals('dhl_label_1234567890.pdf', $result['filename']);
+        $this->assertNotEmpty($result['content']);
+    }
+
+    public function testGetLabelsContentSingleZplWithCustomsDocumentsZipsAll(): void
+    {
+        $shipmentStub = $this->createStub(ShipmentDataInterface::class);
+        $shipmentStub->method('getShipmentId')->willReturn('1234567890');
+        $shipmentStub->method('getShipmentData')->willReturn('{"shipmentSettings":{"labelType":"ZBLP"}}');
+
+        $this->repositoryStub->method('getById')->willReturn($shipmentStub);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+
+        $labelsResult = new GetLabelsResult(true, [
+            [
+                'shipmentId' => '1234567890',
+                'labelType' => 'ZBLP',
+                'labelData' => '^XA^FO50,50^ADN,36,20^FDTest^FS^XZ',
+                'mimeType' => 'application/x-zpl',
+            ],
+        ]);
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->method('getLabels')->willReturn($labelsResult);
+
+        $this->customsDocumentServiceStub->method('getDocumentsForShipments')
+            ->willReturn([
+                1 => [
+                    [
+                        'document_type' => CustomsDocumentService::TYPE_CN23,
+                        'mime_type' => 'application/pdf',
+                        'content' => '%PDF-CN23-RAW',
+                    ],
+                    [
+                        'document_type' => CustomsDocumentService::TYPE_PROFORMA,
+                        'mime_type' => 'application/pdf',
+                        'content' => '%PDF-PROFORMA-RAW',
+                    ],
+                ],
+            ]);
+
+        $service = new LabelPrintingService(
+            $this->repositoryStub,
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->scopeConfigStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            new \Magento\Framework\Serialize\Serializer\Json(),
+            $this->labelGeneratorStub,
+            new \Magento\Framework\Filesystem\Driver\File(),
+            $this->customsDocumentServiceStub
+        );
+
+        $result = $service->getLabelsContent([1]);
+
+        $this->assertEquals('application/zip', $result['mimeType']);
+        $this->assertEquals('dhl_label_1234567890.zip', $result['filename']);
+
+        // Inspect zip contents
+        $zip = new \ZipArchive();
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_zip_');
+        file_put_contents($tmpFile, $result['content']);
+        $this->assertTrue($zip->open($tmpFile));
+        $this->assertEquals('^XA^FO50,50^ADN,36,20^FDTest^FS^XZ', $zip->getFromName('dhl_label_1234567890.zpl'));
+        $this->assertEquals('%PDF-CN23-RAW', $zip->getFromName('dhl_cn23_1234567890.pdf'));
+        $this->assertEquals('%PDF-PROFORMA-RAW', $zip->getFromName('dhl_proforma_1234567890.pdf'));
+        $zip->close();
+        unlink($tmpFile);
+    }
+
+    public function testGetLabelsContentMultipleShipmentsAllPdfCombinesInOrder(): void
+    {
+        $shipment1 = $this->createStub(ShipmentDataInterface::class);
+        $shipment1->method('getShipmentId')->willReturn('SHIP_1');
+        $shipment2 = $this->createStub(ShipmentDataInterface::class);
+        $shipment2->method('getShipmentId')->willReturn('SHIP_2');
+
+        $this->repositoryStub->method('getById')->willReturnMap([
+            [10, $shipment1],
+            [20, $shipment2],
+        ]);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+
+        $labelsResult = new GetLabelsResult(true, [
+            [
+                'shipmentId' => 'SHIP_1',
+                'labelType' => 'BLP',
+                'labelData' => 'PDF-LABEL-1',
+                'mimeType' => 'application/pdf',
+            ],
+            [
+                'shipmentId' => 'SHIP_2',
+                'labelType' => 'BLP',
+                'labelData' => 'PDF-LABEL-2',
+                'mimeType' => 'application/pdf',
+            ],
+        ]);
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->method('getLabels')->willReturn($labelsResult);
+
+        $this->customsDocumentServiceStub->method('getDocumentsForShipments')
+            ->willReturn([
+                10 => [
+                    [
+                        'document_type' => CustomsDocumentService::TYPE_CN23,
+                        'mime_type' => 'application/pdf',
+                        'content' => 'PDF-CN23-1',
+                    ],
+                    [
+                        'document_type' => CustomsDocumentService::TYPE_PROFORMA,
+                        'mime_type' => 'application/pdf',
+                        'content' => 'PDF-PROFORMA-1',
+                    ],
+                ],
+                // SHIP_2 has no customs docs
+            ]);
+
+        $labelGeneratorMock = $this->createMock(\Magento\Shipping\Model\Shipping\LabelGenerator::class);
+        $zendPdfMock = new \Zend_Pdf();
+        $labelGeneratorMock->expects($this->once())
+            ->method('combineLabelsPdf')
+            ->with(['PDF-LABEL-1', 'PDF-CN23-1', 'PDF-PROFORMA-1', 'PDF-LABEL-2'])
+            ->willReturn($zendPdfMock);
+
+        $service = new LabelPrintingService(
+            $this->repositoryStub,
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->scopeConfigStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            new \Magento\Framework\Serialize\Serializer\Json(),
+            $labelGeneratorMock,
+            $this->fileDriverStub,
+            $this->customsDocumentServiceStub
+        );
+
+        $result = $service->getLabelsContent([10, 20]);
+
+        $this->assertEquals('application/pdf', $result['mimeType']);
+        $this->assertStringStartsWith('dhl_labels_', $result['filename']);
+        $this->assertStringEndsWith('.pdf', $result['filename']);
+    }
+
+    public function testGetLabelsContentMultipleShipmentsMixedFormatsZipsAllWithCustomsDocs(): void
+    {
+        $shipment1 = $this->createStub(ShipmentDataInterface::class);
+        $shipment1->method('getShipmentId')->willReturn('SHIP_1');
+        $shipment2 = $this->createStub(ShipmentDataInterface::class);
+        $shipment2->method('getShipmentId')->willReturn('SHIP_2');
+
+        $this->repositoryStub->method('getById')->willReturnMap([
+            [10, $shipment1],
+            [20, $shipment2],
+        ]);
+
+        $credentials = new Credentials('user', 'pass', true);
+        $this->credentialsProviderStub->method('getCredentials')->willReturn($credentials);
+
+        $labelsResult = new GetLabelsResult(true, [
+            [
+                'shipmentId' => 'SHIP_1',
+                'labelType' => 'BLP',
+                'labelData' => 'PDF-LABEL-1',
+                'mimeType' => 'application/pdf',
+            ],
+            [
+                'shipmentId' => 'SHIP_2',
+                'labelType' => 'ZBLP',
+                'labelData' => '^XA^FO50,50^FDZPL-LABEL-2^FS^XZ',
+                'mimeType' => 'application/x-zpl',
+            ],
+        ]);
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->method('getLabels')->willReturn($labelsResult);
+
+        $this->customsDocumentServiceStub->method('getDocumentsForShipments')
+            ->willReturn([
+                10 => [
+                    [
+                        'document_type' => CustomsDocumentService::TYPE_CN23,
+                        'mime_type' => 'application/pdf',
+                        'content' => 'PDF-CN23-1',
+                    ],
+                ],
+                20 => [
+                    [
+                        'document_type' => CustomsDocumentService::TYPE_PROFORMA,
+                        'mime_type' => 'application/pdf',
+                        'content' => 'PDF-PROFORMA-2',
+                    ],
+                ],
+            ]);
+
+        $service = new LabelPrintingService(
+            $this->repositoryStub,
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->scopeConfigStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            new \Magento\Framework\Serialize\Serializer\Json(),
+            $this->labelGeneratorStub,
+            new \Magento\Framework\Filesystem\Driver\File(),
+            $this->customsDocumentServiceStub
+        );
+
+        $result = $service->getLabelsContent([10, 20]);
+
+        $this->assertEquals('application/zip', $result['mimeType']);
+        $this->assertStringStartsWith('dhl_labels_', $result['filename']);
+        $this->assertStringEndsWith('.zip', $result['filename']);
+
+        // Inspect zip contents
+        $zip = new \ZipArchive();
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_zip_');
+        file_put_contents($tmpFile, $result['content']);
+        $this->assertTrue($zip->open($tmpFile));
+        $this->assertEquals('PDF-LABEL-1', $zip->getFromName('dhl_label_SHIP_1.pdf'));
+        $this->assertEquals('PDF-CN23-1', $zip->getFromName('dhl_cn23_SHIP_1.pdf'));
+        $this->assertEquals('^XA^FO50,50^FDZPL-LABEL-2^FS^XZ', $zip->getFromName('dhl_label_SHIP_2.zpl'));
+        $this->assertEquals('PDF-PROFORMA-2', $zip->getFromName('dhl_proforma_SHIP_2.pdf'));
+        $zip->close();
+        unlink($tmpFile);
     }
 
     /**
@@ -532,7 +837,8 @@ class LabelPrintingServiceTest extends TestCase
             $this->createStub(\Psr\Log\LoggerInterface::class),
             new \Magento\Framework\Serialize\Serializer\Json(),
             $this->labelGeneratorStub,
-            $this->fileDriverStub
+            $this->fileDriverStub,
+            $this->customsDocumentServiceStub
         );
     }
 }

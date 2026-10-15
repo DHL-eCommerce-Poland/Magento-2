@@ -156,10 +156,23 @@ class SoapClientAdapter implements ClientInterface
                 : (!empty($shipmentResult->shipmentId) ? (string) $shipmentResult->shipmentId : null);
 
             if (is_object($shipmentResult) && !empty($shipmentId)) {
+                $labelObj = !empty($shipmentResult->label) && is_object($shipmentResult->label)
+                    ? $shipmentResult->label
+                    : $shipmentResult;
+
                 $orderStatus = !empty($shipmentResult->orderStatus) ? (string) $shipmentResult->orderStatus : null;
-                $labelContent = !empty($shipmentResult->labelContent) ? (string) $shipmentResult->labelContent : null;
-                $labelFormat = !empty($shipmentResult->labelFormat) ? (string) $shipmentResult->labelFormat : null;
-                $labelType = !empty($shipmentResult->labelType) ? (string) $shipmentResult->labelType : null;
+                $labelContent = !empty($labelObj->labelContent) ? (string) $labelObj->labelContent : null;
+                $labelFormat = !empty($labelObj->labelFormat) ? (string) $labelObj->labelFormat : null;
+                $labelType = !empty($labelObj->labelType) ? (string) $labelObj->labelType : null;
+                $cn23Content = !empty($labelObj->cn23Content) ? (string) $labelObj->cn23Content : null;
+                $cn23MimeType = !empty($labelObj->cn23MimeType) ? (string) $labelObj->cn23MimeType : null;
+                $fvProformaContent = !empty($labelObj->fvProformaContent)
+                    ? (string) $labelObj->fvProformaContent
+                    : null;
+                $fvProformaMimeType = !empty($labelObj->fvProformaMimeType)
+                    ? (string) $labelObj->fvProformaMimeType
+                    : null;
+                $fvProformaNumber = !empty($labelObj->fvProformaNumer) ? (string) $labelObj->fvProformaNumer : null;
 
                 return new CreateShipmentResult(
                     success: true,
@@ -171,7 +184,13 @@ class SoapClientAdapter implements ClientInterface
                     errorMessage: null,
                     labelContent: $labelContent,
                     labelFormat: $labelFormat,
-                    labelType: $labelType
+                    labelType: $labelType,
+                    entityId: null,
+                    cn23Content: $cn23Content,
+                    cn23MimeType: $cn23MimeType,
+                    fvProformaContent: $fvProformaContent,
+                    fvProformaMimeType: $fvProformaMimeType,
+                    fvProformaNumber: $fvProformaNumber
                 );
             }
 
@@ -1111,11 +1130,11 @@ class SoapClientAdapter implements ClientInterface
         $passwordPattern = '/(<(?:[a-zA-Z0-9_]+:)?password>)[^<]*(<\/(?:[a-zA-Z0-9_]+:)?password>)/i';
         $xml = (string) preg_replace($passwordPattern, '$1***MASKED***$2', $xml);
 
-        $binPattern = '/(<(?:[a-zA-Z0-9_]+:)?'
-            . '(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile|invoice)>)'
+        $binFields = 'labelData|labelContent|scanData|fileData|cn23Data|cn23Content'
+            . '|fvProformaData|fvProformaContent|primaryFile|invoice';
+        $binPattern = '/(<(?:[a-zA-Z0-9_]+:)?(?:' . $binFields . ')>)'
             . '[^<]{30,}'
-            . '(<\/(?:[a-zA-Z0-9_]+:)?'
-            . '(?:labelData|labelContent|scanData|fileData|cn23Data|fvProformaData|primaryFile|invoice)>)/i';
+            . '(<\/(?:[a-zA-Z0-9_]+:)?(?:' . $binFields . ')>)/i';
 
         $xml = (string) preg_replace($binPattern, '$1***BINARY DATA TRUNCATED***$2', $xml);
 
