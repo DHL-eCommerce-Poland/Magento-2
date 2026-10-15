@@ -11,8 +11,9 @@ A clear and concise description of what the bug is.
 
 ### Environment Details
 - **Magento Version:** [e.g. 2.4.4, 2.4.7-p1]
-- **PHP Version:** [e.g. 8.1.28, 8.2.16, 8.3]
+- **PHP Version:** [e.g. 8.1.28, 8.2.16, 8.3, 8.4]
 - **Module Version:** [e.g. 1.0.0]
+- **DHL WebAPI2 Environment:** [e.g. Sandbox / Testing, Production]
 - **Storefront / Checkout:** [e.g. Luma standard checkout, Hyvä Checkout, Other]
 - **Deployment Mode:** [e.g. developer, production]
 
