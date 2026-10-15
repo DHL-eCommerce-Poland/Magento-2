@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/DHL-eCommerce-Poland/Magento-2/security/policy
+    about: Please report security vulnerabilities privately according to our security policy.
+  - name: 💬 DHL Technical Support
+    url: mailto:pl.cim@dhl.com
+    about: For account-specific questions, SAP numbers, or contract inquiries, contact DHL directly.

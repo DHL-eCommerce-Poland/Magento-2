@@ -24,5 +24,6 @@ Fixes #(issue)
 - [ ] I have added unit tests for new business logic / regression tests for bug fixes
 - [ ] All unit tests pass locally (`vendor/bin/phpunit -c phpunit.xml.dist Test/Unit`)
 - [ ] Compatible with minimum supported versions (Magento Open Source 2.4.4, PHP 8.1)
+- [ ] My commits and PR title follow Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, etc.)
 - [ ] No sensitive credentials, tokens, or customer data are committed or exposed
 - [ ] Documentation (README.md, PHPDoc) has been updated where appropriate
