@@ -13,7 +13,7 @@ The DHL eCommerce shipping module interacts with external shipping APIs and hand
 **Please do not report security vulnerabilities through public GitHub issues.**
 
 Instead, please report security issues privately by email to:
-- **Email:** `norbert.cios.KR@dhl.com`
+- **Email:** `pl.cim@dhl.com`
 
 Please include in your report:
 - A detailed description of the vulnerability.
