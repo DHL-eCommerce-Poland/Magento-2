@@ -15,9 +15,24 @@ use Psr\Log\LoggerInterface;
 
 class SoapClientAdapterCustomsTest extends TestCase
 {
+    /**
+     * @var LoggerInterface
+     */
     private LoggerInterface $loggerStub;
+
+    /**
+     * @var ScopeConfigInterface
+     */
     private ScopeConfigInterface $scopeConfigStub;
+
+    /**
+     * @var ShipmentDateSanitizer
+     */
     private ShipmentDateSanitizer $dateSanitizer;
+
+    /**
+     * @var FileDriver
+     */
     private FileDriver $fileDriverStub;
 
     protected function setUp(): void
@@ -115,7 +130,8 @@ class SoapClientAdapterCustomsTest extends TestCase
             . '<SOAP-ENV:Body>'
             . '<label>'
             . '<cn23Content>JVBERi0xLjUKJeLjz9MKNSAwIG9iago8PC9TdWJ0eXBlL0Zvcm0vRmlsdGVyL0ZsYXRlRGVjb2Rl</cn23Content>'
-            . '<fvProformaContent>JVBERi0xLjUKJeLjz9MKNiAwIG9iago8PC9GaWx0ZXIvRmxhdGVEZWNvZGUvTGVuZ3RoIDI2</fvProformaContent>'
+            . '<fvProformaContent>JVBERi0xLjUKJeLjz9MKNiAwIG9iago8PC9GaWx0ZXIv'
+            . 'RmxhdGVEZWNvZGUvTGVuZ3RoIDI2</fvProformaContent>'
             . '</label>'
             . '</SOAP-ENV:Body>'
             . '</SOAP-ENV:Envelope>';
@@ -124,6 +140,9 @@ class SoapClientAdapterCustomsTest extends TestCase
 
         $this->assertStringNotContainsString('JVBERi0xLjUK', $sanitized);
         $this->assertStringContainsString('<cn23Content>***BINARY DATA TRUNCATED***</cn23Content>', $sanitized);
-        $this->assertStringContainsString('<fvProformaContent>***BINARY DATA TRUNCATED***</fvProformaContent>', $sanitized);
+        $this->assertStringContainsString(
+            '<fvProformaContent>***BINARY DATA TRUNCATED***</fvProformaContent>',
+            $sanitized
+        );
     }
 }

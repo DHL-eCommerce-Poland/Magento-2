@@ -166,8 +166,12 @@ class SoapClientAdapter implements ClientInterface
                 $labelType = !empty($labelObj->labelType) ? (string) $labelObj->labelType : null;
                 $cn23Content = !empty($labelObj->cn23Content) ? (string) $labelObj->cn23Content : null;
                 $cn23MimeType = !empty($labelObj->cn23MimeType) ? (string) $labelObj->cn23MimeType : null;
-                $fvProformaContent = !empty($labelObj->fvProformaContent) ? (string) $labelObj->fvProformaContent : null;
-                $fvProformaMimeType = !empty($labelObj->fvProformaMimeType) ? (string) $labelObj->fvProformaMimeType : null;
+                $fvProformaContent = !empty($labelObj->fvProformaContent)
+                    ? (string) $labelObj->fvProformaContent
+                    : null;
+                $fvProformaMimeType = !empty($labelObj->fvProformaMimeType)
+                    ? (string) $labelObj->fvProformaMimeType
+                    : null;
                 $fvProformaNumber = !empty($labelObj->fvProformaNumer) ? (string) $labelObj->fvProformaNumer : null;
 
                 return new CreateShipmentResult(
@@ -1126,11 +1130,11 @@ class SoapClientAdapter implements ClientInterface
         $passwordPattern = '/(<(?:[a-zA-Z0-9_]+:)?password>)[^<]*(<\/(?:[a-zA-Z0-9_]+:)?password>)/i';
         $xml = (string) preg_replace($passwordPattern, '$1***MASKED***$2', $xml);
 
-        $binPattern = '/(<(?:[a-zA-Z0-9_]+:)?'
-            . '(?:labelData|labelContent|scanData|fileData|cn23Data|cn23Content|fvProformaData|fvProformaContent|primaryFile|invoice)>)'
+        $binFields = 'labelData|labelContent|scanData|fileData|cn23Data|cn23Content'
+            . '|fvProformaData|fvProformaContent|primaryFile|invoice';
+        $binPattern = '/(<(?:[a-zA-Z0-9_]+:)?(?:' . $binFields . ')>)'
             . '[^<]{30,}'
-            . '(<\/(?:[a-zA-Z0-9_]+:)?'
-            . '(?:labelData|labelContent|scanData|fileData|cn23Data|cn23Content|fvProformaData|fvProformaContent|primaryFile|invoice)>)/i';
+            . '(<\/(?:[a-zA-Z0-9_]+:)?(?:' . $binFields . ')>)/i';
 
         $xml = (string) preg_replace($binPattern, '$1***BINARY DATA TRUNCATED***$2', $xml);
 
