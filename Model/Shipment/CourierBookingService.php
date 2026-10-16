@@ -8,6 +8,7 @@ use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
 use DhlPoland\Dhl\Model\Api\ClientInterface;
 use DhlPoland\Dhl\Model\Api\CourierBookingResult;
 use DhlPoland\Dhl\Model\Api\CredentialsProvider;
+use DhlPoland\Dhl\Model\Config\Source\PackageType;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Psr\Log\LoggerInterface;
@@ -38,7 +39,7 @@ class CourierBookingService
     /**
      * Book courier for selected Magento shipment entities.
      *
-     * @param array $ids
+     * @param int[]|string[] $ids
      * @param string $pickupDate YYYY-MM-DD format
      * @param string $pickupTimeFrom HH:MM format
      * @param string $pickupTimeTo HH:MM format
@@ -71,8 +72,8 @@ class CourierBookingService
 
         $dhlShipmentIds = [];
         $entityIdsByDhlShipmentId = [];
-        $shipmentIdsByServiceType = [];
-        $serviceTypeByDhlShipmentId = [];
+        $shipmentIdsByGroup = [];
+        $groupByDhlShipmentId = [];
 
         foreach ($ids as $id) {
             if (is_numeric($id) && (int) $id > 0) {
@@ -102,17 +103,20 @@ class CourierBookingService
                 }
 
                 $dhlId = (string) $dhlId;
-                $hasConflict = isset($serviceTypeByDhlShipmentId[$dhlId])
-                    && $serviceTypeByDhlShipmentId[$dhlId] !== $serviceType;
+                $isPallet = $this->payloadReader->hasPalletFromEntity($entity);
+                $groupKey = $serviceType . '_' . ($isPallet ? PackageType::PALLET : PackageType::PACKAGE);
+
+                $hasConflict = isset($groupByDhlShipmentId[$dhlId])
+                    && $groupByDhlShipmentId[$dhlId] !== $groupKey;
                 if ($hasConflict) {
                     throw new LocalizedException(
                         __('Selected DHL shipment %1 has conflicting service codes.', $dhlId)
                     );
                 }
 
-                if (!isset($serviceTypeByDhlShipmentId[$dhlId])) {
-                    $serviceTypeByDhlShipmentId[$dhlId] = $serviceType;
-                    $shipmentIdsByServiceType[$serviceType][] = $dhlId;
+                if (!isset($groupByDhlShipmentId[$dhlId])) {
+                    $groupByDhlShipmentId[$dhlId] = $groupKey;
+                    $shipmentIdsByGroup[$groupKey][] = $dhlId;
                     $dhlShipmentIds[] = $dhlId;
                 }
 
@@ -131,61 +135,124 @@ class CourierBookingService
         }
 
         $credentials = $this->credentialsProvider->getCredentials();
+        $successfulOrderIds = [];
+        $failedErrors = [];
+        $firstErrorCode = null;
+        $bookedStatus = null;
 
-        $result = $this->client->bookCourier(
-            $credentials,
-            $dhlShipmentIds,
-            $formattedPickupDate,
-            $pickupTimeFrom,
-            $pickupTimeTo,
-            $additionalInfo
-        );
+        foreach ($shipmentIdsByGroup as $groupKey => $groupShipmentIds) {
+            $result = $this->client->bookCourier(
+                $credentials,
+                $groupShipmentIds,
+                $formattedPickupDate,
+                $pickupTimeFrom,
+                $pickupTimeTo,
+                $additionalInfo
+            );
 
-        if ($result->isSuccess()) {
-            $courierOrderIds = $result->getCourierOrderIds();
-            if (count($courierOrderIds) !== count($shipmentIdsByServiceType)) {
-                return new CourierBookingResult(
-                    false,
-                    [],
-                    'INVALID_RESPONSE',
-                    (string) __('DHL returned an unexpected number of courier order IDs.')
-                );
+            if (!$result->isSuccess()) {
+                $errMsg = $result->getErrorMessage()
+                    ?: (string) __('Failed to book courier for group %1.', $groupKey);
+                $failedErrors[] = $errMsg;
+                if ($firstErrorCode === null) {
+                    $firstErrorCode = $result->getErrorCode() ?: 'BOOK_COURIER_ERROR';
+                }
+                $this->logger->warning(sprintf(
+                    '[CourierBookingService] Failed to book courier for group %s: [%s] %s',
+                    $groupKey,
+                    $result->getErrorCode() ?? 'UNKNOWN',
+                    $errMsg
+                ));
+                continue;
             }
 
-            foreach ($courierOrderIds as $courierOrderId) {
-                if (!is_string($courierOrderId) || trim($courierOrderId) === '') {
-                    return new CourierBookingResult(
-                        false,
-                        [],
-                        'INVALID_RESPONSE',
-                        (string) __('DHL returned an invalid courier order ID.')
-                    );
+            $courierOrderIds = $result->getCourierOrderIds();
+            $validOrderIds = [];
+            foreach ($courierOrderIds as $orderId) {
+                if (is_string($orderId) && trim($orderId) !== '') {
+                    $validOrderIds[] = trim($orderId);
                 }
             }
 
-            $bookedStatus = $result->getOrderStatus() ?: (string) __('Kurier zamówiony');
+            if (empty($validOrderIds)) {
+                $errMsg = (string) __('DHL returned an invalid courier order ID for group %1.', $groupKey);
+                $failedErrors[] = $errMsg;
+                if ($firstErrorCode === null) {
+                    $firstErrorCode = 'INVALID_RESPONSE';
+                }
+                $this->logger->warning(sprintf(
+                    '[CourierBookingService] DHL returned empty courier order IDs for group %s.',
+                    $groupKey
+                ));
+                continue;
+            }
 
-            foreach (array_values($shipmentIdsByServiceType) as $index => $serviceShipmentIds) {
-                $courierOrderId = trim($courierOrderIds[$index]);
-                foreach ($serviceShipmentIds as $dhlShipmentId) {
-                    foreach (array_unique($entityIdsByDhlShipmentId[$dhlShipmentId] ?? []) as $entityId) {
-                        try {
-                            $entity = $this->shipmentDataRepository->getById($entityId);
-                            $entity->setStatus($bookedStatus);
-                            $entity->setDispatchNumber($courierOrderId);
-                            $this->shipmentDataRepository->save($entity);
-                        } catch (Throwable $e) {
-                            $this->logger->warning(sprintf(
-                                '[CourierBookingService] Failed to update courier booking for shipment entity #%s: %s',
-                                $entityId,
-                                $e->getMessage()
-                            ));
-                        }
+            if (count($validOrderIds) > 1) {
+                $this->logger->info(sprintf(
+                    '[CourierBookingService] DHL returned multiple courier order IDs for group %s: %s',
+                    $groupKey,
+                    implode(', ', $validOrderIds)
+                ));
+            }
+
+            if ($bookedStatus === null) {
+                $bookedStatus = $result->getOrderStatus() ?: (string) __('Kurier zamówiony');
+            }
+
+            $primaryOrderId = $validOrderIds[0];
+            foreach ($validOrderIds as $orderId) {
+                if (!in_array($orderId, $successfulOrderIds, true)) {
+                    $successfulOrderIds[] = $orderId;
+                }
+            }
+
+            foreach ($groupShipmentIds as $dhlShipmentId) {
+                foreach (array_unique($entityIdsByDhlShipmentId[$dhlShipmentId] ?? []) as $entityId) {
+                    try {
+                        $entity = $this->shipmentDataRepository->getById($entityId);
+                        $entity->setStatus($bookedStatus);
+                        $entity->setDispatchNumber($primaryOrderId);
+                        $this->shipmentDataRepository->save($entity);
+                    } catch (Throwable $e) {
+                        $this->logger->warning(sprintf(
+                            '[CourierBookingService] Failed to update courier booking for shipment entity #%s: %s',
+                            $entityId,
+                            $e->getMessage()
+                        ));
                     }
                 }
             }
         }
 
-        return $result;
+        if (!empty($failedErrors)) {
+            if (empty($successfulOrderIds)) {
+                return new CourierBookingResult(
+                    false,
+                    [],
+                    $firstErrorCode ?? 'BOOK_COURIER_ERROR',
+                    implode('; ', $failedErrors)
+                );
+            }
+
+            return new CourierBookingResult(
+                false,
+                $successfulOrderIds,
+                'PARTIAL_BOOKING_ERROR',
+                (string) __(
+                    'Booked courier orders: %1. Errors: %2',
+                    implode(', ', $successfulOrderIds),
+                    implode('; ', $failedErrors)
+                ),
+                $bookedStatus
+            );
+        }
+
+        return new CourierBookingResult(
+            true,
+            $successfulOrderIds,
+            null,
+            null,
+            $bookedStatus
+        );
     }
 }

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace DhlPoland\Dhl\Model\Shipment;
 
 use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
+use DhlPoland\Dhl\Model\Config\Source\PackageType;
+use DhlPoland\Dhl\Model\MethodCatalog;
 use InvalidArgumentException;
 use Magento\Framework\Serialize\SerializerInterface;
 
@@ -154,5 +156,39 @@ class ShipmentDataPayloadReader
         }
 
         return array_values(array_unique($returnIds));
+    }
+
+    /**
+     * Check if a shipment entity contains any pallet packages or pallet services.
+     *
+     * @param ShipmentDataInterface $shipment
+     *
+     * @return bool
+     */
+    public function hasPalletFromEntity(ShipmentDataInterface $shipment): bool
+    {
+        $payload = $this->read($shipment->getShipmentData());
+        $serviceType = $this->getServiceTypeFromEntity($shipment);
+        if ($serviceType === MethodCatalog::SERVICE_CM) {
+            return true;
+        }
+
+        $packages = $this->getPackages($payload);
+        if (empty($packages) && isset($payload['pieceList']['item']) && is_array($payload['pieceList']['item'])) {
+            $packages = $payload['pieceList']['item'];
+        }
+
+        foreach ($packages as $package) {
+            if (!is_array($package)) {
+                continue;
+            }
+
+            $type = strtoupper(trim((string) ($package['packageType'] ?? $package['type'] ?? '')));
+            if ($type === PackageType::PALLET) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

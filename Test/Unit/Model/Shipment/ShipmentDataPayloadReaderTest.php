@@ -161,4 +161,64 @@ class ShipmentDataPayloadReaderTest extends TestCase
 
         $this->assertSame(['RET001', 'RET002', 'RET003'], $returnIds);
     }
+
+    public function testHasPalletFromEntityReturnsTrueWhenPalletPackagePresent(): void
+    {
+        $shipment = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment->method('getShipmentData')->willReturn(
+            (new Json())->serialize([
+                'shipmentSettings' => [
+                    'packages' => [
+                        ['packageType' => 'PACKAGE'],
+                        ['packageType' => 'PALLET'],
+                    ],
+                ],
+            ])
+        );
+
+        $this->assertTrue($this->reader->hasPalletFromEntity($shipment));
+    }
+
+    public function testHasPalletFromEntityReturnsTrueWhenServiceTypeIsConnectPallet(): void
+    {
+        $shipment = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment->method('getShipmentData')->willReturn(
+            (new Json())->serialize([
+                'shipmentSettings' => [
+                    'serviceType' => 'CM',
+                    'packages' => [
+                        ['packageType' => 'PACKAGE'],
+                    ],
+                ],
+            ])
+        );
+
+        $this->assertTrue($this->reader->hasPalletFromEntity($shipment));
+    }
+
+    public function testHasPalletFromEntityReturnsFalseForParcels(): void
+    {
+        $shipment = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment->method('getShipmentData')->willReturn(
+            (new Json())->serialize([
+                'shipmentSettings' => [
+                    'serviceType' => 'AH',
+                    'packages' => [
+                        ['packageType' => 'PACKAGE'],
+                        ['packageType' => 'ENVELOPE'],
+                    ],
+                ],
+            ])
+        );
+
+        $this->assertFalse($this->reader->hasPalletFromEntity($shipment));
+    }
+
+    public function testHasPalletFromEntityReturnsFalseWhenNoData(): void
+    {
+        $shipment = $this->createStub(\DhlPoland\Dhl\Api\Data\ShipmentDataInterface::class);
+        $shipment->method('getShipmentData')->willReturn(null);
+
+        $this->assertFalse($this->reader->hasPalletFromEntity($shipment));
+    }
 }
