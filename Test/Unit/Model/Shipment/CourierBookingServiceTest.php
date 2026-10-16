@@ -11,6 +11,7 @@ use DhlPoland\Dhl\Model\Api\ClientInterface;
 use DhlPoland\Dhl\Model\Api\CourierBookingResult;
 use DhlPoland\Dhl\Model\Api\Credentials;
 use DhlPoland\Dhl\Model\Api\CredentialsProvider;
+use DhlPoland\Dhl\Model\Config\Source\PackageType;
 use DhlPoland\Dhl\Model\Shipment\CourierBookingService;
 use DhlPoland\Dhl\Model\Shipment\ShipmentDateSanitizer;
 use DhlPoland\Dhl\Model\Shipment\ShipmentDataPayloadReader;
@@ -163,17 +164,17 @@ class CourierBookingServiceTest extends TestCase
         $repository->expects($this->exactly(2))->method('save');
 
         $client = $this->createMock(ClientInterface::class);
-        $client->expects($this->once())
+        $client->expects($this->exactly(2))
             ->method('bookCourier')
-            ->with(
-                $this->anything(),
-                ['DHL_SHIPMENT_1', 'DHL_SHIPMENT_2'],
-                '2026-10-06',
-                '10:00',
-                '14:00',
-                null
-            )
-            ->willReturn(new CourierBookingResult(true, ['90002561026WWW', '90002571026WWW']));
+            ->willReturnCallback(function ($credentials, $shipmentIds) {
+                if ($shipmentIds === ['DHL_SHIPMENT_1']) {
+                    return new CourierBookingResult(true, ['90002561026WWW']);
+                }
+                if ($shipmentIds === ['DHL_SHIPMENT_2']) {
+                    return new CourierBookingResult(true, ['90002571026WWW']);
+                }
+                throw new \InvalidArgumentException('Unexpected shipment IDs: ' . implode(',', $shipmentIds));
+            });
 
         $timezone = $this->createFixedTimezone('2026-10-05');
         $service = new CourierBookingService(
@@ -189,35 +190,31 @@ class CourierBookingServiceTest extends TestCase
         $result = $service->bookCourier([10, 20], '2026-10-06', '10:00', '14:00');
 
         $this->assertTrue($result->isSuccess());
+        $this->assertEquals(['90002561026WWW', '90002571026WWW'], $result->getCourierOrderIds());
     }
 
     /**
-     * Test that an incomplete DHL response does not assign an order number to any shipment.
+     * Test that an invalid DHL response does not assign an order number to any shipment.
      *
      * @return void
      */
-    public function testBookCourierDoesNotAssignNumbersWhenResponseCountDoesNotMatchShipments(): void
+    public function testBookCourierDoesNotAssignNumbersWhenResponseIsInvalid(): void
     {
         $firstShipment = $this->createStub(ShipmentDataInterface::class);
         $firstShipment->method('getShipmentId')->willReturn('DHL_SHIPMENT_1');
         $firstShipment->method('getShipmentData')->willReturn($this->shipmentPayload('AH'));
-        $secondShipment = $this->createStub(ShipmentDataInterface::class);
-        $secondShipment->method('getShipmentId')->willReturn('DHL_SHIPMENT_2');
-        $secondShipment->method('getShipmentData')->willReturn($this->shipmentPayload('EK'));
 
         $repository = $this->createMock(ShipmentDataRepositoryInterface::class);
-        $repository->expects($this->exactly(2))
+        $repository->expects($this->once())
             ->method('getById')
-            ->willReturnMap([
-                [10, $firstShipment],
-                [20, $secondShipment],
-            ]);
+            ->with(10)
+            ->willReturn($firstShipment);
         $repository->expects($this->never())->method('save');
 
         $client = $this->createMock(ClientInterface::class);
         $client->expects($this->once())
             ->method('bookCourier')
-            ->willReturn(new CourierBookingResult(true, ['90002561026WWW']));
+            ->willReturn(new CourierBookingResult(false, [], 'BOOK_COURIER_ERROR', 'Service unavailable'));
 
         $service = new CourierBookingService(
             $client,
@@ -229,10 +226,10 @@ class CourierBookingServiceTest extends TestCase
             new ShipmentDataPayloadReader(new Json())
         );
 
-        $result = $service->bookCourier([10, 20], '2026-08-28', '10:00', '14:00');
+        $result = $service->bookCourier([10], '2026-08-28', '10:00', '14:00');
 
         $this->assertFalse($result->isSuccess());
-        $this->assertSame('INVALID_RESPONSE', $result->getErrorCode());
+        $this->assertSame('BOOK_COURIER_ERROR', $result->getErrorCode());
     }
 
     public function testBookCourierAllowsFutureDateAndCallsApiClient(): void
@@ -350,17 +347,17 @@ class CourierBookingServiceTest extends TestCase
         $repository->expects($this->exactly(3))->method('save');
 
         $client = $this->createMock(ClientInterface::class);
-        $client->expects($this->once())
+        $client->expects($this->exactly(2))
             ->method('bookCourier')
-            ->with(
-                $this->anything(),
-                ['DHL_SHIPMENT_10', 'DHL_SHIPMENT_20', 'DHL_SHIPMENT_30'],
-                '2026-10-06',
-                '10:00',
-                '14:00',
-                null
-            )
-            ->willReturn(new CourierBookingResult(true, ['ORDER_AH', 'ORDER_EK']));
+            ->willReturnCallback(function ($credentials, $shipmentIds) {
+                if ($shipmentIds === ['DHL_SHIPMENT_10', 'DHL_SHIPMENT_30']) {
+                    return new CourierBookingResult(true, ['ORDER_AH']);
+                }
+                if ($shipmentIds === ['DHL_SHIPMENT_20']) {
+                    return new CourierBookingResult(true, ['ORDER_EK']);
+                }
+                throw new \InvalidArgumentException('Unexpected shipment IDs: ' . implode(',', $shipmentIds));
+            });
 
         $timezone = $this->createFixedTimezone('2026-10-05');
         $service = new CourierBookingService(
@@ -376,6 +373,126 @@ class CourierBookingServiceTest extends TestCase
         $result = $service->bookCourier([10, 20, 30], '2026-10-06', '10:00', '14:00');
 
         $this->assertTrue($result->isSuccess());
+        $this->assertEquals(['ORDER_AH', 'ORDER_EK'], $result->getCourierOrderIds());
+    }
+
+    public function testBookCourierHandlesMixedParcelsAndPalletForSameServiceType(): void
+    {
+        $parcelShipment1 = $this->createMock(ShipmentDataInterface::class);
+        $parcelShipment1->method('getShipmentId')->willReturn('DHL_SHIP_PARCEL_1');
+        $parcelShipment1->method('getShipmentData')
+            ->willReturn($this->shipmentPayloadWithPackageType('AH', PackageType::PACKAGE));
+        $parcelShipment1->expects($this->once())->method('setStatus');
+        $parcelShipment1->expects($this->once())->method('setDispatchNumber')->with('90007391026WWW');
+
+        $parcelShipment2 = $this->createMock(ShipmentDataInterface::class);
+        $parcelShipment2->method('getShipmentId')->willReturn('DHL_SHIP_PARCEL_2');
+        $parcelShipment2->method('getShipmentData')
+            ->willReturn($this->shipmentPayloadWithPackageType('AH', PackageType::PACKAGE));
+        $parcelShipment2->expects($this->once())->method('setStatus');
+        $parcelShipment2->expects($this->once())->method('setDispatchNumber')->with('90007391026WWW');
+
+        $palletShipment = $this->createMock(ShipmentDataInterface::class);
+        $palletShipment->method('getShipmentId')->willReturn('DHL_SHIP_PALLET_1');
+        $palletShipment->method('getShipmentData')
+            ->willReturn($this->shipmentPayloadWithPackageType('AH', PackageType::PALLET));
+        $palletShipment->expects($this->once())->method('setStatus');
+        $palletShipment->expects($this->once())->method('setDispatchNumber')->with('90007401026WWW');
+
+        $repository = $this->createMock(ShipmentDataRepositoryInterface::class);
+        $repository->expects($this->exactly(6))
+            ->method('getById')
+            ->willReturnMap([
+                [10, $parcelShipment1],
+                [20, $parcelShipment2],
+                [30, $palletShipment],
+            ]);
+        $repository->expects($this->exactly(3))->method('save');
+
+        $client = $this->createMock(ClientInterface::class);
+        $client->expects($this->exactly(2))
+            ->method('bookCourier')
+            ->willReturnCallback(function ($credentials, $shipmentIds) {
+                if ($shipmentIds === ['DHL_SHIP_PARCEL_1', 'DHL_SHIP_PARCEL_2']) {
+                    return new CourierBookingResult(true, ['90007391026WWW']);
+                }
+                if ($shipmentIds === ['DHL_SHIP_PALLET_1']) {
+                    return new CourierBookingResult(true, ['90007401026WWW']);
+                }
+                throw new \InvalidArgumentException('Unexpected shipment IDs: ' . implode(',', $shipmentIds));
+            });
+
+        $timezone = $this->createFixedTimezone('2026-10-05');
+        $service = new CourierBookingService(
+            $client,
+            $this->credentialsProviderStub,
+            $repository,
+            $timezone,
+            new ShipmentDateSanitizer($timezone),
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            new ShipmentDataPayloadReader(new Json())
+        );
+
+        $result = $service->bookCourier([10, 20, 30], '2026-10-15', '10:00', '14:00');
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertSame(['90007391026WWW', '90007401026WWW'], $result->getCourierOrderIds());
+    }
+
+    public function testBookCourierHandlesPartialBookingFailure(): void
+    {
+        $parcelShipment = $this->createMock(ShipmentDataInterface::class);
+        $parcelShipment->method('getShipmentId')->willReturn('DHL_PARCEL');
+        $parcelShipment->method('getShipmentData')
+            ->willReturn($this->shipmentPayloadWithPackageType('AH', PackageType::PACKAGE));
+        $parcelShipment->expects($this->once())->method('setStatus');
+        $parcelShipment->expects($this->once())->method('setDispatchNumber')->with('90007391026WWW');
+
+        $palletShipment = $this->createMock(ShipmentDataInterface::class);
+        $palletShipment->method('getShipmentId')->willReturn('DHL_PALLET');
+        $palletShipment->method('getShipmentData')
+            ->willReturn($this->shipmentPayloadWithPackageType('AH', PackageType::PALLET));
+        $palletShipment->expects($this->never())->method('setStatus');
+        $palletShipment->expects($this->never())->method('setDispatchNumber');
+
+        $repository = $this->createMock(ShipmentDataRepositoryInterface::class);
+        $repository->expects($this->exactly(3))
+            ->method('getById')
+            ->willReturnMap([
+                [10, $parcelShipment],
+                [20, $palletShipment],
+            ]);
+        $repository->expects($this->once())->method('save');
+
+        $client = $this->createMock(ClientInterface::class);
+        $client->expects($this->exactly(2))
+            ->method('bookCourier')
+            ->willReturnCallback(function ($credentials, $shipmentIds) {
+                if ($shipmentIds === ['DHL_PARCEL']) {
+                    return new CourierBookingResult(true, ['90007391026WWW']);
+                }
+                if ($shipmentIds === ['DHL_PALLET']) {
+                    return new CourierBookingResult(false, [], 'BOOK_COURIER_ERROR', 'No pickup slot for pallets');
+                }
+                throw new \InvalidArgumentException('Unexpected shipment IDs: ' . implode(',', $shipmentIds));
+            });
+
+        $timezone = $this->createFixedTimezone('2026-10-05');
+        $service = new CourierBookingService(
+            $client,
+            $this->credentialsProviderStub,
+            $repository,
+            $timezone,
+            new ShipmentDateSanitizer($timezone),
+            $this->createStub(\Psr\Log\LoggerInterface::class),
+            new ShipmentDataPayloadReader(new Json())
+        );
+
+        $result = $service->bookCourier([10, 20], '2026-10-15', '10:00', '14:00');
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertSame('PARTIAL_BOOKING_ERROR', $result->getErrorCode());
+        $this->assertSame(['90007391026WWW'], $result->getCourierOrderIds());
     }
 
     public function testBookCourierStopsBeforeApiWhenServiceTypeIsMissing(): void
@@ -409,6 +526,18 @@ class CourierBookingServiceTest extends TestCase
     private function shipmentPayload(string $serviceType): string
     {
         return (new Json())->serialize(['shipmentSettings' => ['serviceType' => $serviceType]]);
+    }
+
+    private function shipmentPayloadWithPackageType(string $serviceType, string $packageType): string
+    {
+        return (new Json())->serialize([
+            'shipmentSettings' => [
+                'serviceType' => $serviceType,
+                'packages' => [
+                    ['packageType' => $packageType],
+                ],
+            ],
+        ]);
     }
 
     /**
@@ -458,12 +587,13 @@ class CourierBookingServiceTest extends TestCase
             )
             ->willReturn(new CourierBookingResult(true, ['ORDER_PROD_1']));
 
+        $timezone = $this->createFixedTimezone('2026-10-05');
         $service = new CourierBookingService(
             $clientMock,
             $credentialsProviderMock,
             $this->shipmentDataRepositoryStub,
-            $this->timezoneMock,
-            new ShipmentDateSanitizer($this->timezoneMock),
+            $timezone,
+            new ShipmentDateSanitizer($timezone),
             $this->createStub(\Psr\Log\LoggerInterface::class),
             new ShipmentDataPayloadReader(new Json())
         );
