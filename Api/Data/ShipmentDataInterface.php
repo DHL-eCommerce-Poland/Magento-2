@@ -17,8 +17,9 @@ interface ShipmentDataInterface
     public const SHIPMENT_DATA = 'shipment_data';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
-
-    public const DEFAULT_STATUS = 'Nowa';
+    public const STATUS_NEW = 'new';
+    public const STATUS_COURIER_BOOKED = 'courier_booked';
+    public const DEFAULT_STATUS = self::STATUS_NEW;
 
     /**
      * Get entity ID.

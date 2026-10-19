@@ -67,6 +67,8 @@ class TrackingResult
     /**
      * Get latest event status description.
      *
+     * Strictly returns the longer human-readable Polish description, preferring the newest event by timestamp.
+     *
      * @return string|null
      */
     public function getLatestStatusDescription(): ?string
@@ -75,10 +77,28 @@ class TrackingResult
             return null;
         }
 
-        $lastKey = array_key_last($this->events);
-        $lastEvent = $lastKey !== null ? $this->events[$lastKey] : null;
+        $bestEvent = null;
+        $bestTimestamp = -1;
 
-        return !empty($lastEvent['description']) ? (string) $lastEvent['description'] : null;
+        foreach ($this->events as $event) {
+            if (!is_array($event) || empty(trim((string) ($event['description'] ?? '')))) {
+                continue;
+            }
+
+            $rawTimestamp = (string) ($event['timestamp'] ?? '');
+            $timestamp = $rawTimestamp !== '' ? strtotime($rawTimestamp) : false;
+
+            if ($timestamp !== false && $timestamp > 0) {
+                if ($timestamp >= $bestTimestamp) {
+                    $bestTimestamp = $timestamp;
+                    $bestEvent = $event;
+                }
+            } elseif ($bestTimestamp <= 0) {
+                $bestEvent = $event;
+            }
+        }
+
+        return !empty($bestEvent['description']) ? (string) $bestEvent['description'] : null;
     }
 
     /**

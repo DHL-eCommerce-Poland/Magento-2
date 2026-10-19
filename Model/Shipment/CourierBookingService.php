@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DhlPoland\Dhl\Model\Shipment;
 
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
 use DhlPoland\Dhl\Api\ShipmentDataRepositoryInterface;
 use DhlPoland\Dhl\Model\Api\ClientInterface;
 use DhlPoland\Dhl\Model\Api\CourierBookingResult;
@@ -196,7 +197,7 @@ class CourierBookingService
             }
 
             if ($bookedStatus === null) {
-                $bookedStatus = $result->getOrderStatus() ?: (string) __('Kurier zamówiony');
+                $bookedStatus = ShipmentDataInterface::STATUS_COURIER_BOOKED;
             }
 
             $primaryOrderId = $validOrderIds[0];

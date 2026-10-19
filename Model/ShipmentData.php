@@ -250,7 +250,8 @@ class ShipmentData extends AbstractModel implements ShipmentDataInterface
      */
     public function getStatus(): string
     {
-        return (string)($this->getData(self::STATUS) ?? self::DEFAULT_STATUS);
+        $status = (string) $this->getData(self::STATUS);
+        return $status !== '' ? $status : self::DEFAULT_STATUS;
     }
 
     /**

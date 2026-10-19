@@ -75,4 +75,56 @@ class TrackingResultTest extends TestCase
         $this->assertNull($result->getLatestStatusDescription());
         $this->assertNull($result->getLatestStatusCode());
     }
+
+    public function testLatestStatusDescriptionPrefersNewestEventByTimestamp(): void
+    {
+        $events = [
+            [
+                'status' => 'DOR',
+                'description' => 'Doręczono do odbiorcy',
+                'terminal' => 'Warszawa',
+                'timestamp' => '2026-08-28 14:00:00',
+            ],
+            [
+                'status' => 'DWP',
+                'description' => 'Przesyłka w drodze do punktu',
+                'terminal' => 'Warszawa',
+                'timestamp' => '2026-08-28 10:00:00',
+            ],
+        ];
+
+        $result = new TrackingResult(
+            success: true,
+            shipmentId: '123456789',
+            events: $events
+        );
+
+        $this->assertEquals('Doręczono do odbiorcy', $result->getLatestStatusDescription());
+    }
+
+    public function testLatestStatusDescriptionSkipsEmptyDescription(): void
+    {
+        $events = [
+            [
+                'status' => 'WD',
+                'description' => 'W doręczeniu',
+                'terminal' => 'Warszawa',
+                'timestamp' => '2026-08-28 10:00:00',
+            ],
+            [
+                'status' => 'SKR',
+                'description' => '  ',
+                'terminal' => 'Warszawa',
+                'timestamp' => '2026-08-28 12:00:00',
+            ],
+        ];
+
+        $result = new TrackingResult(
+            success: true,
+            shipmentId: '123456789',
+            events: $events
+        );
+
+        $this->assertEquals('W doręczeniu', $result->getLatestStatusDescription());
+    }
 }
