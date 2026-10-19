@@ -110,7 +110,7 @@ class CourierBookingServiceTest extends TestCase
         $entityMock->method('getShipmentData')->willReturn($this->shipmentPayload('AH'));
         $entityMock->expects($this->once())
             ->method('setStatus')
-            ->with((string) __('Kurier zamówiony'));
+            ->with(ShipmentDataInterface::STATUS_COURIER_BOOKED);
         $entityMock->expects($this->once())
             ->method('setDispatchNumber')
             ->with('ORDER_999');
@@ -118,7 +118,13 @@ class CourierBookingServiceTest extends TestCase
         $this->shipmentDataRepositoryStub->method('getById')
             ->willReturn($entityMock);
 
-        $bookingResult = new CourierBookingResult(true, ['ORDER_999'], null, null, (string) __('Kurier zamówiony'));
+        $bookingResult = new CourierBookingResult(
+            true,
+            ['ORDER_999'],
+            null,
+            null,
+            ShipmentDataInterface::STATUS_COURIER_BOOKED
+        );
 
         $this->clientStub->method('bookCourier')
             ->willReturn($bookingResult);

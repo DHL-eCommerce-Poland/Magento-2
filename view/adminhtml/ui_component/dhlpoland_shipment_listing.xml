@@ -152,9 +152,11 @@
                 <label translate="true">Return Package Number</label>
             </settings>
         </column>
-        <column name="status">
+        <column name="status" class="DhlPoland\Dhl\Ui\Component\Listing\Column\Status">
             <settings>
-                <filter>text</filter>
+                <options class="DhlPoland\Dhl\Model\Source\ShipmentStatus"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
                 <label translate="true">Status</label>
             </settings>
         </column>

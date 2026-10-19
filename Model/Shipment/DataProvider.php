@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DhlPoland\Dhl\Model\Shipment;
 
+use DhlPoland\Dhl\Api\Data\ShipmentDataInterface;
 use DhlPoland\Dhl\Model\ResourceModel\ShipmentData\CollectionFactory;
 use DhlPoland\Dhl\Model\Shipment\Data\CustomsData;
 use DhlPoland\Dhl\Model\Shipment\Data\ShipmentSettingsData;
@@ -298,7 +299,7 @@ class DataProvider extends AbstractDataProvider
             $settings['shipmentId'] = $shipmentId;
         }
         if (!empty($status)) {
-            $settings['status'] = $status;
+            $settings['status'] = $this->formatStatusLabel($status);
         }
         if (!empty($dispatchNumber)) {
             $settings['dispatchNumber'] = $dispatchNumber;
@@ -455,5 +456,21 @@ class DataProvider extends AbstractDataProvider
         $result['customsItems'] = $normalizedItems;
 
         return $result;
+    }
+
+    /**
+     * Format status code into human-readable translated label for edit form.
+     *
+     * @param string $status
+     *
+     * @return string
+     */
+    private function formatStatusLabel(string $status): string
+    {
+        return match ($status) {
+            ShipmentDataInterface::STATUS_NEW => (string) __('New'),
+            ShipmentDataInterface::STATUS_COURIER_BOOKED => (string) __('Courier Booked'),
+            default => (string) __($status),
+        };
     }
 }

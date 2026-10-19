@@ -171,7 +171,7 @@ class CourierBookingCancellationServiceTest extends TestCase
             ->with(null);
         $entityMock->expects($this->once())
             ->method('setStatus')
-            ->with((string) __('Nowa'));
+            ->with(ShipmentDataInterface::STATUS_NEW);
 
         $this->shipmentDataRepositoryStub->method('getById')
             ->willReturn($entityMock);
@@ -193,13 +193,13 @@ class CourierBookingCancellationServiceTest extends TestCase
         $entity1Mock->method('getEntityId')->willReturn(10);
         $entity1Mock->method('getDispatchNumber')->willReturn('90018060826WWW');
         $entity1Mock->expects($this->once())->method('setDispatchNumber')->with(null);
-        $entity1Mock->expects($this->once())->method('setStatus')->with((string) __('Nowa'));
+        $entity1Mock->expects($this->once())->method('setStatus')->with(ShipmentDataInterface::STATUS_NEW);
 
         $entity2Mock = $this->createMock(ShipmentDataInterface::class);
         $entity2Mock->method('getEntityId')->willReturn(11);
         $entity2Mock->method('getDispatchNumber')->willReturn('90018060826WWW');
         $entity2Mock->expects($this->once())->method('setDispatchNumber')->with(null);
-        $entity2Mock->expects($this->once())->method('setStatus')->with((string) __('Nowa'));
+        $entity2Mock->expects($this->once())->method('setStatus')->with(ShipmentDataInterface::STATUS_NEW);
 
         $this->shipmentDataRepositoryStub->method('getById')
             ->willReturn($entity1Mock);
@@ -356,7 +356,7 @@ class CourierBookingCancellationServiceTest extends TestCase
         $entitySuccess->method('getEntityId')->willReturn(10);
         $entitySuccess->method('getDispatchNumber')->willReturn('ORDER_SUCCESS');
         $entitySuccess->expects($this->once())->method('setDispatchNumber')->with(null);
-        $entitySuccess->expects($this->once())->method('setStatus')->with((string) __('Nowa'));
+        $entitySuccess->expects($this->once())->method('setStatus')->with(ShipmentDataInterface::STATUS_NEW);
 
         $entityFailure = $this->createMock(ShipmentDataInterface::class);
         $entityFailure->method('getEntityId')->willReturn(20);

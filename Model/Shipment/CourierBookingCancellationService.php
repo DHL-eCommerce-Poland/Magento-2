@@ -147,7 +147,7 @@ class CourierBookingCancellationService
      */
     private function resetEntitiesForDispatchNumber(string $dispatchNumber, array $preloadedEntities = []): void
     {
-        $resetStatus = (string) __('Nowa');
+        $resetStatus = ShipmentDataInterface::STATUS_NEW;
         $entitiesToUpdate = [];
 
         try {

@@ -158,7 +158,7 @@ class ShipmentDataServiceTest extends TestCase
         $shipmentDataFactory->method('create')->willReturn($entity);
 
         $entity->expects($this->once())->method('setOrderId')->with(102);
-        $entity->expects($this->once())->method('setStatus')->with('Nowa');
+        $entity->expects($this->once())->method('setStatus')->with(ShipmentDataInterface::STATUS_NEW);
         $shipmentDataRepository->expects($this->once())->method('save')->willReturn($entity);
 
         $serializer = new Json();

@@ -358,7 +358,7 @@ class ShipmentDataService
     public function updateExistingShipmentPayload(
         int $entityId,
         DhlShipmentData $shipmentData,
-        string $status = 'created',
+        string $status = ShipmentDataInterface::DEFAULT_STATUS,
         ?string $shipmentId = null,
         ?array $packageNumbers = null,
         ?int $magentoShipmentId = null
