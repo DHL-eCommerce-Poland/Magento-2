@@ -120,7 +120,7 @@ class CourierBookingCancellationServiceTest extends TestCase
         $clientMock = $this->createMock(ClientInterface::class);
         $clientMock->expects($this->once())
             ->method('cancelCourierBooking')
-            ->with($this->anything(), ['COURIER_ORDER_10'])
+            ->with($this->anything(), 'COURIER_ORDER_10')
             ->willReturn(new CancelCourierBookingResult(false, null, 'ERR', 'Expected test failure'));
 
         $service = new CourierBookingCancellationService(
@@ -146,7 +146,7 @@ class CourierBookingCancellationServiceTest extends TestCase
         $clientMock = $this->createMock(ClientInterface::class);
         $clientMock->expects($this->once())
             ->method('cancelCourierBooking')
-            ->with($this->anything(), ['COURIER_ORDER_10'])
+            ->with($this->anything(), 'COURIER_ORDER_10')
             ->willReturn(new CancelCourierBookingResult(false, null, 'ERR', 'Expected test failure'));
 
         $service = new CourierBookingCancellationService(
@@ -207,7 +207,7 @@ class CourierBookingCancellationServiceTest extends TestCase
         $collectionMock = $this->createMock(ShipmentDataCollection::class);
         $collectionMock->expects($this->once())
             ->method('addFieldToFilter')
-            ->with(ShipmentDataInterface::DISPATCH_NUMBER, ['in' => ['90018060826WWW']]);
+            ->with(ShipmentDataInterface::DISPATCH_NUMBER, '90018060826WWW');
         $collectionMock->method('getIterator')
             ->willReturn(new ArrayIterator([$entity1Mock, $entity2Mock]));
 
@@ -245,7 +245,7 @@ class CourierBookingCancellationServiceTest extends TestCase
         $clientMock = $this->createMock(ClientInterface::class);
         $clientMock->expects($this->once())
             ->method('cancelCourierBooking')
-            ->with($this->callback(fn (Credentials $c) => !$c->isSandbox()), ['COURIER_PROD_1'])
+            ->with($this->callback(fn (Credentials $c) => !$c->isSandbox()), 'COURIER_PROD_1')
             ->willReturn(new CancelCourierBookingResult(true, 'COURIER_PROD_1'));
 
         $service = new CourierBookingCancellationService(
@@ -258,5 +258,179 @@ class CourierBookingCancellationServiceTest extends TestCase
 
         $result = $service->cancelCourierBooking(['COURIER_PROD_1']);
         $this->assertTrue($result->isSuccess());
+    }
+
+    /**
+     * Test that multiple distinct dispatch numbers trigger separate client calls.
+     *
+     * @return void
+     */
+    public function testCancelCourierBookingExecutesSeparateRequestsPerDispatchNumber(): void
+    {
+        $entity1 = $this->createStub(ShipmentDataInterface::class);
+        $entity1->method('getEntityId')->willReturn(10);
+        $entity1->method('getDispatchNumber')->willReturn('ORDER_100');
+
+        $entity2 = $this->createStub(ShipmentDataInterface::class);
+        $entity2->method('getEntityId')->willReturn(20);
+        $entity2->method('getDispatchNumber')->willReturn('ORDER_200');
+
+        $this->shipmentDataRepositoryStub->method('getById')->willReturnMap([
+            [10, $entity1],
+            [20, $entity2],
+        ]);
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $invokedNumbers = [];
+        $clientMock->expects($this->exactly(2))
+            ->method('cancelCourierBooking')
+            ->willReturnCallback(function (Credentials $credentials, string $dispatchNumber) use (&$invokedNumbers) {
+                $invokedNumbers[] = $dispatchNumber;
+                return new CancelCourierBookingResult(true, $dispatchNumber);
+            });
+
+        $service = new CourierBookingCancellationService(
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->shipmentDataRepositoryStub,
+            $this->collectionFactoryStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
+        );
+
+        $result = $service->cancelCourierBooking([10, 20]);
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertSame(['ORDER_100', 'ORDER_200'], $invokedNumbers);
+        $this->assertSame(['ORDER_100', 'ORDER_200'], $result->getCancelledDispatchNumbers());
+        $this->assertSame([], $result->getErrors());
+    }
+
+    /**
+     * Test that multiple shipments sharing the same dispatch number result in only one client call.
+     *
+     * @return void
+     */
+    public function testCancelCourierBookingDeduplicatesSharedDispatchNumbers(): void
+    {
+        $entity1 = $this->createStub(ShipmentDataInterface::class);
+        $entity1->method('getEntityId')->willReturn(10);
+        $entity1->method('getDispatchNumber')->willReturn('SHARED_ORDER');
+
+        $entity2 = $this->createStub(ShipmentDataInterface::class);
+        $entity2->method('getEntityId')->willReturn(20);
+        $entity2->method('getDispatchNumber')->willReturn('SHARED_ORDER');
+
+        $this->shipmentDataRepositoryStub->method('getById')->willReturnMap([
+            [10, $entity1],
+            [20, $entity2],
+        ]);
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->expects($this->once())
+            ->method('cancelCourierBooking')
+            ->with($this->anything(), 'SHARED_ORDER')
+            ->willReturn(new CancelCourierBookingResult(true, 'SHARED_ORDER'));
+
+        $service = new CourierBookingCancellationService(
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->shipmentDataRepositoryStub,
+            $this->collectionFactoryStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
+        );
+
+        $result = $service->cancelCourierBooking([10, 20]);
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertSame(['SHARED_ORDER'], $result->getCancelledDispatchNumbers());
+    }
+
+    /**
+     * Test partial failure: only entities for successful cancellations are reset.
+     *
+     * @return void
+     */
+    public function testCancelCourierBookingHandlesPartialFailureTransactionalReset(): void
+    {
+        $entitySuccess = $this->createMock(ShipmentDataInterface::class);
+        $entitySuccess->method('getEntityId')->willReturn(10);
+        $entitySuccess->method('getDispatchNumber')->willReturn('ORDER_SUCCESS');
+        $entitySuccess->expects($this->once())->method('setDispatchNumber')->with(null);
+        $entitySuccess->expects($this->once())->method('setStatus')->with((string) __('Nowa'));
+
+        $entityFailure = $this->createMock(ShipmentDataInterface::class);
+        $entityFailure->method('getEntityId')->willReturn(20);
+        $entityFailure->method('getDispatchNumber')->willReturn('ORDER_FAIL');
+        $entityFailure->expects($this->never())->method('setDispatchNumber');
+        $entityFailure->expects($this->never())->method('setStatus');
+
+        $this->shipmentDataRepositoryStub->method('getById')->willReturnMap([
+            [10, $entitySuccess],
+            [20, $entityFailure],
+        ]);
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->expects($this->exactly(2))
+            ->method('cancelCourierBooking')
+            ->willReturnCallback(function (Credentials $credentials, string $dispatchNumber) {
+                if ($dispatchNumber === 'ORDER_SUCCESS') {
+                    return new CancelCourierBookingResult(true, 'ORDER_SUCCESS');
+                }
+                return new CancelCourierBookingResult(false, 'ORDER_FAIL', 'ERR', 'Courier already dispatched');
+            });
+
+        $service = new CourierBookingCancellationService(
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->shipmentDataRepositoryStub,
+            $this->collectionFactoryStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
+        );
+
+        $result = $service->cancelCourierBooking([10, 20]);
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertSame(['ORDER_SUCCESS'], $result->getCancelledDispatchNumbers());
+        $this->assertArrayHasKey('ORDER_FAIL', $result->getErrors());
+        $this->assertStringContainsString('Courier already dispatched', $result->getErrorMessage());
+    }
+
+    /**
+     * Test that identical error messages across multiple dispatch numbers are deduplicated.
+     *
+     * @return void
+     */
+    public function testCancelCourierBookingDeduplicatesIdenticalErrorMessages(): void
+    {
+        $entity1 = $this->createStub(ShipmentDataInterface::class);
+        $entity1->method('getEntityId')->willReturn(10);
+        $entity1->method('getDispatchNumber')->willReturn('ORDER_1');
+
+        $entity2 = $this->createStub(ShipmentDataInterface::class);
+        $entity2->method('getEntityId')->willReturn(20);
+        $entity2->method('getDispatchNumber')->willReturn('ORDER_2');
+
+        $this->shipmentDataRepositoryStub->method('getById')->willReturnMap([
+            [10, $entity1],
+            [20, $entity2],
+        ]);
+
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->expects($this->exactly(2))
+            ->method('cancelCourierBooking')
+            ->willReturn(new CancelCourierBookingResult(false, null, 'ERR', 'Nie znaleziono zamówienia'));
+
+        $service = new CourierBookingCancellationService(
+            $clientMock,
+            $this->credentialsProviderStub,
+            $this->shipmentDataRepositoryStub,
+            $this->collectionFactoryStub,
+            $this->createStub(\Psr\Log\LoggerInterface::class)
+        );
+
+        $result = $service->cancelCourierBooking([10, 20]);
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertSame('Nie znaleziono zamówienia', $result->getErrorMessage());
     }
 }

@@ -237,4 +237,47 @@ class MassCancelCourierBookingTest extends TestCase
 
         $this->assertSame($this->redirectMock, $result);
     }
+
+    public function testExecutePartialCancellationSuccessAndFailure(): void
+    {
+        $itemMock1 = $this->createStub(ShipmentData::class);
+        $itemMock1->method('getEntityId')->willReturn(10);
+        $itemMock2 = $this->createStub(ShipmentData::class);
+        $itemMock2->method('getEntityId')->willReturn(20);
+
+        $collectionMock = $this->createMock(Collection::class);
+        $collectionMock->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator([$itemMock1, $itemMock2]));
+
+        $this->collectionFactoryMock->expects($this->once())
+            ->method('create')
+            ->willReturn($collectionMock);
+
+        $this->filterMock->expects($this->once())
+            ->method('getCollection')
+            ->with($collectionMock)
+            ->willReturn($collectionMock);
+
+        $cancelResult = new CancelCourierBookingResult(
+            false,
+            'ORDER_10',
+            'PARTIAL_ERROR',
+            'ORDER_20: Error',
+            ['ORDER_10'],
+            ['ORDER_20' => 'ORDER_20: Error']
+        );
+        $this->cancellationServiceMock->expects($this->once())
+            ->method('cancelCourierBooking')
+            ->with([10, 20])
+            ->willReturn($cancelResult);
+
+        $this->messageManagerMock->expects($this->once())
+            ->method('addSuccessMessage');
+        $this->messageManagerMock->expects($this->once())
+            ->method('addErrorMessage');
+
+        $result = $this->controller->execute();
+        $this->assertSame($this->redirectMock, $result);
+    }
 }

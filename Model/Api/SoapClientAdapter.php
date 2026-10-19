@@ -508,13 +508,13 @@ class SoapClientAdapter implements ClientInterface
      * Cancel existing courier booking via DHL WebAPI2 API.
      *
      * @param Credentials $credentials
-     * @param string[] $dispatchNumbers
+     * @param string $dispatchNumber
      *
      * @return CancelCourierBookingResult
      */
     public function cancelCourierBooking(
         Credentials $credentials,
-        array $dispatchNumbers
+        string $dispatchNumber
     ): CancelCourierBookingResult {
         $wsdlUrl = $credentials->isSandbox() ? self::WSDL_URL_SANDBOX : self::WSDL_URL_PRODUCTION;
         $client = null;
@@ -522,7 +522,7 @@ class SoapClientAdapter implements ClientInterface
         try {
             $client = $this->createSoapClient($wsdlUrl);
 
-            $formattedNumbers = array_map([$this, 'ensureUtf8'], array_values($dispatchNumbers));
+            $formattedNumber = $this->ensureUtf8($dispatchNumber);
 
             $params = [
                 'authData' => [
@@ -530,7 +530,7 @@ class SoapClientAdapter implements ClientInterface
                     'password' => $this->ensureUtf8($credentials->getPassword()),
                 ],
                 'orders' => [
-                    'item' => $formattedNumbers,
+                    'item' => [$formattedNumber],
                 ],
             ];
 
@@ -547,7 +547,7 @@ class SoapClientAdapter implements ClientInterface
             if (is_object($items)) {
                 $isSuccess = isset($items->result) ? (bool) $items->result : true;
                 $errorMsg = !empty($items->error) ? (string) $items->error : null;
-                $id = !empty($items->id) ? (string) $items->id : ($dispatchNumbers[0] ?? null);
+                $id = !empty($items->id) ? (string) $items->id : $dispatchNumber;
 
                 if ($isSuccess && empty($errorMsg)) {
                     return new CancelCourierBookingResult(true, $id);
@@ -562,12 +562,12 @@ class SoapClientAdapter implements ClientInterface
             }
 
             if (is_bool($items) && $items === true) {
-                return new CancelCourierBookingResult(true, $dispatchNumbers[0] ?? null);
+                return new CancelCourierBookingResult(true, $dispatchNumber);
             }
 
             return new CancelCourierBookingResult(
                 false,
-                $dispatchNumbers[0] ?? null,
+                $dispatchNumber,
                 'INVALID_RESPONSE',
                 'DHL WebAPI2 returned invalid response for cancelCourierBooking.'
             );
@@ -582,7 +582,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new CancelCourierBookingResult(
                 false,
-                $dispatchNumbers[0] ?? null,
+                $dispatchNumber,
                 $fault->faultcode ?? 'SOAP_FAULT',
                 'DHL API error: ' . $fault->getMessage()
             );
@@ -596,7 +596,7 @@ class SoapClientAdapter implements ClientInterface
 
             return new CancelCourierBookingResult(
                 false,
-                $dispatchNumbers[0] ?? null,
+                $dispatchNumber,
                 'CONNECTION_ERROR',
                 'An error occurred while connecting to DHL: ' . $e->getMessage()
             );

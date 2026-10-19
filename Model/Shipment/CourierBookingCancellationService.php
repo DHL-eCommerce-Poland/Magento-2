@@ -48,7 +48,7 @@ class CourierBookingCancellationService
         }
 
         $dispatchNumbers = [];
-        $affectedEntities = [];
+        $affectedEntitiesByDispatch = [];
 
         foreach ($ids as $id) {
             if (is_numeric($id) && (int) $id > 0) {
@@ -56,8 +56,9 @@ class CourierBookingCancellationService
                     $entity = $this->shipmentDataRepository->getById((int) $id);
                     $dispatchNum = $entity->getDispatchNumber();
                     if (!empty($dispatchNum)) {
-                        $dispatchNumbers[] = (string) $dispatchNum;
-                        $affectedEntities[(int) $id] = $entity;
+                        $dispatchStr = (string) $dispatchNum;
+                        $dispatchNumbers[] = $dispatchStr;
+                        $affectedEntitiesByDispatch[$dispatchStr][(int) $id] = $entity;
                     }
                 } catch (Throwable $e) {
                     $this->logger->warning(sprintf(
@@ -81,46 +82,104 @@ class CourierBookingCancellationService
 
         $credentials = $this->credentialsProvider->getCredentials();
 
-        $result = $this->client->cancelCourierBooking($credentials, $dispatchNumbers);
+        $cancelledDispatchNumbers = [];
+        $errors = [];
 
-        if ($result->isSuccess()) {
-            $resetStatus = (string) __('Nowa');
-            $entitiesToUpdate = [];
-
-            if ($this->collectionFactory !== null) {
-                try {
-                    $collection = $this->collectionFactory->create();
-                    $collection->addFieldToFilter(ShipmentDataInterface::DISPATCH_NUMBER, ['in' => $dispatchNumbers]);
-                    foreach ($collection as $entity) {
-                        $entitiesToUpdate[(int) $entity->getEntityId()] = $entity;
-                    }
-                } catch (Throwable $e) {
-                    $this->logger->warning(sprintf(
-                        '[CourierBookingCancellationService] Failed to query entities by dispatch number: %s',
-                        $e->getMessage()
-                    ));
-                }
-            }
-
-            foreach ($affectedEntities as $id => $entity) {
-                $entitiesToUpdate[$id] = $entity;
-            }
-
-            foreach ($entitiesToUpdate as $entity) {
-                try {
-                    $entity->setDispatchNumber(null);
-                    $entity->setStatus($resetStatus);
-                    $this->shipmentDataRepository->save($entity);
-                } catch (Throwable $e) {
-                    $this->logger->warning(sprintf(
-                        '[CourierBookingCancellationService] Failed to reset dispatch number for entity #%d: %s',
-                        $entity->getEntityId(),
-                        $e->getMessage()
-                    ));
-                }
+        foreach ($dispatchNumbers as $dispatchNumber) {
+            $cancelResult = $this->client->cancelCourierBooking($credentials, $dispatchNumber);
+            if ($cancelResult->isSuccess()) {
+                $cancelledDispatchNumbers[] = $dispatchNumber;
+                $preloaded = $affectedEntitiesByDispatch[$dispatchNumber] ?? [];
+                $this->resetEntitiesForDispatchNumber($dispatchNumber, $preloaded);
+            } else {
+                $errorMsg = $cancelResult->getErrorMessage() ?: (string) __('Failed to cancel courier booking.');
+                $errors[$dispatchNumber] = $errorMsg;
+                $this->logger->warning(sprintf(
+                    '[CourierBookingCancellationService] Failed to cancel courier booking %s: %s',
+                    $dispatchNumber,
+                    $errorMsg
+                ));
             }
         }
 
-        return $result;
+        if (empty($errors)) {
+            return new CancelCourierBookingResult(
+                true,
+                implode(', ', $cancelledDispatchNumbers),
+                null,
+                null,
+                $cancelledDispatchNumbers,
+                []
+            );
+        }
+
+        $uniqueErrors = array_unique(array_values($errors));
+        $combinedErrorMessage = implode('; ', $uniqueErrors);
+
+        if (empty($cancelledDispatchNumbers)) {
+            return new CancelCourierBookingResult(
+                false,
+                implode(', ', array_keys($errors)),
+                'CANCEL_COURIER_ERROR',
+                $combinedErrorMessage,
+                [],
+                $errors
+            );
+        }
+
+        return new CancelCourierBookingResult(
+            false,
+            implode(', ', $cancelledDispatchNumbers),
+            'PARTIAL_ERROR',
+            $combinedErrorMessage,
+            $cancelledDispatchNumbers,
+            $errors
+        );
+    }
+
+    /**
+     * Reset dispatch number and shipment status for all entities associated with cancelled dispatch number.
+     *
+     * @param string $dispatchNumber
+     * @param ShipmentDataInterface[] $preloadedEntities
+     *
+     * @return void
+     */
+    private function resetEntitiesForDispatchNumber(string $dispatchNumber, array $preloadedEntities = []): void
+    {
+        $resetStatus = (string) __('Nowa');
+        $entitiesToUpdate = [];
+
+        try {
+            $collection = $this->collectionFactory->create();
+            $collection->addFieldToFilter(ShipmentDataInterface::DISPATCH_NUMBER, $dispatchNumber);
+            foreach ($collection as $entity) {
+                $entitiesToUpdate[(int) $entity->getEntityId()] = $entity;
+            }
+        } catch (Throwable $e) {
+            $this->logger->warning(sprintf(
+                '[CourierBookingCancellationService] Failed to query entities by dispatch number %s: %s',
+                $dispatchNumber,
+                $e->getMessage()
+            ));
+        }
+
+        foreach ($preloadedEntities as $id => $entity) {
+            $entitiesToUpdate[(int) $id] = $entity;
+        }
+
+        foreach ($entitiesToUpdate as $entity) {
+            try {
+                $entity->setDispatchNumber(null);
+                $entity->setStatus($resetStatus);
+                $this->shipmentDataRepository->save($entity);
+            } catch (Throwable $e) {
+                $this->logger->warning(sprintf(
+                    '[CourierBookingCancellationService] Failed to reset dispatch number for entity #%d: %s',
+                    $entity->getEntityId(),
+                    $e->getMessage()
+                ));
+            }
+        }
     }
 }

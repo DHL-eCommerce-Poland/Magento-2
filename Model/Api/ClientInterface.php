@@ -79,13 +79,13 @@ interface ClientInterface
      * Cancel existing courier booking via DHL WebAPI2 API.
      *
      * @param Credentials $credentials
-     * @param string[] $dispatchNumbers
+     * @param string $dispatchNumber
      *
      * @return CancelCourierBookingResult
      */
     public function cancelCourierBooking(
         Credentials $credentials,
-        array $dispatchNumbers
+        string $dispatchNumber
     ): CancelCourierBookingResult;
 
     /**
