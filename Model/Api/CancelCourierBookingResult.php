@@ -11,12 +11,16 @@ class CancelCourierBookingResult
      * @param string|null $dispatchNumber
      * @param string|null $errorCode
      * @param string|null $errorMessage
+     * @param string[] $cancelledDispatchNumbers
+     * @param array $errors
      */
     public function __construct(
         private readonly bool $success,
         private readonly ?string $dispatchNumber = null,
         private readonly ?string $errorCode = null,
-        private readonly ?string $errorMessage = null
+        private readonly ?string $errorMessage = null,
+        private readonly array $cancelledDispatchNumbers = [],
+        private readonly array $errors = []
     ) {
     }
 
@@ -58,5 +62,25 @@ class CancelCourierBookingResult
     public function getErrorMessage(): ?string
     {
         return $this->errorMessage;
+    }
+
+    /**
+     * Get list of successfully cancelled dispatch numbers.
+     *
+     * @return string[]
+     */
+    public function getCancelledDispatchNumbers(): array
+    {
+        return $this->cancelledDispatchNumbers;
+    }
+
+    /**
+     * Get list or map of errors.
+     *
+     * @return array
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 }

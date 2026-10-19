@@ -824,7 +824,7 @@ class SoapClientAdapterTest extends TestCase
             ->willReturn($soapClientStub);
 
         $credentials = new Credentials('user', 'pass', true);
-        $result = $adapter->cancelCourierBooking($credentials, ['ORDER_98765']);
+        $result = $adapter->cancelCourierBooking($credentials, 'ORDER_98765');
 
         $this->assertTrue($result->isSuccess());
         $this->assertEquals('ORDER_98765', $result->getDispatchNumber());
@@ -900,7 +900,7 @@ class SoapClientAdapterTest extends TestCase
 
         $result = $adapter->cancelCourierBooking(
             new Credentials('private-user', 'private-password', true),
-            ['ORDER_1']
+            'ORDER_1'
         );
 
         $logOutput = implode("\n", $loggedMessages);
@@ -980,7 +980,7 @@ class SoapClientAdapterTest extends TestCase
             ->method('createSoapClient')
             ->willReturn($soapClientStub);
 
-        $result = $adapter->cancelCourierBooking(new Credentials('user', 'pass', true), ['ORDER_1']);
+        $result = $adapter->cancelCourierBooking(new Credentials('user', 'pass', true), 'ORDER_1');
 
         $logOutput = implode("\n", $loggedMessages);
         $this->assertFalse($result->isSuccess());
@@ -1013,7 +1013,7 @@ class SoapClientAdapterTest extends TestCase
             ->method('createSoapClient')
             ->willThrowException(new RuntimeException('Could not create SOAP client'));
 
-        $result = $adapter->cancelCourierBooking(new Credentials('user', 'pass', true), ['ORDER_1']);
+        $result = $adapter->cancelCourierBooking(new Credentials('user', 'pass', true), 'ORDER_1');
 
         $this->assertFalse($result->isSuccess());
         $this->assertSame('CONNECTION_ERROR', $result->getErrorCode());

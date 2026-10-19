@@ -54,10 +54,18 @@ class CancelCourierBooking extends Action implements HttpGetActionInterface, Htt
 
         try {
             $result = $this->cancellationService->cancelCourierBooking($selectedIds);
+            $cancelledCount = count($result->getCancelledDispatchNumbers());
 
             if ($result->isSuccess()) {
                 $this->messageManager->addSuccessMessage(
                     __('Courier booking has been successfully cancelled.')
+                );
+            } elseif ($cancelledCount > 0) {
+                $this->messageManager->addSuccessMessage(
+                    __('A total of %1 courier booking(s) have been successfully cancelled.', $cancelledCount)
+                );
+                $this->messageManager->addErrorMessage(
+                    __('Failed to cancel courier booking: %1', $result->getErrorMessage())
                 );
             } else {
                 $this->messageManager->addErrorMessage(
