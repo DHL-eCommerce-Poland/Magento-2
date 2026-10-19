@@ -118,7 +118,13 @@ class CourierBookingServiceTest extends TestCase
         $this->shipmentDataRepositoryStub->method('getById')
             ->willReturn($entityMock);
 
-        $bookingResult = new CourierBookingResult(true, ['ORDER_999'], null, null, ShipmentDataInterface::STATUS_COURIER_BOOKED);
+        $bookingResult = new CourierBookingResult(
+            true,
+            ['ORDER_999'],
+            null,
+            null,
+            ShipmentDataInterface::STATUS_COURIER_BOOKED
+        );
 
         $this->clientStub->method('bookCourier')
             ->willReturn($bookingResult);

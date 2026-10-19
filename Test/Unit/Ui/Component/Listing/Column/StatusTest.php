@@ -13,6 +13,9 @@ use PHPUnit\Framework\TestCase;
 
 class StatusTest extends TestCase
 {
+    /**
+     * @var Status
+     */
     private Status $column;
 
     protected function setUp(): void

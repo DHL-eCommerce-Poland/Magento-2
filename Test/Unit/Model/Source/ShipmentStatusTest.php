@@ -16,7 +16,14 @@ use RuntimeException;
 
 class ShipmentStatusTest extends TestCase
 {
+    /**
+     * @var CollectionFactory|MockObject
+     */
     private CollectionFactory|MockObject $collectionFactoryMock;
+
+    /**
+     * @var ShipmentStatus
+     */
     private ShipmentStatus $source;
 
     protected function setUp(): void
