@@ -1158,4 +1158,32 @@ class SoapClientAdapterTest extends TestCase
         $this->assertEquals('Luma_M2', $reflection->getConstant('API_ORIGIN'));
         $this->assertFalse($reflection->hasConstant('XML_PATH_API_ORIGIN'));
     }
+
+    /**
+     * Test default API origin property is Luma_M2.
+     *
+     * @return void
+     */
+    public function testDefaultApiOriginIsLumaM2(): void
+    {
+        $this->assertEquals('Luma_M2', $this->adapter->getApiOrigin());
+    }
+
+    /**
+     * Test custom API origin can be injected via constructor.
+     *
+     * @return void
+     */
+    public function testCustomApiOriginCanBeInjected(): void
+    {
+        $adapter = new SoapClientAdapter(
+            $this->loggerStub,
+            $this->scopeConfigStub,
+            $this->dateSanitizer,
+            $this->fileDriverStub,
+            'Hyva_M2'
+        );
+
+        $this->assertEquals('Hyva_M2', $adapter->getApiOrigin());
+    }
 }
