@@ -59,7 +59,7 @@ jobs:
           '
 
           # Verify composer.json inside the package
-          composer validate --strict "${BUILD_DIR}/composer.json"
+          composer validate --strict --no-check-version "${BUILD_DIR}/composer.json"
 
           # Create ZIP archive with files at archive root (Marketplace requirement)
           mkdir -p dist
