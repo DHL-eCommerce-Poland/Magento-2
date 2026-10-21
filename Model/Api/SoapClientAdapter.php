@@ -18,7 +18,7 @@ class SoapClientAdapter implements ClientInterface
     private const WSDL_URL_PRODUCTION = 'https://dhl24.com.pl/webapi2';
     private const WSDL_URL_SANDBOX = 'https://sandbox.dhl24.com.pl/webapi2';
     private const CONNECTION_TIMEOUT = 10;
-    private const API_ORIGIN = 'Luma_M2';
+    public const API_ORIGIN = 'Luma_M2';
     private const MAX_ITEMS_TO_PRINT_PER_REQUEST = 3;
 
     /**
@@ -26,12 +26,14 @@ class SoapClientAdapter implements ClientInterface
      * @param ScopeConfigInterface $scopeConfig
      * @param ShipmentDateSanitizer $dateSanitizer
      * @param FileDriver $fileDriver
+     * @param string $apiOrigin
      */
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly ShipmentDateSanitizer $dateSanitizer,
-        private readonly FileDriver $fileDriver
+        private readonly FileDriver $fileDriver,
+        private readonly string $apiOrigin = self::API_ORIGIN
     ) {
     }
 
@@ -1371,6 +1373,16 @@ class SoapClientAdapter implements ClientInterface
     }
 
     /**
+     * Get API origin header value.
+     *
+     * @return string
+     */
+    public function getApiOrigin(): string
+    {
+        return $this->apiOrigin;
+    }
+
+    /**
      * Create SoapClient instance with custom timeout, DHLApiOrgin header and WSDL caching rules.
      *
      * @param string $wsdlUrl
@@ -1395,7 +1407,7 @@ class SoapClientAdapter implements ClientInterface
             // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
             $context = stream_context_create([
                 'http' => [
-                    'header' => 'DHLApiOrgin: ' . self::API_ORIGIN,
+                    'header' => 'DHLApiOrgin: ' . $this->apiOrigin,
                     'user_agent' => 'PHP-SOAP/' . PHP_VERSION . ' (Magento 2 DhlPoland_Dhl)',
                 ],
                 'ssl' => [

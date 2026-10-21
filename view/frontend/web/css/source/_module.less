@@ -1,3 +1,8 @@
+// DHL Brand Color Variables
+@dhl-yellow: #ffcf1f;
+@dhl-yellow-hover: #e6ba1c;
+@dhl-red: #d40511;
+
 .dhl-map-modal-popup {
     .modal-inner-wrap {
         max-width: 1100px !important;
@@ -60,10 +65,10 @@
         }
 
         .dhl-select-point-btn {
-            background-color: #FFCC00;
-            border: 1px solid #D2072A;
+            background-color: @dhl-yellow;
+            border: 1px solid @dhl-red;
             box-shadow: none;
-            color: #D2072A;
+            color: @dhl-red;
             font-size: 12px;
             font-weight: bold;
             line-height: 1.4;
@@ -71,22 +76,22 @@
             padding: 5px 12px;
 
             &:hover, &:focus, &:active {
-                background-color: #e6b800;
-                border-color: #D2072A;
-                color: #D2072A;
+                background-color: @dhl-yellow-hover;
+                border-color: @dhl-red;
+                color: @dhl-red;
             }
 
             span {
-                color: #D2072A;
+                color: @dhl-red;
             }
         }
 
         .dhl-point-selected-inline {
-            background: #FFCC00;
-            border: 1px solid #D2072A;
+            background: @dhl-yellow;
+            border: 1px solid @dhl-red;
             border-radius: 4px;
             box-sizing: border-box;
-            color: #D2072A;
+            color: @dhl-red;
             font-size: 12px;
             margin-top: 6px;
             max-width: 100%;
@@ -96,7 +101,7 @@
             word-wrap: break-word;
 
             p {
-                color: #D2072A;
+                color: @dhl-red;
                 font-weight: bold;
                 margin-bottom: 4px;
             }
@@ -114,7 +119,7 @@
             max-width: 100%;
 
             label {
-                color: #D2072A;
+                color: @dhl-red;
                 display: block;
                 font-size: 12px;
                 font-weight: bold;
